@@ -1,6 +1,4 @@
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
-import initConnection from '../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
@@ -11,6 +9,8 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import AddressParser from '../../src/models/address-parser'
 import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
+import { NetworkType } from '../../src/models/network'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(
@@ -71,6 +71,9 @@ jest.mock('services/networks', () => ({
   getInstance() {
     return {
       isMainnet: () => true,
+      getCurrent: () => ({
+        type: NetworkType.Normal,
+      }),
     }
   },
 }))
@@ -124,7 +127,7 @@ describe('integration tests for AddressService', () => {
     })
 
     afterAll(async () => {
-      await getConnection().close()
+      await closeConnection()
     })
 
     beforeEach(async () => {

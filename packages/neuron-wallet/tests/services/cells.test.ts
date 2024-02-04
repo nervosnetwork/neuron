@@ -1,8 +1,6 @@
-import { getConnection } from 'typeorm'
 import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { bytes } from '@ckb-lumos/codec'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
 import CellsService, {
@@ -31,6 +29,7 @@ import { MultisigConfigNeedError, TransactionInputParameterMiss } from '../../sr
 import LiveCell from '../../src/models/chain/live-cell'
 import BufferUtils from '../../src/utils/buffer'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -101,7 +100,7 @@ describe('CellsService', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {
@@ -704,7 +703,15 @@ describe('CellsService', () => {
         )
         const input = await getConnection().getRepository(MultisigOutput).createQueryBuilder('multisig_output').getOne()
         expect(res).toEqual({
-          inputs: [new Input(input!.outPoint(), '0', input!.capacity, input!.lockScript(), input!.lockHash)],
+          inputs: [
+            Input.fromObject({
+              previousOutput: input!.outPoint(),
+              capacity: input!.capacity,
+              lock: input!.lockScript(),
+              since: '0',
+              status: OutputStatus.Live,
+            }),
+          ],
           capacities: toShannon('1000'),
           finalFee: TransactionFee.fee(
             TransactionSize.input() +
@@ -1492,7 +1499,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,
@@ -1559,7 +1574,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,
@@ -1623,7 +1646,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,

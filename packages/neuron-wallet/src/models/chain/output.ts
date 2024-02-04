@@ -42,6 +42,7 @@ export default class Output {
   public depositOutPoint?: OutPoint
   public depositTimestamp?: string
   public multiSignBlake160?: string | null
+  public isChangeCell?: boolean
 
   public customizedAssetInfo?: CustomizedAssetInfo
 

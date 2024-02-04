@@ -1,4 +1,3 @@
-import { getConnection } from 'typeorm'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import OutputEntity from '../../database/chain/entities/output'
 import NetworksService from '../../services/networks'
@@ -6,6 +5,7 @@ import Output from '../../models/chain/output'
 import OutPoint from '../../models/chain/out-point'
 import Transaction from '../../models/chain/transaction'
 import SystemScriptInfo from '../../models/system-script-info'
+import { getConnection } from '../../database/chain/connection'
 
 export interface AnyoneCanPayInfo {
   tokenID: string

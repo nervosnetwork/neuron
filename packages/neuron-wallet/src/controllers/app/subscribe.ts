@@ -16,6 +16,7 @@ import MigrateSubject from '../../models/subjects/migrate-subject'
 import startMonitor, { stopMonitor } from '../../services/monitor'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
 import ShowGlobalDialogSubject from '../../models/subjects/show-global-dialog'
+import NoDiskSpaceSubject from '../../models/subjects/no-disk-space'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -123,5 +124,10 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   ShowGlobalDialogSubject.subscribe(params => {
     BrowserWindow.getFocusedWindow()?.webContents.send('show-global-dialog', params)
+  })
+
+  NoDiskSpaceSubject.subscribe(params => {
+    stopMonitor()
+    dispatcher.sendMessage('no-disk-space', params)
   })
 }

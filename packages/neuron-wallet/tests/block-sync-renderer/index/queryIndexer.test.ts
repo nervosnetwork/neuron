@@ -1,3 +1,5 @@
+import { NetworkType } from '../../../src/models/network'
+
 const STUB_QUERY = 'stub query'
 const stubbedIndexerServiceStart = jest.fn()
 const stubbedLoggerInfo = jest.fn()
@@ -33,9 +35,9 @@ jest.doMock('services/indexer', () => ({
 }))
 jest.doMock('services/addresses', () => ({ getAddressesByAllWallets: stubbedGetAddressesByAllWallets }))
 jest.doMock('services/networks', () => ({
-  getInstance: jest
-    .fn()
-    .mockReturnValue({ getCurrent: () => ({ id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }) }),
+  getInstance: jest.fn().mockReturnValue({
+    getCurrent: () => ({ id: 'id', genesisHash: '0x1', remote: 'stub_network_url', type: NetworkType.Normal }),
+  }),
 }))
 
 const blockSyncRenderer = require('block-sync-renderer')

@@ -24,13 +24,15 @@
       "experimental-functions": "實驗性功能",
       "s-udt": "資產賬戶",
       "update-neuron-with-ckb": "CKB 節點版本與 Neuron (v{{ version }}) 不匹配，可能導致兼容性問題。請更新到最新版 Neuron。",
-      "ckb-node-compatible": "CKB 節點版本與 Neuron (v{{ version }}) 不兼容，請謹慎使用。",
+      "learn-more": "了解更多",
+      "ckb-node-compatible": "CKB 節點版本與 Neuron (v{{ version }}) 不兼容，請謹慎使用。(<0>{{btnText}}</0>)",
       "ckb-without-indexer": "請添加 '--indexer' 參數來啟動本地節點"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "已同步區塊",
         "looking-valid-target": "尋找預設可信區塊",
+        "start-block-number": "起始區塊",
         "set-start-block-number": "設置同步起始區塊"
       },
       "migrating": "正在數據遷移..."
@@ -106,6 +108,8 @@
         "partially-signed": "部分簽名",
         "signed": "已簽名"
       },
+      "import-signed-transaction": "導入已簽名交易",
+      "import-signed-transaction-detail": "您導入了一個已簽名交易，請確認並重試。",
       "wallet": "錢包：",
       "content": "內容：",
       "export": "導出交易",
@@ -114,8 +118,12 @@
       "actions": {
         "broadcast": "廣播交易",
         "sign": "簽名並導出",
-        "cancel": "取消"
-      }
+        "cancel": "取消",
+        "view-in-explorer": "在瀏覽器中查看"
+      },
+      "broadcast-transaction": "廣播交易",
+      "import-transaction-to-sign": "導入一筆交易以簽名",
+      "import-unsigned-transaction-detail": "您導入了一個未簽名交易，請確認並重試。"
     },
     "overview": {
       "date": "時間",
@@ -142,7 +150,9 @@
       "send": "轉賬",
       "receive": "收款",
       "locked": "已鎖定餘額",
-      "locked-balance": "已鎖定余額"
+      "locked-balance": "已鎖定余額",
+      "first-sync-notice": "首次同步數據至少需要 {{size}} GB的磁盤空間，<br />並且數據大小會隨著時間增長，建議選擇較大磁盤空間來存儲數據。",
+      "start-sync": "開始同步"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -177,7 +187,8 @@
       "repeat-password": "重復密碼",
       "finish-create": "完成創建",
       "creating-wallet": "錢包準備中，請稍後",
-      "add-one": "添加錢包"
+      "add-one": "添加錢包",
+      "detect-duplicate-wallets": "檢測重複錢包"
     },
     "import-keystore": {
       "title": "導入 Keystore 文件",
@@ -379,6 +390,15 @@
         "password": "密碼",
         "wallet-detail": {
           "balance": "餘額"
+        },
+        "importing-existing": {
+          "title": "導入已存在錢包",
+          "detail": "您導入了一個已經存在的錢包，請選擇替換現有錢包或取消導入。",
+          "replace": "替換"
+        },
+        "detected-duplicate": {
+          "title": "檢測到重複的錢包",
+          "detail": "您的帳戶中有重複的錢包，建議您選擇保留需要獨一無二的錢包，以便於更輕鬆地管理。"
         }
       },
       "network": {
@@ -406,7 +426,8 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "節點配置和數據",
@@ -525,7 +546,8 @@
       "verification-failure": "驗證失敗",
       "back": "上一步",
       "switch-to-light": "開啟日間模式",
-      "switch-to-dark": "開啟夜間模式"
+      "switch-to-dark": "開啟夜間模式",
+      "ckb-node-data-path": "CKB 節點數據路徑"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -682,7 +704,8 @@
         "compensated-period": "補貼時間",
         "days-hours": "{{days}} 天 {{hours}} 小時",
         "no-deposit": "沒有存入記錄",
-        "no-completed": "沒有解鎖記錄"
+        "no-completed": "沒有解鎖記錄",
+        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款"
       },
       "compensation-period": {
         "tooltip": {
@@ -1095,10 +1118,13 @@
     },
     "set-start-block-number": {
       "title": "設置同步起始區塊",
+      "warn": "請註意，同步起始區塊之前的交易不會被同步！",
       "tip": "輕客戶端模式下的訂閱起始點是可配置的，因此您可以設置同步起始區塊以加快同步速度。",
       "input-place-holder": "輸入同步起始區塊高度，例如：10,100,101",
       "locate-first-tx": "定位第一筆交易",
-      "view-block": "查看區塊"
+      "view-block": "查看區塊",
+      "set-less-than-before": "您設置的區塊號小於之前區塊，同步將重新開始，請謹慎操作。",
+      "reset-to-header-tip-number": "無法設置比最新區塊更大的區塊號，已重置為最新區塊號。"
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1107,6 +1133,11 @@
         "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡",
         "ignore-external-node": "忽略外部節點"
+      },
+      "no-disk-space-dialog": {
+        "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
+        "continue-sync": "繼續同步",
+        "migrate-data": "遷移數據"
       }
     },
     "cell-manage": {
@@ -1157,6 +1188,18 @@
       "lock": "鎖定",
       "unlock": "解鎖",
       "consume": "消耗"
+    },
+    "send-tx-detail": {
+      "page-title": "交易詳情",
+      "basic-info": "基本信息",
+      "topology": "拓撲圖",
+      "tx-basic": {
+        "tx-hash": "交易哈希",
+        "capacity": "金額",
+        "tx-fee": "交易費",
+        "size": "大小",
+        "lock-time": "鎖定時間"
+      }
     }
   }
 }

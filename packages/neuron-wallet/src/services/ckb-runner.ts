@@ -11,6 +11,7 @@ import { resetSyncTaskQueue } from '../block-sync-renderer'
 import { getUsablePort } from '../utils/get-usable-port'
 import { updateToml } from '../utils/toml'
 import { BUNDLED_URL_PREFIX } from '../utils/const'
+import NoDiskSpaceSubject from '../models/subjects/no-disk-space'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -113,10 +114,9 @@ export const startCkbNode = async () => {
     network: `listen_addresses = ["/ip4/0.0.0.0/tcp/${listenPort}"]`,
   })
   const options = ['run', '-C', SettingsService.getInstance().getNodeDataPath(), '--indexer']
-  const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'ignore', 'pipe']
+  const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'pipe', 'pipe']
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
-    stdio[1] = 'pipe'
   }
   logger.info(`CKB:\tckb full node will with rpc port ${rpcPort}, listen port ${listenPort}, with options`, options)
   const currentProcess = spawn(ckbBinary(), options, { stdio })
@@ -130,6 +130,11 @@ export const startCkbNode = async () => {
   })
   currentProcess.stdout?.on('data', data => {
     const dataString: string = data.toString()
+    if (/No space left/.test(dataString)) {
+      NoDiskSpaceSubject.next(true)
+      logger.error('CKB:\trun fail:', dataString)
+      return
+    }
     if (
       dataString.includes(
         `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
@@ -150,8 +155,8 @@ export const startCkbNode = async () => {
     }
   })
 
-  currentProcess.on('close', () => {
-    logger.info('CKB:\tprocess closed')
+  currentProcess.on('close', code => {
+    logger.info(`CKB:\tprocess closed with code ${code}`)
     isLookingValidTarget = false
     if (Object.is(ckb, currentProcess)) {
       ckb = null

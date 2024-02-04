@@ -1,5 +1,5 @@
-import { getConnection } from 'typeorm'
 import TxDescription from '../../database/chain/entities/tx-description'
+import { getConnection } from '../../database/chain/connection'
 
 const getEntity = async (walletId: string, txHash: string) => {
   return await getConnection().getRepository(TxDescription).createQueryBuilder().where({ walletId, txHash }).getOne()

@@ -15,12 +15,12 @@ import { DepType } from '../../models/chain/cell-dep'
 import { molecule } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
 import type { Base } from '@ckb-lumos/rpc/lib/Base'
-import { getConnection } from 'typeorm'
 import { BI } from '@ckb-lumos/bi'
 import IndexerCacheService from './indexer-cache-service'
 import { ScriptType } from '@ckb-lumos/ckb-indexer/lib/type'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import NetworksService from '../../services/networks'
+import { getConnection } from '../../database/chain/connection'
 
 const unpackGroup = molecule.vector(blockchain.OutPoint)
 
@@ -168,7 +168,7 @@ export default class LightSynchronizer extends Synchronizer {
         updatedSyncProgress.push(currentSyncProgress)
       }
     })
-    await getConnection().manager.save(updatedSyncProgress, { chunk: 100 })
+    await getConnection('light').manager.save(updatedSyncProgress, { chunk: 100 })
   }
 
   private async initSyncProgress(appendScripts: AppendScript[] = []) {

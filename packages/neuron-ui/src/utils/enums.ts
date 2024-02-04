@@ -25,9 +25,11 @@ export enum RoutePath {
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
   ImportHardware = '/import-hardware',
+  SendTxDetail = '/send-tx-detail',
   OfflineSign = 'offline-sign',
   SignVerify = 'sign-verify',
   MultisigAddress = 'multisig-address',
+  BroadcastTransaction = 'broadcast-transaction',
 }
 
 export enum CapacityUnit {
@@ -107,6 +109,7 @@ export enum ErrorCode {
   DeviceInSleep = 501,
   // active warning
   WaitForFullySynced = 600,
+  DuplicateImportWallet = 118,
 }
 
 export enum SyncStatus {

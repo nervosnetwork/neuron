@@ -1,18 +1,22 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ReactComponent as EditWallet } from 'widgets/Icons/Edit.svg'
-import { ReactComponent as DeleteWallet } from 'widgets/Icons/Delete.svg'
-import { ReactComponent as CreateWallet } from 'widgets/Icons/Add.svg'
-import { ReactComponent as ImportKeystore } from 'widgets/Icons/SoftWalletImportKeystore.svg'
-import { ReactComponent as Export } from 'widgets/Icons/Export.svg'
-import { ReactComponent as ImportHardware } from 'widgets/Icons/HardWalletImport.svg'
-import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
+import {
+  Edit as EditWallet,
+  Add as CreateWallet,
+  Detect,
+  Delete as DeleteWallet,
+  Export,
+  AddSimple,
+  ImportKeystore,
+  ImportHardware,
+} from 'widgets/Icons/icon'
 import Tooltip from 'widgets/Tooltip'
 import Toast from 'widgets/Toast'
 import { StateDispatch } from 'states'
 import WalletEditorDialog from 'components/WalletEditorDialog'
+import DetectDuplicateWalletDialog from 'components/DetectDuplicateWalletDialog'
 import {
   backToTop,
   RoutePath,
@@ -63,6 +67,13 @@ const WalletSetting = ({
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [editWallet, setEditWallet] = useState('')
   const [notice, setNotice] = useState('')
+  const [showDetectDialog, setShowDetectDialog] = useState(false)
+
+  const hasDuplicateWallets = useMemo(() => {
+    const extendedKeys = wallets.map(item => item.extendedKey)
+    const extendedKeySet = new Set(extendedKeys)
+    return extendedKeys.length > extendedKeySet.size
+  }, [wallets])
 
   useEffect(() => {
     backToTop()
@@ -124,6 +135,14 @@ const WalletSetting = ({
     setNotice(t('settings.wallet-manager.edit-success'))
   }, [setShowEditDialog, setNotice])
 
+  const handleDetect = useCallback(() => {
+    setShowDetectDialog(true)
+  }, [setShowDetectDialog])
+
+  const onDetectDialogClose = useCallback(() => {
+    setShowDetectDialog(false)
+  }, [setShowDetectDialog])
+
   return (
     <div>
       <RadioGroup
@@ -153,7 +172,7 @@ const WalletSetting = ({
         }))}
       />
 
-      <div className={styles.addWrap}>
+      <div className={styles.actionWrap}>
         <Tooltip
           tip={
             <div className={styles.actions}>
@@ -168,10 +187,16 @@ const WalletSetting = ({
           trigger="click"
           showTriangle
         >
-          <button type="button" className={styles.addBtn}>
+          <button type="button" className={styles.actionBtn}>
             <AddSimple /> {t('wizard.add-one')}
           </button>
         </Tooltip>
+
+        {hasDuplicateWallets ? (
+          <button type="button" className={styles.actionBtn} onClick={handleDetect}>
+            <Detect /> {t('wizard.detect-duplicate-wallets')}
+          </button>
+        ) : null}
       </div>
 
       <WalletEditorDialog
@@ -182,6 +207,8 @@ const WalletSetting = ({
         }}
         onSuccess={onEditSuccess}
       />
+
+      {showDetectDialog ? <DetectDuplicateWalletDialog onClose={onDetectDialogClose} /> : null}
 
       <Toast content={notice} onDismiss={() => setNotice('')} />
     </div>
