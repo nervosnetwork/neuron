@@ -56,27 +56,27 @@
         "finish": "fin de la création"
       },
       "errors": {
-        "multi-device" : "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté",
-        "device-not-found" : "Aucun appareil n'a été détecté. Veuillez connecter votre appareil.",
-        "ckb-app-not-found" : "L'application CKB ne s'ouvre pas. Veuillez ouvrir l'application CKB sur votre appareil."
+        "multi-device": "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté",
+        "device-not-found": "Aucun appareil n'a été détecté. Veuillez connecter votre appareil.",
+        "ckb-app-not-found": "L'application CKB ne s'ouvre pas. Veuillez ouvrir l'application CKB sur votre appareil."
       },
-      "waiting" : "Waiting for CKB app...",
-      "abort" : "En attente de l'application CKB... Action annulée",
-      "app-version" : "CKB App v{{version}} en cours d'exécution",
-      "firmware-version" : "Firmware v{{version}} détecté",
-      "wallet-name" : "Nom du portefeuille",
-      "select-model" : "Select Model",
-      "other-device" : "Autres"
+      "waiting": "Waiting for CKB app...",
+      "abort": "En attente de l'application CKB... Action annulée",
+      "app-version": "CKB App v{{version}} en cours d'exécution",
+      "firmware-version": "Firmware v{{version}} détecté",
+      "wallet-name": "Nom du portefeuille",
+      "select-model": "Select Model",
+      "other-device": "Autres"
     },
     "hardware-sign": {
-      "annuler" : "Annuler",
-      "title" : "Signer via le portefeuille matériel",
-      "device" : "Appareil :",
-      "status" : {
-        "label" : "Status :",
-        "connect" : "Connecté, prêt à signer",
-        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
-        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
+      "annuler": "Annuler",
+      "title": "Signer via le portefeuille matériel",
+      "device": "Appareil :",
+      "status": {
+        "label": "Status :",
+        "connect": "Connecté, prêt à signer",
+        "user-input": "Connecté, en attente de confirmation sur l'appareil...",
+        "disconnect": "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
@@ -93,10 +93,10 @@
       "verified": "Vérifié",
       "invalid": "Invalid",
       "status": {
-        "label" : "Status :",
-        "connect" : "Connecté, prêt pour la vérification",
-        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
-        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
+        "label": "Status :",
+        "connect": "Connecté, prêt pour la vérification",
+        "user-input": "Connecté, en attente de confirmation sur l'appareil...",
+        "disconnect": "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "actions": {
         "close": "Fermer",
@@ -105,7 +105,7 @@
         "verify": "Vérifier l'adresse",
         "finish": "Ok"
       }
-    },  
+    },
     "offline-sign": {
       "title": "Signature hors ligne",
       "json-file": "Fichier JSON :",
@@ -115,6 +115,8 @@
         "partially-signed": "Partiellement signé",
         "signed": "Signé"
       },
+      "import-signed-transaction": "Importer une transaction signée",
+      "import-signed-transaction-detail": "Vous avez importé une transaction signée, veuillez confirmer et essayer à nouveau.",
       "wallet": "Wallet :",
       "content": "Contenu :",
       "export": "Exporter Tx",
@@ -123,8 +125,12 @@
       "actions": {
         "broadcast": "Diffuser",
         "sign": "Signer et exporter",
-        "cancel": "Annuler"
-      }
+        "cancel": "Annuler",
+        "view-in-explorer": "Voir dans l'Explorateur"
+      },
+      "broadcast-transaction": "Diffuser la Transaction",
+      "import-transaction-to-sign": "Importer une transaction à signer",
+      "import-unsigned-transaction-detail": "Vous avez importé une transaction non signée, veuillez confirmer et essayer à nouveau."
     },
     "overview": {
       "date": "Date",
@@ -151,7 +157,9 @@
       "send": "Envoyer",
       "receive": "Recevoir",
       "locked": "Montant verrouillé",
-      "locked-balance": "Solde verrouillé"
+      "locked-balance": "Solde verrouillé",
+      "first-sync-notice": "La synchronisation initiale nécessite au moins {{size}} Go d'espace disque, la taille des données augmentera avec le temps. Il est recommandé de choisir un espace disque plus important pour stocker les données.",
+      "start-sync": "Démarrer la synchronisation"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenue sur Neuron",
@@ -295,7 +303,7 @@
       "search": {
         "button": "Rechercher",
         "placeholder": "Rechercher le hash de transaction, l'adresse ou la date (aaaa-mm-jj)"
-     },
+      },
       "table": {
         "name": "Nom du Wallet",
         "type": "Type",
@@ -319,42 +327,42 @@
       "copy-address": "Copier l'adresse",
       "create": "Créer le compte d'actif {{name}}",
       "destroy": "Détruire le compte d'actif {{name}}"
-    },  
-    "transaction": {
-        "window-title": "Transaction : {{hash}}",
-        "date": "Date",
-        "transaction-hash": "Hash de transaction",
-        "block-number": "Numéro de bloc",
-        "goBack": "Retour",
-        "index": "Index",
-        "address": "Adresse",
-        "income": "Revenu",
-        "amount": "Montant",
-        "inputs": "Entrées",
-        "outputs": "Sorties",
-        "cell-from-cellbase": "De cellbase",
-        "lock-script": "Script de verrouillage",
-        "lock-script-title": "Informations sur l'adresse",
-        "deprecated-address-format": "Adresse au format obsolète"
-      },
-      "addresses": {
-        "title": "Carnet d'adresses",
-        "addresses": "Adresses",
-        "type": "Type",
-        "address": "Adresse",
-        "identifier": "Identifiant",
-        "description": "Description",
-        "balance": "Solde",
-        "transactions": "TXs",
-        "receiving-address": "Réception",
-        "change-address": "Changement",
-        "copy-address": "Copier l'adresse",
-        "request-payment": "Demander un paiement",
-        "view-on-explorer": "Voir sur l'explorateur",
-        "default-description": "Aucun",
-        "all-address": "Toutes"
     },
-    "settings":{
+    "transaction": {
+      "window-title": "Transaction : {{hash}}",
+      "date": "Date",
+      "transaction-hash": "Hash de transaction",
+      "block-number": "Numéro de bloc",
+      "goBack": "Retour",
+      "index": "Index",
+      "address": "Adresse",
+      "income": "Revenu",
+      "amount": "Montant",
+      "inputs": "Entrées",
+      "outputs": "Sorties",
+      "cell-from-cellbase": "De cellbase",
+      "lock-script": "Script de verrouillage",
+      "lock-script-title": "Informations sur l'adresse",
+      "deprecated-address-format": "Adresse au format obsolète"
+    },
+    "addresses": {
+      "title": "Carnet d'adresses",
+      "addresses": "Adresses",
+      "type": "Type",
+      "address": "Adresse",
+      "identifier": "Identifiant",
+      "description": "Description",
+      "balance": "Solde",
+      "transactions": "TXs",
+      "receiving-address": "Réception",
+      "change-address": "Changement",
+      "copy-address": "Copier l'adresse",
+      "request-payment": "Demander un paiement",
+      "view-on-explorer": "Voir sur l'explorateur",
+      "default-description": "Aucun",
+      "all-address": "Toutes"
+    },
+    "settings": {
       "title": {
         "normal": "Paramètres",
         "mac": "Préférences"
@@ -390,17 +398,17 @@
         }
       },
       "network": {
-       "online": "En ligne",
-       "offline": "Hors ligne",
-       "add-network": "Ajouter un réseau",
-       "remove-network": "Supprimer le réseau",
-       "remove-network-msg": "Êtes-vous sûr de vouloir supprimer le réseau sélectionné ?",
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "add-network": "Ajouter un réseau",
+        "remove-network": "Supprimer le réseau",
+        "remove-network-msg": "Êtes-vous sûr de vouloir supprimer le réseau sélectionné ?",
         "edit-network": {
-         "title": "Modifier le réseau",
-         "rpc-url": "URL RPC",
-         "name": "Nom du réseau",
-         "input-rpc": "Veuillez entrer rpc",
-         "input-network": "Veuillez entrer le nom" 
+          "title": "Modifier le réseau",
+          "rpc-url": "URL RPC",
+          "name": "Nom du réseau",
+          "input-rpc": "Veuillez entrer rpc",
+          "input-network": "Veuillez entrer le nom"
         },
         "edit-success": "Modification réussie du réseau",
         "mainnet": "Mainnet",
@@ -409,8 +417,8 @@
         "lightMainnet": "Mainnet léger",
         "devnet": "Devnet",
         "switch-network-type": "Basculer vers {{type}}"
-      },  
-        "locale": {
+      },
+      "locale": {
         "en": "Anglais",
         "en-US": "Anglais (États-Unis)",
         "zh": "中文(简体)",
@@ -437,7 +445,7 @@
         "disabled-set-path": "Lorsque le noeud CKB est démarré manuellement, la configuration du chemin du noeud CKB ne prend pas effet.",
         "ckb-node-storage": "Stockage du noeud CKB"
       }
-    },    
+    },
     "password-request": {
       "wallet-not-found": "Le Wallet n'a pas été trouvé",
       "password": "Entrez le mot de passe",
@@ -507,7 +515,7 @@
     "qrcode": {
       "copy": "Copier l'image",
       "save": "Enregistrer l'image"
-    },  
+    },
     "common": {
       "or": "ou",
       "ok": "Ok",
@@ -535,7 +543,8 @@
       "verification-failure": "Échec de la vérification",
       "back": "Retour",
       "switch-to-light": "Passer en mode clair",
-      "switch-to-dark": "Passer en mode sombre"
+      "switch-to-dark": "Passer en mode sombre",
+      "ckb-node-data-path": "CKB Chemin des données du nœud"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -1144,6 +1153,11 @@
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
         "ignore-external-node": "Ignorer le noeud externe"
+      },
+      "no-disk-space-dialog": {
+        "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
+        "continue-sync": "Continuer la synchronisation",
+        "migrate-data": "Migration des données"
       }
     },
     "cell-manage": {

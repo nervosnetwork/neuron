@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 const stubbedSyncedBlockNumberSubjectNext = jest.fn()
 const stubbedLoggerInfo = jest.fn()
@@ -8,22 +8,20 @@ const resetMocks = () => {
   stubbedLoggerInfo.mockReset()
 }
 
-jest.doMock('utils/logger', () => {
+jest.mock('utils/logger', () => {
   return {
-    info: stubbedLoggerInfo,
+    info: () => stubbedLoggerInfo(),
   }
 })
-
-import { initConnection } from '../../src/database/chain/ormconfig'
 
 describe('SyncedBlockNumber model', () => {
   let SyncedBlockNumber: any
   beforeAll(async () => {
-    await initConnection('')
+    await initConnection()
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

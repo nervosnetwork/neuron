@@ -4,6 +4,7 @@ import MultisigController from '../../src/controllers/multisig'
 import CellsService from '../../src/services/cells'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { systemScripts } from '../../src/utils/systemScripts'
+import { NetworkType } from '../../src/models/network'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -64,6 +65,9 @@ const isMainnetMock = jest.fn().mockReturnValue(false)
 jest.mock('../../src/services/networks', () => ({
   getInstance: () => ({
     isMainnet: () => isMainnetMock(),
+    getCurrent: () => ({
+      type: NetworkType.Normal,
+    }),
   }),
 }))
 

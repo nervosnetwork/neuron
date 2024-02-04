@@ -1,8 +1,6 @@
-import { getConnection } from 'typeorm'
 import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { bytes } from '@ckb-lumos/codec'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
 import CellsService, {
@@ -31,6 +29,7 @@ import { MultisigConfigNeedError, TransactionInputParameterMiss } from '../../sr
 import LiveCell from '../../src/models/chain/live-cell'
 import BufferUtils from '../../src/utils/buffer'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -101,7 +100,7 @@ describe('CellsService', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

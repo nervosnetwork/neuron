@@ -1,7 +1,8 @@
-import { getConnection, In, LessThan, Not } from 'typeorm'
+import { In, LessThan, Not } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
+import { getConnection } from '../database/chain/connection'
 
 export default class SyncProgressService {
   static async resetSyncProgress(

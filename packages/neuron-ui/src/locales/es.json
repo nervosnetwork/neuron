@@ -150,7 +150,9 @@
       "send": "Enviar",
       "receive": "Recibir",
       "locked": "Cantidad bloqueada",
-      "locked-balance": "Saldo bloqueado"
+      "locked-balance": "Saldo bloqueado",
+      "first-sync-notice": "La sincronización inicial requiere al menos {{size}} GB de espacio en disco, <br />Además, el tamaño de los datos aumentará con el tiempo, se recomienda seleccionar un espacio en disco más grande para almacenar los datos.",
+      "start-sync": "Iniciar sincronización"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenido a Neuron",
@@ -534,7 +536,8 @@
         "verification-failure": "Falló la Verificación",
         "back": "Atrás",
         "switch-to-light": "Cambiar a modo claro",
-        "switch-to-dark": "Cambiar a modo oscuro"
+        "switch-to-dark": "Cambiar a modo oscuro",
+        "ckb-node-data-path": "CKB Ruta de los datos del nodo"
       },
       "notification-panel": {
         "title": "Notificaciones"
@@ -1139,6 +1142,11 @@
         "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
         "add-network": "Agregar red",
         "ignore-external-node": "Ignorar nodo externo"
+      },
+      "no-disk-space-dialog": {
+        "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",
+        "continue-sync": "Continuar sincronización",
+        "migrate-data": "Migrar datos"
       }
     },
     "cell-manage": {

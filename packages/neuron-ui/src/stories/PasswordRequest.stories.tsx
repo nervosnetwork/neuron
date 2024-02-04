@@ -22,7 +22,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,
@@ -36,7 +36,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,
@@ -50,7 +50,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,
@@ -64,7 +64,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,
@@ -78,7 +78,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,
@@ -92,7 +92,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
     ...initStates,
     settings: {
       ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
+      wallets: [{ id: '1', name: 'test wallet', extendedKey: '' }],
     },
     app: {
       ...initStates.app,

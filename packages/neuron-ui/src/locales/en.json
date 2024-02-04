@@ -115,6 +115,8 @@
         "partially-signed": "Partially Signed",
         "signed": "Signed"
       },
+      "import-signed-transaction": "Import a signed transaction",
+      "import-signed-transaction-detail": "You have imported a signed transaction, please confirm and try again.",
       "wallet": "Wallet:",
       "content": "Content:",
       "export": "Export Tx",
@@ -123,8 +125,12 @@
       "actions": {
         "broadcast": "Broadcast",
         "sign": "Sign and export",
-        "cancel": "Cancel"
-      }
+        "cancel": "Cancel",
+        "view-in-explorer": "View in Explorer"
+      },
+      "broadcast-transaction": "Broadcast Transaction",
+      "import-transaction-to-sign": "Import a transaction to sign",
+      "import-unsigned-transaction-detail": "You have imported an unsigned transaction, please confirm and try again."
     },
     "overview": {
       "date": "Date",
@@ -151,7 +157,9 @@
       "send": "Send",
       "receive": "Receive",
       "locked": "Locked Amount",
-      "locked-balance": "Locked Balance"
+      "locked-balance": "Locked Balance",
+      "first-sync-notice": "The initial synchronization requires at least {{size}} GB of disk space. <br />And the data size will increase over time. It is recommended to choose a larger disk space to store the data.",
+      "start-sync": "Start Sync"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -186,7 +194,8 @@
       "repeat-password": "Repeat Password",
       "finish-create": "Finish Creating",
       "creating-wallet": "Wallet is being preparing, please wait",
-      "add-one": "Add One More"
+      "add-one": "Add One More",
+      "detect-duplicate-wallets": "Detect Duplicate Wallets"
     },
     "import-keystore": {
       "title": "Import Keystore File",
@@ -387,6 +396,15 @@
         "password": "Password",
         "wallet-detail": {
           "balance": "Balance"
+        },
+        "importing-existing": {
+          "title": "Importing an existing wallet",
+          "detail": "You imported a wallet that already exists, choose to replace the existing wallet or cancel the import.",
+          "replace": "Replace"
+        },
+        "detected-duplicate": {
+          "title": "Detected duplicate wallets",
+          "detail": "You have duplicate wallets in your account and it is recommended that you choose to keep the wallet that needs to be unique to make it less difficult to manage."
         }
       },
       "network": {
@@ -535,7 +553,8 @@
       "verification-failure": "Verification Failed",
       "back": "Back",
       "switch-to-light": "Switch to Light Mode",
-      "switch-to-dark": "Switch to Dark Mode"
+      "switch-to-dark": "Switch to Dark Mode",
+      "ckb-node-data-path": "CKB Node Data Path"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -1144,6 +1163,11 @@
         "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"
+      },
+      "no-disk-space-dialog": {
+        "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
+        "continue-sync": "Continue Sync",
+        "migrate-data": "Migrate Data"
       }
     },
     "cell-manage": {

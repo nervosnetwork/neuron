@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { createHardwareWallet } from 'services/remote'
-import { CONSTANTS, isSuccessResponse, useDialogWrapper } from 'utils'
+import { CONSTANTS, isSuccessResponse, useDialogWrapper, ErrorCode } from 'utils'
 import Alert from 'widgets/Alert'
 import { FinishCreateLoading, getAlertStatus } from 'components/WalletWizard'
 import { importedWalletDialogShown } from 'services/localCache'
+import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'components/ReplaceDuplicateWalletDialog'
 import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
@@ -26,6 +27,7 @@ const NameWallet = ({
   const [walletName, setWalletName] = useState(`${model?.manufacturer} ${model?.product}`)
   const [errorMsg, setErrorMsg] = useState('')
   const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
+  const { onImportingExitingWalletError, dialogProps } = useReplaceDuplicateWallet()
 
   const onBack = useCallback(() => {
     dispatch({ step: ImportStep.ImportHardware })
@@ -46,6 +48,11 @@ const NameWallet = ({
               importedWalletDialogShown.setStatus(res.result.id, true)
             }
           } else {
+            if (res.status === ErrorCode.DuplicateImportWallet) {
+              onImportingExitingWalletError(res.message)
+              return
+            }
+
             setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
           }
         })
@@ -62,33 +69,37 @@ const NameWallet = ({
   }, [])
 
   return (
-    <form className={styles.container}>
-      <header className={styles.title}>{t('import-hardware.title.name-wallet')}</header>
-      <section className={styles.name}>
-        <TextField
-          required
-          autoFocus
-          placeholder={t('wizard.set-wallet-name')}
-          onChange={onInput}
-          field="wallet-name"
-          value={walletName}
-          maxLength={MAX_WALLET_NAME_LENGTH}
-        />
-      </section>
-      <Alert status={getAlertStatus(!!walletName, !errorMsg)} className={styles.alert}>
-        <span>{errorMsg || t('wizard.new-name')}</span>
-      </Alert>
-      <footer className={styles.footer}>
-        <Button
-          type="submit"
-          label={t('import-hardware.actions.finish')}
-          onClick={onNext}
-          disabled={!walletName || !!errorMsg}
-        />
-        <Button type="text" label={t('import-hardware.actions.back')} onClick={onBack} />
-      </footer>
-      <FinishCreateLoading dialogRef={dialogRef} />
-    </form>
+    <>
+      <form className={styles.container}>
+        <header className={styles.title}>{t('import-hardware.title.name-wallet')}</header>
+        <section className={styles.name}>
+          <TextField
+            required
+            autoFocus
+            placeholder={t('wizard.set-wallet-name')}
+            onChange={onInput}
+            field="wallet-name"
+            value={walletName}
+            maxLength={MAX_WALLET_NAME_LENGTH}
+          />
+        </section>
+        <Alert status={getAlertStatus(!!walletName, !errorMsg)} className={styles.alert}>
+          <span>{errorMsg || t('wizard.new-name')}</span>
+        </Alert>
+        <footer className={styles.footer}>
+          <Button
+            type="submit"
+            label={t('import-hardware.actions.finish')}
+            onClick={onNext}
+            disabled={!walletName || !!errorMsg}
+          />
+          <Button type="text" label={t('import-hardware.actions.back')} onClick={onBack} />
+        </footer>
+        <FinishCreateLoading dialogRef={dialogRef} />
+      </form>
+
+      <ReplaceDuplicateWalletDialog {...dialogProps} />
+    </>
   )
 }
 

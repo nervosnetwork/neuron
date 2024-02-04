@@ -108,6 +108,8 @@
         "partially-signed": "部分签名",
         "signed": "已签名"
       },
+      "import-signed-transaction": "导入已签名交易",
+      "import-signed-transaction-detail": "您导入了一个已签名交易，请确认并重试。",
       "wallet": "钱包：",
       "content": "内容：",
       "export": "导出交易",
@@ -116,8 +118,12 @@
       "actions": {
         "broadcast": "广播交易",
         "sign": "签名并导出",
-        "cancel": "取消"
-      }
+        "cancel": "取消",
+        "view-in-explorer": "在浏览器中查看"
+      },
+      "broadcast-transaction": "广播交易",
+      "import-transaction-to-sign": "导入一笔交易以签名",
+      "import-unsigned-transaction-detail": "您导入了一个未签名交易，请确认并重试。"
     },
     "overview": {
       "date": "时间",
@@ -144,7 +150,9 @@
       "send": "转账",
       "receive": "收款",
       "locked": "已锁定余额",
-      "locked-balance": "已锁定余额"
+      "locked-balance": "已锁定余额",
+      "first-sync-notice": "首次同步数据至少需要 {{size}} GB的磁盘空间，<br />并且数据大小会随着时间增长，建议选择较大磁盘空间来存储数据。",
+      "start-sync": "开始同步"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -179,7 +187,8 @@
       "repeat-password": "重复密码",
       "finish-create": "完成创建",
       "creating-wallet": "钱包准备中，请稍后",
-      "add-one": "添加钱包"
+      "add-one": "添加钱包",
+      "detect-duplicate-wallets": "检测重复钱包"
     },
     "import-keystore": {
       "title": "导入 Keystore 文件",
@@ -380,6 +389,15 @@
         "password": "密码",
         "wallet-detail": {
           "balance": "余额"
+        },
+        "importing-existing": {
+          "title": "导入已存在钱包",
+          "detail": "您导入了一个已经存在的钱包，请选择替换现有钱包或取消导入。",
+          "replace": "替换"
+        },
+        "detected-duplicate": {
+          "title": "检测到重复的钱包",
+          "detail": "您的账户中有重复的钱包，建议您选择保留需要独一无二的钱包，以便于更轻松地管理。"
         }
       },
       "network": {
@@ -528,7 +546,8 @@
       "verification-failure": "验证失败",
       "back": "上一步",
       "switch-to-light": "开启日间模式",
-      "switch-to-dark": "开启夜间模式"
+      "switch-to-dark": "开启夜间模式",
+      "ckb-node-data-path": "CKB 节点数据路径"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -1136,6 +1155,11 @@
         "body-tips-with-network": "\"Internal Node\" 仅用于连接内置节点，请选择以下网络选项或添加新的网络选项以连接外部节点。",
         "add-network": "添加网络",
         "ignore-external-node": "忽略外部节点"
+      },
+      "no-disk-space-dialog": {
+        "tip": "由于磁盘空间不足，同步已停止。 <br /> 请分配更多磁盘空间或将数据迁移到其他磁盘。",
+        "continue-sync": "继续同步",
+        "migrate-data": "迁移数据"
       }
     },
     "cell-manage": {

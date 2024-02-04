@@ -8,6 +8,7 @@ export const importKeystore = remoteApi<Controller.ImportKeystoreParams>('import
 export const createWallet = remoteApi<Controller.CreateWalletParams>('create-wallet')
 export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wallet')
 export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
+export const replaceWallet = remoteApi<Controller.ReplaceWalletParams>('replace-wallet')
 export const backupWallet = remoteApi<Controller.DeleteWalletParams>('backup-wallet')
 export const updateWalletStartBlockNumber = remoteApi<Controller.UpdateWalletStartBlockNumberParams>(
   'update-wallet-start-block-number'

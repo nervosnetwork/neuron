@@ -5,6 +5,7 @@ export const emptyWallet: State.Wallet = {
   id: '',
   balance: '0',
   addresses: [],
+  extendedKey: '',
 }
 
 const wallet = currentWallet.load()
@@ -17,6 +18,7 @@ export const walletState: State.Wallet = {
   device: wallet?.device,
   isHD: wallet?.isHD,
   isWatchOnly: wallet?.isWatchOnly,
+  extendedKey: '',
 }
 
 export default walletState

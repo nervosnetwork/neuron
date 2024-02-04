@@ -9,10 +9,12 @@ const states: { [title: string]: State.WalletIdentity[] } = {
     {
       id: '1',
       name: 'Wallet 1',
+      extendedKey: '',
     },
     {
       id: '2',
       name: 'Wallet 2',
+      extendedKey: '',
     },
   ],
 }

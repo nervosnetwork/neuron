@@ -1,8 +1,6 @@
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import { TransactionPersistor, TxSaveType } from '../../../src/services/tx'
-import initConnection from '../../../src/database/chain/ormconfig'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
-import { getConnection } from 'typeorm'
 import transactions from '../../setupAndTeardown/transactions.fixture'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import SystemScriptInfo from '../../../src/models/system-script-info'
@@ -12,6 +10,7 @@ import { OutputStatus } from '../../../src/models/chain/output'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import InputEntity from '../../../src/database/chain/entities/input'
+import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
 
 const [tx, tx2] = transactions
 
@@ -21,7 +20,7 @@ describe('TransactionPersistor', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {
