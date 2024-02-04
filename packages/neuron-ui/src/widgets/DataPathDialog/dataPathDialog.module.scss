@@ -1,0 +1,62 @@
+.dialog {
+  min-width: 600px;
+}
+
+.icon {
+  text-align: center;
+}
+
+.text {
+  margin: 8px 0 28px 0;
+  color: var(--main-text-color);
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.pathContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+  button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 16px;
+    height: 100%;
+  }
+
+  .btn {
+    color: var(--secondary-text-color);
+    flex-shrink: 0;
+    background: var(--input-disabled-color);
+    border-radius: 0 8px 8px 0;
+    border-left: 1px solid var(--divide-line-color);
+  }
+  .path {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--input-hint-color);
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.desc {
+  color: var(--third-text-color);
+  font-size: 12px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.content {
+  padding: 20px 40px 0 40px;
+}

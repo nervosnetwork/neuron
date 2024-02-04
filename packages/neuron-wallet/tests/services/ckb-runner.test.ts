@@ -145,7 +145,7 @@ describe('ckb runner', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath, 'ckb')),
             ['run', '-C', ckbDataPath, '--indexer'],
-            { stdio: ['ignore', 'ignore', 'pipe'] }
+            { stdio: ['ignore', 'pipe', 'pipe'] }
           )
         })
       })
@@ -179,7 +179,7 @@ describe('ckb runner', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath, 'ckb')),
               ['run', '-C', ckbDataPath, '--indexer'],
-              { stdio: ['ignore', 'ignore', 'pipe'] }
+              { stdio: ['ignore', 'pipe', 'pipe'] }
             )
           })
         })

@@ -632,6 +632,26 @@ export default class ApiController {
       return { status: ResponseCode.Success, result: true }
     })
 
+    handle('get-first-sync-info', () => {
+      const currentNetwork = NetworksService.getInstance().getCurrent()
+      return {
+        status: ResponseCode.Success,
+        result: {
+          isFirstSync: SettingsService.getInstance().isFirstSync && currentNetwork.type === NetworkType.Default,
+          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+          ckbNodeDataPath: SettingsService.getInstance().getNodeDataPath(),
+        },
+      }
+    })
+
+    handle('start-sync', () => {
+      SettingsService.getInstance().isFirstSync = false
+      this.#networksController.activate(this.#networksController.currentID().result)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
@@ -639,21 +659,34 @@ export default class ApiController {
       }
     })
 
-    handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
-      if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+    handle(
+      'set-ckb-node-data-path',
+      async (
+        _,
+        { dataPath, clearCache, onlySetPath }: { dataPath: string; clearCache: boolean; onlySetPath?: boolean }
+      ) => {
+        if (onlySetPath) {
+          SettingsService.getInstance().setNodeDataPath(dataPath)
+          return {
+            status: ResponseCode.Success,
+            result: SettingsService.getInstance().getNodeDataPath(),
+          }
+        }
+        if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+          return {
+            status: ResponseCode.Fail,
+            message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          }
+        }
+        await cleanChain()
+        SettingsService.getInstance().setNodeDataPath(dataPath)
+        await startMonitor('ckb', true)
         return {
-          status: ResponseCode.Fail,
-          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          status: ResponseCode.Success,
+          result: SettingsService.getInstance().getNodeDataPath(),
         }
       }
-      await cleanChain()
-      SettingsService.getInstance().setNodeDataPath(dataPath)
-      await startMonitor('ckb', true)
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().getNodeDataPath(),
-      }
-    })
+    )
 
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
