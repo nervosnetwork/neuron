@@ -29,7 +29,7 @@ export type MultisigConfig = MultisigEntity & {
 }
 
 export const saveMultisigConfig = remoteApi<PartialSome<MultisigEntity, 'id'>, MultisigEntity>('save-multisig-config')
-export const getMultisigConfig = remoteApi<string, MultisigEntity[]>('get-multisig-config')
+export const getMultisigConfig = remoteApi<void, MultisigEntity[]>('get-multisig-config')
 export const importMultisigConfig = remoteApi<string, MultisigConfig[]>('import-multisig-config')
 export const exportMultisigConfig = remoteApi<MultisigConfig[]>('export-multisig-config')
 export const updateMultisigConfig = remoteApi<RequiredSome<Partial<MultisigEntity>, 'id'>, MultisigEntity>(

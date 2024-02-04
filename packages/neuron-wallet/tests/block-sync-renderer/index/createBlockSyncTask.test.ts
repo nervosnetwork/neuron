@@ -1,6 +1,8 @@
+import { NetworkType } from '../../../src/models/network'
+
 describe(`Create block sync task`, () => {
   const STUB_ADDRESS_METAS = 'address metas'
-  const STUB_NETWORK = { id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }
+  const STUB_NETWORK = { id: 'id', genesisHash: '0x1', remote: 'stub_network_url', type: NetworkType.Normal }
   const stubbedLoggerInfo = jest.fn()
   const stubbedChildProcessOn = jest.fn()
   const stubbedChildProcessSend = jest.fn()
@@ -74,6 +76,7 @@ describe(`Create block sync task`, () => {
         addressMetas: STUB_ADDRESS_METAS,
         genesisHash: STUB_NETWORK.genesisHash,
         indexerUrl: STUB_NETWORK.remote,
+        nodeType: NetworkType.Normal,
         url: STUB_NETWORK.remote,
       },
     })

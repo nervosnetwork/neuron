@@ -2,6 +2,7 @@ import OutPoint from './out-point'
 import Script from './script'
 import { BI } from '@ckb-lumos/bi'
 import TypeChecker from '../../utils/type-checker'
+import { OutputStatus } from './output'
 
 export default class Input {
   public previousOutput: OutPoint | null
@@ -14,6 +15,7 @@ export default class Input {
   public type?: Script | null
   public typeHash?: string | null
   public data?: string | null
+  public status?: OutputStatus
 
   // don't using = directly, using setXxx instead
   // check hex string
@@ -27,7 +29,8 @@ export default class Input {
     multiSignBlake160?: string | null,
     type?: Script | null,
     typeHash?: string | null,
-    data?: string | null
+    data?: string | null,
+    status?: OutputStatus
   ) {
     this.previousOutput = previousOutput
     this.since = since ? BigInt(since).toString() : since
@@ -42,6 +45,7 @@ export default class Input {
     this.typeHash = typeHash || this.type?.computeHash()
 
     this.data = data
+    this.status = status
 
     TypeChecker.hashChecker(this.lockHash, this.typeHash)
     TypeChecker.numberChecker(this.since, this.capacity, this.inputIndex)
@@ -58,6 +62,7 @@ export default class Input {
     type,
     typeHash,
     data,
+    status,
   }: {
     previousOutput: OutPoint | null
     since?: string
@@ -69,6 +74,7 @@ export default class Input {
     type?: Script | null
     typeHash?: string | null
     data?: string | null
+    status?: OutputStatus
   }): Input {
     return new Input(
       previousOutput ? OutPoint.fromObject(previousOutput) : previousOutput,
@@ -80,7 +86,8 @@ export default class Input {
       multiSignBlake160,
       type ? Script.fromObject(type) : type,
       typeHash,
-      data
+      data,
+      status
     )
   }
 

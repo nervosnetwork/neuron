@@ -24,13 +24,15 @@
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
-      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure.",
+      "learn-more": "En savoir plus",
+      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Veuillez ajouter l'option '--indexer' pour démarrer le noeud local"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Bloc synchronisé",
         "looking-valid-target": "Recherche de la cible valide présumée",
+        "start-block-number": "bloc de départ",
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
       "migrating": "migration en cours..."
@@ -53,27 +55,27 @@
         "finish": "fin de la création"
       },
       "errors": {
-        "multi-device" : "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté",
-        "device-not-found" : "Aucun appareil n'a été détecté. Veuillez connecter votre appareil.",
-        "ckb-app-not-found" : "L'application CKB ne s'ouvre pas. Veuillez ouvrir l'application CKB sur votre appareil."
+        "multi-device": "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté",
+        "device-not-found": "Aucun appareil n'a été détecté. Veuillez connecter votre appareil.",
+        "ckb-app-not-found": "L'application CKB ne s'ouvre pas. Veuillez ouvrir l'application CKB sur votre appareil."
       },
-      "waiting" : "Waiting for CKB app...",
-      "abort" : "En attente de l'application CKB... Action annulée",
-      "app-version" : "CKB App v{{version}} en cours d'exécution",
-      "firmware-version" : "Firmware v{{version}} détecté",
-      "wallet-name" : "Nom du portefeuille",
-      "select-model" : "Select Model",
-      "other-device" : "Autres"
+      "waiting": "Waiting for CKB app...",
+      "abort": "En attente de l'application CKB... Action annulée",
+      "app-version": "CKB App v{{version}} en cours d'exécution",
+      "firmware-version": "Firmware v{{version}} détecté",
+      "wallet-name": "Nom du portefeuille",
+      "select-model": "Select Model",
+      "other-device": "Autres"
     },
     "hardware-sign": {
-      "annuler" : "Annuler",
-      "title" : "Signer via le portefeuille matériel",
-      "device" : "Appareil :",
-      "status" : {
-        "label" : "Status :",
-        "connect" : "Connecté, prêt à signer",
-        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
-        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
+      "annuler": "Annuler",
+      "title": "Signer via le portefeuille matériel",
+      "device": "Appareil :",
+      "status": {
+        "label": "Status :",
+        "connect": "Connecté, prêt à signer",
+        "user-input": "Connecté, en attente de confirmation sur l'appareil...",
+        "disconnect": "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
@@ -90,10 +92,10 @@
       "verified": "Vérifié",
       "invalid": "Invalid",
       "status": {
-        "label" : "Status :",
-        "connect" : "Connecté, prêt pour la vérification",
-        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
-        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
+        "label": "Status :",
+        "connect": "Connecté, prêt pour la vérification",
+        "user-input": "Connecté, en attente de confirmation sur l'appareil...",
+        "disconnect": "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "actions": {
         "close": "Fermer",
@@ -102,7 +104,7 @@
         "verify": "Vérifier l'adresse",
         "finish": "Ok"
       }
-    },  
+    },
     "offline-sign": {
       "title": "Signature hors ligne",
       "json-file": "Fichier JSON :",
@@ -112,6 +114,8 @@
         "partially-signed": "Partiellement signé",
         "signed": "Signé"
       },
+      "import-signed-transaction": "Importer une transaction signée",
+      "import-signed-transaction-detail": "Vous avez importé une transaction signée, veuillez confirmer et essayer à nouveau.",
       "wallet": "Wallet :",
       "content": "Contenu :",
       "export": "Exporter Tx",
@@ -120,8 +124,12 @@
       "actions": {
         "broadcast": "Diffuser",
         "sign": "Signer et exporter",
-        "cancel": "Annuler"
-      }
+        "cancel": "Annuler",
+        "view-in-explorer": "Voir dans l'Explorateur"
+      },
+      "broadcast-transaction": "Diffuser la Transaction",
+      "import-transaction-to-sign": "Importer une transaction à signer",
+      "import-unsigned-transaction-detail": "Vous avez importé une transaction non signée, veuillez confirmer et essayer à nouveau."
     },
     "overview": {
       "date": "Date",
@@ -148,7 +156,9 @@
       "send": "Envoyer",
       "receive": "Recevoir",
       "locked": "Montant verrouillé",
-      "locked-balance": "Solde verrouillé"
+      "locked-balance": "Solde verrouillé",
+      "first-sync-notice": "La synchronisation initiale nécessite au moins {{size}} Go d'espace disque, la taille des données augmentera avec le temps. Il est recommandé de choisir un espace disque plus important pour stocker les données.",
+      "start-sync": "Démarrer la synchronisation"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenue sur Neuron",
@@ -292,7 +302,7 @@
       "search": {
         "button": "Rechercher",
         "placeholder": "Rechercher le hash de transaction, l'adresse ou la date (aaaa-mm-jj)"
-     },
+      },
       "table": {
         "name": "Nom du Wallet",
         "type": "Type",
@@ -316,42 +326,42 @@
       "copy-address": "Copier l'adresse",
       "create": "Créer le compte d'actif {{name}}",
       "destroy": "Détruire le compte d'actif {{name}}"
-    },  
-    "transaction": {
-        "window-title": "Transaction : {{hash}}",
-        "date": "Date",
-        "transaction-hash": "Hash de transaction",
-        "block-number": "Numéro de bloc",
-        "goBack": "Retour",
-        "index": "Index",
-        "address": "Adresse",
-        "income": "Revenu",
-        "amount": "Montant",
-        "inputs": "Entrées",
-        "outputs": "Sorties",
-        "cell-from-cellbase": "De cellbase",
-        "lock-script": "Script de verrouillage",
-        "lock-script-title": "Informations sur l'adresse",
-        "deprecated-address-format": "Adresse au format obsolète"
-      },
-      "addresses": {
-        "title": "Carnet d'adresses",
-        "addresses": "Adresses",
-        "type": "Type",
-        "address": "Adresse",
-        "identifier": "Identifiant",
-        "description": "Description",
-        "balance": "Solde",
-        "transactions": "TXs",
-        "receiving-address": "Réception",
-        "change-address": "Changement",
-        "copy-address": "Copier l'adresse",
-        "request-payment": "Demander un paiement",
-        "view-on-explorer": "Voir sur l'explorateur",
-        "default-description": "Aucun",
-        "all-address": "Toutes"
     },
-    "settings":{
+    "transaction": {
+      "window-title": "Transaction : {{hash}}",
+      "date": "Date",
+      "transaction-hash": "Hash de transaction",
+      "block-number": "Numéro de bloc",
+      "goBack": "Retour",
+      "index": "Index",
+      "address": "Adresse",
+      "income": "Revenu",
+      "amount": "Montant",
+      "inputs": "Entrées",
+      "outputs": "Sorties",
+      "cell-from-cellbase": "De cellbase",
+      "lock-script": "Script de verrouillage",
+      "lock-script-title": "Informations sur l'adresse",
+      "deprecated-address-format": "Adresse au format obsolète"
+    },
+    "addresses": {
+      "title": "Carnet d'adresses",
+      "addresses": "Adresses",
+      "type": "Type",
+      "address": "Adresse",
+      "identifier": "Identifiant",
+      "description": "Description",
+      "balance": "Solde",
+      "transactions": "TXs",
+      "receiving-address": "Réception",
+      "change-address": "Changement",
+      "copy-address": "Copier l'adresse",
+      "request-payment": "Demander un paiement",
+      "view-on-explorer": "Voir sur l'explorateur",
+      "default-description": "Aucun",
+      "all-address": "Toutes"
+    },
+    "settings": {
       "title": {
         "normal": "Paramètres",
         "mac": "Préférences"
@@ -387,17 +397,17 @@
         }
       },
       "network": {
-       "online": "En ligne",
-       "offline": "Hors ligne",
-       "add-network": "Ajouter un réseau",
-       "remove-network": "Supprimer le réseau",
-       "remove-network-msg": "Êtes-vous sûr de vouloir supprimer le réseau sélectionné ?",
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "add-network": "Ajouter un réseau",
+        "remove-network": "Supprimer le réseau",
+        "remove-network-msg": "Êtes-vous sûr de vouloir supprimer le réseau sélectionné ?",
         "edit-network": {
-         "title": "Modifier le réseau",
-         "rpc-url": "URL RPC",
-         "name": "Nom du réseau",
-         "input-rpc": "Veuillez entrer rpc",
-         "input-network": "Veuillez entrer le nom" 
+          "title": "Modifier le réseau",
+          "rpc-url": "URL RPC",
+          "name": "Nom du réseau",
+          "input-rpc": "Veuillez entrer rpc",
+          "input-network": "Veuillez entrer le nom"
         },
         "edit-success": "Modification réussie du réseau",
         "mainnet": "Mainnet",
@@ -406,13 +416,14 @@
         "lightMainnet": "Mainnet léger",
         "devnet": "Devnet",
         "switch-network-type": "Basculer vers {{type}}"
-      },  
-        "locale": {
+      },
+      "locale": {
         "en": "Anglais",
         "en-US": "Anglais (États-Unis)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "Configuration & stockage du noeud CKB",
@@ -433,7 +444,7 @@
         "disabled-set-path": "Lorsque le noeud CKB est démarré manuellement, la configuration du chemin du noeud CKB ne prend pas effet.",
         "ckb-node-storage": "Stockage du noeud CKB"
       }
-    },    
+    },
     "password-request": {
       "wallet-not-found": "Le Wallet n'a pas été trouvé",
       "password": "Entrez le mot de passe",
@@ -503,7 +514,7 @@
     "qrcode": {
       "copy": "Copier l'image",
       "save": "Enregistrer l'image"
-    },  
+    },
     "common": {
       "or": "ou",
       "ok": "Ok",
@@ -531,7 +542,8 @@
       "verification-failure": "Échec de la vérification",
       "back": "Retour",
       "switch-to-light": "Passer en mode clair",
-      "switch-to-dark": "Passer en mode sombre"
+      "switch-to-dark": "Passer en mode sombre",
+      "ckb-node-data-path": "CKB Chemin des données du nœud"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -689,7 +701,8 @@
         "compensated-period": "Période de compensation",
         "days-hours": "{{days}} jours {{hours}} heures",
         "no-deposit": "Aucun dépôt",
-        "no-completed": "Aucun terminé"
+        "no-completed": "Aucun terminé",
+        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO."
       },
       "compensation-period": {
         "tooltip": {
@@ -1124,10 +1137,13 @@
     },
     "set-start-block-number": {
       "title": "Définir le numéro de bloc de départ",
+      "warn": "Veuillez noter que les transactions antérieures à la synchronisation du bloc initial ne seront pas synchronisées !",
       "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
-      "view-block": "Voir le bloc"
+      "view-block": "Voir le bloc",
+      "set-less-than-before": "Le numéro de bloc que vous avez défini est inférieur au bloc précédent. La synchronisation recommencera, veuillez procéder avec prudence.",
+      "reset-to-header-tip-number": "Impossible de définir un numéro de bloc supérieur au bloc le plus récent. Réinitialisation au numéro de bloc le plus récent."
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1136,6 +1152,11 @@
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
         "ignore-external-node": "Ignorer le noeud externe"
+      },
+      "no-disk-space-dialog": {
+        "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
+        "continue-sync": "Continuer la synchronisation",
+        "migrate-data": "Migration des données"
       }
     },
     "cell-manage": {
@@ -1186,6 +1207,18 @@
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer"
+    },
+    "send-tx-detail": {
+      "page-title": "Détail de l'historique",
+      "basic-info": "Informations de base",
+      "topology": "Schéma topologique",
+      "tx-basic": {
+        "tx-hash": "Hash de transaction",
+        "capacity": "Montant",
+        "tx-fee": "Frais de transaction",
+        "size": "taille",
+        "lock-time": "Période de verrouillage"
+      }
     }
   }
 }

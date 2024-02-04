@@ -1,6 +1,7 @@
 import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
+import fs from 'fs'
 
 import logger from '../../utils/logger'
 import env from '../../env'
@@ -60,23 +61,33 @@ import { IndexerTxHashCacheRemoveField1701234043431 } from './migrations/1701234
 import { CreateCellLocalInfo1701234043432 } from './migrations/1701234043432-CreateCellLocalInfo'
 import { RenameSyncProgress1702781527414 } from './migrations/1702781527414-RenameSyncProgress'
 import { RemoveAddressInIndexerCache1704357651876 } from './migrations/1704357651876-RemoveAddressInIndexerCache'
+import { ConnectionName } from './connection'
+import AddressSubscribe from './subscriber/address-subscriber'
+import MultisigConfigSubscribe from './subscriber/multisig-config-subscriber'
+import TxDescriptionSubscribe from './subscriber/tx-description-subscriber'
+import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
+import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
-const dbPath = (name: string): string => {
-  const filename = `cell-${name}.sqlite`
+const dbPath = (name: string, connectionName: string): string => {
+  const filename = `${connectionName}-${name}.sqlite`
   return path.join(env.fileBasePath, 'cells', filename)
 }
 
-const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
+const connectOptions = async (
+  genesisBlockHash: string,
+  connectionName: ConnectionName
+): Promise<SqliteConnectionOptions> => {
   const connectionOptions = await getConnectionOptions()
-  const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
+  const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash, connectionName)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] = ['warn', 'error']
   // (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
     ...connectionOptions,
+    name: connectionName,
     type: 'sqlite',
     database,
     entities: [
@@ -137,27 +148,54 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       RenameSyncProgress1702781527414,
       RemoveAddressInIndexerCache1704357651876,
     ],
+    subscribers: [
+      AddressSubscribe,
+      AssetAccountSubscribe,
+      MultisigConfigSubscribe,
+      SudtTokenInfoSubscribe,
+      TxDescriptionSubscribe,
+    ],
     logger: 'simple-console',
     logging,
     maxQueryExecutionTime: 30,
   }
 }
 
-export const initConnection = async (genesisBlockHash: string) => {
+const initConnectionWithType = async (genesisBlockHash: string, connectionName: ConnectionName) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
-    await getConnection().close()
+    await getConnection(connectionName).close()
   } catch (err) {
     // do nothing
   }
-  const connectionOptions = await connectOptions(genesisBlockHash)
+  const connectionOptions = await connectOptions(genesisBlockHash, connectionName)
 
   try {
     await createConnection(connectionOptions)
-    await getConnection().manager.query(`PRAGMA busy_timeout = 3000;`)
-    await getConnection().manager.query(`PRAGMA temp_store = MEMORY;`)
+    await getConnection(connectionName).manager.query(`PRAGMA busy_timeout = 3000;`)
+    await getConnection(connectionName).manager.query(`PRAGMA temp_store = MEMORY;`)
   } catch (err) {
     logger.error(err.message)
+  }
+}
+
+export async function initConnection(genesisBlockHash: string) {
+  await initConnectionWithType(genesisBlockHash, 'full')
+  await initConnectionWithType(genesisBlockHash, 'light')
+}
+
+export function migrateDBFile(genesisBlockHash: string) {
+  const originDBFile = dbPath(genesisBlockHash, 'cell')
+  const currentFullDBFile = dbPath(genesisBlockHash, 'full')
+  const currentLightDBFile = dbPath(genesisBlockHash, 'light')
+  if (fs.existsSync(originDBFile) && (!fs.existsSync(currentLightDBFile) || !fs.existsSync(currentFullDBFile))) {
+    if (!fs.existsSync(currentFullDBFile)) {
+      fs.copyFileSync(originDBFile, currentFullDBFile)
+    }
+    if (!fs.existsSync(currentLightDBFile)) {
+      fs.copyFileSync(originDBFile, currentLightDBFile)
+    }
+    fs.rmSync(originDBFile)
   }
 }
 

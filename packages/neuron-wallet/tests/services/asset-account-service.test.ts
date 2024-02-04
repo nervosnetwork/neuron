@@ -1,5 +1,3 @@
-import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import AssetAccount from '../../src/models/asset-account'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 import SudtTokenInfo from '../../src/database/chain/entities/sudt-token-info'
@@ -10,7 +8,7 @@ import { OutputStatus } from '../../src/models/chain/output'
 import SudtTokenInfoEntity from '../../src/database/chain/entities/sudt-token-info'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
-import { createAccounts } from '../setupAndTeardown'
+import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { AddressType } from '../../src/models/keys/address'
@@ -138,7 +136,7 @@ describe('AssetAccountService', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

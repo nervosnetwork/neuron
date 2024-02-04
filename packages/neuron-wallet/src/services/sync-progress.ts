@@ -1,7 +1,8 @@
-import { getConnection, In, LessThan, Not } from 'typeorm'
+import { In, LessThan, Not } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
+import { getConnection } from '../database/chain/connection'
 
 export default class SyncProgressService {
   static async resetSyncProgress(
@@ -27,13 +28,13 @@ export default class SyncProgressService {
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: true })
-      .where({ walletId: Not(In(existWalletIds)) })
+      .where({ walletId: Not(In(existWalletIds)), addressType: SyncAddressType.Default })
       .execute()
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: false })
-      .where({ walletId: In(existWalletIds) })
+      .where({ walletId: In(existWalletIds), addressType: SyncAddressType.Default })
       .execute()
   }
 

@@ -79,8 +79,8 @@ export default class MultisigController {
     }
   }
 
-  async getConfig(walletId: string) {
-    const result = await this.#multisigService.getMultisigConfig(walletId)
+  async getConfig() {
+    const result = await this.#multisigService.getMultisigConfig()
     return {
       status: ResponseCode.Success,
       result,

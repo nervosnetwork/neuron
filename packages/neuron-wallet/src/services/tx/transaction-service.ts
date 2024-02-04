@@ -1,7 +1,7 @@
-import { getConnection } from 'typeorm'
 import { CKBRPC } from '@ckb-lumos/rpc'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
+import { getConnection } from '../../database/chain/connection'
 import Transaction, {
   TransactionStatus,
   SudtInfo,

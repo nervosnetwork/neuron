@@ -50,6 +50,8 @@ type Action =
   | 'set-theme'
   | 'verify-external-ckb-node'
   | 'start-node-ignore-external'
+  | 'get-first-sync-info'
+  | 'start-sync'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -59,7 +61,9 @@ type Action =
   | 'create-wallet'
   | 'update-wallet'
   | 'delete-wallet'
+  | 'replace-wallet'
   | 'backup-wallet'
+  | 'update-wallet-start-block-number'
   | 'get-all-addresses'
   | 'update-address-description'
   | 'request-password'
@@ -133,6 +137,7 @@ type Action =
   | 'export-transaction-as-json'
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
+  | 'broadcast-signed-transaction'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft
