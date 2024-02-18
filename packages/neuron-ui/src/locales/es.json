@@ -300,6 +300,7 @@
       "table": {
         "name": "Nombre de la Billetera",
         "type": "Tipo",
+        "balance": "Saldo",
         "amount": "Cantidad",
         "timestamp": "Tiempo",
         "status": "Estado",
@@ -319,7 +320,8 @@
       "copy-balance": "Copiar Saldo",
       "copy-address": "Copiar Dirección",
       "create": "Crear Cuenta de Activos {{name}}",
-      "destroy": "Destruir Cuenta de Activos {{name}}"
+      "destroy": "Destruir Cuenta de Activos {{name}}",
+      "fee": "Tarifa de transacción"
     },
     "transaction": {
       "window-title": "Transacción: {{hash}}",
@@ -336,7 +338,15 @@
       "cell-from-cellbase": "Desde cellbase",
       "lock-script": "Script de Bloqueo",
       "lock-script-title": "Información de Dirección",
-      "deprecated-address-format": "Dirección en formato obsoleto"
+      "deprecated-address-format": "Dirección en formato obsoleto",
+      "type": "Tipo",
+      "fee": "Tarifa de transacción",
+      "assets": "Activos",
+      "balance": "Saldo",
+      "status": "Estado",
+      "size": "Tamaño",
+      "cycles": "Ciclos",
+      "cell-detail": "Detalles de la Cell"
     },
     "addresses": {
       "title": "Libro de Direcciones",
@@ -1170,7 +1180,12 @@
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
-        "used": "Usado"
+        "used": "Usado",
+        "view-raw-data": "Datos sin procesar",
+        "UTF8": "UTF-8",
+        "address": "Dirección",
+        "number": "Número",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "La Cell tiene un bloqueo de tiempo y no se puede usar hasta {{time}}.",
