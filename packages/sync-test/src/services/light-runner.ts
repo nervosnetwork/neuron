@@ -20,7 +20,7 @@ const ckbLightBinary = (binPath: string): string => {
 export const startCkbLightNodeWithConfig = async (option: { binPath: string; configPath: string; decPath: string }) => {
   console.log('start ckb node ')
   if (ckbLight !== null) {
-    console.info(`CKB:\tckb is not closed, close it before start...`)
+    console.info(`CKB:\tLight client is not closed, close it before start...`)
     await stopLightCkbNode()
     await cleanLightCkbNode(option.decPath)
   }
