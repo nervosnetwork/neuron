@@ -41,7 +41,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   const {
     app: { showWaitForFullySynced },
     chain: {
-      syncState: { bestKnownBlockNumber, cacheTipBlockNumber, syncStatus, isLookingValidTarget, validTarget },
+      syncState: { bestKnownBlockNumber, cacheTipBlockNumber, syncStatus, isLookingValidTarget, validTarget, estimate },
       connectionStatus,
       networkID,
     },
@@ -141,6 +141,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
               isLightClient={isLightClient}
               onOpenSetStartBlock={openDialog}
               startBlockNumber={walletStartBlockNumber}
+              estimate={estimate}
             />
           </div>
         </div>

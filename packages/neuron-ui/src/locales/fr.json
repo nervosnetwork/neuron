@@ -35,7 +35,8 @@
         "start-block-number": "bloc de départ",
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
-      "migrating": "migration en cours..."
+      "migrating": "migration en cours...",
+      "left-time": "Temps restant"
     },
     "import-hardware": {
       "title": {
