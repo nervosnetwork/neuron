@@ -5,7 +5,7 @@ import WalletService from './wallets'
 import { getConnection } from '../database/chain/connection'
 
 export default class SyncProgressService {
-  static async resetSyncProgress(
+  static async initSyncProgress(
     params: {
       script: CKBComponents.Script
       scriptType: CKBRPC.ScriptType
@@ -14,13 +14,15 @@ export default class SyncProgressService {
       blockNumber: string
     }[]
   ) {
-    await getConnection()
+    const syncProgresses = params.map(v => SyncProgress.fromObject(v))
+    const existProgresses = await getConnection()
       .getRepository(SyncProgress)
-      .createQueryBuilder()
-      .insert()
-      .orIgnore()
-      .values(params.map(v => SyncProgress.fromObject(v)))
-      .execute()
+      .find({
+        select: ['hash'],
+      })
+    const existHashes = new Set(existProgresses.map(v => v.hash))
+    const newSyncProgreses = syncProgresses.filter(v => !existHashes.has(v.hash))
+    await getConnection().manager.save(newSyncProgreses, { chunk: 100 })
   }
 
   static async updateSyncProgressFlag(existWalletIds: string[]) {
