@@ -103,22 +103,44 @@ export const useInitialize = ({
     clear(dispatch)
   }, [walletID, dispatch])
 
-  const onSubmit = useCallback(async () => {
-    // @ts-expect-error Replace-By-Fee (RBF)
-    const { min_replace_fee: minFee } = await getTransaction(hash)
-    if (!minFee) {
-      setShowConfirmedAlert(true)
-      return
-    }
-    dispatch({
-      type: AppActions.RequestPassword,
-      payload: {
-        walletID,
-        amendHash: hash,
-        actionType: 'send',
-      },
-    })
-  }, [dispatch, walletID, hash, setShowConfirmedAlert])
+  const onSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      const {
+        dataset: { walletId, status },
+      } = e.target as HTMLFormElement
+      e.preventDefault()
+      if (status !== 'ready') {
+        return
+      }
+      try {
+        // @ts-expect-error Replace-By-Fee (RBF)
+        const { min_replace_fee: minFee } = await getTransaction(hash)
+        if (!minFee) {
+          setShowConfirmedAlert(true)
+          return
+        }
+        dispatch({
+          type: AppActions.RequestPassword,
+          payload: {
+            walletID: walletId as string,
+            actionType: 'send',
+          },
+        })
+      } catch {
+        // ignore
+      }
+
+      dispatch({
+        type: AppActions.RequestPassword,
+        payload: {
+          walletID,
+          amendHash: hash,
+          actionType: 'send',
+        },
+      })
+    },
+    [dispatch, walletID, hash, setShowConfirmedAlert]
+  )
 
   return {
     updateTransactionPrice,
