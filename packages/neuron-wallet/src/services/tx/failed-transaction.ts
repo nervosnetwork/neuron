@@ -32,14 +32,14 @@ export class FailedTransaction {
 
     if (!failedTransactions.length) return
 
-    const failedHashs = failedTransactions.map(item => item.hash)
+    const failedHashes = failedTransactions.map(item => item.hash)
 
     const amendTxs = await getConnection()
       .getRepository(AmendTransactionEntity)
       .createQueryBuilder('amend')
       .where([
-        { amendHash: In(failedHashs), hash: Not(In(failedHashs)) },
-        { hash: In(failedHashs), amendHash: Not(In(failedHashs)) },
+        { amendHash: In(failedHashes), hash: Not(In(failedHashes)) },
+        { hash: In(failedHashes), amendHash: Not(In(failedHashes)) },
       ])
       .getMany()
 
@@ -47,10 +47,10 @@ export class FailedTransaction {
 
     const removeTxs: string[] = []
     amendTxs.forEach(({ hash, amendHash }) => {
-      if (failedHashs.includes(hash)) {
+      if (failedHashes.includes(hash)) {
         removeTxs.push(hash)
       }
-      if (failedHashs.includes(amendHash)) {
+      if (failedHashes.includes(amendHash)) {
         removeTxs.push(amendHash)
       }
     })
