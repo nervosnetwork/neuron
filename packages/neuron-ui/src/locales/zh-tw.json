@@ -246,7 +246,9 @@
       "release-on": "鎖定至",
       "locktime-warning": "請確保對方錢包支持到期解鎖功能。（註：1.交易所壹般不支持到期解鎖功能 {{extraNote}}）",
       "allow-use-sent-cell": "允許使用待確認的 Outputs 構建交易",
-      "submit-transaction": "發起交易"
+      "submit-transaction": "發起交易",
+      "transaction-confirmed": "交易已確認",
+      "transaction-cannot-amend": "目前交易已確認，無法修改。"
     },
     "receive": {
       "title": "收款",
@@ -314,6 +316,7 @@
       "no-txs": "沒有交易記錄",
       "view-in-explorer": "瀏覽器打開",
       "view-in-explorer-button-title": "瀏覽器中查看詳情",
+      "amend": "修改",
       "view-detail": "詳情",
       "view-detail-button-title": "查看詳情",
       "opening": "正在打開",

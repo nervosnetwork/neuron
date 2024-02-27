@@ -9,6 +9,7 @@ import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
 import History from 'components/History'
 import HistoryDetailPage from 'components/HistoryDetailPage'
+import AmendSend from 'components/AmendSend'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
@@ -137,6 +138,16 @@ const mainRouterConfig: RouteObject[] = [
             element: (
               <>
                 <History />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: 'amend/:hash',
+            element: (
+              <>
+                <AmendSend />
                 <Outlet />
               </>
             ),

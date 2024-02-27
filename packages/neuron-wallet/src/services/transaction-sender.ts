@@ -37,6 +37,7 @@ import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
 import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
+import AmendTransactionService from './amend-transaction'
 import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
@@ -68,13 +69,14 @@ export default class TransactionSender {
     transaction: Transaction,
     password: string = '',
     skipLastInputs: boolean = true,
-    skipSign = false
+    skipSign = false,
+    amendHash = ''
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
       : await this.sign(walletID, transaction, password, skipLastInputs)
 
-    return this.broadcastTx(walletID, tx)
+    return this.broadcastTx(walletID, tx, amendHash)
   }
 
   public async sendMultisigTx(
@@ -91,7 +93,7 @@ export default class TransactionSender {
     return this.broadcastTx(walletID, tx)
   }
 
-  public async broadcastTx(walletID: string = '', tx: Transaction) {
+  public async broadcastTx(walletID: string = '', tx: Transaction, amendHash = '') {
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -99,6 +101,9 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
     await MultisigService.saveSentMultisigOutput(tx)
+    if (amendHash) {
+      await AmendTransactionService.save(txHash, amendHash)
+    }
 
     if (walletID) {
       const wallet = WalletService.getInstance().get(walletID)

@@ -1,10 +1,11 @@
-import { In } from 'typeorm'
+import { In, Not } from 'typeorm'
 import { getConnection } from '../../database/chain/connection'
 import OutputEntity from '../../database/chain/entities/output'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import { OutputStatus } from '../../models/chain/output'
 import TransactionsService from './transaction-service'
 import { TransactionStatus } from '../../models/chain/transaction'
+import AmendTransactionEntity from '../../database/chain/entities/amend-transaction'
 
 export class FailedTransaction {
   public static pendings = async (): Promise<TransactionEntity[]> => {
@@ -17,6 +18,49 @@ export class FailedTransaction {
       .getMany()
 
     return pendingTransactions
+  }
+
+  public static processAmendFailedTxs = async () => {
+    const failedTransactions = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        status: TransactionStatus.Failed,
+      })
+      .select('tx.hash', 'hash')
+      .getRawMany()
+
+    if (!failedTransactions.length) return
+
+    const failedHashs = failedTransactions.map(item => item.hash)
+
+    const amendTxs = await getConnection()
+      .getRepository(AmendTransactionEntity)
+      .createQueryBuilder('amend')
+      .where([
+        { amendHash: In(failedHashs), hash: Not(In(failedHashs)) },
+        { hash: In(failedHashs), amendHash: Not(In(failedHashs)) },
+      ])
+      .getMany()
+
+    if (!amendTxs) return
+
+    const removeTxs: string[] = []
+    amendTxs.forEach(({ hash, amendHash }) => {
+      if (failedHashs.includes(hash)) {
+        removeTxs.push(hash)
+      }
+      if (failedHashs.includes(amendHash)) {
+        removeTxs.push(amendHash)
+      }
+    })
+
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(TransactionEntity)
+      .where({ hash: In(removeTxs) })
+      .execute()
   }
 
   // update tx status to TransactionStatus.Failed

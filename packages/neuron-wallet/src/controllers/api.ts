@@ -416,6 +416,7 @@ export default class ApiController {
           password: string
           description?: string
           multisigConfig?: MultisigConfigModel
+          amendHash?: string
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -834,6 +835,10 @@ export default class ApiController {
 
     handle('broadcast-signed-transaction', async (_, params) => {
       return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
+    })
+
+    handle('get-transaction-size', async (_, params) => {
+      return this.#transactionsController.getTransactionSize(params)
     })
 
     handle('sign-and-export-transaction', async (_, params) => {

@@ -245,7 +245,9 @@
       "release-on": "锁定至",
       "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）",
       "allow-use-sent-cell": "允许使用待确认的 Outputs 构建交易",
-      "submit-transaction": "发起交易"
+      "submit-transaction": "发起交易",
+      "transaction-confirmed": "交易已确认",
+      "transaction-cannot-amend": "当前交易已确认，无法修改。"
     },
     "receive": {
       "title": "收款",
@@ -314,6 +316,7 @@
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
+      "amend": "修改",
       "opening": "正在打开",
       "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
