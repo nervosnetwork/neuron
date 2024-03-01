@@ -9,7 +9,7 @@ import { ExplorerIcon, Copy, DetailIcon } from 'widgets/Icons/icon'
 import { useTranslation } from 'react-i18next'
 import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import Tooltip from 'widgets/Tooltip'
-import { getTransaction } from 'services/chain'
+import { getTransaction as getOnChainTransaction } from 'services/chain'
 
 import Button from 'widgets/Button'
 import styles from './history.module.scss'
@@ -67,7 +67,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   useEffect(() => {
     if (status !== 'success') {
       if (column.type === 'send' && !column.nftInfo) {
-        getTransaction(hash).then(tx => {
+        getOnChainTransaction(hash).then(tx => {
           // @ts-expect-error Replace-By-Fee (RBF)
           const { min_replace_fee: minReplaceFee } = tx
           if (minReplaceFee) {

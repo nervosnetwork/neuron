@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { getTransaction } from 'services/chain'
-import { getTransaction as getTransactionRemote, getTransactionSize } from 'services/remote'
+import { getTransaction as getOnChainTransaction } from 'services/chain'
+import { getTransaction as getSentTransaction, getTransactionSize } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 
 const clear = (dispatch: StateDispatch) => {
@@ -67,12 +67,12 @@ export const useInitialize = ({
 
   const fetchInitData = useCallback(async () => {
     // @ts-expect-error Replace-By-Fee (RBF)
-    const { min_replace_fee: minFee } = await getTransaction(hash)
+    const { min_replace_fee: minFee } = await getOnChainTransaction(hash)
     if (!minFee) {
       setShowConfirmedAlert(true)
     }
 
-    const txRes = await getTransactionRemote({ hash, walletID })
+    const txRes = await getSentTransaction({ hash, walletID })
     if (isSuccessResponse(txRes)) {
       const tx = txRes.result
       if (tx.outputsData.length === 0 && tx.outputs) {
@@ -114,7 +114,7 @@ export const useInitialize = ({
       }
       try {
         // @ts-expect-error Replace-By-Fee (RBF)
-        const { min_replace_fee: minFee } = await getTransaction(hash)
+        const { min_replace_fee: minFee } = await getOnChainTransaction(hash)
         if (!minFee) {
           setShowConfirmedAlert(true)
           return
