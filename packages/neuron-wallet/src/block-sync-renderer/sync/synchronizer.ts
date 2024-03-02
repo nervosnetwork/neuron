@@ -58,6 +58,7 @@ export abstract class Synchronizer {
   protected addressesByWalletId: Map<string, AddressMeta[]> = new Map()
   protected pollingIndexer: boolean = false
   private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
+  protected _needGenerateAddress: boolean = false
 
   abstract connect(): Promise<void>
   abstract processTxsInNextBlockNumber(): Promise<void>
@@ -94,6 +95,10 @@ export abstract class Synchronizer {
 
   public stop(): void {
     this.pollingIndexer = false
+  }
+
+  public set needGenerateAddress(v: boolean) {
+    this._needGenerateAddress = v
   }
 
   protected async processNextBlockNumber() {
