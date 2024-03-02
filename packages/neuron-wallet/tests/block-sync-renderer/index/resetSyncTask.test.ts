@@ -5,7 +5,11 @@ describe(`Reset sync task`, () => {
   jest.doMock('services/wallets', () => ({
     getInstance: () => ({ maintainAddressesIfNecessary: stubbedmaintainAddressesIfNecessary }),
   }))
-  jest.doMock('utils/common', () => ({ sleep: stubbedSleep, timeout: stubbedTimeout }))
+  jest.doMock('utils/common', () => ({
+    sleep: stubbedSleep,
+    timeout: stubbedTimeout,
+    retry: (_: number, __: number, fn: () => void) => fn(),
+  }))
   jest.doMock('services/tx', () => ({ TransactionPersistor: { checkTxLock: jest.fn() } }))
 
   const blockSyncRenderer = require('block-sync-renderer')
