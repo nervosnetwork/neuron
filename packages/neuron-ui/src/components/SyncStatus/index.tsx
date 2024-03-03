@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SyncStatus as SyncStatusEnum, ConnectionStatus, clsx, localNumberFormatter } from 'utils'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus, clsx, localNumberFormatter, getSyncLeftTime } from 'utils'
 import { Confirming, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as UnexpandStatus } from 'widgets/Icons/UnexpandStatus.svg'
 import { ReactComponent as StartBlock } from 'widgets/Icons/StartBlock.svg'
@@ -14,6 +14,7 @@ const SyncDetail = ({
   isLightClient,
   onOpenSetStartBlock,
   startBlockNumber,
+  estimate,
 }: {
   syncBlockNumbers: string
   isLookingValidTarget: boolean
@@ -21,6 +22,7 @@ const SyncDetail = ({
   isLightClient: boolean
   onOpenSetStartBlock: () => void
   startBlockNumber?: string
+  estimate?: number
 }) => {
   const [t] = useTranslation()
   return (
@@ -45,11 +47,15 @@ const SyncDetail = ({
         </div>
       )}
       {isLightClient && startBlockNumber ? (
-        <div className={styles.startBlockNumber}>
+        <div className={styles.item}>
           <div className={styles.title}>{t('network-status.tooltip.start-block-number')}:</div>
           <div className={styles.number}>{localNumberFormatter(startBlockNumber)}</div>
         </div>
       ) : null}
+      <div className={styles.item}>
+        <div className={styles.title}>{t('network-status.left-time')}</div>
+        <div className={styles.number}>{getSyncLeftTime(estimate)}</div>
+      </div>
       {isLightClient && (
         <div
           role="link"
@@ -79,6 +85,7 @@ const SyncStatus = ({
   isLightClient,
   onOpenSetStartBlock,
   startBlockNumber,
+  estimate,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
@@ -90,6 +97,7 @@ const SyncStatus = ({
   isLightClient: boolean
   onOpenSetStartBlock: () => void
   startBlockNumber?: string
+  estimate?: number
 }>) => {
   const [t] = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
@@ -127,6 +135,7 @@ const SyncStatus = ({
           isLightClient={isLightClient}
           onOpenSetStartBlock={onOpenSetStartBlock}
           startBlockNumber={startBlockNumber}
+          estimate={estimate}
         />
       }
       trigger="click"

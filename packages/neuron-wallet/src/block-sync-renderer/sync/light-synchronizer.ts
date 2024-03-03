@@ -231,7 +231,7 @@ export default class LightSynchronizer extends Synchronizer {
     const deleteScript = syncScripts.filter(v => !allScriptHashes.has(scriptToHash(v.script)))
     await this.lightRpc.setScripts(deleteScript, 'delete')
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
-    await SyncProgressService.resetSyncProgress(addScripts)
+    await SyncProgressService.initSyncProgress(addScripts)
     await SyncProgressService.updateSyncProgressFlag(walletIds)
     await SyncProgressService.removeByHashesAndAddressType(
       SyncAddressType.Multisig,

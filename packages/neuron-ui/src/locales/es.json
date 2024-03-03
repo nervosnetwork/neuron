@@ -34,7 +34,8 @@
         "looking-valid-target": "Buscando objetivo válido asumido",
         "set-start-block-number": "Establecer el número de bloque inicial"
       },
-      "migrating": "migrando..."
+      "migrating": "migrando...",
+      "left-time": "Tiempo restante"
     },
     "import-hardware": {
       "title": {
