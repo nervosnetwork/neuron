@@ -7,6 +7,7 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
+import { MIN_AMOUNT } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { isMainnet as isMainnetUtil, localNumberFormatter, useGoBack, shannonToCKBFormatter } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
@@ -144,7 +145,7 @@ const AmendSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < 61
+  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT
 
   return (
     <PageContainer
