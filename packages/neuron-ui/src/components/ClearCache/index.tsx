@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Spinner from 'widgets/Spinner'
-import Dialog from 'widgets/Dialog'
 import Toast from 'widgets/Toast'
 import { StateDispatch, addPopup } from 'states'
 import { clearCellCache } from 'services/remote'
@@ -9,7 +8,7 @@ import { cacheClearDate } from 'services/localCache'
 import { isSuccessResponse, uniformTimeFormatter } from 'utils'
 import styles from './clearCache.module.scss'
 
-const ClearCacheDialog = ({
+const ClearCache = ({
   dispatch,
   className,
   btnClassName,
@@ -50,20 +49,21 @@ const ClearCacheDialog = ({
           onClick={handleSubmit}
           disabled={isClearing}
         >
-          {t('settings.data.refresh')}
+          {isClearing ? (
+            <>
+              <Spinner className={styles.spinner} />
+              &nbsp;&nbsp;
+              {t('settings.data.clearing-cache')}
+            </>
+          ) : (
+            t('settings.data.refresh')
+          )}
         </button>
       </div>
-
-      <Dialog show={isClearing} showHeader={false} showFooter={false}>
-        <div className={styles.clearDialog}>
-          <Spinner size={3} />
-          <p>{t('settings.data.clearing-cache')}</p>
-        </div>
-      </Dialog>
       <Toast content={notice} onDismiss={() => setNotice('')} />
     </>
   )
 }
 
-ClearCacheDialog.displayName = 'ClearCacheDialog'
-export default ClearCacheDialog
+ClearCache.displayName = 'ClearCache'
+export default ClearCache

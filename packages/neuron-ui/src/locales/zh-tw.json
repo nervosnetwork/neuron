@@ -35,7 +35,8 @@
         "start-block-number": "起始區塊",
         "set-start-block-number": "設置同步起始區塊"
       },
-      "migrating": "正在數據遷移..."
+      "migrating": "正在數據遷移...",
+      "left-time": "剩余時間"
     },
     "import-hardware": {
       "title": {

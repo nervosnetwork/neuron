@@ -35,7 +35,8 @@
         "start-block-number": "Start block number",
         "set-start-block-number": "Set start block number"
       },
-      "migrating": "migrating..."
+      "migrating": "migrating...",
+      "left-time": "Left Time"
     },
     "import-hardware": {
       "title": {
