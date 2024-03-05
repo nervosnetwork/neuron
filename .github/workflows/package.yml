@@ -20,6 +20,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    environment: Release
+
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
     steps:
