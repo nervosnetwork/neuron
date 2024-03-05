@@ -1,8 +1,11 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm'
+import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm'
 
 @Entity()
 export default class AmendTransaction {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn()
+  id!: number
+
+  @Column({
     type: 'varchar',
   })
   hash!: string

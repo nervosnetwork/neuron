@@ -144,7 +144,7 @@ const AmendSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < 0
+  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < 61
 
   return (
     <PageContainer

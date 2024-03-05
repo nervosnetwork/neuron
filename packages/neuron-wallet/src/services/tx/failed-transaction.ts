@@ -1,6 +1,7 @@
 import { In, Not } from 'typeorm'
 import { getConnection } from '../../database/chain/connection'
 import OutputEntity from '../../database/chain/entities/output'
+import InputEntity from '../../database/chain/entities/input'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import { OutputStatus } from '../../models/chain/output'
 import TransactionsService from './transaction-service'
@@ -55,12 +56,28 @@ export class FailedTransaction {
       }
     })
 
-    await getConnection()
-      .createQueryBuilder()
-      .delete()
-      .from(TransactionEntity)
-      .where({ hash: In(removeTxs) })
-      .execute()
+    await getConnection().manager.transaction(async transactionalEntityManager => {
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where({ hash: In(removeTxs) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(OutputEntity)
+        .where({ outPointTxHash: In(removeTxs) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(InputEntity)
+        .where({ outPointTxHash: In(removeTxs) })
+        .execute()
+    })
   }
 
   // update tx status to TransactionStatus.Failed
