@@ -26,7 +26,7 @@ import {
   useOnGenerateNewAccountTransaction,
 } from 'utils'
 
-import { getSUDTAccountList, updateSUDTAccount, checkMigrateAcp } from 'services/remote'
+import { getSUDTAccountList, updateSUDTAccount } from 'services/remote'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -57,24 +57,6 @@ const SUDTAccountList = () => {
 
   const existingAccountNames = sUDTAccounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
 
-  useEffect(() => {
-    checkMigrateAcp().then(res => {
-      if (isSuccessResponse(res)) {
-        if (res.result === false) {
-          navigate(RoutePath.Overview)
-        }
-      } else {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: typeof res.message === 'string' ? res.message : res.message.content,
-          },
-        })
-      }
-    })
-  }, [dispatch, navigate])
   useIsInsufficientToCreateSUDTAccount({ walletId, balance: BigInt(balance), setInsufficient })
 
   const fetchAndUpdateList = useCallback(() => {

@@ -6,7 +6,7 @@ import Dialog from 'widgets/Dialog'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx } from 'services/remote'
-import { AppActions, useDispatch } from 'states'
+import { AppActions, showGlobalAlertDialog, useDispatch } from 'states'
 import { isErrorWithI18n } from 'exceptions'
 import styles from './sUDTMigrateToExistAccountDialog.module.scss'
 
@@ -79,14 +79,11 @@ const SUDTMigrateToExistAccountDialog = ({
           })
         }
       } else {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: typeof res.message === 'string' ? res.message : res.message.content!,
-          },
-        })
+        showGlobalAlertDialog({
+          type: 'failed',
+          message: typeof res.message === 'string' ? res.message : res.message.content!,
+          action: 'ok',
+        })(dispatch)
       }
     })
   }, [cell.outPoint, address, t, onCloseDialog, dispatch, walletID])
