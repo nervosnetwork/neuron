@@ -20,6 +20,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    permissions:
+      contents: read
+      pull-requests: read
+
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
     env:
@@ -208,6 +212,9 @@ jobs:
     needs: [packaging]
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Comment by push event
         if: ${{ github.event_name == 'push' }}
@@ -230,6 +237,8 @@ jobs:
     if: ${{ always() && needs.packaging.result == 'failure' }}
     name: Append failed comment to the comment
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Comment by pull request comment event when package failed
         if: ${{ github.event_name == 'issue_comment' }}
