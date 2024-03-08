@@ -45,6 +45,7 @@ export default {
         label: 'Window',
         minimize: 'Minimize',
         close: 'Close Window',
+        lock: 'Lock window',
       },
       help: {
         label: 'Help',

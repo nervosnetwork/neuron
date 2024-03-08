@@ -11,6 +11,7 @@ export enum LocalCacheKey {
   LoadedWalletIDs = 'loadedWalletIDs',
   ImportedWallet = 'ImportedWallet',
   ShownNodeId = 'ShownNodeId',
+  RetryUnlockWindowInfo = 'RetryUnlockWindowInfo',
 }
 
 export const addresses = {
@@ -163,5 +164,22 @@ export const lastShowInternalNodeIds = {
   },
   save: (type: NetworkType, id: string) => {
     window.localStorage.setItem(`${type}_${LocalCacheKey.ShownNodeId}`, id)
+  },
+}
+
+export const retryUnlockWindow = {
+  reset: () => {
+    window.localStorage.setItem(LocalCacheKey.RetryUnlockWindowInfo, JSON.stringify({ retryTimes: 0 }))
+  },
+  save: (info: { lastRetryTime?: number; retryTimes: number }) => {
+    window.localStorage.setItem(LocalCacheKey.RetryUnlockWindowInfo, JSON.stringify(info))
+  },
+  get: (): { lastRetryTime?: number; retryTimes: number } => {
+    try {
+      const info = window.localStorage.getItem(LocalCacheKey.RetryUnlockWindowInfo)
+      return info ? JSON.parse(info) : { retryTimes: 0 }
+    } catch (error) {
+      return { retryTimes: 0 }
+    }
   },
 }

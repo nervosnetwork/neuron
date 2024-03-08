@@ -1,6 +1,6 @@
-const MILLISECS_PER_SEC = 1_000
-const MILLISECS_PER_MIN = 60_000
-const MILLISECS_PER_HOUR = 3600_000
+export const MILLISECS_PER_SEC = 1_000
+export const MILLISECS_PER_MIN = 60_000
+export const MILLISECS_PER_HOUR = 3600_000
 
 export const getSyncLeftTime = (estimate: number | undefined) => {
   let leftTime = '-'

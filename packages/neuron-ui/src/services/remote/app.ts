@@ -47,3 +47,9 @@ export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-display
 export const invokeShowMessageBox = remoteApi<MessageBoxOptions, MessageBoxReturnValue>('show-message-box')
 export const isDark = remoteApi<void, boolean>('is-dark')
 export const setTheme = remoteApi<'light' | 'dark', void>('set-theme')
+export const getLockWindowInfo = remoteApi<void, State.App['lockWindowInfo']>('get-lock-window-info')
+export const updateLockWindowInfo = remoteApi<{ locked?: boolean; password?: string }, State.App['lockWindowInfo']>(
+  'update-lock-window-info'
+)
+export const verifyLockWindowPassword = remoteApi<string, boolean>('verify-lock-window-password')
+export const unlockWindow = remoteApi<string, boolean>('unlock-window')

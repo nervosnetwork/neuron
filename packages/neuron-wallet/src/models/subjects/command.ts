@@ -13,6 +13,7 @@ const CommandSubject = new Subject<{
     | 'migrate-acp'
     | 'sign-verify'
     | 'multisig-address'
+    | 'lock-window'
   payload: string | null
   dispatchToUI: boolean
 }>()
