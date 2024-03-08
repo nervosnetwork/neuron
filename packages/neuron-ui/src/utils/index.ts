@@ -28,5 +28,6 @@ export * from './multisig'
 export * from './getNetworkLabel'
 export * from './calculateUsedCapacity'
 export * from './outPointTransform'
+export * from './wakeScreen'
 
 export { CONSTANTS }

@@ -4,14 +4,19 @@ $action-button-width: 11.25rem;
 
 .container {
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
+  gap: 16px;
 
   .content {
     width: 176px;
     padding: 16px;
     background: var(--input-disabled-color);
     border-radius: 8px;
-    margin-right: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
 
     p {
       font-size: 14px;
@@ -19,7 +24,7 @@ $action-button-width: 11.25rem;
       margin: 0 0 12px;
       color: var(--main-text-color);
     }
-    button {
+    button[data-button-type='text'] {
       font-size: 14px;
       line-height: 20px;
       border: none;
