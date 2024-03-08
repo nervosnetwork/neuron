@@ -395,7 +395,21 @@
         "language": "Language",
         "select-language": "Select Language",
         "apply": "Apply",
-        "keep-awake": "Keep the screen awake during synchronization"
+        "keep-awake": "Keep the screen awake during synchronization",
+        "lock-password": "Lock window password",
+        "set-lock-password": "Set lock window password",
+        "change-lock-password": "Change lock window password",
+        "lock-window": {
+          "set-password": "Set Password",
+          "confirm-password": "Confirm Password",
+          "enter-current-password": "Enter Password",
+          "enter-new-password": "Enter new password",
+          "password-error": "Password error",
+          "different-password": "Two entered passwords do not match",
+          "set-password-success": "Password set successfully",
+          "change-password-success": "Password change successfully.",
+          "reset": "Reset"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -1254,6 +1268,12 @@
         "size": "Size",
         "lock-time": "Lock Time"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron's window has been locked",
+      "enter-lock-password": "Enter lock password",
+      "lock-password-error": "Lock windows password error",
+      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}"
     }
   }
 }

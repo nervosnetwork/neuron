@@ -15,6 +15,7 @@ import NetworksService from '../../services/networks'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
 import { CKBLightRunner } from '../../services/light-runner'
 import { NetworkType } from '../../models/network'
+import SettingsService from '../../services/settings'
 
 enum URL {
   Settings = '/settings',
@@ -109,6 +110,13 @@ const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
     CommandSubject.next({ winID: window.id, type: actionType, payload: walletID, dispatchToUI: false })
+  }
+}
+
+const lockWindow = () => {
+  const window = BrowserWindow.getFocusedWindow()
+  if (window) {
+    CommandSubject.next({ winID: window.id, type: 'lock-window', payload: null, dispatchToUI: true })
   }
 }
 
@@ -389,6 +397,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.window.close'),
         role: 'close',
       },
+      {
+        label: t('application-menu.window.lock'),
+        accelerator: 'CmdOrCtrl+L',
+        click: () => {
+          lockWindow()
+        },
+      },
     ],
   }
 
@@ -523,10 +538,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     ],
   }
 
-  const applicationMenuTemplate = env.isDevMode
+  let applicationMenuTemplate = env.isDevMode
     ? [walletMenuItem, editMenuItem, developMenuItem, toolsMenuItem, windowMenuItem, helpMenuItem]
     : [walletMenuItem, editMenuItem, toolsMenuItem, windowMenuItem, helpMenuItem]
 
+  if (SettingsService.getInstance().lockWindowInfo.locked) {
+    applicationMenuTemplate = env.isDevMode
+      ? [editMenuItem, developMenuItem, windowMenuItem, helpMenuItem]
+      : [editMenuItem, windowMenuItem, helpMenuItem]
+  }
   if (isMac) {
     applicationMenuTemplate.unshift(appMenuItem)
   }

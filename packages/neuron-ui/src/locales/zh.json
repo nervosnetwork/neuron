@@ -388,7 +388,21 @@
         "language": "系统语言",
         "select-language": "选择语言",
         "apply": "应用",
-        "keep-awake": "同步期间保持屏幕唤醒"
+        "keep-awake": "同步期间保持屏幕唤醒",
+        "lock-password": "锁屏密码",
+        "set-lock-password": "设置锁屏密码",
+        "change-lock-password": "修改锁屏密码",
+        "lock-window": {
+          "set-password": "设置密码",
+          "confirm-password": "确认密码",
+          "enter-current-password": "输入当前密码",
+          "enter-new-password": "输入新密码",
+          "password-error": "密码错误",
+          "different-password": "两次输入密码不一致",
+          "set-password-success": "密码设置成功",
+          "change-password-success": "密码修改成功",
+          "reset": "重新设置"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -1246,6 +1260,12 @@
         "size": "大小",
         "lock-time": "锁定时间"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron 窗口已锁定",
+      "enter-lock-password": "输入锁屏密码",
+      "lock-password-error": "锁屏密码错误",
+      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试"
     }
   }
 }

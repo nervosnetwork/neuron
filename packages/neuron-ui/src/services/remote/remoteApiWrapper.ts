@@ -52,6 +52,10 @@ type Action =
   | 'start-node-ignore-external'
   | 'get-first-sync-info'
   | 'start-sync'
+  | 'get-lock-window-info'
+  | 'update-lock-window-info'
+  | 'verify-lock-window-password'
+  | 'unlock-window'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

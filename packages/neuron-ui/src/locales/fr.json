@@ -394,7 +394,21 @@
         "language": "Langue",
         "select-language": "Sélectionner la langue",
         "apply": "Appliquer",
-        "keep-awake": "Maintenir l'écran allumé pendant la synchronisation"
+        "keep-awake": "Maintenir l'écran allumé pendant la synchronisation",
+        "lock-password": "Mot de passe de verrouillage de l'écran",
+        "set-lock-password": "Configurer le mot de passe de verrouillage de l'écran",
+        "change-lock-password": "Modifier le mot de passe de verrouillage de l'écran",
+        "lock-window": {
+          "set-password": "Créer un mot de passe",
+          "confirm-password": "Confirmer le mot de passe",
+          "enter-current-password": "Entrer le mot de passe actuel",
+          "enter-new-password": "Entrer le nouveau mot de passe",
+          "password-error": "Mot de passe incorrect",
+          "different-password": "Les deux mots de passe entrés ne correspondent pas",
+          "set-password-success": "Mot de passe défini avec succès",
+          "change-password-success": "Mot de passe modifié avec succès",
+          "reset": "Réinitialiser"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -1244,6 +1258,12 @@
         "size": "taille",
         "lock-time": "Période de verrouillage"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "a fenêtre de Neuron est verrouillée",
+      "enter-lock-password": "Entrer le mot de passe de verrouillage d'écran",
+      "lock-password-error": "Mot de passe de verrouillage d'écran incorrect",
+      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}"
     }
   }
 }

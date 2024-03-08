@@ -306,6 +306,42 @@ export default class ApiController {
       }
     })
 
+    handle('unlock-window', async (_, password: string) => {
+      if (!SettingsService.getInstance().verifyLockWindowPassword(password)) {
+        return {
+          status: ResponseCode.Fail,
+        }
+      }
+      SettingsService.getInstance().updateLockWindowInfo({ locked: false })
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('update-lock-window-info', async (_, params: { locked?: boolean; password?: string }) => {
+      SettingsService.getInstance().updateLockWindowInfo(params)
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('get-lock-window-info', async () => {
+      return {
+        result: SettingsService.getInstance().lockWindowInfo,
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle('verify-lock-window-password', async (_, password: string) => {
+      return {
+        status: SettingsService.getInstance().verifyLockWindowPassword(password)
+          ? ResponseCode.Success
+          : ResponseCode.Fail,
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
