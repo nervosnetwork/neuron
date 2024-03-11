@@ -42,6 +42,8 @@ const getTransactionStatus = async (hash: string) => {
 
 const trackingStatus = async () => {
   const pendingTransactions = await FailedTransaction.pendings()
+  await FailedTransaction.processAmendFailedTxs()
+
   if (!pendingTransactions.length) {
     return
   }
@@ -62,8 +64,6 @@ const trackingStatus = async () => {
       }
     })
   )
-
-  await FailedTransaction.processAmendFailedTxs()
 
   const failedTxs = txs.filter(
     (tx): tx is TransactionDetail & { status: TransactionStatus.Failed } => tx?.status === TransactionStatus.Failed

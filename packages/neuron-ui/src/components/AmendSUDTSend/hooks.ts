@@ -1,48 +1,17 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { AppActions } from 'states/stateProvider/reducer'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
-import { getTransaction as getSentTransaction, getTransactionSize } from 'services/remote'
+import { getTransaction as getSentTransaction, getTransactionSize, getTransactionList } from 'services/remote'
 import { isSuccessResponse } from 'utils'
-
-const clear = (dispatch: StateDispatch) => {
-  dispatch({
-    type: AppActions.ClearSendState,
-  })
-}
-
-const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
-  useCallback(
-    (value: string) => {
-      dispatch({
-        type: AppActions.UpdateSendPrice,
-        payload: value,
-      })
-    },
-    [dispatch]
-  )
-
-const useSendDescriptionChange = (dispatch: StateDispatch) =>
-  useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
-      dispatch({
-        type: AppActions.UpdateSendDescription,
-        payload: value,
-      })
-    },
-    [dispatch]
-  )
 
 export const useInitialize = ({
   hash,
   walletID,
-  price,
   dispatch,
 }: {
   hash: string
   walletID: string
-  price: string
   isMainnet: boolean
   dispatch: React.Dispatch<any>
   t: TFunction
@@ -50,10 +19,19 @@ export const useInitialize = ({
   const [transaction, setTransaction] = useState<State.GeneratedTx | null>(null)
   const [size, setSize] = useState(0)
   const [minPrice, setMinPrice] = useState('0')
+  const [price, setPrice] = useState('0')
+  const [description, setDescription] = useState('')
   const [showConfirmedAlert, setShowConfirmedAlert] = useState(false)
+  const [sudtInfo, setSudtInfo] = useState<State.Transaction['sudtInfo'] | null>(null)
+  const [txValue, setTxValue] = useState('0')
 
-  const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
-  const onDescriptionChange = useSendDescriptionChange(dispatch)
+  const onDescriptionChange = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      setDescription(value)
+    },
+    [dispatch]
+  )
 
   const fee = useMemo(() => {
     const ratio = BigInt(1000)
@@ -75,13 +53,26 @@ export const useInitialize = ({
       setShowConfirmedAlert(true)
     }
 
+    const listRes = await getTransactionList({
+      walletID,
+      pageNo: 1,
+      pageSize: 10,
+      keywords: hash,
+    })
+    if (isSuccessResponse(listRes)) {
+      const list = listRes.result.items
+      if (list.length) {
+        const { sudtInfo: info, value } = list[0]
+        setSudtInfo(info)
+        setTxValue(value)
+      }
+    }
+
     const txRes = await getSentTransaction({ hash, walletID })
     if (isSuccessResponse(txRes)) {
       const tx = txRes.result
-      setTransaction({
-        ...tx,
-        outputsData,
-      })
+
+      setTransaction({ ...tx, outputsData })
 
       const sizeRes = await getTransactionSize(tx)
 
@@ -90,19 +81,15 @@ export const useInitialize = ({
         if (minFee) {
           const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(sizeRes.result)).toString()
           setMinPrice(mPrice)
-          updateTransactionPrice(mPrice)
+          setPrice(mPrice)
         }
       }
     }
-  }, [hash, setShowConfirmedAlert, updateTransactionPrice, setTransaction, setSize, setMinPrice])
+  }, [hash, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
 
   useEffect(() => {
     fetchInitData()
   }, [])
-
-  useEffect(() => {
-    clear(dispatch)
-  }, [walletID, dispatch])
 
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -125,7 +112,7 @@ export const useInitialize = ({
           payload: {
             walletID: walletId as string,
             amendHash: hash,
-            actionType: 'send',
+            actionType: 'send-sudt',
           },
         })
       } catch {
@@ -136,7 +123,9 @@ export const useInitialize = ({
   )
 
   return {
-    updateTransactionPrice,
+    setPrice,
+    price,
+    description,
     onDescriptionChange,
     fee,
     transaction,
@@ -144,6 +133,8 @@ export const useInitialize = ({
     minPrice,
     showConfirmedAlert,
     onSubmit,
+    sudtInfo,
+    txValue,
   }
 }
 

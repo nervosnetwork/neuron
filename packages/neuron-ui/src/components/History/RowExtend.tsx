@@ -44,6 +44,10 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
             break
           }
           case 'amend': {
+            if (column?.sudtInfo) {
+              navigate(`${RoutePath.History}/amendSUDTSend/${btn.dataset.hash}`)
+              return
+            }
             navigate(`${RoutePath.History}/amend/${btn.dataset.hash}`)
             break
           }
@@ -66,7 +70,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
 
   useEffect(() => {
     if (status !== 'success') {
-      if (column.type === 'send' && !column.nftInfo && !column.sudtInfo) {
+      if (column.type === 'send' && !column.nftInfo) {
         getOnChainTransaction(hash).then(tx => {
           // @ts-expect-error Replace-By-Fee (RBF)
           const { min_replace_fee: minReplaceFee } = tx

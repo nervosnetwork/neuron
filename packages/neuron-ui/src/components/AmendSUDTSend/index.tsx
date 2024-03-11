@@ -1,32 +1,39 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useState as useGlobalState, useDispatch, appState, AppActions } from 'states'
+import { useParams } from 'react-router-dom'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import TextField from 'widgets/TextField'
 import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
-import { MIN_AMOUNT } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { isMainnet as isMainnetUtil, localNumberFormatter, useGoBack, shannonToCKBFormatter, RoutePath } from 'utils'
+import {
+  isMainnet as isMainnetUtil,
+  localNumberFormatter,
+  useGoBack,
+  shannonToCKBFormatter,
+  sudtValueToAmount,
+  sUDTAmountFormatter,
+} from 'utils'
+import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import AlertDialog from 'widgets/AlertDialog'
-import styles from './amendSend.module.scss'
+import styles from './amendSUDTSend.module.scss'
 import { useInitialize } from './hooks'
 
-const AmendSend = () => {
+const AmendSUDTSend = () => {
   const {
     app: {
-      send = appState.send,
       loadings: { sending = false },
       showWaitForFullySynced,
     },
     wallet: { id: walletID = '', addresses },
     chain: { networkID },
+    experimental,
     settings: { networks = [] },
+    sUDTAccounts,
   } = useGlobalState()
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const { hash = '' } = useParams()
 
@@ -34,19 +41,29 @@ const AmendSend = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, showConfirmedAlert } =
-    useInitialize({
-      hash,
-      walletID,
-      price: send.price,
-      isMainnet,
-      dispatch,
-      t,
-    })
+  const {
+    fee,
+    price,
+    setPrice,
+    transaction,
+    onSubmit,
+    minPrice,
+    showConfirmedAlert,
+    sudtInfo,
+    description,
+    onDescriptionChange,
+    txValue,
+  } = useInitialize({
+    hash,
+    walletID,
+    isMainnet,
+    dispatch,
+    t,
+  })
 
   const priceError = useMemo(() => {
-    return Number(send.price) < Number(minPrice) ? t('price-switch.errorTip', { minPrice }) : null
-  }, [send.price, minPrice])
+    return Number(price || '0') < Number(minPrice) ? t('price-switch.errorTip', { minPrice }) : null
+  }, [price, minPrice])
 
   const inputHint = t('price-switch.hintTip', { suggestFeeRate: minPrice })
 
@@ -54,14 +71,33 @@ const AmendSend = () => {
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value: inputValue } = e.currentTarget
 
-      updateTransactionPrice(inputValue.replace(/,/g, ''))
+      setPrice(inputValue.replace(/,/g, ''))
     },
-    [updateTransactionPrice]
+    [setPrice]
   )
+
+  const getToAddress = (outputs?: State.DetailedOutput[]) => {
+    if (!outputs) return ''
+
+    const list = sUDTAccounts.map(item => item.address)
+
+    const to = outputs.find(output => {
+      const address = scriptToAddress(output.lock, isMainnet)
+      if (list.includes(address) || (sudtInfo && !output.type)) {
+        return false
+      }
+      return true
+    })
+    if (to) {
+      return scriptToAddress(to.lock, isMainnet)
+    }
+    return ''
+  }
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     const change = outputs.find(output => {
       const address = scriptToAddress(output.lock, isMainnet)
+
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
     if (change) {
@@ -76,9 +112,13 @@ const AmendSend = () => {
       return scriptToAddress(receive.lock, isMainnet)
     }
 
-    navigate(`${RoutePath.History}/amendSUDTSend/${hash}`, {
-      replace: true,
+    const sudt = outputs.find(output => {
+      const address = scriptToAddress(output.lock, isMainnet)
+      return !!sUDTAccounts.find(item => item.address === address)
     })
+    if (sudt) {
+      return scriptToAddress(sudt.lock, isMainnet)
+    }
     return ''
   }
 
@@ -115,8 +155,6 @@ const AmendSend = () => {
     }, BigInt(0))
   }, [items])
 
-  const totalAmount = shannonToCKBFormatter(outputsCapacity.toString())
-
   const lastOutputsCapacity = useMemo(() => {
     if (transaction) {
       const inputsCapacity = transaction.inputs.reduce((total, cur) => {
@@ -141,16 +179,19 @@ const AmendSend = () => {
         }
       })
       dispatch({
-        type: AppActions.UpdateGeneratedTx,
+        type: AppActions.UpdateExperimentalParams,
         payload: {
-          ...transaction,
-          outputs,
+          tx: {
+            ...transaction,
+            description: experimental?.params?.description || description || '',
+            outputs,
+          },
         },
       })
     }
-  }, [lastOutputsCapacity, transaction, items, dispatch])
+  }, [lastOutputsCapacity, transaction, items, dispatch, experimental?.params?.description, description])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT
+  const disabled = sending || !experimental?.tx || priceError || lastOutputsCapacity < 0
 
   return (
     <PageContainer
@@ -165,40 +206,37 @@ const AmendSend = () => {
         <div className={`${styles.layout} ${showWaitForFullySynced ? styles.withFullySynced : ''}`}>
           <div className={styles.left}>
             <div className={styles.content}>
-              {items
-                .filter(item => !item.isLastOutput)
-                .map(item => (
-                  <div className={styles.inputCell}>
-                    <div className={styles.addressCell}>
-                      <div className={styles.label}>{t('send.address')}</div>
-                      <div className={styles.content}>{item.address}</div>
-                    </div>
+              <div className={styles.inputCell}>
+                <div className={styles.addressCell}>
+                  <div className={styles.label}>{t('send.address')}</div>
+                  <div className={styles.content}>{getToAddress(transaction?.outputs)}</div>
+                </div>
 
-                    <TextField
-                      className={styles.textFieldClass}
-                      label={t('send.amount')}
-                      field="amount"
-                      value={item.amount ? localNumberFormatter(item.amount) : ''}
-                      disabled
-                      width="100%"
-                    />
-                  </div>
-                ))}
+                <TextField
+                  className={styles.textFieldClass}
+                  label={`${t('s-udt.send.amount')}(${sudtInfo?.sUDT.tokenName || 'CKB'})`}
+                  field="amount"
+                  value={sUDTAmountFormatter(
+                    sudtValueToAmount(
+                      (sudtInfo?.amount || txValue).replace('-', ''),
+                      sudtInfo?.sUDT.decimal || DEFAULT_SUDT_FIELDS.CKBDecimal
+                    )
+                  )}
+                  disabled
+                  width="100%"
+                />
+              </div>
             </div>
           </div>
 
           <div className={styles.right}>
             <div className={styles.content}>
-              <div className={styles.totalAmountField}>
-                <p className={styles.title}>{t('send.total-amount')}</p>
-                <p className={styles.value}>{totalAmount}</p>
-              </div>
               <TextField
                 placeholder={t('send.description-optional')}
                 className={styles.textFieldClass}
                 field="description"
                 label={t('send.description')}
-                value={send.description}
+                value={description || experimental?.params?.description || ''}
                 disabled={sending}
                 onChange={onDescriptionChange}
                 width="100%"
@@ -214,7 +252,7 @@ const AmendSend = () => {
               <TextField
                 label={t('price-switch.customPrice')}
                 field="price"
-                value={localNumberFormatter(send.price)}
+                value={localNumberFormatter(price)}
                 onChange={handlePriceChange}
                 suffix="shannons/kB"
                 error={priceError}
@@ -223,10 +261,6 @@ const AmendSend = () => {
               />
             </div>
             <div className={styles.rightFooter}>
-              <label htmlFor="send-with-sent-cell" className={styles.allowUseSent}>
-                <input type="checkbox" id="send-with-sent-cell" checked />
-                <span>{t('send.allow-use-sent-cell')}</span>
-              </label>
               <div className={styles.actions}>
                 <Button type="submit" disabled={disabled} label={t('send.send')}>
                   {sending ? <Spinner /> : (t('send.submit-transaction') as string)}
@@ -236,7 +270,6 @@ const AmendSend = () => {
           </div>
         </div>
       </form>
-
       <AlertDialog
         show={showConfirmedAlert}
         title={t('send.transaction-confirmed')}
@@ -249,6 +282,6 @@ const AmendSend = () => {
   )
 }
 
-AmendSend.displayName = 'AmendSend'
+AmendSUDTSend.displayName = 'AmendSUDTSend'
 
-export default AmendSend
+export default AmendSUDTSend
