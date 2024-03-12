@@ -422,11 +422,11 @@
         "switch-network-type": "Cambiar a {{type}}"
       },
       "locale": {
-        "en": "Inglés",
-        "en-US": "Inglés(Estados Unidos)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Francés",
+        "fr": "Français",
         "es": "Español"
       },
       "data": {

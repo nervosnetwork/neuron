@@ -429,8 +429,8 @@
         "switch-network-type": "Basculer vers {{type}}"
       },
       "locale": {
-        "en": "Anglais",
-        "en-US": "Anglais (États-Unis)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
         "fr": "Français",
