@@ -310,6 +310,7 @@
       "table": {
         "name": "Wallet Name",
         "type": "Type",
+        "balance": "Balance",
         "amount": "Amount",
         "timestamp": "Time",
         "status": "Status",
@@ -330,7 +331,8 @@
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address",
       "create": "Create {{name}} Asset Account",
-      "destroy": "Destroy {{name}} Asset Account"
+      "destroy": "Destroy {{name}} Asset Account",
+      "fee": "Transaction Fee"
     },
     "transaction": {
       "window-title": "Transaction: {{hash}}",
@@ -347,7 +349,15 @@
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
       "lock-script-title": "Address Information",
-      "deprecated-address-format": "Address in deprecated format"
+      "deprecated-address-format": "Address in deprecated format",
+      "type": "Type",
+      "fee": "Transaction Fee",
+      "assets": "Assets",
+      "balance": "Balance",
+      "status": "Status",
+      "size": "Size",
+      "cycles": "Cycles",
+      "cell-detail": "Cell Detail"
     },
     "addresses": {
       "title": "Address Book",
@@ -1194,7 +1204,12 @@
         "capacity-used": "Used Capacity",
         "data": "Data",
         "total": "Total",
-        "used": "Used"
+        "used": "Used",
+        "view-raw-data": "Raw data",
+        "UTF8": "UTF-8",
+        "address": "Address",
+        "number": "Number",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",

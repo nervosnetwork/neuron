@@ -305,6 +305,7 @@
       "table": {
         "name": "錢包名稱",
         "type": "類型",
+        "balance": "余額",
         "amount": "金額",
         "timestamp": "時間",
         "status": "狀態",
@@ -325,7 +326,8 @@
       "copy-balance": "複製餘額",
       "copy-address": "複製地址",
       "create": "創建 {{name}} 資產賬戶",
-      "destroy": "銷毀 {{name}} 資產賬戶"
+      "destroy": "銷毀 {{name}} 資產賬戶",
+      "fee": "交易費用"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
@@ -342,7 +344,15 @@
       "cell-from-cellbase": "來自 Cellbase",
       "lock-script": "腳本鎖定",
       "lock-script-title": "地址資訊",
-      "deprecated-address-format": "已棄用格式的地址"
+      "deprecated-address-format": "已棄用格式的地址",
+      "type": "類型",
+      "fee": "交易費用",
+      "assets": "資產",
+      "balance": "余額",
+      "status": "狀態",
+      "size": "大小",
+      "cycles": "周期",
+      "cell-detail": "Cell詳情"
     },
     "addresses": {
       "title": "地址簿",
@@ -1024,7 +1034,7 @@
         "address": "簽名者地址",
         "alias": "别名",
         "type": "類型",
-        "balance": "余额",
+        "balance": "余額",
         "copy-address": "復製地址",
         "action": "操作",
         "more": "更多",
@@ -1165,7 +1175,8 @@
         "capacity-used": "容量使用",
         "data": "數據",
         "total": "總量",
-        "used": "已用"
+        "used": "已用",
+        "view-raw-data": "原始數據"
       },
       "locked-reason": {
         "multi-locktime": "這是壹個有時間鎖的 cell, 只能在 {{time}} 之後使用。",

@@ -5,6 +5,8 @@ export interface GetTransactionListParams {
   pageSize: number
   keywords?: string
   walletID: string
+  sort?: string
+  direction?: string
 }
 
 export const getTransactionList = remoteApi<GetTransactionListParams>('get-transaction-list')
