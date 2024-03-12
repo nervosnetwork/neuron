@@ -14,9 +14,10 @@ const clear = (dispatch: StateDispatch) => {
 const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
     (value: string) => {
+      const price = value.split('.')[0].replace(/[^\d]/, '')
       dispatch({
         type: AppActions.UpdateSendPrice,
-        payload: value,
+        payload: price,
       })
     },
     [dispatch]

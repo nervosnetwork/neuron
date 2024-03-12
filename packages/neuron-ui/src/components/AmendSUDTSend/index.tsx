@@ -71,7 +71,8 @@ const AmendSUDTSend = () => {
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value: inputValue } = e.currentTarget
 
-      setPrice(inputValue.replace(/,/g, ''))
+      const value = inputValue.split('.')[0].replace(/[^\d]/, '')
+      setPrice(value)
     },
     [setPrice]
   )
