@@ -2,12 +2,12 @@ name: Package Neuron for Test
 
 on: 
   issue_comment:
-    types: [created, edited]
+    types: [created]
   push:
 
 jobs:
   packaging:
-    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package')) || github.event_name == 'push' }}
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package') && contains(fromJSON('["MEMBER", "OWNER"]'), (github.event.comment.author_association))) || github.event_name == 'push' }}
 
     strategy:
       matrix:
@@ -19,6 +19,10 @@ jobs:
           - windows-2019
 
     runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
+      pull-requests: read
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
@@ -208,6 +212,9 @@ jobs:
     needs: [packaging]
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Comment by push event
         if: ${{ github.event_name == 'push' }}
@@ -230,6 +237,8 @@ jobs:
     if: ${{ always() && needs.packaging.result == 'failure' }}
     name: Append failed comment to the comment
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Comment by pull request comment event when package failed
         if: ${{ github.event_name == 'issue_comment' }}
