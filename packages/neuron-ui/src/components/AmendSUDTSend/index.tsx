@@ -77,12 +77,12 @@ const AmendSUDTSend = () => {
     [setPrice]
   )
 
-  const getToAddress = (outputs?: State.DetailedOutput[]) => {
-    if (!outputs) return ''
+  const toAddress = useMemo(() => {
+    if (!transaction?.outputs) return ''
 
     const list = sUDTAccounts.map(item => item.address)
 
-    const to = outputs.find(output => {
+    const to = transaction?.outputs.find(output => {
       const address = scriptToAddress(output.lock, isMainnet)
       if (list.includes(address) || (sudtInfo && !output.type)) {
         return false
@@ -92,8 +92,8 @@ const AmendSUDTSend = () => {
     if (to) {
       return scriptToAddress(to.lock, isMainnet)
     }
-    return ''
-  }
+    return scriptToAddress(transaction?.outputs[0].lock, isMainnet)
+  }, [transaction?.outputs])
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     const change = outputs.find(output => {
@@ -210,7 +210,7 @@ const AmendSUDTSend = () => {
               <div className={styles.inputCell}>
                 <div className={styles.addressCell}>
                   <div className={styles.label}>{t('send.address')}</div>
-                  <div className={styles.content}>{getToAddress(transaction?.outputs)}</div>
+                  <div className={styles.content}>{toAddress}</div>
                 </div>
 
                 <TextField

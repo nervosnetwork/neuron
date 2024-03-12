@@ -97,7 +97,7 @@ export const useInitialize = ({
         dataset: { walletId, status },
       } = e.target as HTMLFormElement
       e.preventDefault()
-      if (status !== 'ready') {
+      if (status !== 'ready' || !transaction) {
         return
       }
       try {
@@ -107,19 +107,23 @@ export const useInitialize = ({
           setShowConfirmedAlert(true)
           return
         }
+
+        const actionType =
+          transaction.inputs.length > transaction.witnesses.length ? 'send-sudt' : 'send-acp-sudt-to-new-cell'
+
         dispatch({
           type: AppActions.RequestPassword,
           payload: {
             walletID: walletId as string,
             amendHash: hash,
-            actionType: 'send-sudt',
+            actionType,
           },
         })
       } catch {
         // ignore
       }
     },
-    [dispatch, walletID, hash, setShowConfirmedAlert]
+    [dispatch, walletID, hash, setShowConfirmedAlert, transaction]
   )
 
   return {

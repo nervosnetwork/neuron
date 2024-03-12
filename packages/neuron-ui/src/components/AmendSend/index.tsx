@@ -9,7 +9,14 @@ import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
 import { MIN_AMOUNT } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { isMainnet as isMainnetUtil, localNumberFormatter, useGoBack, shannonToCKBFormatter, RoutePath } from 'utils'
+import {
+  isMainnet as isMainnetUtil,
+  localNumberFormatter,
+  useGoBack,
+  shannonToCKBFormatter,
+  RoutePath,
+  isSecp256k1Address,
+} from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import styles from './amendSend.module.scss'
 import { useInitialize } from './hooks'
@@ -62,6 +69,12 @@ const AmendSend = () => {
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     const change = outputs.find(output => {
       const address = scriptToAddress(output.lock, isMainnet)
+      if (!isSecp256k1Address(address)) {
+        navigate(`${RoutePath.History}/amendSUDTSend/${hash}`, {
+          replace: true,
+        })
+      }
+
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
     if (change) {
@@ -76,9 +89,6 @@ const AmendSend = () => {
       return scriptToAddress(receive.lock, isMainnet)
     }
 
-    navigate(`${RoutePath.History}/amendSUDTSend/${hash}`, {
-      replace: true,
-    })
     return ''
   }
 
