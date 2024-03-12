@@ -7,7 +7,7 @@ on:
 
 jobs:
   packaging:
-    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package') && contains(fromJSON('["MEMBER", "OWNER"]'), (github.event.comment.author_association))) || github.event_name == 'push' }}
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package') && contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)) || github.event_name == 'push' }}
 
     strategy:
       matrix:
