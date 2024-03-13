@@ -67,6 +67,10 @@ const AmendSend = () => {
   )
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
+    if (outputs.length === 1) {
+      return scriptToAddress(outputs[0].lock, isMainnet)
+    }
+
     const change = outputs.find(output => {
       const address = scriptToAddress(output.lock, isMainnet)
       if (!isSecp256k1Address(address)) {
@@ -176,7 +180,7 @@ const AmendSend = () => {
           <div className={styles.left}>
             <div className={styles.content}>
               {items
-                .filter(item => !item.isLastOutput)
+                .filter(item => items.length === 1 || !item.isLastOutput)
                 .map(item => (
                   <div className={styles.inputCell}>
                     <div className={styles.addressCell}>

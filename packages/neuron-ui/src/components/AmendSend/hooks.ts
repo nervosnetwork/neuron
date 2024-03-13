@@ -67,11 +67,12 @@ export const useInitialize = ({
   }, [price, size])
 
   const fetchInitData = useCallback(async () => {
+    const res = await getOnChainTransaction(hash)
     const {
       // @ts-expect-error Replace-By-Fee (RBF)
       min_replace_fee: minFee,
       transaction: { outputsData },
-    } = await getOnChainTransaction(hash)
+    } = res
     if (!minFee) {
       setShowConfirmedAlert(true)
     }

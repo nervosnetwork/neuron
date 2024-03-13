@@ -70,7 +70,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
 
   useEffect(() => {
     if (status !== 'success') {
-      if (column.type === 'send' && !column.nftInfo) {
+      if (column.type === 'send' && !column.nftInfo && !column.nervosDao) {
         getOnChainTransaction(hash).then(tx => {
           // @ts-expect-error Replace-By-Fee (RBF)
           const { min_replace_fee: minReplaceFee } = tx
