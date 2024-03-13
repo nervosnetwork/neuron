@@ -1,21 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  openExternal,
   getLiveCells,
   updateLiveCellsLocalInfo,
   updateLiveCellsLockStatus as updateLiveCellsLockStatusAPI,
 } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
-import {
-  LockScriptCategory,
-  RoutePath,
-  TypeScriptCategory,
-  calculateUsedCapacity,
-  getExplorerUrl,
-  isSuccessResponse,
-  outPointToStr,
-} from 'utils'
+import { LockScriptCategory, RoutePath, TypeScriptCategory, isSuccessResponse, outPointToStr } from 'utils'
 import { SortType } from 'widgets/Table'
 
 const cellTypeOrder: Record<string, number> = {
@@ -348,52 +339,6 @@ export const useSelect = (liveCells: State.LiveCellWithLocalInfo[]) => {
     isAllSelected: selectedOutPoints.size === allCanSelectOutPoints.size && !!allCanSelectOutPoints.size,
     hasSelectLocked,
     isAllLocked,
-  }
-}
-
-export const useViewCell = ({ isMainnet, viewCell }: { isMainnet: boolean; viewCell: State.LiveCellWithLocalInfo }) => {
-  const onViewDetail = useCallback(
-    (e: React.SyntheticEvent<SVGSVGElement, MouseEvent>) => {
-      const {
-        dataset: { txHash },
-      } = e.currentTarget
-      if (!txHash) {
-        return
-      }
-      const explorerUrl = getExplorerUrl(isMainnet)
-      openExternal(`${explorerUrl}/transaction/${txHash}`)
-    },
-    [isMainnet]
-  )
-  const rawLock = `{
-  "code_hash": "${viewCell?.lock.codeHash}"
-  "hash_type": "${viewCell?.lock.hashType}"
-  "args": "${viewCell?.lock.args}"
-}`
-  const rawType = viewCell?.type
-    ? `{
-  "code_hash": "${viewCell.type.codeHash}"
-  "hash_type": "${viewCell.type.hashType}"
-  "args": "${viewCell.type.args}"
-}`
-    : `{
-  "null"
-}`
-  const rawData = `{
-  "data": "${viewCell?.data ?? '0x'}"
-}`
-  const usedCapacity = useMemo(() => {
-    if (!viewCell) {
-      return 0
-    }
-    return calculateUsedCapacity(viewCell)
-  }, [viewCell])
-  return {
-    onViewDetail,
-    rawData,
-    rawLock,
-    rawType,
-    usedCapacity,
   }
 }
 

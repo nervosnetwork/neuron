@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Attention, Consume, Copy, DetailIcon, EyesClose, EyesOpen, LockCell, NewTab, UnLock } from 'widgets/Icons/icon'
+import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
@@ -10,9 +10,6 @@ import {
   shannonToCKBFormatter,
   uniformTimeFormatter,
   usePagination,
-  isMainnet as isMainnetUtil,
-  useCopy,
-  clsx,
   outPointToStr,
   LockScriptCategory,
   getLockTimestamp,
@@ -20,12 +17,13 @@ import {
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
-import Alert from 'widgets/Alert'
 import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
 import { useSearchParams } from 'react-router-dom'
-import { Actions, useAction, useLiveCells, usePassword, useSelect, useViewCell } from './hooks'
+import CellInfoDialog from 'components/CellInfoDialog'
+import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { Actions, useAction, useLiveCells, usePassword, useSelect } from './hooks'
 import styles from './cellManagement.module.scss'
 
 const getColumns = ({
@@ -218,12 +216,9 @@ const CellManagement = () => {
     app: { epoch },
     wallet: { balance = '' },
     chain: {
-      networkID,
       syncState: { bestKnownBlockTimestamp },
     },
-    settings: { networks },
   } = useGlobalState()
-  const isMainnet = isMainnetUtil(networks, networkID)
   const [t] = useTranslation()
   const [searchParams] = useSearchParams()
   const breadPages = useMemo(() => [{ label: t('cell-manage.title') }], [t])
@@ -277,11 +272,6 @@ const CellManagement = () => {
       bestKnownBlockTimestamp,
     ]
   )
-  const { copied, onCopy, copyTimes } = useCopy()
-  const { onViewDetail, rawData, rawLock, rawType, usedCapacity } = useViewCell({
-    viewCell: operateCells[0],
-    isMainnet,
-  })
   const totalCapacity = useMemo(
     () => shannonToCKBFormatter(operateCells.reduce((pre, cur) => pre + BigInt(cur.capacity), BigInt(0)).toString()),
     [operateCells]
@@ -332,57 +322,14 @@ const CellManagement = () => {
         pageNo={pageNo}
         onChange={onPageChange}
       />
-      <Dialog
-        show={action === Actions.View}
-        title={t('cell-manage.cell-detail-dialog.title')}
+      <CellInfoDialog
+        output={
+          action === Actions.View
+            ? { ...operateCells[0]!, lockHash: computeScriptHash(operateCells[0]!.lock) }
+            : undefined
+        }
         onCancel={onActionCancel}
-        showFooter={false}
-        className={styles.cellDetailDialog}
-      >
-        <section className={styles.section}>
-          <h6 className={styles.title}>OutPoint.TxHash</h6>
-          <div className={styles.txHash}>
-            <p>{operateCells[0]?.outPoint.txHash}</p>
-            <div className={styles.cellActions}>
-              <Copy onClick={() => onCopy(operateCells[0]!.outPoint.txHash)} />
-              <NewTab onClick={onViewDetail} data-tx-hash={operateCells[0]?.outPoint.txHash} />
-            </div>
-          </div>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>Lock Script</h6>
-          <pre>{rawLock}</pre>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>Type Script</h6>
-          <pre>{rawType}</pre>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>{t('cell-manage.cell-detail-dialog.data')}</h6>
-          <pre>{rawData}</pre>
-        </section>
-        {copied ? (
-          <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
-            {t('common.copied')}
-          </Alert>
-        ) : null}
-        <section className={styles.section}>
-          <h6 className={clsx(styles.title, styles.capacity)}>
-            {t('cell-manage.cell-detail-dialog.capacity-used')}
-            <div className={styles.capacityDetail}>
-              {t('cell-manage.cell-detail-dialog.total')}
-              &nbsp;{shannonToCKBFormatter(operateCells[0]?.capacity ?? '')} CKB ，
-              {t('cell-manage.cell-detail-dialog.used')}
-              &nbsp;{usedCapacity} CKB
-            </div>
-          </h6>
-          <div className={styles.slider}>
-            <div
-              style={{ width: `${(100 * usedCapacity) / +shannonToCKBFormatter(operateCells[0]?.capacity ?? '')}%` }}
-            />
-          </div>
-        </section>
-      </Dialog>
+      />
       <Dialog
         show={action === Actions.Lock || action === Actions.Unlock}
         title={t(`cell-manage.cell-${action}-dialog.title`)}

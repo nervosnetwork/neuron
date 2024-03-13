@@ -307,6 +307,7 @@
       "table": {
         "name": "Nom du Wallet",
         "type": "Type",
+        "balance": "Solde",
         "amount": "Montant",
         "timestamp": "Heure",
         "status": "Statut",
@@ -326,7 +327,8 @@
       "copy-balance": "Copier le solde",
       "copy-address": "Copier l'adresse",
       "create": "Créer le compte d'actif {{name}}",
-      "destroy": "Détruire le compte d'actif {{name}}"
+      "destroy": "Détruire le compte d'actif {{name}}",
+      "fee": "Frais de transaction"
     },
     "transaction": {
       "window-title": "Transaction : {{hash}}",
@@ -343,7 +345,15 @@
       "cell-from-cellbase": "De cellbase",
       "lock-script": "Script de verrouillage",
       "lock-script-title": "Informations sur l'adresse",
-      "deprecated-address-format": "Adresse au format obsolète"
+      "deprecated-address-format": "Adresse au format obsolète",
+      "type": "Type",
+      "fee": "Frais de transaction",
+      "assets": "Actifs",
+      "balance": "Solde",
+      "status": "Statut",
+      "size": "taille",
+      "cycles": "Cycles",
+      "cell-detail": "Détail de la cellule"
     },
     "addresses": {
       "title": "Carnet d'adresses",
@@ -419,8 +429,8 @@
         "switch-network-type": "Basculer vers {{type}}"
       },
       "locale": {
-        "en": "Anglais",
-        "en-US": "Anglais (États-Unis)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
         "fr": "Français",
@@ -1184,7 +1194,12 @@
         "capacity-used": "Capacité utilisée",
         "data": "Données",
         "total": "Total",
-        "used": "Utilisé"
+        "used": "Utilisé",
+        "view-raw-data": "Données",
+        "UTF8": "UTF-8",
+        "address": "Adresse",
+        "number": "Numéro",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "La cellule est verrouillée dans le temps et vous ne pouvez pas l'utiliser avant {{time}}.",

@@ -1,0 +1,34 @@
+.switchRoot {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  width: 26px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+
+  .slider {
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    background-color: var(--primary-text-color);
+    display: inline-block;
+    position: absolute;
+    right: 2px;
+    transition: right 0.25s;
+  }
+
+  &[data-checked='false'] {
+    background-color: var(--secondary-text-color);
+    .slider {
+      right: calc(100% - 14px);
+    }
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    background-color: var(--secondary-text-color);
+  }
+}
