@@ -1169,6 +1169,7 @@
       },
       "cell-detail-dialog": {
         "title": "Cell詳情",
+        "transaction-hash": "交易哈希",
         "capacity-used": "容量使用",
         "data": "數據",
         "total": "總量",

@@ -1198,6 +1198,7 @@
       },
       "cell-detail-dialog": {
         "title": "Cell Detail",
+        "transaction-hash": "Transaction Hash",
         "capacity-used": "Used Capacity",
         "data": "Data",
         "total": "Total",

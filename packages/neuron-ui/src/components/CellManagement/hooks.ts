@@ -380,12 +380,10 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
   const isWin32 = useMemo(() => {
     return getPlatform() === 'win32'
   }, [])
-  const [error, setError] = useState<string | undefined>()
-  const disconnectStatus = t('hardware-verify-address.status.disconnect')
-  const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
+  const [error, setError] = useState<ErrorCode | string | undefined>()
   const isNotAvailable = useMemo(() => {
-    return error === disconnectStatus || error === ckbAppNotFoundStatus
-  }, [error, disconnectStatus, ckbAppNotFoundStatus])
+    return error === ErrorCode.DeviceNotFound || error === ErrorCode.CkbAppNotFound
+  }, [error])
 
   const [deviceInfo, setDeviceInfo] = useState(wallet.device)
   const [isReconnecting, setIsReconnecting] = useState(false)
@@ -436,15 +434,13 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
         setError(undefined)
         return true
       } catch (err) {
-        if (err instanceof CkbAppNotFoundException) {
-          setError(ckbAppNotFoundStatus)
-        } else {
-          setError(disconnectStatus)
+        if (err instanceof CkbAppNotFoundException || err instanceof DeviceNotFoundException) {
+          setError(err.code)
         }
         return false
       }
     },
-    [disconnectStatus, ckbAppNotFoundStatus, isWin32]
+    [isWin32]
   )
 
   const reconnect = useCallback(async () => {
@@ -464,14 +460,14 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
         }
         await ensureDeviceAvailable(device)
       } else {
-        setError(disconnectStatus)
+        setError(ErrorCode.DeviceNotFound)
       }
     } catch (err) {
-      setError(disconnectStatus)
+      setError(ErrorCode.DeviceNotFound)
     } finally {
       setIsReconnecting(false)
     }
-  }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
+  }, [deviceInfo, ensureDeviceAvailable, wallet.id])
 
   const verifyDeviceStatus = useCallback(async () => {
     if (deviceInfo) {
@@ -479,13 +475,24 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
     }
     return true
   }, [ensureDeviceAvailable, deviceInfo])
+
+  const errorMessage = useMemo(() => {
+    switch (error) {
+      case ErrorCode.DeviceNotFound:
+        return t('hardware-verify-address.status.disconnect')
+      case ErrorCode.CkbAppNotFound:
+        return t(CkbAppNotFoundException.message)
+      default:
+        return error
+    }
+  }, [error, t])
   return {
     deviceInfo,
     isReconnecting,
     isNotAvailable,
     reconnect,
     verifyDeviceStatus,
-    error,
+    errorMessage,
     setError,
   }
 }

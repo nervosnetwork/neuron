@@ -13,6 +13,7 @@ import {
   outPointToStr,
   LockScriptCategory,
   getLockTimestamp,
+  isMainnet as isMainnetUtil,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -220,8 +221,11 @@ const CellManagement = () => {
     wallet,
     chain: {
       syncState: { bestKnownBlockTimestamp },
+      networkID,
     },
+    settings: { networks },
   } = useGlobalState()
+  const isMainnet = useMemo(() => isMainnetUtil(networks, networkID), [networks, networkID])
   const [t] = useTranslation()
   const [searchParams] = useSearchParams()
   const breadPages = useMemo(() => [{ label: t('cell-manage.title') }], [t])
@@ -244,7 +248,7 @@ const CellManagement = () => {
     isNotAvailable,
     reconnect,
     verifyDeviceStatus,
-    error: hardwalletError,
+    errorMessage: hardwalletError,
     setError: setHardwalletError,
   } = useHardWallet({
     wallet,
@@ -344,6 +348,7 @@ const CellManagement = () => {
             : undefined
         }
         onCancel={onActionCancel}
+        isMainnet={isMainnet}
       />
       {wallet.device ? (
         <Dialog

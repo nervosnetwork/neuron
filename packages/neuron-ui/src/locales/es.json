@@ -1177,6 +1177,7 @@
       },
       "cell-detail-dialog": {
         "title": "Detalles de la Cell",
+        "transaction-hash": "Hash de Transacción",
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
