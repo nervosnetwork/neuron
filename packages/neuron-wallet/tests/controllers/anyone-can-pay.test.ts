@@ -96,7 +96,7 @@ describe('anyone-can-pay-controller', () => {
       walletID: 'string',
       tx: new Transaction('', [], [], [], [], []),
       password: 'string',
-      skipLastInputs: false,
+      skipLastInput: false,
     }
     it('throw exception', async () => {
       sendTxMock.mockResolvedValueOnce(undefined)

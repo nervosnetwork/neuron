@@ -204,6 +204,7 @@ import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
 import { addressToScript } from '../../../src/utils/scriptAndAddress'
 import { serializeWitnessArgs } from '../../../src/utils/serialization'
+import { signWitnesses } from '../../../src/utils/signWitnesses'
 
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
@@ -343,7 +344,7 @@ describe('TransactionSender Test', () => {
 
     describe('#sign', () => {
       describe('single sign', () => {
-        const tx = Transaction.fromObject({
+        const tx = {
           version: '0x0',
           cellDeps: [
             CellDep.fromObject({
@@ -393,13 +394,49 @@ describe('TransactionSender Test', () => {
           witnesses: [
             '0x55000000100000005500000055000000410000003965f54cc684d35d886358ad57214e5f4a5fd13ecc7aba67950495b9be7740267a1d6bb14f1c215e3bc926f9655648b75e173ce6f5fd1e60218383b45503c30301',
           ],
-          hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1',
-        })
+        }
 
         it('success', async () => {
-          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
+          const res = await transactionSender.sign(fakeWallet.id, Transaction.fromObject(tx), '1234', false)
+          expect(res.tx.witnesses[0]).toEqual(tx.witnesses[0])
+          expect(res.metadata.locks.skipped.size).toEqual(0)
+          expect(res.metadata.skipLastInput).toEqual(false)
+        })
 
-          expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
+        it('sign with unidentified lock scripts skipped', async () => {
+          const FIXTURE = {
+            lock: Input.fromObject({
+              previousOutput: OutPoint.fromObject({
+                txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
+                index: '0x0',
+              }),
+              since: '0x0',
+              lock: Script.fromObject({
+                args: '0x0000000000000000000000000000000000000000',
+                codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+                hashType: 'type' as ScriptHashType,
+              }),
+            }),
+            witness: new WitnessArgs('0x01'),
+          }
+
+          const txObj = Transaction.fromObject({
+            ...tx,
+            inputs: [...tx.inputs, FIXTURE.lock],
+            witnesses: [new WitnessArgs('0x00'), FIXTURE.witness],
+          })
+
+          const signedWitnesses = signWitnesses({
+            witnesses: txObj.witnesses.slice(0, -1),
+            transactionHash: txObj.computeHash(),
+            privateKey: pathAndPrivateKey.privateKey,
+          })
+
+          const res = await transactionSender.sign(fakeWallet.id, txObj, '1234', false)
+          expect(res.tx.witnesses.slice(0, -1)).toEqual(signedWitnesses)
+          expect(res.tx.witnesses.slice(-1)).toEqual([serializeWitnessArgs(FIXTURE.witness)])
+          expect([...res.metadata.locks.skipped.values()]).toEqual([FIXTURE.lock.lockHash])
+          expect(res.metadata.skipLastInput).toEqual(false)
         })
       })
 
@@ -453,9 +490,11 @@ describe('TransactionSender Test', () => {
 
         it('success', async () => {
           // @ts-ignore: Private method
-          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
+          const res = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
-          expect(ntx.witnesses[0]).toEqual(expectedWitness[0])
+          expect(res.tx.witnesses[0]).toEqual(expectedWitness[0])
+          expect(res.metadata.locks.skipped.size).toEqual(0)
+          expect(res.metadata.skipLastInput).toEqual(false)
         })
       })
 
@@ -491,9 +530,11 @@ describe('TransactionSender Test', () => {
           })
           it('success', async () => {
             // @ts-ignore: Private method
-            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
+            const res = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
-            expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
+            expect(res.tx.witnesses[0]).toEqual(tx.witnesses[0])
+            expect(res.metadata.locks.skipped.size).toEqual(0)
+            expect(res.metadata.skipLastInput).toEqual(false)
           })
         })
         describe('when not matched receiver lock hash', () => {
@@ -546,9 +587,11 @@ describe('TransactionSender Test', () => {
             tx.inputs[0].lock = chequeLock
           })
           it('success', async () => {
-            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
+            const res = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
-            expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
+            expect(res.tx.witnesses[0]).toEqual(tx.witnesses[0])
+            expect(res.metadata.locks.skipped.size).toEqual(0)
+            expect(res.metadata.skipLastInput).toEqual(false)
           })
         })
         describe('when not matched sender lock hash', () => {
