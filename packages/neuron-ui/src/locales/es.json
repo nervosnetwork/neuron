@@ -1211,7 +1211,8 @@
       "password-placeholder": "Ingrese la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
-      "consume": "Consumir"
+      "consume": "Consumir",
+      "verify": "Verificar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

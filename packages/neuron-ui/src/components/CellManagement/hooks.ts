@@ -1,12 +1,20 @@
+import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
+import { TFunction } from 'i18next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  connectDevice,
+  getDeviceCkbAppVersion,
+  getDevices,
   getLiveCells,
+  getPlatform,
   updateLiveCellsLocalInfo,
   updateLiveCellsLockStatus as updateLiveCellsLockStatusAPI,
+  updateWallet,
 } from 'services/remote'
+import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import { AppActions, useDispatch } from 'states'
-import { LockScriptCategory, RoutePath, TypeScriptCategory, isSuccessResponse, outPointToStr } from 'utils'
+import { ErrorCode, LockScriptCategory, RoutePath, TypeScriptCategory, isSuccessResponse, outPointToStr } from 'utils'
 import { SortType } from 'widgets/Table'
 
 const cellTypeOrder: Record<string, number> = {
@@ -204,6 +212,7 @@ export const useAction = ({
   resetPassword,
   setError,
   password,
+  verifyDeviceStatus,
 }: {
   liveCells: State.LiveCellWithLocalInfo[]
   currentPageLiveCells: State.LiveCellWithLocalInfo[]
@@ -212,6 +221,7 @@ export const useAction = ({
   resetPassword: () => void
   setError: (error: string) => void
   password: string
+  verifyDeviceStatus: () => Promise<boolean>
 }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -219,7 +229,7 @@ export const useAction = ({
   const [operateCells, setOperateCells] = useState<State.LiveCellWithLocalInfo[]>([])
   const [loading, setLoading] = useState(false)
   const onOpenActionDialog = useCallback(
-    (e: React.SyntheticEvent<SVGSVGElement, MouseEvent>) => {
+    async (e: React.SyntheticEvent<SVGSVGElement, MouseEvent>) => {
       e.stopPropagation()
       const { action: curAction, index } = e.currentTarget.dataset as { action: Actions; index: string }
       if (!curAction || index === undefined || !currentPageLiveCells[+index]) return
@@ -227,24 +237,27 @@ export const useAction = ({
       setOperateCells([operateCell])
       setAction(curAction)
       resetPassword()
+      await verifyDeviceStatus()
     },
     [currentPageLiveCells, setOperateCells, dispatch, navigate]
   )
   const onMultiAction = useCallback(
-    (e: React.SyntheticEvent<HTMLButtonElement, MouseEvent>) => {
+    async (e: React.SyntheticEvent<HTMLButtonElement, MouseEvent>) => {
       e.stopPropagation()
       const { action: curAction } = e.currentTarget.dataset as { action: Actions }
       if (!curAction || !selectedOutPoints.size) return
       setOperateCells(liveCells.filter(v => selectedOutPoints.has(outPointToStr(v.outPoint))))
       setAction(curAction)
       resetPassword()
+      await verifyDeviceStatus()
     },
     [liveCells, selectedOutPoints, setOperateCells, dispatch, navigate]
   )
-  const onActionConfirm = useCallback(() => {
+  const onActionConfirm = useCallback(async () => {
     switch (action) {
       case 'lock':
       case 'unlock':
+        if (!(await verifyDeviceStatus())) return
         setLoading(true)
         updateLiveCellsLockStatus({
           outPoints: operateCells.map(v => v.outPoint),
@@ -360,5 +373,119 @@ export const usePassword = () => {
     setError,
     onPasswordChange,
     resetPassword,
+  }
+}
+
+export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: TFunction }) => {
+  const isWin32 = useMemo(() => {
+    return getPlatform() === 'win32'
+  }, [])
+  const [error, setError] = useState<string | undefined>()
+  const disconnectStatus = t('hardware-verify-address.status.disconnect')
+  const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
+  const isNotAvailable = useMemo(() => {
+    return error === disconnectStatus || error === ckbAppNotFoundStatus
+  }, [error, disconnectStatus, ckbAppNotFoundStatus])
+
+  const [deviceInfo, setDeviceInfo] = useState(wallet.device)
+  const [isReconnecting, setIsReconnecting] = useState(false)
+
+  const ensureDeviceAvailable = useCallback(
+    async (device: State.DeviceInfo) => {
+      try {
+        const connectionRes = await connectDevice(device)
+        let { descriptor } = device
+        if (!isSuccessResponse(connectionRes)) {
+          // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
+          // so if we can't connect to the device, we need to re-search device automatically.
+          // for unix, the descriptor never changes unless user plugs the device into another USB port,
+          // in that case, mannauly re-search device one time will do.
+          if (isWin32) {
+            setIsReconnecting(true)
+            const devicesRes = await getDevices(device)
+            setIsReconnecting(false)
+            if (isSuccessResponse(devicesRes) && Array.isArray(devicesRes.result) && devicesRes.result.length > 0) {
+              const [updatedDeviceInfo] = devicesRes.result
+              descriptor = updatedDeviceInfo.descriptor
+              setDeviceInfo(updatedDeviceInfo)
+            } else {
+              throw new DeviceNotFoundException()
+            }
+          } else {
+            throw new DeviceNotFoundException()
+          }
+        }
+
+        // getDeviceCkbAppVersion will halt forever while in win32 sleep mode.
+        const ckbVersionRes = await Promise.race([
+          getDeviceCkbAppVersion(descriptor),
+          new Promise<ControllerResponse>((_, reject) => {
+            setTimeout(() => reject(), 1000)
+          }),
+        ]).catch(() => {
+          return { status: ErrorCode.DeviceInSleep }
+        })
+
+        if (!isSuccessResponse(ckbVersionRes)) {
+          if (ckbVersionRes.status !== ErrorCode.DeviceInSleep) {
+            throw new CkbAppNotFoundException()
+          } else {
+            throw new DeviceNotFoundException()
+          }
+        }
+        setError(undefined)
+        return true
+      } catch (err) {
+        if (err instanceof CkbAppNotFoundException) {
+          setError(ckbAppNotFoundStatus)
+        } else {
+          setError(disconnectStatus)
+        }
+        return false
+      }
+    },
+    [disconnectStatus, ckbAppNotFoundStatus, isWin32]
+  )
+
+  const reconnect = useCallback(async () => {
+    if (!deviceInfo) return
+    setError(undefined)
+    setIsReconnecting(true)
+    try {
+      const res = await getDevices(deviceInfo)
+      if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
+        const [device] = res.result
+        setDeviceInfo(device)
+        if (device.descriptor !== deviceInfo.descriptor) {
+          await updateWallet({
+            id: wallet.id,
+            device,
+          })
+        }
+        await ensureDeviceAvailable(device)
+      } else {
+        setError(disconnectStatus)
+      }
+    } catch (err) {
+      setError(disconnectStatus)
+    } finally {
+      setIsReconnecting(false)
+    }
+  }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
+
+  const verifyDeviceStatus = useCallback(async () => {
+    if (deviceInfo) {
+      return ensureDeviceAvailable(deviceInfo)
+    }
+    return true
+  }, [ensureDeviceAvailable, deviceInfo])
+  return {
+    deviceInfo,
+    isReconnecting,
+    isNotAvailable,
+    reconnect,
+    verifyDeviceStatus,
+    error,
+    setError,
   }
 }

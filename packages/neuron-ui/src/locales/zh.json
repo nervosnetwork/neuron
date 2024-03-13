@@ -1224,7 +1224,8 @@
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
-      "consume": "消耗"
+      "consume": "消耗",
+      "verify": "验证"
     },
     "send-tx-detail": {
       "page-title": "交易详情",

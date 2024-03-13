@@ -1232,7 +1232,8 @@
       "password-placeholder": "Please input wallet password",
       "lock": "Lock",
       "unlock": "Unlock",
-      "consume": "Consume"
+      "consume": "Consume",
+      "verify": "Verify"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

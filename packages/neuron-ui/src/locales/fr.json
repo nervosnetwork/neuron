@@ -1222,7 +1222,8 @@
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
-      "consume": "Consommer"
+      "consume": "Consommer",
+      "verify": "Vérifier"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

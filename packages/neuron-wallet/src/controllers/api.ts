@@ -926,7 +926,7 @@ export default class ApiController {
         params: {
           outPoints: OutPoint[]
           locked: boolean
-          password: string
+          password?: string
           lockScripts: CKBComponents.Script[]
         }
       ) => {

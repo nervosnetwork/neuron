@@ -1199,7 +1199,8 @@
       "password-placeholder": "請輸入錢包密碼",
       "lock": "鎖定",
       "unlock": "解鎖",
-      "consume": "消耗"
+      "consume": "消耗",
+      "verify": "驗證"
     },
     "send-tx-detail": {
       "page-title": "交易詳情",
