@@ -1198,6 +1198,7 @@
       },
       "cell-detail-dialog": {
         "title": "Cell Detail",
+        "transaction-hash": "Transaction Hash",
         "capacity-used": "Used Capacity",
         "data": "Data",
         "total": "Total",
@@ -1232,7 +1233,8 @@
       "password-placeholder": "Please input wallet password",
       "lock": "Lock",
       "unlock": "Unlock",
-      "consume": "Consume"
+      "consume": "Consume",
+      "verify": "Verify"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

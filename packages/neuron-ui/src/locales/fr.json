@@ -1188,6 +1188,7 @@
       },
       "cell-detail-dialog": {
         "title": "Détail de la cellule",
+        "transaction-hash": "Hash de transaction",
         "capacity-used": "Capacité utilisée",
         "data": "Données",
         "total": "Total",
@@ -1222,7 +1223,8 @@
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
-      "consume": "Consommer"
+      "consume": "Consommer",
+      "verify": "Vérifier"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

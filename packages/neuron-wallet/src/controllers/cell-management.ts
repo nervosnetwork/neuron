@@ -61,7 +61,7 @@ export default class CellManagement {
     outPoints: OutPointSDK[],
     locked: boolean,
     lockScripts: Script[],
-    password: string
+    password: string = ''
   ) {
     // check wallet password
     const currentWallet = WalletService.getInstance().getCurrent()
@@ -69,7 +69,7 @@ export default class CellManagement {
     const addresses = new Set((await AddressService.getAddressesByWalletId(currentWallet.id)).map(v => v.address))
     const isMainnet = NetworksService.getInstance().isMainnet()
     if (!lockScripts.every(v => addresses.has(scriptToAddress(v, isMainnet)))) throw new AddressNotFound()
-    await SignMessage.sign(currentWallet.id, scriptToAddress(lockScripts[0], isMainnet), password, 'verify password')
+    await SignMessage.sign(currentWallet.id, scriptToAddress(lockScripts[0], isMainnet), password, 'verify cell owner')
     return CellLocalInfoService.updateLiveCellLockStatus(outPoints, locked)
   }
 

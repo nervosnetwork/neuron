@@ -1,11 +1,14 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Dialog from 'widgets/Dialog'
-import { calculateUsedCapacity, shannonToCKBFormatter } from 'utils'
+import { calculateUsedCapacity, getExplorerUrl, shannonToCKBFormatter, truncateMiddle, useCopy } from 'utils'
 import { useTranslation } from 'react-i18next'
 import Tabs from 'widgets/Tabs'
 import { type TFunction } from 'i18next'
 import { Script } from '@ckb-lumos/base'
 import Switch from 'widgets/Switch'
+import { Copy, ExplorerIcon } from 'widgets/Icons/icon'
+import Alert from 'widgets/Alert'
+import { openExternal } from 'services/remote'
 import styles from './cellInfoDialog.module.scss'
 
 type ScriptRenderType = 'table' | 'raw'
@@ -108,13 +111,26 @@ const useTabs = ({ t, output }: { t: TFunction; output?: State.DetailedOutput })
   }
 }
 
-const CellInfoDialog = ({ onCancel, output }: { onCancel: () => void; output?: State.DetailedOutput }) => {
+const CellInfoDialog = ({
+  onCancel,
+  output,
+  isMainnet,
+}: {
+  onCancel: () => void
+  output?: State.DetailedOutput
+  isMainnet: boolean
+}) => {
   const [t] = useTranslation()
 
   const { tabs, currentTab, setCurrentTab, scriptRenderType, setScriptRenderType } = useTabs({
     t,
     output,
   })
+  const { copied, copyTimes, onCopy } = useCopy()
+  const onOpenTx = useCallback(() => {
+    const explorerUrl = getExplorerUrl(isMainnet)
+    openExternal(`${explorerUrl}/transaction/${output?.outPoint.txHash}`)
+  }, [isMainnet, output?.outPoint.txHash])
   if (!output) {
     return null
   }
@@ -124,6 +140,13 @@ const CellInfoDialog = ({ onCancel, output }: { onCancel: () => void; output?: S
       title={
         <div className={styles.title}>
           <span>{t('cell-manage.cell-detail-dialog.title')}</span>
+          <div className={styles.outPoint}>
+            {t('cell-manage.cell-detail-dialog.transaction-hash')}
+            :&nbsp;&nbsp;
+            {truncateMiddle(output.outPoint.txHash, 10, 10)}
+            <Copy onClick={() => onCopy(output.outPoint.txHash)} />
+            <ExplorerIcon onClick={onOpenTx} />
+          </div>
         </div>
       }
       onCancel={onCancel}
@@ -149,6 +172,11 @@ const CellInfoDialog = ({ onCancel, output }: { onCancel: () => void; output?: S
           </div>
         ) : null}
       </div>
+      {copied ? (
+        <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
+          {t('common.copied')}
+        </Alert>
+      ) : null}
     </Dialog>
   )
 }

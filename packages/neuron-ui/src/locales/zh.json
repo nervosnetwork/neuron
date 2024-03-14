@@ -1190,6 +1190,7 @@
       },
       "cell-detail-dialog": {
         "title": "Cell详情",
+        "transaction-hash": "交易哈希",
         "capacity-used": "容量使用",
         "data": "数据",
         "total": "总量",
@@ -1224,7 +1225,8 @@
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
-      "consume": "消耗"
+      "consume": "消耗",
+      "verify": "验证"
     },
     "send-tx-detail": {
       "page-title": "交易详情",

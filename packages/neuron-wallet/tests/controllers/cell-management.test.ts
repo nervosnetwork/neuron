@@ -155,7 +155,7 @@ describe('CellManage', () => {
       getAddressesByWalletIdMock.mockResolvedValueOnce([{ address }])
       const outPoints = [new OutPoint(`0x${'00'.repeat(32)}`, '0')]
       await CellManagement.updateLiveCellsLockStatus(outPoints, true, [lockScript], 'password')
-      expect(signMock).toBeCalledWith('walletId1', address, 'password', 'verify password')
+      expect(signMock).toBeCalledWith('walletId1', address, 'password', 'verify cell owner')
       expect(updateLiveCellLockStatusMock).toBeCalledWith(outPoints, true)
     })
   })

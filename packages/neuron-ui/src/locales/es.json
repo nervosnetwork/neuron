@@ -1177,6 +1177,7 @@
       },
       "cell-detail-dialog": {
         "title": "Detalles de la Cell",
+        "transaction-hash": "Hash de Transacción",
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
@@ -1211,7 +1212,8 @@
       "password-placeholder": "Ingrese la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
-      "consume": "Consumir"
+      "consume": "Consumir",
+      "verify": "Verificar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

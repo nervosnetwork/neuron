@@ -422,7 +422,7 @@ const HistoryDetailPage = () => {
         type="failed"
         onCancel={() => navigate(-1)}
       />
-      <CellInfoDialog output={outputCell} onCancel={onCancel} />
+      <CellInfoDialog output={outputCell} onCancel={onCancel} isMainnet={isMainnet} />
     </PageContainer>
   )
 }
