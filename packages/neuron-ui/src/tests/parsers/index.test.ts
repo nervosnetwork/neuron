@@ -9,6 +9,8 @@ describe('listParams', () => {
         pageNo: 1,
         pageSize: 15,
         keywords: 'foo',
+        sort: '',
+        direction: '',
       },
     }
     expect(listParams(fixture.params)).toEqual(fixture.expected)
@@ -21,6 +23,22 @@ describe('listParams', () => {
         pageNo: 2,
         pageSize: 30,
         keywords: 'foo',
+        sort: '',
+        direction: '',
+      },
+    }
+    expect(listParams(fixture.params)).toEqual(fixture.expected)
+  })
+
+  it('should use passed sort and direction', () => {
+    const fixture = {
+      params: '?sort=foo&direction=asc',
+      expected: {
+        pageNo: 1,
+        pageSize: 15,
+        keywords: '',
+        sort: 'foo',
+        direction: 'asc',
       },
     }
     expect(listParams(fixture.params)).toEqual(fixture.expected)

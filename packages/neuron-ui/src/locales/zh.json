@@ -246,7 +246,9 @@
       "release-on": "锁定至",
       "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）",
       "allow-use-sent-cell": "允许使用待确认的 Outputs 构建交易",
-      "submit-transaction": "发起交易"
+      "submit-transaction": "发起交易",
+      "transaction-confirmed": "交易已确认",
+      "transaction-cannot-amend": "当前交易已确认，无法修改。"
     },
     "receive": {
       "title": "收款",
@@ -301,6 +303,7 @@
       "table": {
         "name": "钱包名称",
         "type": "类型",
+        "balance": "余额",
         "amount": "金额",
         "timestamp": "时间",
         "status": "状态",
@@ -315,12 +318,14 @@
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
+      "amend": "修改",
       "opening": "正在打开",
       "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址",
       "create": "创建 {{name}} 资产账户",
-      "destroy": "销毁 {{name}} 资产账户"
+      "destroy": "销毁 {{name}} 资产账户",
+      "fee": "交易费用"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
@@ -337,7 +342,15 @@
       "cell-from-cellbase": "来自 Cellbase",
       "lock-script": "脚本锁定",
       "lock-script-title": "地址信息",
-      "deprecated-address-format": "已弃用格式的地址"
+      "deprecated-address-format": "已弃用格式的地址",
+      "type": "类型",
+      "fee": "交易费用",
+      "assets": "资产",
+      "balance": "余额",
+      "status": "状态",
+      "size": "大小",
+      "cycles": "周期",
+      "cell-detail": "Cell详情"
     },
     "addresses": {
       "title": "地址簿",
@@ -1180,10 +1193,16 @@
       },
       "cell-detail-dialog": {
         "title": "Cell详情",
+        "transaction-hash": "交易哈希",
         "capacity-used": "容量使用",
         "data": "数据",
         "total": "总量",
-        "used": "已用"
+        "used": "已用",
+        "view-raw-data": "原始数据",
+        "UTF8": "UTF-8",
+        "address": "地址",
+        "number": "数字",
+        "bigEndian": "大端序"
       },
       "locked-reason": {
         "multi-locktime": "这是一个有时间锁的 cell, 只能在 {{time}} 之后使用。",
@@ -1209,7 +1228,8 @@
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
-      "consume": "消耗"
+      "consume": "消耗",
+      "verify": "验证"
     },
     "send-tx-detail": {
       "page-title": "交易详情",

@@ -33,7 +33,6 @@ import NetworksController from '../controllers/networks'
 import UpdateController from '../controllers/update'
 import MultisigController from '../controllers/multisig'
 import Transaction from '../models/chain/transaction'
-import OutPoint from '../models/chain/out-point'
 import SignMessageController from '../controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from '../models/system-script-info'
@@ -65,6 +64,7 @@ import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
+import { OutPoint } from '@ckb-lumos/base'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -416,6 +416,7 @@ export default class ApiController {
           password: string
           description?: string
           multisigConfig?: MultisigConfigModel
+          amendHash?: string
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -434,7 +435,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints?: CKBComponents.OutPoint[]
+          consumeOutPoints?: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -451,7 +452,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints: CKBComponents.OutPoint[]
+          consumeOutPoints: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -550,6 +551,10 @@ export default class ApiController {
         return this.#daoController.withdrawFromDao(params)
       }
     )
+
+    handle('calculate-unlock-dao-maximum-withdraw', async (_, unlockHash: string) => {
+      return this.#daoController.calculateUnlockDaoMaximumWithdraw(unlockHash)
+    })
 
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
@@ -836,6 +841,10 @@ export default class ApiController {
       return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
     })
 
+    handle('get-transaction-size', async (_, params) => {
+      return this.#transactionsController.getTransactionSize(params)
+    })
+
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,
@@ -920,9 +929,9 @@ export default class ApiController {
       async (
         _,
         params: {
-          outPoints: CKBComponents.OutPoint[]
+          outPoints: OutPoint[]
           locked: boolean
-          password: string
+          password?: string
           lockScripts: CKBComponents.Script[]
         }
       ) => {
