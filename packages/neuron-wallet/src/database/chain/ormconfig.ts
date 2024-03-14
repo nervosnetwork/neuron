@@ -21,6 +21,7 @@ import MultisigOutput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
 import TxLock from './entities/tx-lock'
 import CellLocalInfo from './entities/cell-local-info'
+import AmendTransaction from './entities/amend-transaction'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -61,6 +62,7 @@ import { IndexerTxHashCacheRemoveField1701234043431 } from './migrations/1701234
 import { CreateCellLocalInfo1701234043432 } from './migrations/1701234043432-CreateCellLocalInfo'
 import { RenameSyncProgress1702781527414 } from './migrations/1702781527414-RenameSyncProgress'
 import { RemoveAddressInIndexerCache1704357651876 } from './migrations/1704357651876-RemoveAddressInIndexerCache'
+import { AmendTransaction1709008125088 } from './migrations/1709008125088-AmendTransaction'
 import { ConnectionName } from './connection'
 import AddressSubscribe from './subscriber/address-subscriber'
 import MultisigConfigSubscribe from './subscriber/multisig-config-subscriber'
@@ -106,6 +108,7 @@ const connectOptions = async (
       SyncProgress,
       TxLock,
       CellLocalInfo,
+      AmendTransaction,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -147,6 +150,7 @@ const connectOptions = async (
       CreateCellLocalInfo1701234043432,
       RenameSyncProgress1702781527414,
       RemoveAddressInIndexerCache1704357651876,
+      AmendTransaction1709008125088,
     ],
     subscribers: [
       AddressSubscribe,

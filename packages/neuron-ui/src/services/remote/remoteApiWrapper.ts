@@ -85,6 +85,7 @@ type Action =
   | 'generate-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
   | 'withdraw-from-dao'
+  | 'calculate-unlock-dao-maximum-withdraw'
   // Special Assets
   | 'get-customized-asset-cells'
   | 'generate-withdraw-customized-cell-tx'
@@ -137,6 +138,7 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'broadcast-signed-transaction'
+  | 'get-transaction-size'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft

@@ -9,19 +9,19 @@ import { TransactionNotFound, CurrentWalletNotSet } from '../exceptions'
 import Transaction from '../models/chain/transaction'
 
 import { set as setDescription, get as getDescription } from '../services/tx/transaction-description'
-import AddressParser from '../models/address-parser'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
+import TransactionSize from '../models/transaction-size'
 
 export default class TransactionsController {
   public async getAll(
     params: Controller.Params.TransactionsByKeywords
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
-    const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
+    const { pageNo = 1, pageSize = 15, keywords = '', walletID = '', sort, direction } = params
 
     const addresses = (await AddressesService.getAddressesByWalletId(walletID)).map(addr => addr.address)
 
     const transactions = await TransactionsService.getAllByAddresses(
-      { walletID, pageNo, pageSize, addresses },
+      { walletID, pageNo, pageSize, addresses, sort, direction },
       keywords.trim()
     ).catch(() => ({
       totalCount: 0,
@@ -61,17 +61,16 @@ export default class TransactionsController {
       throw new CurrentWalletNotSet()
     }
 
-    const addresses: string[] = (await AddressesService.getAddressesByWalletId(wallet.id)).map(addr => addr.address)
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
+    const lockArgs: string[] = (await AddressesService.getAddressesByWalletId(wallet.id)).map(addr => addr.blake160)
 
     const outputCapacities: bigint = transaction
-      .outputs!.filter(o => lockHashes.includes(o.lockHash!))
+      .outputs!.filter(o => lockArgs.includes(o.lock.args))
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
     const inputCapacities: bigint = transaction
       .inputs!.filter(i => {
-        if (i.lockHash) {
-          return lockHashes.includes(i.lockHash)
+        if (i.lock?.args) {
+          return lockArgs.includes(i.lock?.args)
         }
         return false
       })
@@ -146,6 +145,14 @@ export default class TransactionsController {
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)
       throw err
+    }
+  }
+
+  public async getTransactionSize(tx: Transaction) {
+    const size = TransactionSize.tx(Transaction.fromObject(tx))
+    return {
+      status: ResponseCode.Success,
+      result: size,
     }
   }
 }
