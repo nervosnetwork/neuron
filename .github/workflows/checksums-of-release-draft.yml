@@ -10,6 +10,8 @@ on:
 jobs:
   checksums:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout
