@@ -139,6 +139,7 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'broadcast-signed-transaction'
+  | 'get-transaction-size'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft

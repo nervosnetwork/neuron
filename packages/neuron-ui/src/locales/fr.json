@@ -252,7 +252,9 @@
       "release-on": "Libération le",
       "locktime-warning": "Veuillez vous assurer que le Wallet du destinataire peut prendre en charge le déverrouillage par expiration. (Remarque : 1. Les échanges ne prennent généralement pas en charge le déverrouillage par expiration {{extraNote}})",
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
-      "submit-transaction": "Soumettre la transaction"
+      "submit-transaction": "Soumettre la transaction",
+      "transaction-confirmed": "Transaction confirmée",
+      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée."
     },
     "receive": {
       "title": "Recevoir",
@@ -322,6 +324,7 @@
       "view-in-explorer-button-title": "Voir sur l'explorateur",
       "view-detail": "Détail",
       "view-detail-button-title": "Voir les détails",
+      "amend": "Modifier",
       "opening": "Ouverture",
       "copy-tx-hash": "Copier le hash de la transaction",
       "copy-balance": "Copier le solde",

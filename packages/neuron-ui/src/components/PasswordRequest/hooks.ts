@@ -45,7 +45,7 @@ export default ({
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { walletID = '', actionType = null, multisigConfig, onSuccess } = passwordRequest
+  const { walletID = '', actionType = null, amendHash, multisigConfig, onSuccess } = passwordRequest
 
   useEffect(() => {
     setPassword('')
@@ -139,7 +139,9 @@ export default ({
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
+            await sendTransaction({ walletID, tx: generatedTx, description, password, amendHash })(dispatch).then(
+              handleSendTxRes
+            )
             break
           }
           case 'send-from-multisig-need-one': {
@@ -231,6 +233,7 @@ export default ({
               tx: experimental?.tx,
               password,
               skipLastInputs,
+              amendHash,
             }
             await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
