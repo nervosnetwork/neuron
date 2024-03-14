@@ -22,6 +22,7 @@ export interface SendAnyoneCanPayTxParams {
   tx: Transaction
   password: string
   skipLastInputs?: boolean
+  amendHash?: string
 }
 
 export default class AnyoneCanPayController {
@@ -65,7 +66,8 @@ export default class AnyoneCanPayController {
       txModel,
       params.password,
       params?.skipLastInputs ?? true,
-      skipSign
+      skipSign,
+      params?.amendHash
     )
 
     if (!txHash) {
