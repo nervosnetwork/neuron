@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { AppActions, StateAction, StateDispatch } from 'states/stateProvider/reducer'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
 import { getTransaction as getSentTransaction, getTransactionSize } from 'services/remote'
 import { isSuccessResponse } from 'utils'
@@ -45,7 +45,7 @@ export const useInitialize = ({
   walletID: string
   price: string
   isMainnet: boolean
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<StateAction>
   t: TFunction
 }) => {
   const [transaction, setTransaction] = useState<State.GeneratedTx | null>(null)
