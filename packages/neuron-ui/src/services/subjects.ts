@@ -1,5 +1,5 @@
 import { CONSTANTS } from 'utils'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, type IpcRendererEvent } from 'electron'
 
 const { LOCALES } = CONSTANTS
 
@@ -31,13 +31,14 @@ const SubjectConstructor = <T>(
     | 'device-sign-index'
     | 'multisig-output-update'
     | 'migrate'
-    | 'show-global-dialog',
+    | 'show-global-dialog'
+    | 'no-disk-space',
   isMulti?: boolean
 ) => {
   return ipcRenderer
     ? {
         subscribe: (handler: (data: T) => void) => {
-          const handlerWrap = (_e: Event, data: T) => {
+          const handlerWrap = (_e: IpcRendererEvent, data: T) => {
             handler(data)
           }
           ipcRenderer.on(channel, handlerWrap)
@@ -69,6 +70,7 @@ export const SetLocale = SubjectConstructor<(typeof LOCALES)[number]>('set-local
 export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
 export const MultisigOutputUpdate = SubjectConstructor<string>('multisig-output-update')
 export const Migrate = SubjectConstructor<'need-migrate' | 'migrating' | 'failed' | 'finish'>('migrate', true)
+export const NoDiskSpace = SubjectConstructor<boolean>('no-disk-space')
 
 export default {
   DataUpdate,

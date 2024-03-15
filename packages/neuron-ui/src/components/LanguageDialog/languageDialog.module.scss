@@ -33,6 +33,9 @@
   .selects {
     position: fixed;
     width: 648px;
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+    overflow-x: hidden;
     margin-top: 8px;
     padding: 16px 0;
     z-index: 2;

@@ -1,4 +1,5 @@
 import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
+import { t } from 'i18next'
 import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
 import logger from '../utils/logger'
 
@@ -64,11 +65,16 @@ export default class UpdateController {
 
     autoUpdater.on('error', error => {
       UpdateController.isChecking = false
+      let errorMsg = error == null ? 'unknown' : (error.stack || error).toString()
+      logger.error('Update Controller:\t autoUpdater fail:', errorMsg)
+      if (errorMsg.includes('net::ERR_INTERNET_DISCONNECTED') || errorMsg.includes('net::ERR_TIMED_OUT')) {
+        errorMsg = t('messages.could-not-connect-service')
+      }
       this.notify({
         version: '',
         releaseDate: '',
         releaseNotes: '',
-        errorMsg: error == null ? 'unknown' : (error.stack || error).toString(),
+        errorMsg,
       })
     })
 

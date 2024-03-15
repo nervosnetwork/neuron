@@ -2,12 +2,12 @@ name: Package Neuron for Test
 
 on: 
   issue_comment:
-    types: [created, edited]
+    types: [created]
   push:
 
 jobs:
   packaging:
-    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package')) || github.event_name == 'push' }}
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package') && contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)) || github.event_name == 'push' }}
 
     strategy:
       matrix:
@@ -19,6 +19,10 @@ jobs:
           - windows-2019
 
     runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
+      pull-requests: read
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
@@ -33,17 +37,17 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout for push
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event_name == 'push' }}
 
       - name: Checkout for PR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event_name == 'issue_comment' }}
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: "yarn"
@@ -110,6 +114,14 @@ jobs:
         env:
           CI: false
 
+      - name: Write electron-build Test yml
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs')
+            const ympPath = 'packages/neuron-wallet/electron-builder.yml'
+            fs.writeFileSync(ympPath, fs.readFileSync(ympPath).toString().replace('asar: true', 'asar: false'))
+
       - name: Package for MacOS
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
         run: |
@@ -122,6 +134,7 @@ jobs:
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          USE_HARD_LINKS: false
 
       - name: Package for MacOS for skip code sign
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
@@ -132,6 +145,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SKIP_NOTARIZE: true
+          USE_HARD_LINKS: false
 
       - name: Package for Windows
         if: matrix.os == 'windows-2019'
@@ -150,45 +164,46 @@ jobs:
           yarn package:test linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false
 
       - name: Upload Neuron App Zip
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Mac-x64
           path: release/Neuron-*-mac-x64.zip
 
       - name: Upload Neuron App Zip(arm64)
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Mac-arm64
           path: release/Neuron-*-mac-arm64.zip
 
       - name: Upload Neuron Dmg
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Dmg-x64
           path: release/Neuron-*-x64.dmg
 
       - name: Upload Neuron Dmg(arm64)
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Dmg-arm64
           path: release/Neuron-*-arm64.dmg
 
       - name: Upload Neuron Win
         if: matrix.os == 'windows-2019'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Win
           path: release/Neuron-*-setup.exe
 
       - name: Upload Neuron Linux
         if: matrix.os == 'ubuntu-20.04'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
@@ -197,10 +212,13 @@ jobs:
     needs: [packaging]
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Comment by push event
         if: ${{ github.event_name == 'push' }}
-        uses: peter-evans/commit-comment@v2
+        uses: peter-evans/commit-comment@v3
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
@@ -219,6 +237,8 @@ jobs:
     if: ${{ always() && needs.packaging.result == 'failure' }}
     name: Append failed comment to the comment
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Comment by pull request comment event when package failed
         if: ${{ github.event_name == 'issue_comment' }}

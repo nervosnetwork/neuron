@@ -1,0 +1,274 @@
+@import '../../styles/mixin.scss';
+
+.cellItemRoot {
+  margin: 16px 0;
+  position: relative;
+  min-width: 160px;
+
+  .inputStatus {
+    color: var(--secondary-text-color);
+    font-size: 12px;
+    font-weight: 400;
+    margin-bottom: 4px;
+    position: absolute;
+    bottom: 100%;
+  }
+
+  .itemTable {
+    border: 1px solid var(--divide-line-color);
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: var(--table-head-background-color);
+    color: --third-text-color;
+    display: grid;
+    grid-template-areas:
+      'label amount amount'
+      'address address address';
+
+    & > div {
+      padding: 6px;
+      line-height: 16px;
+    }
+    .label {
+      grid-area: label;
+      color: var(--main-text-color);
+      border-right: 1px solid var(--divide-line-color);
+      font-weight: 500;
+    }
+
+    .amount {
+      grid-area: amount;
+      color: var(--third-text-color);
+    }
+
+    .address {
+      border-top: 1px solid var(--divide-line-color);
+      grid-area: address;
+      width: calc(100% - 12px);
+      color: var(--third-text-color);
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    .copyAddress {
+      width: 346px;
+      @include copyAddress;
+    }
+  }
+}
+
+.root {
+  padding: 28px 0;
+  border-top: 1px solid var(--divide-line-color);
+  display: flex;
+  justify-content: center;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    .txBox {
+      border-radius: 4px;
+      border: 1px solid var(--divide-line-color);
+      background-color: var(--table-head-background-color);
+      width: 74px;
+      height: 24px;
+      line-height: 24px;
+      font-size: 12px;
+      font-weight: 400;
+      text-align: center;
+      color: var(--third-text-color);
+    }
+
+    .onlyOneInput {
+      width: 100px;
+      height: 1px;
+      background-color: var(--divide-line-color);
+      position: relative;
+      svg {
+        position: absolute;
+        left: 50%;
+        top: 100%;
+        transform: rotate(-90deg) translateX(50%);
+        > path {
+          fill: var(--divide-line-color);
+          stroke: var(--divide-line-color);
+        }
+      }
+    }
+    .inputConnection {
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+
+      & > div {
+        flex: 1 1 auto;
+        border-color: var(--divide-line-color) !important;
+        border-right: 1px solid;
+
+        &:nth-child(4n + 1) {
+          border-top: 1px solid;
+        }
+        &:first-child {
+          border-radius: 0 8px 0 0;
+        }
+        &:last-child {
+          border-radius: 0 0 8px 0;
+          border-bottom: 1px solid;
+        }
+        &[data-ignore-right='true'] {
+          border-right: none;
+        }
+        &.centerLine {
+          position: absolute;
+          top: calc(50% - 1px);
+          width: calc(200% + 16px);
+          left: -28px;
+          transform: scale(0.5);
+          border-top: 2px solid;
+        }
+      }
+    }
+    .inputConnectTx {
+      width: 60px;
+      height: 46px;
+      position: relative;
+
+      & > div {
+        height: 50%;
+        border-left: 1px solid;
+        border-color: var(--divide-line-color) !important;
+        margin-left: -1px;
+        &:first-child {
+          border-bottom: 1px solid;
+          border-radius: 0 0 0 8px;
+        }
+        &:last-child {
+          border-top: 1px solid;
+          width: 8px;
+          border-radius: 8px 0 0 0;
+          margin-top: -1px;
+        }
+      }
+
+      svg {
+        position: absolute;
+        transform: translateY(-50%) rotate(-90deg);
+        left: 50%;
+        top: 50%;
+        > path {
+          fill: var(--divide-line-color);
+          stroke: var(--divide-line-color);
+        }
+      }
+    }
+    .outputConnectTx {
+      width: 60px;
+      height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      & > div {
+        height: 50%;
+        border-right: 1px solid;
+        border-color: var(--divide-line-color) !important;
+        margin-right: -1px;
+        &:first-child {
+          width: 100%;
+          border-bottom: 1px solid;
+          border-radius: 0 0 8px 0;
+        }
+        &:last-child {
+          border-top: 1px solid;
+          width: 8px;
+          border-radius: 0 8px 0 0;
+          margin-top: -1px;
+        }
+      }
+    }
+    .outputConnection {
+      width: 40px;
+      height: calc(100% - 59px - 32px);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+
+      & > div {
+        flex: 1;
+        border-color: var(--divide-line-color) !important;
+        border-left: 1px solid;
+        position: relative;
+        &:nth-child(4n + 1) {
+          border-top: 1px solid;
+          svg {
+            bottom: 100%;
+            transform: rotate(-90deg) translateY(-50%) translateX(-50%);
+          }
+        }
+        &:first-child {
+          border-radius: 8px 0 0 0;
+
+          svg {
+            bottom: 100%;
+            transform: rotate(-90deg) translateY(-50%) translateX(-50%);
+          }
+        }
+        &:last-child {
+          border-radius: 0 0 0 8px;
+          border-bottom: 1px solid;
+          position: relative;
+          top: -14px;
+          svg {
+            top: 100%;
+            transform: rotate(-90deg) translateY(-50%) translateX(50%);
+          }
+        }
+        &[data-ignore-left='true'] {
+          border-left: none;
+        }
+        &.centerLine {
+          position: absolute;
+          top: calc(50% - 1px);
+          width: calc(200% + 16px);
+          left: -28px;
+          transform: scale(0.5);
+          border-top: 2px solid;
+
+          & > svg {
+            transform: rotate(-90deg) translateY(-50%) translateX(-50%) scale(2);
+          }
+        }
+      }
+
+      svg {
+        position: absolute;
+        left: 50%;
+        > path {
+          fill: var(--divide-line-color);
+          stroke: var(--divide-line-color);
+        }
+      }
+    }
+  }
+
+  .inputs {
+    position: relative;
+  }
+
+  .outputs {
+    position: relative;
+
+    .placeHolder {
+      height: 29px;
+    }
+  }
+}

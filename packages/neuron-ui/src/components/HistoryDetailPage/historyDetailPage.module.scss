@@ -1,26 +1,36 @@
 @import '../../styles/mixin.scss';
 
-.basicInfoWrap {
+.tx {
+  @include card;
   margin-bottom: 16px;
+}
 
-  .basicInfoTitle {
-    font-weight: 500;
-    font-size: 16px;
+.basicInfoWrap {
+  .basicInfoItemBox {
+    display: flex;
+    font-size: 14px;
     padding: 16px;
-  }
 
-  .basicInfoItemWrap {
-    .basicInfoItemBox {
-      display: flex;
-      font-size: 14px;
-      padding: 16px;
-
-      .infoItemLabel {
-        min-width: 125px;
-      }
+    .infoItemLabel {
+      min-width: 125px;
     }
-    .basicInfoMiddleWrap {
-      display: flex;
+  }
+  .twoColumns {
+    display: flex;
+  }
+  .txHash {
+    flex: 1;
+    border: 1px solid var(--table-head-border-color);
+    border-left: none;
+    border-right: none;
+  }
+  .flexItem {
+    display: flex;
+    align-items: center;
+
+    & > svg {
+      margin-left: 8px;
+      cursor: pointer;
     }
   }
 }
@@ -39,15 +49,6 @@
   color: #999;
   &Nav {
     color: var(--main-text-color);
-  }
-}
-
-.goBack {
-  margin-right: 8px;
-  cursor: pointer;
-
-  & path {
-    stroke: var(--main-text-color);
   }
 }
 
@@ -90,22 +91,6 @@
   }
 }
 
-.income {
-  display: flex;
-  align-items: center;
-
-  .incomeCopy {
-    height: 20px;
-    line-height: 20px;
-    cursor: pointer;
-  }
-
-  & > svg {
-    margin-left: 8px;
-    cursor: pointer;
-  }
-}
-
 .amount {
   height: 32px;
   line-height: 32px;
@@ -123,4 +108,21 @@
 
 .scriptTag:hover {
   color: var(--primary-color);
+}
+
+.cellInfo {
+  display: flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  &:hover {
+    & > span {
+      color: var(--primary-color);
+    }
+  }
+  & > span {
+    color: var(--main-text-color);
+    margin-right: 4px;
+  }
 }

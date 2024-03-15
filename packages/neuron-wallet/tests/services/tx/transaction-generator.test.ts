@@ -1,7 +1,5 @@
 import { when } from 'jest-when'
-import { getConnection } from 'typeorm'
 import { bytes } from '@ckb-lumos/codec'
-import { initConnection } from '../../../src/database/chain/ormconfig'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
@@ -87,7 +85,8 @@ import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-
 import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
+import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
+import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -124,7 +123,7 @@ describe('TransactionGenerator', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   const generateCell = (
@@ -239,18 +238,18 @@ describe('TransactionGenerator', () => {
       const feeRate = '1000'
       it('capacity 500', async () => {
         const feeRate = '1000'
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: toShannon('500'),
             },
           ],
-          bob.address,
-          '0',
-          feeRate
-        )
+          changeAddress: bob.address,
+          fee: '0',
+          feeRate,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -269,18 +268,18 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000', async () => {
         const feeRate = '1000'
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: toShannon('1000'),
             },
           ],
-          bob.address,
-          '0',
-          feeRate
-        )
+          changeAddress: bob.address,
+          fee: '0',
+          feeRate,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -298,18 +297,18 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee, no change output', async () => {
         const feeRate = '1000'
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: BigInt(1000 * 10 ** 8 - 355).toString(),
             },
           ],
-          bob.address,
-          '0',
-          feeRate
-        )
+          changeAddress: bob.address,
+          fee: '0',
+          feeRate,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -327,18 +326,18 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee + 1 shannon', async () => {
         const feeRate = '1000'
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: (BigInt(1000 * 10 ** 8) - BigInt(464) + BigInt(1)).toString(),
             },
           ],
-          bob.address,
-          '0',
-          feeRate
-        )
+          changeAddress: bob.address,
+          fee: '0',
+          feeRate,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -358,9 +357,9 @@ describe('TransactionGenerator', () => {
         await getConnection().manager.save(aliceCell)
 
         const feeRate = '1000'
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: BigInt(1000 * 10 ** 8).toString(),
@@ -370,10 +369,10 @@ describe('TransactionGenerator', () => {
               capacity: BigInt(2500 * 10 ** 8).toString(),
             },
           ],
-          bob.address,
-          '0',
-          feeRate
-        )
+          changeAddress: bob.address,
+          fee: '0',
+          feeRate,
+        })
 
         const expectedSize: number =
           TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
@@ -384,18 +383,18 @@ describe('TransactionGenerator', () => {
 
       describe('with full address', () => {
         it(`only full address, 43 capacity`, async () => {
-          const tx: Transaction = await TransactionGenerator.generateTx(
-            walletId1,
-            [
+          const tx: Transaction = await TransactionGenerator.generateTx({
+            walletID: walletId1,
+            targetOutputs: [
               {
                 address: fullAddressInfo.address,
                 capacity: BigInt(43 * 10 ** 8).toString(),
               },
             ],
-            bob.address,
-            '0',
-            feeRate
-          )
+            changeAddress: bob.address,
+            fee: '0',
+            feeRate,
+          })
 
           const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
           const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
@@ -405,25 +404,25 @@ describe('TransactionGenerator', () => {
 
         it('only full address, 42 capacity', async () => {
           expect(
-            TransactionGenerator.generateTx(
-              walletId1,
-              [
+            TransactionGenerator.generateTx({
+              walletID: walletId1,
+              targetOutputs: [
                 {
                   address: fullAddressInfo.address,
                   capacity: BigInt(42 * 10 ** 8).toString(),
                 },
               ],
-              bob.address,
-              '0',
-              feeRate
-            )
+              changeAddress: bob.address,
+              fee: '0',
+              feeRate,
+            })
           ).rejects.toThrowError()
         })
 
         it(`full address and bob's output`, async () => {
-          const tx: Transaction = await TransactionGenerator.generateTx(
-            walletId1,
-            [
+          const tx: Transaction = await TransactionGenerator.generateTx({
+            walletID: walletId1,
+            targetOutputs: [
               {
                 address: fullAddressInfo.address,
                 capacity: BigInt(1000 * 10 ** 8).toString(),
@@ -433,10 +432,10 @@ describe('TransactionGenerator', () => {
                 capacity: BigInt(1000 * 10 ** 8).toString(),
               },
             ],
-            bob.address,
-            '0',
-            feeRate
-          )
+            changeAddress: bob.address,
+            fee: '0',
+            feeRate,
+          })
 
           const expectedSize: number =
             TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
@@ -448,19 +447,19 @@ describe('TransactionGenerator', () => {
 
       describe('with date', () => {
         it('capacity 500', async () => {
-          const tx: Transaction = await TransactionGenerator.generateTx(
-            walletId1,
-            [
+          const tx: Transaction = await TransactionGenerator.generateTx({
+            walletID: walletId1,
+            targetOutputs: [
               {
                 address: bob.address,
                 capacity: toShannon('500'),
                 date,
               },
             ],
-            bob.address,
-            '0',
-            feeRate
-          )
+            changeAddress: bob.address,
+            fee: '0',
+            feeRate,
+          })
 
           const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
 
@@ -485,17 +484,17 @@ describe('TransactionGenerator', () => {
     describe('with fee 1000', () => {
       const fee = '1000'
       it('capacity 500', async () => {
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: toShannon('500'),
             },
           ],
-          bob.address,
-          fee
-        )
+          changeAddress: bob.address,
+          fee,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -508,17 +507,17 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000', async () => {
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: toShannon('1000'),
             },
           ],
-          bob.address,
-          fee
-        )
+          changeAddress: bob.address,
+          fee,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -531,17 +530,17 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000 - fee', async () => {
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: (BigInt(1000 * 10 ** 8) - BigInt(fee)).toString(),
             },
           ],
-          bob.address,
-          fee
-        )
+          changeAddress: bob.address,
+          fee,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -554,17 +553,17 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000 - fee + 1 shannon', async () => {
-        const tx: Transaction = await TransactionGenerator.generateTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: (BigInt(1000 * 10 ** 8) - BigInt(fee) + BigInt(1)).toString(),
             },
           ],
-          bob.address,
-          fee
-        )
+          changeAddress: bob.address,
+          fee,
+        })
 
         const inputCapacities = tx
           .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -608,7 +607,11 @@ describe('TransactionGenerator', () => {
     it('with fee 800', async () => {
       const fee = '800'
       const feeInt = BigInt(fee)
-      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletId1, targetOutputs, fee)
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+        walletID: walletId1,
+        targetOutputs,
+        fee,
+      })
 
       const inputCapacities = tx
         .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -629,7 +632,12 @@ describe('TransactionGenerator', () => {
 
     it('with feeRate 1000', async () => {
       const feeRate = '1000'
-      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletId1, targetOutputs, '0', feeRate)
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+        walletID: walletId1,
+        targetOutputs,
+        fee: '0',
+        feeRate,
+      })
 
       const inputCapacities = tx
         .inputs!.map(input => BigInt(input.capacity ?? 0))
@@ -656,9 +664,9 @@ describe('TransactionGenerator', () => {
 
     it('full address with feeRate 1000, 43 capacity', async () => {
       const feeRate = '1000'
-      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-        walletId1,
-        [
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+        walletID: walletId1,
+        targetOutputs: [
           {
             address: fullAddressInfo.address,
             capacity: toShannon('43'),
@@ -668,9 +676,9 @@ describe('TransactionGenerator', () => {
             capacity: toShannon('0'),
           },
         ],
-        '0',
-        feeRate
-      )
+        fee: '0',
+        feeRate,
+      })
 
       const outputCapacities = tx
         .outputs!.map(output => BigInt(output.capacity))
@@ -689,9 +697,9 @@ describe('TransactionGenerator', () => {
       const feeRate = '1000'
 
       expect(
-        TransactionGenerator.generateSendingAllTx(
-          walletId1,
-          [
+        TransactionGenerator.generateSendingAllTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: fullAddressInfo.address,
               capacity: toShannon('42'),
@@ -701,27 +709,27 @@ describe('TransactionGenerator', () => {
               capacity: toShannon('0'),
             },
           ],
-          '0',
-          feeRate
-        )
+          fee: '0',
+          feeRate,
+        })
       ).rejects.toThrowError()
     })
 
     describe('feeRate = 1000, with date', () => {
       const feeRate = '1000'
       it('capacity 500', async () => {
-        const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-          walletId1,
-          [
+        const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+          walletID: walletId1,
+          targetOutputs: [
             {
               address: bob.address,
               capacity: toShannon('500'),
               date,
             },
           ],
-          '0',
-          feeRate
-        )
+          fee: '0',
+          feeRate,
+        })
 
         expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
 
@@ -744,12 +752,12 @@ describe('TransactionGenerator', () => {
         }),
       })
       const feeRate = '1000'
-      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-        walletId1,
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+        walletID: walletId1,
         targetOutputs,
-        '0',
+        fee: '0',
         feeRate,
-        MultisigConfigModel.fromObject({
+        multisigConfig: MultisigConfigModel.fromObject({
           walletId: walletId1,
           r: 1,
           m: 2,
@@ -759,8 +767,8 @@ describe('TransactionGenerator', () => {
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda',
           ].map(v => addressToScript(v).args),
-        })
-      )
+        }),
+      })
 
       const inputCapacities = tx
         .inputs!.map(input => BigInt(input.capacity ?? 0))

@@ -1,5 +1,3 @@
-import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import AssetAccount from '../../src/models/asset-account'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 import SudtTokenInfo from '../../src/database/chain/entities/sudt-token-info'
@@ -10,7 +8,7 @@ import { OutputStatus } from '../../src/models/chain/output'
 import SudtTokenInfoEntity from '../../src/database/chain/entities/sudt-token-info'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
-import { createAccounts } from '../setupAndTeardown'
+import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { AddressType } from '../../src/models/keys/address'
@@ -138,7 +136,7 @@ describe('AssetAccountService', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {
@@ -891,48 +889,6 @@ describe('AssetAccountService', () => {
       const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(2)
-    })
-  })
-
-  describe('Test Token Info List', () => {
-    beforeEach(async () => {
-      const tokens = [
-        {
-          tokenID: 'CKBytes',
-          symbol: 'ckb',
-          tokenName: 'ckb',
-          decimal: '0',
-        },
-        {
-          tokenID: tokenID,
-          symbol: 'udt',
-          tokenName: 'udt',
-          decimal: '0',
-        },
-        {
-          tokenID: 'invalid token info',
-          symbol: '',
-          tokenName: '',
-          decimal: '',
-        },
-      ]
-      const repo = getConnection().getRepository(SudtTokenInfoEntity)
-      await repo.save(tokens)
-    })
-
-    it('Get token info list', async () => {
-      const list = await AssetAccountService.getTokenInfoList()
-      expect(list.length).toEqual(2)
-      expect(list.find((item: any) => item.tokenID === 'CKBytes')).toBeTruthy()
-      expect(list.find((item: any) => item.tokenID === tokenID)).toBeTruthy()
-    })
-
-    it('Filter invalid token info out', async () => {
-      const repo = getConnection().getRepository(SudtTokenInfoEntity)
-      const count = await repo.count()
-      expect(count).toBe(3)
-      const list = await AssetAccountService.getTokenInfoList()
-      expect(list).toHaveLength(2)
     })
   })
 

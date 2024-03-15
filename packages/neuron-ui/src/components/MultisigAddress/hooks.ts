@@ -73,12 +73,12 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
     [walletId, setEntities]
   )
   useEffect(() => {
-    getMultisigConfig(walletId).then(res => {
+    getMultisigConfig().then(res => {
       if (isSuccessResponse(res) && res.result) {
         setEntities(res.result)
       }
     })
-  }, [setEntities, walletId])
+  }, [setEntities])
   const updateConfig = useCallback(
     (id: number) => (e: React.SyntheticEvent<unknown>) => {
       const { value } = e.target as HTMLInputElement
@@ -335,7 +335,7 @@ export const useSubscription = ({
         const tmp: Record<string, number> = {}
         res.result.forEach(v => {
           if (hashToPayload[v.hash]) {
-            tmp[hashToPayload[v.hash]] = v.blockStartNumber
+            tmp[hashToPayload[v.hash]] = v.localSavedBlockNumber
           }
         })
         setMultisigSyncProgress(tmp)

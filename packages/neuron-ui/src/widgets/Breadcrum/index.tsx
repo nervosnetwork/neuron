@@ -1,17 +1,20 @@
 import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GoBack } from 'widgets/Icons/icon'
+import { useGoBack } from 'utils'
 import styles from './breadcrum.module.scss'
 
 export interface Page {
   label: string
-  link: string
+  link?: string
 }
 
 export interface BreadcumProps {
   pages: Page[]
+  showBackIcon?: boolean
 }
 
-const Breadcrum = ({ pages = [] }: BreadcumProps) => {
+const Breadcrum = ({ pages = [], showBackIcon }: BreadcumProps) => {
   const navigate = useNavigate()
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -24,9 +27,11 @@ const Breadcrum = ({ pages = [] }: BreadcumProps) => {
     },
     [navigate]
   )
+  const goBack = useGoBack()
 
   return (
     <div className={styles.container}>
+      {showBackIcon ? <GoBack className={styles.goBack} onClick={goBack} /> : null}
       {pages.map(page => (
         <span
           className={styles.page}

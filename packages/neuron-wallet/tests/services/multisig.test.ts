@@ -1,5 +1,3 @@
-import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import MultisigConfig from '../../src/database/chain/entities/multisig-config'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
@@ -9,6 +7,8 @@ import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
+import { NetworkType } from '../../src/models/network'
 
 const [alice, bob, charlie] = keyInfos
 
@@ -23,6 +23,14 @@ jest.mock('../../src/models/subjects/multisig-output-db-changed-subject', () => 
       next: multisigOutputChangedSubjectNextMock,
     }
   },
+}))
+
+jest.mock('../../src/services/networks', () => ({
+  getInstance: () => ({
+    getCurrent: () => ({
+      type: NetworkType.Normal,
+    }),
+  }),
 }))
 
 describe('multisig service', () => {
@@ -66,7 +74,7 @@ describe('multisig service', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {
@@ -87,8 +95,10 @@ describe('multisig service', () => {
       await expect(multisigService.saveMultisigConfig(defaultMultisigConfig)).rejects.toThrow()
     })
     it('save success', async () => {
-      defaultMultisigConfig.walletId = 'walletId1'
-      const res = await multisigService.saveMultisigConfig(defaultMultisigConfig)
+      const anotherConfig = MultisigConfig.fromModel(multisigConfigModel)
+      anotherConfig.lastestBlockNumber = '0x0'
+      anotherConfig.r = 2
+      const res = await multisigService.saveMultisigConfig(anotherConfig)
       const count = await getConnection()
         .getRepository(MultisigConfig)
         .createQueryBuilder()
@@ -97,7 +107,6 @@ describe('multisig service', () => {
         })
         .getCount()
       expect(count).toBe(1)
-      defaultMultisigConfig.walletId = 'walletId'
     })
   })
 
@@ -127,12 +136,8 @@ describe('multisig service', () => {
   })
 
   describe('test get config', () => {
-    it('no config', async () => {
-      const configs = await multisigService.getMultisigConfig('noconfigwallet')
-      expect(configs).toHaveLength(0)
-    })
     it('has config wallet', async () => {
-      const configs = await multisigService.getMultisigConfig(multisigConfigModel.walletId)
+      const configs = await multisigService.getMultisigConfig()
       expect(configs).toHaveLength(1)
     })
   })

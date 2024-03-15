@@ -198,3 +198,11 @@ $hover-bg-color: #3cc68a4d;
   top: 0;
   right: 0;
 }
+
+.learnMore {
+  border: none;
+  background-color: transparent;
+  color: var(--primary-color);
+  padding: 0;
+  cursor: pointer;
+}

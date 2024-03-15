@@ -23,6 +23,7 @@ import {
   validateAmount,
   validateAddress,
   validateAmountRange,
+  validateCapacity,
 } from 'utils/validators'
 import { MenuItemConstructorOptions, shell } from 'electron'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
@@ -37,10 +38,9 @@ export const useGoBack = () => {
   }, [navigate])
 }
 
-export const useLocalDescription = (
-  type: 'address' | 'transaction',
-  walletID: string,
-  dispatch: StateDispatch,
+export const useDescription = (
+  onSubmitDescription: (param: { key: string; description: string }) => void,
+  onChangeEditStatus?: (isEditing: boolean) => void,
   inputType = 'input'
 ) => {
   const [localDescription, setLocalDescription] = useState<{ description: string; key: string }>({
@@ -50,37 +50,16 @@ export const useLocalDescription = (
 
   const submitDescription = useCallback(
     (key: string, originDesc: string) => {
+      onChangeEditStatus?.(false)
       if ((key && key !== localDescription.key) || localDescription.description === originDesc) {
-        dispatch({
-          type: AppActions.ToggleIsAllowedToFetchList,
-          payload: true,
-        })
         setLocalDescription({ key: '', description: '' })
       } else {
-        dispatch({
-          type: AppActions.ToggleIsAllowedToFetchList,
-          payload: true,
-        })
-        if (localDescription.key && type === 'transaction') {
-          updateTransactionDescription({
-            walletID,
-            hash: localDescription.key,
-            description: localDescription.description,
-          })(dispatch)
-        }
-        if (localDescription.key && type === 'address') {
-          updateAddressDescription({
-            walletID,
-            address: localDescription.key,
-            description: localDescription.description,
-          })(dispatch)
-        }
+        onSubmitDescription(localDescription)
         setLocalDescription({ key: '', description: '' })
       }
     },
-    [type, walletID, localDescription, dispatch]
+    [localDescription, onChangeEditStatus]
   )
-
   const onDescriptionFieldBlur = useCallback(
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
@@ -121,11 +100,9 @@ export const useLocalDescription = (
       const {
         dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
       } = e.currentTarget
+      e.stopPropagation()
       if (key) {
-        dispatch({
-          type: AppActions.ToggleIsAllowedToFetchList,
-          payload: false,
-        })
+        onChangeEditStatus?.(true)
         setLocalDescription({ key, description: originDesc })
         try {
           const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
@@ -138,7 +115,7 @@ export const useLocalDescription = (
         }
       }
     },
-    [setLocalDescription, dispatch]
+    [setLocalDescription]
   )
   return {
     localDescription,
@@ -146,6 +123,48 @@ export const useLocalDescription = (
     onDescriptionPress,
     onDescriptionChange,
     onDescriptionSelected,
+  }
+}
+
+export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
+  const onSubmitDescription = useCallback(
+    (localDescription: { key: string; description: string }) => {
+      if (!localDescription.key) {
+        return
+      }
+      switch (type) {
+        case 'transaction':
+          updateTransactionDescription({
+            walletID,
+            hash: localDescription.key,
+            description: localDescription.description,
+          })(dispatch)
+          break
+        case 'address':
+          updateAddressDescription({
+            walletID,
+            address: localDescription.key,
+            description: localDescription.description,
+          })(dispatch)
+          break
+        default:
+          break
+      }
+    },
+    [type, walletID, dispatch]
+  )
+  const onChangeEditStatus = useCallback(
+    (isEditing: boolean) => {
+      dispatch({
+        type: AppActions.ToggleIsAllowedToFetchList,
+        payload: !isEditing,
+      })
+    },
+    [dispatch]
+  )
+  return {
+    onSubmitDescription,
+    onChangeEditStatus,
   }
 }
 
@@ -481,18 +500,22 @@ export const useForceUpdate = <T extends (...args: any[]) => void>(cb: T) => {
 }
 
 export const useOutputErrors = (
-  outputs: Partial<Record<'address' | 'amount' | 'date', string>>[],
-  isMainnet: boolean
+  outputs: Partial<Record<'address' | 'amount' | 'date' | 'unit', string>>[],
+  isMainnet: boolean,
+  isSendMax?: boolean
 ) => {
   return useMemo(
     () =>
-      outputs.map(({ address, amount, date }) => {
+      outputs.map(({ address, amount, date, unit }, index) => {
         let amountError: ErrorWithI18n | undefined
         if (amount !== undefined) {
           try {
             const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
             validateAmount(amount)
             validateAmountRange(amount, extraSize)
+            if (!(isSendMax && index === outputs.length - 1)) {
+              validateCapacity({ address, amount, unit })
+            }
           } catch (err) {
             if (isErrorWithI18n(err)) {
               amountError = err
@@ -559,5 +582,22 @@ export const useCopy = () => {
     copied,
     onCopy,
     copyTimes,
+  }
+}
+
+export const usePagination = (pagination?: { pageSize?: number; onPageChange?: (pageNo: number) => void }) => {
+  const [pageNo, setPageNo] = useState(1)
+  const pageSize = useMemo(() => pagination?.pageSize ?? 10, [pagination])
+  const onPageChange = useCallback(
+    (page: number) => {
+      setPageNo(page)
+      pagination?.onPageChange?.(page)
+    },
+    [pagination]
+  )
+  return {
+    pageNo,
+    pageSize,
+    onPageChange,
   }
 }

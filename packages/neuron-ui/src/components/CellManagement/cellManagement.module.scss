@@ -1,0 +1,256 @@
+@use 'sass:color';
+@import '../../styles/mixin.scss';
+
+.head {
+  display: flex;
+
+  .balance {
+    font-size: 14px;
+    margin-left: 14px;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '';
+      width: 1px;
+      height: 12px;
+      background-color: var(--border-color);
+    }
+
+    & > svg {
+      margin: 0 8px;
+      cursor: pointer;
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+}
+
+.tableHead {
+  padding: 18px 0 16px 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.container {
+  margin: 20px 0;
+}
+
+.lockedWithTip {
+  display: flex;
+  align-items: center;
+
+  .lockedTip {
+    margin-left: 4px;
+    g,
+    path {
+      fill: var(--main-text-color);
+    }
+  }
+}
+
+.actions {
+  & > svg {
+    cursor: pointer;
+    &[data-disabled='true'] {
+      cursor: not-allowed;
+      opacity: 50%;
+    }
+    margin-right: 16px;
+  }
+}
+
+.cellDetailDialog {
+  width: 680px;
+
+  .section {
+    margin-bottom: 20px;
+
+    .txHash {
+      padding: 10px 0 10px 16px;
+      border-radius: 8px;
+      display: flex;
+      background-color: var(--input-disabled-color);
+      p {
+        font-family: 'JetBrains Mono';
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--main-text-color);
+      }
+      .cellActions {
+        width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        flex-shrink: 0;
+
+        & > svg {
+          cursor: pointer;
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: var(--secondary-text-color);
+      margin: 0 0 8px 0;
+    }
+
+    & > pre {
+      border: 1px solid var(--lock-info-title-border);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'JetBrains Mono';
+      line-height: 18px;
+      overflow-y: auto;
+      margin: 0;
+      color: var(--main-text-color);
+    }
+
+    .capacity {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .capacityDetail {
+        font-weight: 400;
+        color: var(--main-text-color);
+      }
+    }
+
+    .slider {
+      width: 648px;
+      height: 8px;
+      border-radius: 8px;
+      background-color: var(--process-background-color);
+      position: relative;
+
+      & > div {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        border-radius: 8px;
+        background-color: var(--primary-color);
+      }
+    }
+  }
+
+  .notice {
+    @include dialog-copy-animation;
+  }
+}
+
+.description {
+  height: 56px;
+  line-height: 56px;
+  min-width: 100px;
+
+  .descText {
+    @include text-overflow-ellipsis;
+    max-width: calc(100vw - 1050px);
+    cursor: pointer;
+  }
+}
+
+.table {
+  position: relative;
+  @include checkbox;
+
+  .multiActions {
+    position: fixed;
+    bottom: 24px;
+    left: calc(50% + 80px);
+    transform: translateX(-50%);
+    padding: 12px 40px 12px 40px;
+    border-radius: 40px;
+    background-color: var(--secondary-background-color);
+    box-shadow: 0px 8px 16px 4px var(--divide-line-color);
+    display: flex;
+    justify-content: space-evenly;
+    column-gap: 56px;
+
+    & > button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: none;
+      background-color: transparent;
+      color: var(--secondary-text-color);
+      column-gap: 2px;
+      cursor: pointer;
+      &[disabled] {
+        cursor: not-allowed;
+        opacity: 50%;
+      }
+
+      & > svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+.consumeNotice {
+  color: var(--main-text-color);
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.lockCell {
+  width: 648px;
+  text-align: center;
+
+  .cellsCapacity {
+    text-align: center;
+    color: var(--main-text-color);
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .passwordInput {
+    margin-top: 12px;
+  }
+
+  .canNotUse {
+    display: inline-flex;
+    align-items: center;
+    background: color-mix(in srgb, #fc8800 5%, var(--warn-background-color));
+    border: 1px solid #fc880033;
+    border-radius: 4px;
+    color: var(--warn-text-color);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px 36px;
+
+    & > svg {
+      margin-right: 4px;
+    }
+  }
+
+  .hardWalletImg {
+    width: 88px;
+    height: 88px;
+    margin: 16px 0 24px 0;
+  }
+
+  .lockActions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hardwalletErr {
+    justify-content: center;
+    margin-top: 12px;
+  }
+}

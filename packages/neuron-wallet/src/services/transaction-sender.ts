@@ -37,13 +37,14 @@ import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
 import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
+import AmendTransactionService from './amend-transaction'
 import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
-import { getClusterCellByOutPoint } from '@spore-sdk/core'
+import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/common-scripts'
 
@@ -68,13 +69,14 @@ export default class TransactionSender {
     transaction: Transaction,
     password: string = '',
     skipLastInputs: boolean = true,
-    skipSign = false
+    skipSign = false,
+    amendHash = ''
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
       : await this.sign(walletID, transaction, password, skipLastInputs)
 
-    return this.broadcastTx(walletID, tx)
+    return this.broadcastTx(walletID, tx, amendHash)
   }
 
   public async sendMultisigTx(
@@ -91,7 +93,7 @@ export default class TransactionSender {
     return this.broadcastTx(walletID, tx)
   }
 
-  public async broadcastTx(walletID: string = '', tx: Transaction) {
+  public async broadcastTx(walletID: string = '', tx: Transaction, amendHash = '') {
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -99,9 +101,14 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
     await MultisigService.saveSentMultisigOutput(tx)
+    if (amendHash) {
+      await AmendTransactionService.save(txHash, amendHash)
+    }
 
-    const wallet = WalletService.getInstance().get(walletID)
-    await wallet.checkAndGenerateAddresses()
+    if (walletID) {
+      const wallet = WalletService.getInstance().get(walletID)
+      await wallet.checkAndGenerateAddresses()
+    }
     return txHash
   }
 
@@ -428,12 +435,21 @@ export default class TransactionSender {
     return [emptyWitness, ...restWitnesses]
   }
 
-  public generateTx = async (
-    walletID: string = '',
-    items: TargetOutput[] = [],
-    fee: string = '0',
-    feeRate: string = '0'
-  ): Promise<Transaction> => {
+  public generateTx = async ({
+    walletID = '',
+    items = [],
+    fee = '0',
+    feeRate = '0',
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    items: TargetOutput[]
+    fee: string
+    feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
@@ -442,13 +458,15 @@ export default class TransactionSender {
     const changeAddress: string = await this.getChangeAddress()
 
     try {
-      const tx: Transaction = await TransactionGenerator.generateTx(
+      const tx: Transaction = await TransactionGenerator.generateTx({
         walletID,
         targetOutputs,
         changeAddress,
         fee,
-        feeRate
-      )
+        feeRate,
+        consumeOutPoints,
+        enableUseSentCell,
+      })
 
       return tx
     } catch (error) {
@@ -459,18 +477,34 @@ export default class TransactionSender {
     }
   }
 
-  public generateSendingAllTx = async (
-    walletID: string = '',
-    items: TargetOutput[] = [],
-    fee: string = '0',
-    feeRate: string = '0'
-  ): Promise<Transaction> => {
+  public generateSendingAllTx = async ({
+    walletID = '',
+    items = [],
+    fee = '0',
+    feeRate = '0',
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    items: TargetOutput[]
+    fee: string
+    feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+      walletID,
+      targetOutputs,
+      fee,
+      feeRate,
+      consumeOutPoints,
+      enableUseSentCell,
+    })
 
     return tx
   }
@@ -484,13 +518,13 @@ export default class TransactionSender {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-      '',
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+      walletID: '',
       targetOutputs,
-      '0',
-      '1000',
-      multisigConfig
-    )
+      fee: '0',
+      feeRate: '1000',
+      multisigConfig,
+    })
 
     return tx
   }
@@ -512,19 +546,19 @@ export default class TransactionSender {
         multisigConfig.n
       )
       const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
-      const tx: Transaction = await TransactionGenerator.generateTx(
-        '',
+      const tx: Transaction = await TransactionGenerator.generateTx({
+        walletID: '',
         targetOutputs,
-        multisigAddresses,
-        '0',
-        '1000',
-        {
+        changeAddress: multisigAddresses,
+        fee: '0',
+        feeRate: '1000',
+        lockClass: {
           lockArgs: [lockScript.args],
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
         },
-        multisigConfig
-      )
+        multisigConfig,
+      })
       return tx
     } catch (error) {
       if (error instanceof CapacityNotEnoughForChange) {
@@ -579,7 +613,7 @@ export default class TransactionSender {
 
     // https://github.com/sporeprotocol/spore-sdk/blob/05f2cbe1c03d03e334ebd3b440b5b3b20ec67da7/packages/core/src/api/joints/spore.ts#L154-L158
     const clusterDep = await (async () => {
-      const clusterCell = await getClusterCellByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
+      const clusterCell = await getClusterByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
         _ => _,
         () => undefined
       )
@@ -843,7 +877,9 @@ export default class TransactionSender {
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
 
     let tx = await rpc.getTransaction(depositOutPoint.txHash)
-    if (tx.txStatus.status !== 'committed') throw new Error('Transaction is not committed yet')
+    if (tx.txStatus.status !== 'committed' || !tx.txStatus.blockHash) {
+      throw new Error('Transaction is not committed yet')
+    }
     const depositBlockHash = tx.txStatus.blockHash
 
     const cellOutput = tx.transaction.outputs[+depositOutPoint.index]

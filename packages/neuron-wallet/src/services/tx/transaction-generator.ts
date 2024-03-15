@@ -161,19 +161,34 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static generateTx = async (
-    walletId: string,
-    targetOutputs: TargetOutput[],
-    changeAddress: string,
-    fee: string = '0',
-    feeRate: string = '0',
-    lockClass: {
+  public static generateTx = async ({
+    walletID,
+    targetOutputs,
+    changeAddress,
+    fee = '0',
+    feeRate = '0',
+    lockClass = {
+      codeHash: SystemScriptInfo.SECP_CODE_HASH,
+      hashType: ScriptHashType.Type,
+    },
+    multisigConfig,
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    targetOutputs: TargetOutput[]
+    changeAddress: string
+    fee: string
+    feeRate?: string
+    lockClass?: {
       lockArgs?: string[]
       codeHash: string
       hashType: ScriptHashType
-    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+    }
     multisigConfig?: MultisigConfigModel
-  ): Promise<Transaction> => {
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     let cellDep: CellDep
     if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
       cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
@@ -221,9 +236,9 @@ export class TransactionGenerator {
     })
 
     const baseSize: number = TransactionSize.tx(tx)
-    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput, totalSize } = await CellsService.gatherInputs(
       needCapacities.toString(),
-      walletId,
+      walletID,
       fee,
       feeRate,
       baseSize,
@@ -231,35 +246,50 @@ export class TransactionGenerator {
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
       undefined,
       lockClass,
-      multisigConfig ? [multisigConfig] : []
+      multisigConfig ? [multisigConfig] : [],
+      consumeOutPoints,
+      enableUseSentCell
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
     tx.fee = finalFee
+    tx.size = totalSize
 
     // change
     if (hasChangeOutput) {
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
       const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
+      output.isChangeCell = true
 
       tx.addOutput(output)
     }
 
     tx.outputs = ArrayUtils.shuffle(tx.outputs)
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
+    tx.hash = tx.computeHash()
 
     return tx
   }
 
   // rest of capacity all send to last target output.
-  public static generateSendingAllTx = async (
-    walletId: string,
-    targetOutputs: TargetOutput[],
-    fee: string = '0',
-    feeRate: string = '0',
+  public static generateSendingAllTx = async ({
+    walletID,
+    targetOutputs,
+    fee = '0',
+    feeRate = '0',
+    multisigConfig,
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    targetOutputs: TargetOutput[]
+    fee: string
+    feeRate?: string
     multisigConfig?: MultisigConfigModel
-  ): Promise<Transaction> => {
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     let cellDep: CellDep
     if (multisigConfig) {
       cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
@@ -275,12 +305,14 @@ export class TransactionGenerator {
     const mode = new FeeMode(feeRateInt)
 
     const allInputs: Input[] = await CellsService.gatherAllInputs(
-      walletId,
+      walletID,
       multisigConfig
         ? Script.fromSDK(
             Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
           )
-        : undefined
+        : undefined,
+      consumeOutPoints,
+      enableUseSentCell
     )
 
     if (allInputs.length === 0) {
@@ -327,15 +359,15 @@ export class TransactionGenerator {
 
     // change
     let finalFee: bigint = feeInt
+    const lockHashes = new Set(allInputs.map(i => i.lockHash!))
+    const keyCount: number = lockHashes.size
+    const txSize: number =
+      TransactionSize.tx(tx) +
+      (multisigConfig
+        ? TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n)
+        : TransactionSize.secpLockWitness() * keyCount) +
+      TransactionSize.emptyWitness() * (allInputs.length - keyCount)
     if (mode.isFeeRateMode()) {
-      const lockHashes = new Set(allInputs.map(i => i.lockHash!))
-      const keyCount: number = lockHashes.size
-      const txSize: number =
-        TransactionSize.tx(tx) +
-        (multisigConfig
-          ? TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n)
-          : TransactionSize.secpLockWitness() * keyCount) +
-        TransactionSize.emptyWitness() * (allInputs.length - keyCount)
       finalFee = TransactionFee.fee(txSize, feeRateInt)
     }
 
@@ -345,6 +377,7 @@ export class TransactionGenerator {
       .reduce((result, c) => result + c, BigInt(0))
     tx.outputs[outputs.length - 1].setCapacity((totalCapacity - capacitiesExceptLast - finalFee).toString())
     tx.fee = finalFee.toString()
+    tx.size = txSize
 
     // check
     if (

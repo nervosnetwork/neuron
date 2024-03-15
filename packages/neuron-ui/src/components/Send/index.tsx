@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
-import { useState as useGlobalState, useDispatch, appState } from 'states'
+import { useState as useGlobalState, useDispatch, appState, AppActions } from 'states'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
 import PageContainer from 'components/PageContainer'
@@ -22,10 +22,10 @@ import { HIDE_BALANCE } from 'utils/const'
 
 import { isErrorWithI18n } from 'exceptions'
 import { useSearchParams } from 'react-router-dom'
-import { useInitialize } from './hooks'
+import { useInitialize, useSendWithSentCell } from './hooks'
 import styles from './send.module.scss'
 
-const SendHeader = ({ balance }: { balance: string }) => {
+const SendHeader = ({ balance, useConsumeCell }: { balance: string; useConsumeCell: boolean }) => {
   const { t } = useTranslation()
   const onBack = useGoBack()
 
@@ -38,12 +38,16 @@ const SendHeader = ({ balance }: { balance: string }) => {
     <div className={styles.headerContainer}>
       <GoBack className={styles.goBack} onClick={onBack} />
       <p>{t('navbar.send')}</p>
-      <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
-        {showBalance ? <EyesOpen /> : <EyesClose />}
-      </Button>
-      <p className={styles.balance}>
-        {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
-      </p>
+      {useConsumeCell ? null : (
+        <>
+          <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
+            {showBalance ? <EyesOpen /> : <EyesClose />}
+          </Button>
+          <p className={styles.balance}>
+            {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
+          </p>
+        </>
+      )}
     </div>
   )
 }
@@ -58,11 +62,14 @@ const Send = () => {
     wallet: { id: walletID = '', balance = '', device },
     chain: { networkID, connectionStatus },
     settings: { networks = [] },
+    consumeCells,
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const consumeOutPoints = useMemo(() => consumeCells?.map(v => v.outPoint), [useMemo])
+  const { enableUseSentCell, onChangeEnableUseSentCell } = useSendWithSentCell()
 
   const {
     outputs,
@@ -83,7 +90,18 @@ const Send = () => {
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
     updateIsSendMax,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
+  } = useInitialize({
+    walletID,
+    items: send.outputs,
+    generatedTx: send.generatedTx,
+    price: send.price,
+    sending,
+    isMainnet,
+    enableUseSentCell,
+    consumeOutPoints,
+    dispatch,
+    t,
+  })
 
   const [searchParams] = useSearchParams()
 
@@ -118,21 +136,29 @@ const Send = () => {
     [setLocktimeIndex, updateTransactionOutput]
   )
 
-  useOnTransactionChange(
+  useOnTransactionChange({
     walletID,
-    outputs,
-    send.price,
+    items: outputs,
+    price: send.price,
     isMainnet,
     dispatch,
     isSendMax,
     setTotalAmount,
     setErrorMessage,
-    t
-  )
+    t,
+    consumeOutPoints,
+    enableUseSentCell,
+  })
 
   let errorMessageUnderTotal = errorMessage
   try {
-    validateTotalAmount(totalAmount, fee, balance)
+    validateTotalAmount(
+      totalAmount,
+      fee,
+      consumeCells
+        ? consumeCells.reduce((total, addr) => total + BigInt(addr.capacity || 0), BigInt(0)).toString()
+        : balance
+    )
   } catch (err) {
     if (isErrorWithI18n(err)) {
       errorMessageUnderTotal = t(err.message)
@@ -146,7 +172,7 @@ const Send = () => {
     !send.generatedTx ||
     outputs.some(v => !v.address)
 
-  const outputErrors = useOutputErrors(outputs, isMainnet)
+  const outputErrors = useOutputErrors(outputs, isMainnet, isSendMax)
 
   const isMaxBtnDisabled = (() => {
     try {
@@ -169,8 +195,16 @@ const Send = () => {
     return false
   })()
 
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: AppActions.UpdateConsumeCells,
+      })
+    }
+  }, [])
+
   return (
-    <PageContainer head={<SendHeader balance={balance} />}>
+    <PageContainer head={<SendHeader balance={balance} useConsumeCell={!!consumeCells?.length} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={`${styles.layout} ${showWaitForFullySynced ? styles.withFullySynced : ''}`}>
           <div className={styles.left}>
@@ -234,10 +268,21 @@ const Send = () => {
               />
             </div>
             <div className={styles.rightFooter}>
-              <Button type="reset" onClick={handleClear} label={t('send.reset')} />
-              <Button type="submit" disabled={disabled} label={t('send.send')}>
-                {sending ? <Spinner /> : (t('send.send') as string)}
-              </Button>
+              <label htmlFor="send-with-sent-cell" className={styles.allowUseSent}>
+                <input
+                  type="checkbox"
+                  id="send-with-sent-cell"
+                  checked={enableUseSentCell}
+                  onChange={onChangeEnableUseSentCell}
+                />
+                <span>{t('send.allow-use-sent-cell')}</span>
+              </label>
+              <div className={styles.actions}>
+                <Button type="reset" onClick={handleClear} label={t('send.reset')} />
+                <Button type="submit" disabled={disabled} label={t('send.send')}>
+                  {sending ? <Spinner /> : (t(enableUseSentCell ? 'send.submit-transaction' : 'send.send') as string)}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

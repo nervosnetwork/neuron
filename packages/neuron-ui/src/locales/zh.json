@@ -24,16 +24,19 @@
       "experimental-functions": "实验性功能",
       "s-udt": "资产账户",
       "update-neuron-with-ckb": "CKB 节点版本与 Neuron (v{{ version }}) 不匹配，可能导致兼容性问题。请更新到最新版 Neuron。",
-      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。",
+      "learn-more": "了解更多",
+      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。(<0>{{btnText}}</0>)",
       "ckb-without-indexer": "请添加 '--indexer' 参数来启动本地节点"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "已同步区块",
         "looking-valid-target": "寻找预设可信区块",
+        "start-block-number": "起始区块",
         "set-start-block-number": "设置同步起始区块"
       },
-      "migrating": "正在数据迁移..."
+      "migrating": "正在数据迁移...",
+      "left-time": "剩余时间"
     },
     "import-hardware": {
       "title": {
@@ -105,6 +108,8 @@
         "partially-signed": "部分签名",
         "signed": "已签名"
       },
+      "import-signed-transaction": "导入已签名交易",
+      "import-signed-transaction-detail": "您导入了一个已签名交易，请确认并重试。",
       "wallet": "钱包：",
       "content": "内容：",
       "export": "导出交易",
@@ -113,8 +118,12 @@
       "actions": {
         "broadcast": "广播交易",
         "sign": "签名并导出",
-        "cancel": "取消"
-      }
+        "cancel": "取消",
+        "view-in-explorer": "在浏览器中查看"
+      },
+      "broadcast-transaction": "广播交易",
+      "import-transaction-to-sign": "导入一笔交易以签名",
+      "import-unsigned-transaction-detail": "您导入了一个未签名交易，请确认并重试。"
     },
     "overview": {
       "date": "时间",
@@ -140,7 +149,10 @@
       "wallet-ready": "钱包准备完成，欢迎使用",
       "send": "转账",
       "receive": "收款",
-      "locked": "已锁定余额"
+      "locked": "已锁定余额",
+      "locked-balance": "已锁定余额",
+      "first-sync-notice": "首次同步数据至少需要 {{size}} GB的磁盘空间，<br />并且数据大小会随着时间增长，建议选择较大磁盘空间来存储数据。",
+      "start-sync": "开始同步"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -175,7 +187,8 @@
       "repeat-password": "重复密码",
       "finish-create": "完成创建",
       "creating-wallet": "钱包准备中，请稍后",
-      "add-one": "添加钱包"
+      "add-one": "添加钱包",
+      "detect-duplicate-wallets": "检测重复钱包"
     },
     "import-keystore": {
       "title": "导入 Keystore 文件",
@@ -231,7 +244,11 @@
       "remove-receiving-address-msg": "确定要删除所选收款地址？",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至",
-      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）"
+      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）",
+      "allow-use-sent-cell": "允许使用待确认的 Outputs 构建交易",
+      "submit-transaction": "发起交易",
+      "transaction-confirmed": "交易已确认",
+      "transaction-cannot-amend": "当前交易已确认，无法修改。"
     },
     "receive": {
       "title": "收款",
@@ -286,6 +303,7 @@
       "table": {
         "name": "钱包名称",
         "type": "类型",
+        "balance": "余额",
         "amount": "金额",
         "timestamp": "时间",
         "status": "状态",
@@ -300,12 +318,14 @@
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
+      "amend": "修改",
       "opening": "正在打开",
       "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址",
       "create": "创建 {{name}} 资产账户",
-      "destroy": "销毁 {{name}} 资产账户"
+      "destroy": "销毁 {{name}} 资产账户",
+      "fee": "交易费用"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
@@ -322,7 +342,15 @@
       "cell-from-cellbase": "来自 Cellbase",
       "lock-script": "脚本锁定",
       "lock-script-title": "地址信息",
-      "deprecated-address-format": "已弃用格式的地址"
+      "deprecated-address-format": "已弃用格式的地址",
+      "type": "类型",
+      "fee": "交易费用",
+      "assets": "资产",
+      "balance": "余额",
+      "status": "状态",
+      "size": "大小",
+      "cycles": "周期",
+      "cell-detail": "Cell详情"
     },
     "addresses": {
       "title": "地址簿",
@@ -374,6 +402,15 @@
         "password": "密码",
         "wallet-detail": {
           "balance": "余额"
+        },
+        "importing-existing": {
+          "title": "导入已存在钱包",
+          "detail": "您导入了一个已经存在的钱包，请选择替换现有钱包或取消导入。",
+          "replace": "替换"
+        },
+        "detected-duplicate": {
+          "title": "检测到重复的钱包",
+          "detail": "您的账户中有重复的钱包，建议您选择保留需要独一无二的钱包，以便于更轻松地管理。"
         }
       },
       "network": {
@@ -401,30 +438,17 @@
         "en": "English",
         "en-US": "English(United States)",
         "zh": "中文(简体)",
-        "zh-TW": "中文(繁體)"
-      },
-      "clear-cache": {
-        "title": "清除缓存",
-        "options": {
-          "refresh": {
-            "label": "刷新缓存"
-          },
-          "rebuild": {
-            "label": "重建索引 (需要 30 ~ 50 分钟)"
-          }
-        },
-        "buttons": {
-          "cancel": "取消",
-          "ok": "确认"
-        }
+        "zh-TW": "中文(繁體)",
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "节点配置和数据",
         "set": "设置",
         "cache": "缓存",
         "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
-        "cache-cleared-on": "上次清空缓存时间 {{date}}",
-        "clear-cache": "清空缓存",
+        "cache-cleared-on": "上次刷新缓存时间 {{date}}",
+        "refresh": "刷新",
         "clearing-cache": "正在清除缓存中，请稍候",
         "clear-success": "已清除缓存",
         "set-path": "设置路径",
@@ -535,7 +559,8 @@
       "verification-failure": "验证失败",
       "back": "上一步",
       "switch-to-light": "开启日间模式",
-      "switch-to-dark": "开启夜间模式"
+      "switch-to-dark": "开启夜间模式",
+      "ckb-node-data-path": "CKB 节点数据路径"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -693,7 +718,8 @@
         "compensated-period": "补贴时间",
         "days-hours": "{{days}} 天 {{hours}} 小时",
         "no-deposit": "没有存入记录",
-        "no-completed": "没有解锁记录"
+        "no-completed": "没有解锁记录",
+        "insufficient-balance-to-unlock": "没有足够余额支付交易费用以解锁 DAO 存款"
       },
       "compensation-period": {
         "tooltip": {
@@ -1127,10 +1153,13 @@
     },
     "set-start-block-number": {
       "title": "设置同步起始区块",
+      "warn": "请注意，同步起始区块之前的交易不会被同步！",
       "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",
-      "view-block": "查看区块"
+      "view-block": "查看区块",
+      "set-less-than-before": "您设置的区块号小于之前的设定，同步将重新开始，请谨慎操作。",
+      "reset-to-header-tip-number": "无法设置比最新区块更大的区块号，已重置为最新区块号。"
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1139,6 +1168,79 @@
         "body-tips-with-network": "\"Internal Node\" 仅用于连接内置节点，请选择以下网络选项或添加新的网络选项以连接外部节点。",
         "add-network": "添加网络",
         "ignore-external-node": "忽略外部节点"
+      },
+      "no-disk-space-dialog": {
+        "tip": "由于磁盘空间不足，同步已停止。 <br /> 请分配更多磁盘空间或将数据迁移到其他磁盘。",
+        "continue-sync": "继续同步",
+        "migrate-data": "迁移数据"
+      }
+    },
+    "cell-manage": {
+      "title": "Cell管理",
+      "wallet-balance": "钱包余额",
+      "table": {
+        "head": {
+          "date": "日期",
+          "type": "类型",
+          "balance": "金额",
+          "status": "状态",
+          "description": "备注",
+          "action": "操作"
+        },
+        "locked": "锁定",
+        "unlocked": "解锁",
+        "default-description": "无"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell详情",
+        "transaction-hash": "交易哈希",
+        "capacity-used": "容量使用",
+        "data": "数据",
+        "total": "总量",
+        "used": "已用",
+        "view-raw-data": "原始数据",
+        "UTF8": "UTF-8",
+        "address": "地址",
+        "number": "数字",
+        "bigEndian": "大端序"
+      },
+      "locked-reason": {
+        "multi-locktime": "这是一个有时间锁的 cell, 只能在 {{time}} 之后使用。",
+        "multi-locktime-reached": "此 Cell 的锁定已经结束，请在\"自定义资产\"中解锁后使用。",
+        "cheque-acp-multisig": "这是一个 {{type}} 的 cell, 不支持解锁。",
+        "NFT-SUDT-DAO": "这是一个 {{type}} 的资产，不支持解锁。",
+        "Unknown": "這是壹項未知的資產，請在繼續操作之前進行檢查和確認。"
+      },
+      "cell-lock-dialog": {
+        "title": "锁定 Cell",
+        "capacity": "锁定所选 Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "请注意, 锁定的 Cells 不能花费"
+      },
+      "cell-unlock-dialog": {
+        "title": "解锁 Cell",
+        "capacity": "解锁所选 Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "消耗 Cell",
+        "warn-consume": "消耗Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
+      },
+      "enter-password": "输入密码",
+      "password-placeholder": "请输入钱包密码",
+      "lock": "锁定",
+      "unlock": "解锁",
+      "consume": "消耗",
+      "verify": "验证"
+    },
+    "send-tx-detail": {
+      "page-title": "交易详情",
+      "basic-info": "基本信息",
+      "topology": "拓扑图",
+      "tx-basic": {
+        "tx-hash": "交易哈希",
+        "capacity": "金额",
+        "tx-fee": "交易费",
+        "size": "大小",
+        "lock-time": "锁定时间"
       }
     }
   }

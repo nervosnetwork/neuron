@@ -3,7 +3,7 @@
   position: absolute;
   background: var(--third-background-color);
   color: var(--main-text-color);
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 10px 2px #e5e5e5;
   padding: 8px 16px;
   border-radius: 8px;
   font-style: normal;
@@ -12,6 +12,9 @@
   line-height: 20px;
   z-index: 300;
   white-space: nowrap;
+  @media (prefers-color-scheme: dark) {
+    box-shadow: none;
+  }
 }
 
 @mixin left($class) {
@@ -180,6 +183,7 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 
   .triangle {
     display: none;
+    z-index: 310;
   }
 
   & > * {
@@ -234,8 +238,10 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
           .triangle {
             top: calc(100% + 4px);
             transform: translateY(50%) rotate(45deg);
-            right: inherit;
           }
+        }
+        &[data-placement='top'] .triangle {
+          bottom: calc(100% + 12px);
         }
       }
     }
@@ -282,6 +288,13 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
       &:not([data-trigger-next-to-child='true']) {
         & .tip {
           top: calc(100% + 20px);
+        }
+      }
+    }
+    &[data-placement='top'] {
+      &[data-trigger-next-to-child='true'] {
+        & .tip {
+          margin-bottom: 2px;
         }
       }
     }

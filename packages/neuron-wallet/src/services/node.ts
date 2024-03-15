@@ -19,6 +19,7 @@ import { rpcRequest } from '../utils/rpc-request'
 import { generateRPC } from '../utils/ckb-rpc'
 import startMonitor, { stopMonitor } from './monitor'
 import { CKBLightRunner } from './light-runner'
+import SettingsService from './settings'
 
 export enum VerifyCkbVersionResult {
   Same,
@@ -135,6 +136,10 @@ class NodeService {
     await stopMonitor('ckb')
     const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
     if (isDefaultCKBNeedStart) {
+      if (SettingsService.getInstance().isFirstSync) {
+        logger.info("CKB:\tThis is the first sync, please wait for the user's confirmation")
+        return
+      }
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       const redistReady = await redistCheck()
       await (redistReady ? this.#startNodeSubject.next() : this.showGuideDialog())

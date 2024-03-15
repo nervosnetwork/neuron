@@ -8,7 +8,11 @@ export const importKeystore = remoteApi<Controller.ImportKeystoreParams>('import
 export const createWallet = remoteApi<Controller.CreateWalletParams>('create-wallet')
 export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wallet')
 export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
+export const replaceWallet = remoteApi<Controller.ReplaceWalletParams>('replace-wallet')
 export const backupWallet = remoteApi<Controller.DeleteWalletParams>('backup-wallet')
+export const updateWalletStartBlockNumber = remoteApi<Controller.UpdateWalletStartBlockNumberParams>(
+  'update-wallet-start-block-number'
+)
 export const getAddressesByWalletID = remoteApi<Controller.GetAddressesByWalletIDParams>('get-all-addresses')
 export const updateAddressDescription =
   remoteApi<Controller.UpdateAddressDescriptionParams>('update-address-description')
@@ -27,6 +31,7 @@ export const generateDaoDepositAllTx = remoteApi<Controller.GenerateDepositAllTr
 )
 export const generateDaoWithdrawTx = remoteApi<Controller.WithdrawParams>('start-withdraw-from-dao')
 export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-from-dao')
+export const calculateUnlockDaoMaximumWithdraw = remoteApi<string, string>('calculate-unlock-dao-maximum-withdraw')
 
 // Sign and Verify
 export const signMessage = remoteApi<Controller.SignMessageParams>('sign-message')

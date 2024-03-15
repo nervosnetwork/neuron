@@ -1,11 +1,11 @@
-import { getConnection, In, Not } from 'typeorm'
+import { In } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import BufferUtils from '../utils/buffer'
 import OutputEntity from '../database/chain/entities/output'
 import Transaction, { TransactionStatus } from '../models/chain/transaction'
 import AssetAccountInfo from '../models/asset-account-info'
 import { OutputStatus } from '../models/chain/output'
 import AssetAccount from '../models/asset-account'
-import SudtTokenInfoEntity from '../database/chain/entities/sudt-token-info'
 import AssetAccountEntity from '../database/chain/entities/asset-account'
 import { CapacityNotEnoughForChange } from '../exceptions'
 import CellsService from '../services/cells'
@@ -16,6 +16,7 @@ import OutPoint from '../models/chain/out-point'
 import SystemScriptInfo from '../models/system-script-info'
 import Input from '../models/chain/input'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import SudtTokenInfoService from './sudt-token-info'
 
 export default class AssetAccountService {
   private static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes') {
@@ -248,14 +249,7 @@ export default class AssetAccountService {
     const tokenName = isCKB ? 'CKBytes' : ''
     const assetAccount = new AssetAccount(tokenID, symbol, '', tokenName, decimal, '0', blake160)
     const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
-    const sudtTokenInfoEntity = assetAccountEntity.sudtTokenInfo
-    await getConnection()
-      .createQueryBuilder()
-      .insert()
-      .into(SudtTokenInfoEntity)
-      .values(sudtTokenInfoEntity)
-      .onConflict(`("tokenID") DO NOTHING`)
-      .execute()
+    await SudtTokenInfoService.insertSudtTokenInfo(assetAccountEntity.sudtTokenInfo)
     const existAccountAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder()
@@ -348,7 +342,7 @@ export default class AssetAccountService {
       [assetAccount.tokenID, assetAccount.blake160]
     )
 
-    if (exists[0].exist === 1) {
+    if (exists[0].exist === 1 && walletID) {
       // For hardware wallet in ckb asset account:
       // 1. If a ckb account has been created, another one cannot be created;
       // 2. If a ckb account has been destroyed, ckb account can be created.
@@ -415,20 +409,6 @@ export default class AssetAccountService {
       assetAccount.sudtTokenInfo.decimal = params.decimal
     }
     return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
-  }
-
-  public static getTokenInfoList() {
-    const repo = getConnection().getRepository(SudtTokenInfoEntity)
-    return repo
-      .find({
-        where: {
-          tokenID: Not(''),
-          tokenName: Not(''),
-          symbol: Not(''),
-          decimal: Not(''),
-        },
-      })
-      .then(list => list.map(item => item.toModel()))
   }
 
   public static async generateCreateChequeTx(

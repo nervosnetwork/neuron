@@ -34,7 +34,15 @@ import { SendType } from 'utils/enums'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import { Attention } from 'widgets/Icons/icon'
-import { AddressLockType, getGenerator, useAddressLockType, useOnSubmit, useOptions, useSendType } from './hooks'
+import {
+  AddressLockType,
+  getGenerator,
+  isSendType,
+  useAddressLockType,
+  useOnSubmit,
+  useOptions,
+  useSendType,
+} from './hooks'
 import styles from './sUDTSend.module.scss'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, HIDE_BALANCE } = CONSTANTS
@@ -401,7 +409,11 @@ const SUDTSend = () => {
                       <>
                         {options.length > 1 ? (
                           <RadioGroup
-                            onChange={onChangeSendType}
+                            onChange={(v: string) => {
+                              if (isSendType(v)) {
+                                onChangeSendType(v)
+                              }
+                            }}
                             itemClassName={styles.optionItem}
                             options={options.map(item => ({
                               value: item.key,

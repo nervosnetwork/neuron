@@ -1,7 +1,7 @@
-import { getConnection } from 'typeorm'
 import { CKBRPC } from '@ckb-lumos/rpc'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
+import { getConnection } from '../../database/chain/connection'
 import Transaction, {
   TransactionStatus,
   SudtInfo,
@@ -14,18 +14,22 @@ import AddressParser from '../../models/address-parser'
 import AssetAccountInfo from '../../models/asset-account-info'
 import BufferUtils from '../../utils/buffer'
 import AssetAccountEntity from '../../database/chain/entities/asset-account'
-import SudtTokenInfoEntity from '../../database/chain/entities/sudt-token-info'
 import exportTransactions from '../../utils/export-history'
 import RpcService from '../rpc-service'
 import NetworksService from '../networks'
 import Script from '../../models/chain/script'
 import Input from '../../models/chain/input'
+import SudtTokenInfoService from '../sudt-token-info'
+import TransactionSize from '../../models/transaction-size'
+import Output from '../../models/chain/output'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
   addresses: string[]
   walletID: string
+  sort?: string
+  direction?: string
 }
 
 export interface PaginationResult<T = any> {
@@ -41,6 +45,8 @@ export enum SearchType {
   TokenInfo = 'tokenInfo',
   Unknown = 'unknown',
 }
+
+const DESC = 'decrease'
 
 export class TransactionsService {
   public static filterSearchType(value: string) {
@@ -61,6 +67,30 @@ export class TransactionsService {
       // Amount search is not supported
     }
     return SearchType.TokenInfo
+  }
+
+  public static ComparedTxType(a: Transaction, b: Transaction, direction: string) {
+    const aType = a.type ?? ''
+    const bType = b.type ?? ''
+    if (aType > bType) return direction === DESC ? 1 : -1
+    if (aType < bType) return direction === DESC ? -1 : 1
+    return 0
+  }
+
+  public static ComparedTxTimestamp(a: Transaction, b: Transaction, direction: string) {
+    const aTimestamp = a.timestamp ? +a.timestamp : 0
+    const bTimestamp = b.timestamp ? +b.timestamp : 0
+    if (aTimestamp > bTimestamp) return direction === DESC ? 1 : -1
+    if (aTimestamp < bTimestamp) return direction === DESC ? -1 : 1
+    return 0
+  }
+
+  public static ComparedTxBalance(a: Transaction, b: Transaction, direction: string) {
+    const aBalance = a.value ? BigInt(a.value) : BigInt(0)
+    const bBalance = b.value ? BigInt(b.value) : BigInt(0)
+    if (aBalance > bBalance) return direction === DESC ? 1 : -1
+    if (aBalance < bBalance) return direction === DESC ? -1 : 1
+    return 0
   }
 
   public static async getAllByAddresses(
@@ -207,7 +237,10 @@ export class TransactionsService {
     }
 
     const skip = (params.pageNo - 1) * params.pageSize
-    const txHashes = allTxHashes.slice(skip, skip + params.pageSize)
+    const needSort =
+      ['type', 'value', 'timestamp'].includes(params.sort ?? '') &&
+      ['increase', 'decrease'].includes(params.direction ?? '')
+    const txHashes = needSort ? allTxHashes : allTxHashes.slice(skip, skip + params.pageSize)
 
     const transactions = await connection
       .getRepository(TransactionEntity)
@@ -424,18 +457,7 @@ export class TransactionsService {
             .reduce((result, c) => result + c, BigInt(0))
 
           const amount = outputAmount - inputAmount
-          const tokenInfo = await getConnection()
-            .getRepository(SudtTokenInfoEntity)
-            .createQueryBuilder('info')
-            .leftJoinAndSelect('info.assetAccounts', 'aa')
-            .where(
-              `info.tokenID = :typeArgs AND aa.blake160 IN (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)`,
-              {
-                typeArgs,
-                walletId: params.walletID,
-              }
-            )
-            .getOne()
+          const tokenInfo = await SudtTokenInfoService.getSudtTokenInfo(typeArgs)
 
           if (tokenInfo) {
             sudtInfo = {
@@ -478,7 +500,16 @@ export class TransactionsService {
 
     return {
       totalCount,
-      items: txs,
+      items: needSort
+        ? txs
+            .sort((a, b) => {
+              if (params.sort === 'type') return TransactionsService.ComparedTxType(a, b, params.direction!)
+              if (params.sort === 'value') return TransactionsService.ComparedTxBalance(a, b, params.direction!)
+              if (params.sort === 'timestamp') return TransactionsService.ComparedTxTimestamp(a, b, params.direction!)
+              return 0
+            })
+            .slice(skip, skip + params.pageSize)
+        : txs,
     }
   }
 
@@ -499,7 +530,11 @@ export class TransactionsService {
     }
     const tx = txInDB.toModel()
     tx.inputs = await this.fillInputFields(txWithStatus.transaction.inputs)
-    tx.outputs = txWithStatus.transaction.outputs
+    tx.outputs = txWithStatus.transaction.outputs.map((v, idx) =>
+      Output.fromObject({ ...v, data: txWithStatus.transaction.outputsData[idx] })
+    )
+    tx.size = TransactionSize.tx(tx)
+    tx.cycles = txWithStatus.cycles
     return tx
   }
 

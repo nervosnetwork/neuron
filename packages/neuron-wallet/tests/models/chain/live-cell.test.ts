@@ -1,5 +1,5 @@
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
+import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
 import LiveCell from '../../../src/models/chain/live-cell'
 
 describe('LiveCell Test', () => {

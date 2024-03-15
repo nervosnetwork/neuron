@@ -5,25 +5,21 @@
   font-size: 12px;
 }
 
-.clearDialog {
-  height: 180px;
-  width: 360px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  p {
-    font-weight: 500;
-    font-size: 16px;
-    color: var(--main-text-color);
-  }
-}
-
 .clearBtn {
   &[disabled] {
     opacity: 0.5;
     box-shadow: none !important;
     cursor: not-allowed;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    vertical-align: sub;
+    margin-left: 4px;
+    & > path {
+      fill: var(--secondary-text-color);
+    }
   }
 }
 

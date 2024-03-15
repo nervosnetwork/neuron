@@ -42,7 +42,7 @@ export default class WalletsController {
     }
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id, device }) => ({ name, id, device })),
+      result: wallets.map(({ name, id, device, extendedKey }) => ({ name, id, device, extendedKey })),
     }
   }
 
@@ -416,6 +416,7 @@ export default class WalletsController {
       password: string
       description?: string
       multisigConfig?: MultisigConfigModel
+      amendHash?: string
     },
     skipSign = false
   ) {
@@ -438,7 +439,8 @@ export default class WalletsController {
         Transaction.fromObject(params.tx),
         params.password,
         false,
-        skipSign
+        skipSign,
+        params.amendHash
       )
     }
     const description = params.description || params.tx.description || ''
@@ -457,6 +459,8 @@ export default class WalletsController {
     items: { address: string; capacity: string; date?: string }[]
     fee: string
     feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -464,12 +468,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx: Transaction = await new TransactionSender().generateTx(
-      params.walletID,
-      params.items,
-      params.fee,
-      params.feeRate
-    )
+    const tx: Transaction = await new TransactionSender().generateTx(params)
     return {
       status: ResponseCode.Success,
       result: tx,
@@ -481,6 +480,8 @@ export default class WalletsController {
     items: { address: string; capacity: string; date?: string }[]
     fee: string
     feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -488,12 +489,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx: Transaction = await new TransactionSender().generateSendingAllTx(
-      params.walletID,
-      params.items,
-      params.fee,
-      params.feeRate
-    )
+    const tx: Transaction = await new TransactionSender().generateSendingAllTx(params)
     return {
       status: ResponseCode.Success,
       result: tx,
@@ -632,6 +628,15 @@ export default class WalletsController {
   private async deleteWallet(id: string): Promise<Controller.Response<any>> {
     const walletsService = WalletsService.getInstance()
     await walletsService.delete(id)
+
+    return {
+      status: ResponseCode.Success,
+    }
+  }
+
+  public async replaceWallet(existingWalletId: string, importedWalletId: string): Promise<Controller.Response<any>> {
+    const walletsService = WalletsService.getInstance()
+    await walletsService.replace(existingWalletId, importedWalletId)
 
     return {
       status: ResponseCode.Success,

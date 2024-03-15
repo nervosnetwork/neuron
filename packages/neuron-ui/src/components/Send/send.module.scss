@@ -1,18 +1,7 @@
 @import '../../styles/mixin.scss';
-$bottomHeight: 84px;
-$headerHeight: 104px;
-
-.content {
-  overflow-y: scroll;
-  margin-bottom: 60px;
-  height: calc(100vh - $headerHeight - $bottomHeight);
-}
-
-.withFullySynced {
-  .content {
-    height: calc(100vh - $headerHeight - $bottomHeight - 60px);
-  }
-}
+$bottomHeight: 24px;
+$headerHeight: 72px;
+$noticeHeight: 60px;
 
 .layout {
   display: flex;
@@ -51,14 +40,23 @@ $headerHeight: 104px;
     }
   }
 
+  &.withFullySynced {
+    .right {
+      height: calc(100vh - $headerHeight - $bottomHeight - $noticeHeight);
+    }
+  }
+
   .right {
     margin-left: 16px;
     flex: 1;
     position: relative;
     border-radius: 16px;
     background: var(--secondary-background-color);
+    height: calc(100vh - $headerHeight - $bottomHeight);
+    $actionHeight: 108px;
 
     .content {
+      $contentPadding: 16px;
       padding: 16px;
       /**
         These styles are for showing the full tips, because of content needs to scroll on the y-axis.
@@ -69,6 +67,8 @@ $headerHeight: 104px;
       left: -48px;
       padding-left: 64px;
       width: calc(100% - 32px);
+      overflow-y: scroll;
+      height: calc(100% - $actionHeight - 2 * $contentPadding);
     }
 
     .rightFooter {
@@ -76,13 +76,34 @@ $headerHeight: 104px;
       width: 100%;
       bottom: 16px;
       left: 0;
-      display: flex;
-      justify-content: center;
+      text-align: center;
+      .actions {
+        display: flex;
+        justify-content: center;
 
-      button {
-        width: 216px;
-        &:last-child {
-          margin-left: 12px;
+        button {
+          width: 216px;
+          &:last-child {
+            margin-left: 12px;
+          }
+        }
+      }
+      .allowUseSent {
+        display: inline-block;
+        margin-bottom: 16px;
+        color: var(--secondary-text-color);
+        input[type='checkbox'] {
+          display: none;
+          margin-right: 8px;
+        }
+        input[type='checkbox'] + span {
+          display: inline-block;
+          padding-left: 26px;
+          background: url('../../widgets/Icons/Radio.svg') no-repeat left top;
+          user-select: none;
+        }
+        input[type='checkbox']:checked + span {
+          background: url('../../widgets/Icons/RadioSelected.svg') no-repeat left top;
         }
       }
     }

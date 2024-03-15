@@ -1,3 +1,4 @@
+import '../../src/types/ckbComponents.d.ts'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
@@ -160,7 +161,7 @@ describe('queue', () => {
     jest.doMock('utils/logger', () => {
       return { error: stubbedLoggerErrorFn, info: jest.fn() }
     })
-    jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
+    jest.doMock('../../src/block-sync-renderer/sync/full-synchronizer', () => {
       return stubbedIndexerConnector
     })
     jest.doMock('../../src/block-sync-renderer/sync/tx-address-finder', () => {
@@ -273,7 +274,7 @@ describe('queue', () => {
                 message: [fakeWalletId],
               })
             })
-            it('notify indexer connector of processed block number', () => {
+            it('notify full synchronizer of processed block number', () => {
               expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
                 fakeTxs[0].transaction.blockNumber
               )

@@ -5,11 +5,11 @@ import Script, { ScriptHashType } from '../models/chain/script'
 import parseSUDTTokenInfo from '../utils/parse_sudt_token_info'
 import { ResponseCode } from '../utils/const'
 import { SudtTokenInfo } from '../models/chain/transaction'
-import AssetAccountService from '../services/asset-account-service'
+import SudtTokenInfoService from '../services/sudt-token-info'
 
 export default class SUDTController {
   public async getSUDTTokenInfo(params: { tokenID: string }): Promise<Controller.Response<SudtTokenInfo>> {
-    const tokenList = await AssetAccountService.getTokenInfoList()
+    const tokenList = await SudtTokenInfoService.getAllSudtTokenInfo()
     const sudtInfo = tokenList.find(sudtInfo => sudtInfo.tokenID === params.tokenID)
     if (sudtInfo) {
       return {

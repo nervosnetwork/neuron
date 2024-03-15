@@ -11,16 +11,17 @@ jobs:
   update-neuron-compatible:
     name: Update Neuron compatibility table
     runs-on: ubuntu-latest
+    environment: neuron-bot
     permissions:
       pull-requests: write # open PR
       contents: write # update version files
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
 
@@ -31,7 +32,7 @@ jobs:
           git add compatible.json
 
       - name: Set GPG
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}

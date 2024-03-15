@@ -46,6 +46,16 @@ import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
 import { ReactComponent as AddSvg } from './Add.svg'
 import { ReactComponent as AddSimpleSvg } from './AddSimple.svg'
 import { ReactComponent as SwitchSvg } from './Switch.svg'
+import { ReactComponent as CleanSvg } from './Clean.svg'
+import { ReactComponent as CellManageSvg } from './CellManage.svg'
+import { ReactComponent as LockSvg } from './Lock.svg'
+import { ReactComponent as LockCellSvg } from './LockCell.svg'
+import { ReactComponent as UnLockSvg } from './Unlock.svg'
+import { ReactComponent as ConsumeSvg } from './Consume.svg'
+import { ReactComponent as DetectSvg } from './Detect.svg'
+import { ReactComponent as DeleteSvg } from './Delete.svg'
+import { ReactComponent as ImportKeystoreSvg } from './SoftWalletImportKeystore.svg'
+import { ReactComponent as ImportHardwareSvg } from './HardWalletImport.svg'
 
 import styles from './icon.module.scss'
 
@@ -104,7 +114,17 @@ export const Sort = WrapSvg(SortSvg)
 export const Edit = WrapSvg(EditSvg)
 export const OverviewSend = WrapSvg(OverviewSendSvg)
 export const OverviewReceive = WrapSvg(OverviewReceiveSvg)
-export const Addressbook = WrapSvg(AddressbookSvg)
+export const Addressbook = WrapSvg(AddressbookSvg, styles.withTheme)
 export const Add = WrapSvg(AddSvg)
 export const Switch = WrapSvg(SwitchSvg)
 export const AddSimple = WrapSvg(AddSimpleSvg)
+export const Clean = WrapSvg(CleanSvg)
+export const CellManage = WrapSvg(CellManageSvg, styles.withTheme)
+export const Lock = WrapSvg(LockSvg, styles.withTheme)
+export const LockCell = WrapSvg(LockCellSvg)
+export const UnLock = WrapSvg(UnLockSvg)
+export const Consume = WrapSvg(ConsumeSvg)
+export const Detect = WrapSvg(DetectSvg)
+export const Delete = WrapSvg(DeleteSvg)
+export const ImportKeystore = WrapSvg(ImportKeystoreSvg)
+export const ImportHardware = WrapSvg(ImportHardwareSvg)

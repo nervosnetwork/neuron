@@ -56,3 +56,15 @@ export class AmountNegativeException extends RangeError {
     this.i18n.fieldValue = value
   }
 }
+
+export class CapacityTooSmallException extends Error {
+  public code = ErrorCode.CapacityTooSmall
+  public i18n: {
+    bytes: string
+  }
+
+  constructor(bytes: string) {
+    super(`${I18N_PATH}${ErrorCode.CapacityTooSmall}`)
+    this.i18n = { bytes }
+  }
+}

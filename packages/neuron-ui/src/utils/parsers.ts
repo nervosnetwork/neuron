@@ -1,5 +1,5 @@
 import { toUint64Le, parseEpoch } from 'services/chain'
-import { PAGE_SIZE } from './const'
+import { MILLISECONDS, PAGE_SIZE } from './const'
 
 export const listParams = (search: string) => {
   const query = new URLSearchParams(search)
@@ -9,6 +9,8 @@ export const listParams = (search: string) => {
     pageNo: +(query.get('pageNo') || 1),
     pageSize: +(query.get('pageSize') || PAGE_SIZE),
     keywords,
+    sort: query.get('sort') || '',
+    direction: query.get('direction') || '',
   }
   return params
 }
@@ -43,4 +45,27 @@ export const toUint128Le = (hexString: string) => {
   }
 
   return `${toUint64Le(`0x${s.substr(18, 16)}`)}${toUint64Le(s.substr(0, 18)).slice(2)}`
+}
+
+export const getLockTimestamp = ({
+  lockArgs,
+  epoch,
+  bestKnownBlockTimestamp,
+}: {
+  lockArgs: string
+  epoch: string
+  bestKnownBlockTimestamp: number
+}) => {
+  const targetEpochInfo = epochParser(toUint64Le(`0x${lockArgs.slice(-16)}`))
+  const currentEpochInfo = epochParser(epoch)
+  const targetEpochFraction =
+    Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
+  const epochsInfo = {
+    target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
+    current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
+  }
+  return {
+    hasReached: epochsInfo.target <= epochsInfo.current,
+    lockTimestamp: bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS,
+  }
 }

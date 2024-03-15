@@ -24,16 +24,19 @@
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
-      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation.",
+      "learn-more": "Learn More",
+      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Please add '--indexer' option to start local node"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Block Synced",
         "looking-valid-target": "Looking for assumed valid target",
+        "start-block-number": "Start block number",
         "set-start-block-number": "Set start block number"
       },
-      "migrating": "migrating..."
+      "migrating": "migrating...",
+      "left-time": "Left Time"
     },
     "import-hardware": {
       "title": {
@@ -112,6 +115,8 @@
         "partially-signed": "Partially Signed",
         "signed": "Signed"
       },
+      "import-signed-transaction": "Import a signed transaction",
+      "import-signed-transaction-detail": "You have imported a signed transaction, please confirm and try again.",
       "wallet": "Wallet:",
       "content": "Content:",
       "export": "Export Tx",
@@ -120,8 +125,12 @@
       "actions": {
         "broadcast": "Broadcast",
         "sign": "Sign and export",
-        "cancel": "Cancel"
-      }
+        "cancel": "Cancel",
+        "view-in-explorer": "View in Explorer"
+      },
+      "broadcast-transaction": "Broadcast Transaction",
+      "import-transaction-to-sign": "Import a transaction to sign",
+      "import-unsigned-transaction-detail": "You have imported an unsigned transaction, please confirm and try again."
     },
     "overview": {
       "date": "Date",
@@ -147,7 +156,10 @@
       "wallet-ready": "Wallet is ready, welcome",
       "send": "Send",
       "receive": "Receive",
-      "locked": "Locked Amount"
+      "locked": "Locked Amount",
+      "locked-balance": "Locked Balance",
+      "first-sync-notice": "The initial synchronization requires at least {{size}} GB of disk space. <br />And the data size will increase over time. It is recommended to choose a larger disk space to store the data.",
+      "start-sync": "Start Sync"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -182,7 +194,8 @@
       "repeat-password": "Repeat Password",
       "finish-create": "Finish Creating",
       "creating-wallet": "Wallet is being preparing, please wait",
-      "add-one": "Add One More"
+      "add-one": "Add One More",
+      "detect-duplicate-wallets": "Detect Duplicate Wallets"
     },
     "import-keystore": {
       "title": "Import Keystore File",
@@ -238,7 +251,11 @@
       "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})",
+      "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
+      "submit-transaction": "Submit the transaction",
+      "transaction-confirmed": "Transaction Confirmed",
+      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended."
     },
     "receive": {
       "title": "Receive",
@@ -293,6 +310,7 @@
       "table": {
         "name": "Wallet Name",
         "type": "Type",
+        "balance": "Balance",
         "amount": "Amount",
         "timestamp": "Time",
         "status": "Status",
@@ -307,12 +325,14 @@
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
+      "amend": "Amend",
       "opening": "Opening",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address",
       "create": "Create {{name}} Asset Account",
-      "destroy": "Destroy {{name}} Asset Account"
+      "destroy": "Destroy {{name}} Asset Account",
+      "fee": "Transaction Fee"
     },
     "transaction": {
       "window-title": "Transaction: {{hash}}",
@@ -329,7 +349,15 @@
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
       "lock-script-title": "Address Information",
-      "deprecated-address-format": "Address in deprecated format"
+      "deprecated-address-format": "Address in deprecated format",
+      "type": "Type",
+      "fee": "Transaction Fee",
+      "assets": "Assets",
+      "balance": "Balance",
+      "status": "Status",
+      "size": "Size",
+      "cycles": "Cycles",
+      "cell-detail": "Cell Detail"
     },
     "addresses": {
       "title": "Address Book",
@@ -381,6 +409,15 @@
         "password": "Password",
         "wallet-detail": {
           "balance": "Balance"
+        },
+        "importing-existing": {
+          "title": "Importing an existing wallet",
+          "detail": "You imported a wallet that already exists, choose to replace the existing wallet or cancel the import.",
+          "replace": "Replace"
+        },
+        "detected-duplicate": {
+          "title": "Detected duplicate wallets",
+          "detail": "You have duplicate wallets in your account and it is recommended that you choose to keep the wallet that needs to be unique to make it less difficult to manage."
         }
       },
       "network": {
@@ -408,30 +445,17 @@
         "en": "English",
         "en-US": "English(United States)",
         "zh": "中文(简体)",
-        "zh-TW": "中文(繁體)"
-      },
-      "clear-cache": {
-        "title": "Clear Cache",
-        "options": {
-          "refresh": {
-            "label": "Refresh"
-          },
-          "rebuild": {
-            "label": "Fully rebuild index (cost extra 30 ~ 50 min)"
-          }
-        },
-        "buttons": {
-          "cancel": "Cancel",
-          "ok": "OK"
-        }
+        "zh-TW": "中文(繁體)",
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "CKB Node Config & Storage",
         "set": "Set",
         "cache": "Cache",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
-        "cache-cleared-on": "Cache cleared on {{date}}",
-        "clear-cache": "Clear Cache",
+        "cache-cleared-on": "Refreshed cache on {{date}}",
+        "refresh": "Refresh",
         "clearing-cache": "Clearing Cache, please wait a moment",
         "clear-success": "Cache Cleared",
         "set-path": "Set Path",
@@ -542,7 +566,8 @@
       "verification-failure": "Verification Failed",
       "back": "Back",
       "switch-to-light": "Switch to Light Mode",
-      "switch-to-dark": "Switch to Dark Mode"
+      "switch-to-dark": "Switch to Dark Mode",
+      "ckb-node-data-path": "CKB Node Data Path"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -677,7 +702,7 @@
       "cancel": "Cancel",
       "proceed": "Proceed",
       "compensation": "Compensation",
-      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days} days).",
+      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days}} days).",
       "deposit-dialog-title": "Deposit",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
@@ -700,7 +725,8 @@
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
         "no-deposit": "No Deposit",
-        "no-completed": "No Completed"
+        "no-completed": "No Completed",
+        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit"
       },
       "compensation-period": {
         "tooltip": {
@@ -727,7 +753,7 @@
     "nervos-dao-detail": {
       "tx-detail": "Transaction Detail",
       "deposited": "Deposited",
-      "withdrawn": "Withdrawn",
+      "withdrawn": "Withdraw",
       "unlocked": "Unlocked",
       "basic-information": "Basic Information",
       "transaction-hash": "Transaction Hash",
@@ -1135,10 +1161,13 @@
     },
     "set-start-block-number": {
       "title": "Set the start block number",
+      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
-      "view-block": "View the block"
+      "view-block": "View the block",
+      "set-less-than-before": "The block number you set is smaller than the previous set, the synchronization will restart, please proceed with caution.",
+      "reset-to-header-tip-number": "Unable to set a block number greater than the header tip block number, reset to the header tip block number."
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1147,6 +1176,79 @@
         "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"
+      },
+      "no-disk-space-dialog": {
+        "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
+        "continue-sync": "Continue Sync",
+        "migrate-data": "Migrate Data"
+      }
+    },
+    "cell-manage": {
+      "title": "Cell Manage",
+      "wallet-balance": "Wallet Balance",
+      "table": {
+        "head": {
+          "date": "Date",
+          "type": "Type",
+          "balance": "Balance",
+          "status": "Status",
+          "description": "Description",
+          "action": "Operation"
+        },
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "default-description": "None"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell Detail",
+        "transaction-hash": "Transaction Hash",
+        "capacity-used": "Used Capacity",
+        "data": "Data",
+        "total": "Total",
+        "used": "Used",
+        "view-raw-data": "Raw data",
+        "UTF8": "UTF-8",
+        "address": "Address",
+        "number": "Number",
+        "bigEndian": "Big-Endian"
+      },
+      "locked-reason": {
+        "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",
+        "multi-locktime-reached": "The time lock for this cell has expired and you need to claim it in Customized Assets before using it.",
+        "cheque-acp-multisig": "This is a {{type}} cell and does not support unlocking.",
+        "NFT-SUDT-DAO": " This is a {{type}} asset and does not support unlocking.",
+        "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."
+      },
+      "cell-lock-dialog": {
+        "title": "Lock Cell",
+        "capacity": "Lock selected Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "Warn, locked Cells can not use"
+      },
+      "cell-unlock-dialog": {
+        "title": "Unlock Cell",
+        "capacity": "Unlock selected Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "Consume Cell",
+        "warn-consume": "Consume cell will not keep any data and use all of the ckb, please ensure that no important data needs to be retained"
+      },
+      "enter-password": "Enter Password",
+      "password-placeholder": "Please input wallet password",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "consume": "Consume",
+      "verify": "Verify"
+    },
+    "send-tx-detail": {
+      "page-title": "Transaction Detail",
+      "basic-info": "Basic Information",
+      "topology": "Topology",
+      "tx-basic": {
+        "tx-hash": "Transaction Hash",
+        "capacity": "Capacity",
+        "tx-fee": "Transaction Fee",
+        "size": "Size",
+        "lock-time": "Lock Time"
       }
     }
   }

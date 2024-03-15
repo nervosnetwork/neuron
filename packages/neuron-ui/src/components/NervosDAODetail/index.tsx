@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, transactionState, useDispatch, showPageNotice } from 'states'
 import {
@@ -9,28 +9,27 @@ import {
   ErrorCode,
   localNumberFormatter,
   uniformTimeFormatter,
-  useGoBack,
 } from 'utils'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction } from 'services/remote'
-import PageContainer, { Breadcrumbs } from 'components/PageContainer'
+import PageContainer from 'components/PageContainer'
 import { useParams } from 'react-router-dom'
 
 import Tabs, { VariantProps } from 'widgets/Tabs'
 import { onEnter } from 'utils/inputDevice'
-import { Copy, GoBack, BalanceHide, BalanceShow } from 'widgets/Icons/icon'
+import { Copy, BalanceHide, BalanceShow } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
+import Breadcrum from 'widgets/Breadcrum'
 import styles from './nervosDAODetail.module.scss'
 import hooks from './hooks'
 import CellsCard from './CellsCard'
 
-const TabsVariantWithTxTypes: FC<
-  VariantProps<{
-    title: string
-    hash: string
-  }>
-> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithTxTypes = ({
+  tabs,
+  selectedTab,
+  onTabChange,
+}: VariantProps<Record<'title' | 'hash', string>>): React.ReactElement => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState<string>()
@@ -144,20 +143,10 @@ const NervosDAODetail = () => {
   const { depositOutPoint } = useParams<{ depositOutPoint: string }>()
   const daoRecord = records.find(record => getRecordKey(record) === depositOutPoint)
   const hash = daoRecord?.depositOutPoint?.txHash ?? daoRecord?.outPoint.txHash
-  const onBack = useGoBack()
+  const breadPages = useMemo(() => [{ label: t('nervos-dao-detail.tx-detail') }], [t])
 
   return (
-    <PageContainer
-      head={
-        <Breadcrumbs>
-          <>
-            <GoBack className={styles.goBack} onClick={onBack} />
-            <span>{t('nervos-dao-detail.tx-detail')}</span>
-          </>
-        </Breadcrumbs>
-      }
-      notice={pageNotice}
-    >
+    <PageContainer head={<Breadcrum pages={breadPages} showBackIcon />} notice={pageNotice}>
       {hash && (
         <Tabs
           Variant={TabsVariantWithTxTypes}

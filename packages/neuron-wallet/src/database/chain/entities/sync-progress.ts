@@ -28,10 +28,13 @@ export default class SyncProgress {
   walletId!: string
 
   @Column()
-  blockStartNumber: number = 0
+  lightStartBlockNumber: number = 0
 
   @Column()
-  blockEndNumber: number = 0
+  localSavedBlockNumber: number = 0
+
+  @Column()
+  syncedBlockNumber: number = 0
 
   @Column({ type: 'varchar' })
   cursor?: HexString
@@ -58,8 +61,9 @@ export default class SyncProgress {
     res.scriptType = obj.scriptType
     res.delete = false
     res.addressType = obj.addressType ?? SyncAddressType.Default
-    res.blockStartNumber = parseInt(obj.blockNumber)
-    res.blockEndNumber = parseInt(obj.blockNumber)
+    res.lightStartBlockNumber = parseInt(obj.blockNumber)
+    res.localSavedBlockNumber = parseInt(obj.blockNumber)
+    res.syncedBlockNumber = parseInt(obj.blockNumber)
     return res
   }
 }

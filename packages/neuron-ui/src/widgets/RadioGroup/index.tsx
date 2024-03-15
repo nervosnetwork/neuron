@@ -11,9 +11,9 @@ export interface RadioGroupOptions {
 
 export interface RadioGroupProps {
   options: RadioGroupOptions[]
-  onChange?: (arg: string | number) => void
-  defaultValue?: string | number
-  value?: string | number
+  onChange?: (arg: string) => void
+  defaultValue?: string
+  value?: string
   itemClassName?: string
   className?: string
   inputIdPrefix?: string
