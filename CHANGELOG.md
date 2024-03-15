@@ -1,4 +1,4 @@
-# 0.114.2 (2024-03-15)
+# 0.114.1 (2024-03-15)
 
 ### CKB Node & Light Client
 
@@ -23,7 +23,7 @@ With optimizations to settings and transaction overviews, Neuron continues to pr
 
 Upgrade now and experience seamless transaction management with Neuron.
 
-[![Neuron@v0.114.2](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/df29-EUZG0Y)
+[![Neuron@v0.114.1](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/df29-EUZG0Y)
 
 ---
 
@@ -31,7 +31,7 @@ Upgrade now and experience seamless transaction management with Neuron.
 
 - #3081: fix start-sync confirmation in light client mode.(@yanguoyu)
 
-**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.0...v0.114.2
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.0...v0.114.1
 
 # 0.114.0 (2024-03-15)
 
