@@ -8,16 +8,16 @@ jobs:
   compare:
     name: Compare checksums
     runs-on: macos-latest
+    environment: Release
     permissions:
-      contents: read
-      actions: read
+      contents: write # to append checksum for each commit
+      actions: read # to read artifacts
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Generate checksums from artifacts
-        run:
-          ruby ./scripts/release-checksums.rb ${{ github.event.release.tag_name }} | tee generated_checksums.txt
+        run: ruby ./scripts/release-checksums.rb ${{ github.event.release.tag_name }} | tee generated_checksums.txt
 
       - name: Fetch checksums from release note
         run: |
@@ -39,4 +39,3 @@ jobs:
       - uses: peter-evans/commit-comment@v3
         with:
           body: ${{ steps.comment_body.outputs.body }}
-
