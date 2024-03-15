@@ -23,7 +23,7 @@ With optimizations to settings and transaction overviews, Neuron continues to pr
 
 Upgrade now and experience seamless transaction management with Neuron.
 
-[![Neuron@v0.114.0](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/WjEzMS2T9F0)
+[![Neuron@v0.114.0](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/df29-EUZG0Y)
 
 ---
 
