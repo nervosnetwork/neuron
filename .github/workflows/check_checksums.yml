@@ -8,6 +8,9 @@ jobs:
   compare:
     name: Compare checksums
     runs-on: macos-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
