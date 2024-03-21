@@ -61,8 +61,14 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   )
 
   const { blockNumber, hash, description, status } = column
-  const confirmations = blockNumber ? 1 + bestBlockNumber - +blockNumber : 0
-  const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
+  const confirmations = bestBlockNumber && blockNumber ? 1 + bestBlockNumber - +blockNumber : null
+  const confirmationsLabel =
+    // eslint-disable-next-line no-nested-ternary
+    confirmations === null || confirmations < 0
+      ? '--'
+      : confirmations > 1000
+      ? '1,000+'
+      : localNumberFormatter(confirmations)
   const onCopy = useCallback(() => {
     window.navigator.clipboard.writeText(hash)
     showPageNotice('common.copied')(dispatch)
