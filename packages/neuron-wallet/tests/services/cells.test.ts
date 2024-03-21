@@ -2,6 +2,7 @@ import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { bytes } from '@ckb-lumos/codec'
 import OutputEntity from '../../src/database/chain/entities/output'
+import InputEntity from '../../src/database/chain/entities/input'
 import { OutputStatus } from '../../src/models/chain/output'
 import CellsService, {
   CustomizedLock,
@@ -190,6 +191,19 @@ describe('CellsService', () => {
     multisigCell.lockHash = who.lockHash
     await getConnection().manager.save(multisigCell)
     return multisigCell
+  }
+
+  const generateTx = (hash: string, timestamp: string, inputs: InputEntity[] = []) => {
+    const tx = new TransactionEntity()
+    tx.hash = hash
+    tx.version = '0x0'
+    tx.timestamp = timestamp
+    tx.status = TransactionStatus.Success
+    tx.witnesses = []
+    tx.blockNumber = '1'
+    tx.blockHash = '0x' + '10'.repeat(32)
+    tx.inputs = inputs
+    return tx
   }
 
   const typeScript = new Script(randomHex(), '0x', ScriptHashType.Data)
@@ -834,17 +848,6 @@ describe('CellsService', () => {
   describe('#getDaoCells', () => {
     const depositData = '0x0000000000000000'
     const withdrawData = '0x000000000000000a'
-    const generateTx = (hash: string, timestamp: string) => {
-      const tx = new TransactionEntity()
-      tx.hash = hash
-      tx.version = '0x0'
-      tx.timestamp = timestamp
-      tx.status = TransactionStatus.Success
-      tx.witnesses = []
-      tx.blockNumber = '1'
-      tx.blockHash = '0x' + '10'.repeat(32)
-      return tx
-    }
 
     const createCells = async () => {
       const tx1 = generateTx('0x1234', '1572862777481')
@@ -1066,17 +1069,6 @@ describe('CellsService', () => {
   describe('#addUnlockInfo', () => {
     const depositData = '0x0000000000000000'
     const withdrawData = '0x000000000000000a'
-    const generateTx = (hash: string, timestamp: string) => {
-      const tx = new TransactionEntity()
-      tx.hash = hash
-      tx.version = '0x0'
-      tx.timestamp = timestamp
-      tx.status = TransactionStatus.Success
-      tx.witnesses = []
-      tx.blockNumber = '1'
-      tx.blockHash = '0x' + '10'.repeat(32)
-      return tx
-    }
 
     const withdrawTxHash = '0x' + '2'.repeat(64)
 
@@ -1138,17 +1130,6 @@ describe('CellsService', () => {
   describe('#addDepositInfo', () => {
     const depositData = '0x0000000000000000'
     const withdrawData = '0x000000000000000a'
-    const generateTx = (hash: string, timestamp: string) => {
-      const tx = new TransactionEntity()
-      tx.hash = hash
-      tx.version = '0x0'
-      tx.timestamp = timestamp
-      tx.status = TransactionStatus.Success
-      tx.witnesses = []
-      tx.blockNumber = '1'
-      tx.blockHash = '0x' + '10'.repeat(32)
-      return tx
-    }
 
     const depositTxHash = '0x' + '0'.repeat(64)
     const depositTx = Transaction.fromObject({
@@ -1846,6 +1827,104 @@ describe('CellsService', () => {
         type: typeScript,
       })
       expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.Unknown)
+    })
+  })
+
+  describe('getDaoWithdrawAndDeposit', () => {
+    const generateInput = (
+      params: {
+        capacity?: string
+        typeScript?: Script | null
+        who?: any
+        data?: string
+        transaction?: TransactionEntity | null
+        transactionHash?: string
+      } = {}
+    ) => {
+      const input = new InputEntity()
+      input.transactionHash = params.transaction?.hash ?? params.transactionHash ?? randomHex()
+      input.outPointTxHash = randomHex()
+      input.outPointIndex = '0'
+      input.capacity = params?.capacity ?? toShannon('1000')
+      const who = params.who ?? bob
+      input.lockCodeHash = who.lockScript.codeHash
+      input.lockArgs = who.lockScript.args
+      input.lockHashType = who.lockScript.hashType
+      if (who.lockScript.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+        input.multiSignBlake160 = who.lockScript.args
+      }
+      input.lockHash = who.lockScript.computeHash()
+      input.data = params.data ?? '0x'
+      const typeScript = params.typeScript ?? SystemScriptInfo.generateDaoScript('0x')
+      if (typeScript) {
+        input.typeCodeHash = typeScript.codeHash
+        input.typeArgs = typeScript.args
+        input.typeHashType = typeScript.hashType
+        input.typeHash = typeScript.computeHash()
+      }
+      if (params.transaction) {
+        input.transaction = params.transaction
+      }
+      input.since = '0'
+      return input
+    }
+    const saveTxAndInput = async (
+      params: {
+        capacity?: string
+        typeScript?: Script | null
+        who?: any
+        data?: string
+      } = {}
+    ) => {
+      const tx = generateTx(randomHex(), '1572862777481')
+      const input = await generateInput({ ...params, transactionHash: tx.hash })
+      await getConnection().manager.save([tx, input])
+      return input
+    }
+    it('no input', async () => {
+      const input = await saveTxAndInput()
+      await expect(CellsService.getDaoWithdrawAndDeposit(input.transactionHash)).rejects.toThrow(
+        new Error(`No unlock transaction use ${input.transactionHash} as input`)
+      )
+    })
+    it('can not find output', async () => {
+      const input = await saveTxAndInput({ data: '0x1234' })
+      const output = await generateCell(toShannon('1000'), OutputStatus.Dead, false, null)
+      await getConnection().manager.save(output)
+      await expect(CellsService.getDaoWithdrawAndDeposit(input.transactionHash)).rejects.toThrow(
+        new Error(`${input.transactionHash} is not a DAO transaction`)
+      )
+    })
+    it('output without deposit tx', async () => {
+      const input = await saveTxAndInput({ data: '0x1234' })
+      const output = await generateCell(toShannon('1000'), OutputStatus.Dead, false, null)
+      output.outPointTxHash = input.outPointTxHash!
+      output.outPointIndex = input.outPointIndex!
+      await getConnection().manager.save(output)
+      await expect(CellsService.getDaoWithdrawAndDeposit(input.transactionHash)).rejects.toThrow(
+        new Error(`${input.transactionHash} is not a DAO transaction`)
+      )
+    })
+    it('success', async () => {
+      const input = await saveTxAndInput({ data: '0x1234' })
+      const output = await generateCell(toShannon('1000'), OutputStatus.Dead, false, null)
+      const tx = generateTx(randomHex(), '1572862777481')
+      output.outPointTxHash = input.outPointTxHash!
+      output.outPointIndex = input.outPointIndex!
+      output.depositTxHash = randomHex()
+      output.depositIndex = '0'
+      tx.outputs = [output]
+      await getConnection().manager.save([tx, output])
+      const res = await CellsService.getDaoWithdrawAndDeposit(input.transactionHash)
+      expect(res).toStrictEqual([
+        {
+          withdrawBlockHash: tx.blockHash,
+          depositOutPoint: OutPoint.fromSDK({
+            txHash: output.depositTxHash,
+            index: output.depositIndex,
+          }),
+        },
+      ])
     })
   })
 })

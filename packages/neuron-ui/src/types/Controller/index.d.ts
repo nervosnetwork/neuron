@@ -69,6 +69,7 @@ declare namespace Controller {
     tx: any
     password?: string
     description?: string
+    amendHash?: string
     multisigConfig?: {
       id: number
       walletId: string
@@ -289,6 +290,7 @@ declare namespace Controller {
       tx: any
       password?: string
       skipLastInputs?: boolean
+      amendHash?: string
     }
     type Response = Hash
   }

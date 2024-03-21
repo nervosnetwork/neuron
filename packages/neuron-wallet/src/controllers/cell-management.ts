@@ -1,4 +1,4 @@
-import type { OutPoint, Script } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK, Script } from '@ckb-lumos/base'
 import CellLocalInfo, { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import Output from '../models/chain/output'
 import CellsService, { LockScriptCategory, TypeScriptCategory } from '../services/cells'
@@ -17,7 +17,9 @@ export default class CellManagement {
     const liveCells = (await CellsService.getLiveOrSentCellByWalletId(currentWallet.id, { includeCheque: true })).map(
       v => v.toModel()
     )
-    const outPoints = liveCells.filter((v): v is Output & { outPoint: OutPoint } => !!v.outPoint).map(v => v.outPoint)
+    const outPoints = liveCells
+      .filter((v): v is Output & { outPoint: OutPointSDK } => !!v.outPoint)
+      .map(v => v.outPoint)
     const cellLocalInfoMap = await CellLocalInfoService.getCellLocalInfoMap(outPoints)
     return liveCells
       .map<
@@ -56,10 +58,10 @@ export default class CellManagement {
   }
 
   static async updateLiveCellsLockStatus(
-    outPoints: OutPoint[],
+    outPoints: OutPointSDK[],
     locked: boolean,
     lockScripts: Script[],
-    password: string
+    password: string = ''
   ) {
     // check wallet password
     const currentWallet = WalletService.getInstance().getCurrent()
@@ -67,7 +69,7 @@ export default class CellManagement {
     const addresses = new Set((await AddressService.getAddressesByWalletId(currentWallet.id)).map(v => v.address))
     const isMainnet = NetworksService.getInstance().isMainnet()
     if (!lockScripts.every(v => addresses.has(scriptToAddress(v, isMainnet)))) throw new AddressNotFound()
-    await SignMessage.sign(currentWallet.id, scriptToAddress(lockScripts[0], isMainnet), password, 'verify password')
+    await SignMessage.sign(currentWallet.id, scriptToAddress(lockScripts[0], isMainnet), password, 'verify cell owner')
     return CellLocalInfoService.updateLiveCellLockStatus(outPoints, locked)
   }
 

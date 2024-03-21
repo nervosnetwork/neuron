@@ -1,3 +1,4 @@
+import { type OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import { ServiceHasNoResponse, IsRequired } from '../exceptions'
 import { ResponseCode } from '../utils/const'
 import CellsService from '../services/cells'
@@ -67,7 +68,7 @@ export default class DaoController {
 
   public async startWithdrawFromDao(params: {
     walletID: string
-    outPoint: OutPoint
+    outPoint: OutPointSDK
     fee: string
     feeRate: string
   }): Promise<Controller.Response<Transaction>> {
@@ -77,7 +78,7 @@ export default class DaoController {
 
     const tx = await new TransactionSender().startWithdrawFromDao(
       params.walletID,
-      new OutPoint(params.outPoint.txHash, params.outPoint.index),
+      OutPoint.fromSDK(params.outPoint),
       params.fee,
       params.feeRate
     )
@@ -89,8 +90,8 @@ export default class DaoController {
 
   public async withdrawFromDao(params: {
     walletID: string
-    depositOutPoint: OutPoint
-    withdrawingOutPoint: OutPoint
+    depositOutPoint: OutPointSDK
+    withdrawingOutPoint: OutPointSDK
     fee: string
     feeRate: string
   }): Promise<Controller.Response<Transaction>> {
@@ -100,14 +101,31 @@ export default class DaoController {
 
     const tx = await new TransactionSender().withdrawFromDao(
       params.walletID,
-      new OutPoint(params.depositOutPoint.txHash, params.depositOutPoint.index),
-      new OutPoint(params.withdrawingOutPoint.txHash, params.withdrawingOutPoint.index),
+      OutPoint.fromSDK(params.depositOutPoint),
+      OutPoint.fromSDK(params.withdrawingOutPoint),
       params.fee,
       params.feeRate
     )
     return {
       status: ResponseCode.Success,
       result: tx,
+    }
+  }
+
+  public async calculateUnlockDaoMaximumWithdraw(unlockHash: string): Promise<Controller.Response<string>> {
+    const depositAndWithdrawInfo = await CellsService.getDaoWithdrawAndDeposit(unlockHash)
+    let total = BigInt(0)
+    for (let index = 0; index < depositAndWithdrawInfo.length; index++) {
+      total =
+        total +
+        (await new TransactionSender().calculateDaoMaximumWithdraw(
+          depositAndWithdrawInfo[index].depositOutPoint,
+          depositAndWithdrawInfo[index].withdrawBlockHash
+        ))
+    }
+    return {
+      status: ResponseCode.Success,
+      result: total.toString(),
     }
   }
 }

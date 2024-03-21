@@ -58,10 +58,22 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     onSorted,
     initSortInfo,
   } = props
-  const [showBalance, setShowBalance] = useState(true)
-  const onClickBalanceIcon = useCallback(() => {
-    setShowBalance(v => !v)
-  }, [setShowBalance])
+  const [showBalance, setShowBalance] = useState<Record<string, boolean>>(
+    columns.filter(v => v.isBalance).reduce((pre, cur) => ({ ...pre, [cur.dataIndex]: true }), {})
+  )
+  const onClickBalanceIcon = useCallback(
+    (e: React.SyntheticEvent<SVGSVGElement, MouseEvent>) => {
+      const {
+        dataset: { index },
+      } = e.currentTarget
+      if (!index) return
+      setShowBalance(v => ({
+        ...v,
+        [index]: !v[index],
+      }))
+    },
+    [setShowBalance]
+  )
 
   const handleRowClick = (e: React.SyntheticEvent, item: T, idx: number) => {
     onRowClick?.(e, item, idx)
@@ -141,9 +153,17 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                         <div className={styles.headWithBalance} style={{ justifyContent: align }}>
                           {title}
                           {showBalance ? (
-                            <BalanceShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                            <BalanceShow
+                              onClick={onClickBalanceIcon}
+                              data-index={dataIndex}
+                              className={styles.balanceIcon}
+                            />
                           ) : (
-                            <BalanceHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                            <BalanceHide
+                              onClick={onClickBalanceIcon}
+                              data-index={dataIndex}
+                              className={styles.balanceIcon}
+                            />
                           )}
                         </div>
                       ) : (
@@ -200,7 +220,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                           expandedRow === idx && rowExtendRender ? styles.noBorder : ''
                         }`}
                       >
-                        {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
+                        {render ? render(item[dataIndex], idx, item, showBalance[dataIndex]) : item[dataIndex]}
                       </td>
                     )
                   )}

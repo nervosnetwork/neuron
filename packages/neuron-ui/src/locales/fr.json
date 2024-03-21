@@ -252,7 +252,9 @@
       "release-on": "Libération le",
       "locktime-warning": "Veuillez vous assurer que le Wallet du destinataire peut prendre en charge le déverrouillage par expiration. (Remarque : 1. Les échanges ne prennent généralement pas en charge le déverrouillage par expiration {{extraNote}})",
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
-      "submit-transaction": "Soumettre la transaction"
+      "submit-transaction": "Soumettre la transaction",
+      "transaction-confirmed": "Transaction confirmée",
+      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée."
     },
     "receive": {
       "title": "Recevoir",
@@ -307,6 +309,7 @@
       "table": {
         "name": "Nom du Wallet",
         "type": "Type",
+        "balance": "Solde",
         "amount": "Montant",
         "timestamp": "Heure",
         "status": "Statut",
@@ -321,12 +324,14 @@
       "view-in-explorer-button-title": "Voir sur l'explorateur",
       "view-detail": "Détail",
       "view-detail-button-title": "Voir les détails",
+      "amend": "Modifier",
       "opening": "Ouverture",
       "copy-tx-hash": "Copier le hash de la transaction",
       "copy-balance": "Copier le solde",
       "copy-address": "Copier l'adresse",
       "create": "Créer le compte d'actif {{name}}",
-      "destroy": "Détruire le compte d'actif {{name}}"
+      "destroy": "Détruire le compte d'actif {{name}}",
+      "fee": "Frais de transaction"
     },
     "transaction": {
       "window-title": "Transaction : {{hash}}",
@@ -343,7 +348,15 @@
       "cell-from-cellbase": "De cellbase",
       "lock-script": "Script de verrouillage",
       "lock-script-title": "Informations sur l'adresse",
-      "deprecated-address-format": "Adresse au format obsolète"
+      "deprecated-address-format": "Adresse au format obsolète",
+      "type": "Type",
+      "fee": "Frais de transaction",
+      "assets": "Actifs",
+      "balance": "Solde",
+      "status": "Statut",
+      "size": "taille",
+      "cycles": "Cycles",
+      "cell-detail": "Détail de la cellule"
     },
     "addresses": {
       "title": "Carnet d'adresses",
@@ -419,8 +432,8 @@
         "switch-network-type": "Basculer vers {{type}}"
       },
       "locale": {
-        "en": "Anglais",
-        "en-US": "Anglais (États-Unis)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
         "fr": "Français",
@@ -1178,10 +1191,16 @@
       },
       "cell-detail-dialog": {
         "title": "Détail de la cellule",
+        "transaction-hash": "Hash de transaction",
         "capacity-used": "Capacité utilisée",
         "data": "Données",
         "total": "Total",
-        "used": "Utilisé"
+        "used": "Utilisé",
+        "view-raw-data": "Données",
+        "UTF8": "UTF-8",
+        "address": "Adresse",
+        "number": "Numéro",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "La cellule est verrouillée dans le temps et vous ne pouvez pas l'utiliser avant {{time}}.",
@@ -1207,7 +1226,8 @@
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
-      "consume": "Consommer"
+      "consume": "Consommer",
+      "verify": "Vérifier"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

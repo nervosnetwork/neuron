@@ -571,7 +571,7 @@ describe('NodeService', () => {
   describe('test start default node', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
-      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: true })
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: true, type: 0 })
       getLocalNodeInfoMock.mockRejectedValue('not start')
       nodeService = new NodeService()
     })

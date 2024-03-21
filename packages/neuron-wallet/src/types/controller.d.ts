@@ -16,6 +16,8 @@ declare namespace Controller {
       pageSize: number
       keywords: string
       walletID: string
+      sort?: string
+      direction?: string
     }
     interface GenerateTransferNftTxParams {
       walletID: string

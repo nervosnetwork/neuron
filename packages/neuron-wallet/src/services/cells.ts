@@ -1,4 +1,4 @@
-import { Brackets, In, IsNull, type ObjectLiteral } from 'typeorm'
+import { Brackets, In, IsNull, Not, type ObjectLiteral } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { getConnection } from '../database/chain/connection'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
@@ -1378,5 +1378,42 @@ export default class CellsService {
           return TypeScriptCategory.Unknown
       }
     }
+  }
+
+  public static async getDaoWithdrawAndDeposit(unlockHash: string) {
+    const inputEntities = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where({
+        transactionHash: unlockHash,
+        data: Not('0x'),
+        typeCodeHash: SystemScriptInfo.DAO_CODE_HASH,
+        typeHashType: SystemScriptInfo.DAO_HASH_TYPE,
+      })
+      .getMany()
+    if (!inputEntities.length) throw new Error(`No unlock transaction use ${unlockHash} as input`)
+    const inputPreviousTxHashes = inputEntities.map(v => v.outPointTxHash)
+    const outputEntities = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where({ outPointTxHash: In(inputPreviousTxHashes), depositTxHash: Not(IsNull()) })
+      .getMany()
+    if (!outputEntities.length) throw new Error(`${unlockHash} is not a DAO transaction`)
+    return inputEntities
+      .map(v => {
+        const withdrawOutput = outputEntities.find(
+          o => o.outPointTxHash === v.outPointTxHash && o.outPointIndex === v.outPointIndex
+        )
+        if (!withdrawOutput) return
+        return {
+          withdrawBlockHash: withdrawOutput.transaction.blockHash,
+          depositOutPoint: OutPoint.fromSDK({
+            txHash: withdrawOutput!.depositTxHash,
+            index: withdrawOutput!.depositIndex,
+          }),
+        }
+      })
+      .filter((v): v is { withdrawBlockHash: string; depositOutPoint: OutPoint } => !!v)
   }
 }

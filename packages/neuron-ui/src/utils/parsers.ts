@@ -9,6 +9,8 @@ export const listParams = (search: string) => {
     pageNo: +(query.get('pageNo') || 1),
     pageSize: +(query.get('pageSize') || PAGE_SIZE),
     keywords,
+    sort: query.get('sort') || '',
+    direction: query.get('direction') || '',
   }
   return params
 }

@@ -54,6 +54,7 @@ declare namespace State {
     witnesses: string[]
     size?: number
     isLastChange?: boolean
+    cycles?: string
   }
   interface Output {
     address: string | undefined
@@ -126,6 +127,7 @@ declare namespace State {
     }
     onSuccess?: () => void
     showType?: 'Global' | ''
+    amendHash?: string
   }
 
   interface SUDTAccount {

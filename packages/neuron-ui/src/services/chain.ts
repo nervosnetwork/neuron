@@ -4,8 +4,6 @@ export const ckbCore = new CKBCore('')
 export const { getHeader, getBlockchainInfo, getTipHeader, getHeaderByNumber, getFeeRateStats, getTransaction } =
   ckbCore.rpc
 
-export const { calculateDaoMaximumWithdraw } = ckbCore
-
 export const { toUint64Le, parseEpoch } = ckbCore.utils
 
 export default {

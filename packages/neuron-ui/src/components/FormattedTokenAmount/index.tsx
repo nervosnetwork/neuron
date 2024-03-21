@@ -8,18 +8,20 @@ import { HIDE_BALANCE } from 'utils/const'
 
 import styles from './formattedTokenAmount.module.scss'
 
-type FormattedTokenAmountProps = { item: State.Transaction; show: boolean; symbolClassName?: string }
+type FormattedTokenAmountProps = { item: State.Transaction; show: boolean; symbolClassName?: string; symbol?: string }
 type AmountProps = Omit<FormattedTokenAmountProps, 'isNeedCopy'> & {
-  sudtAmount: string
+  sudtAmount?: string
   isReceive: boolean
   amount: string
   symbolClassName?: string
 }
 
-const Amount = ({ sudtAmount, show, item, isReceive, amount, symbolClassName }: AmountProps) => {
+const Amount = ({ sudtAmount, show, item, isReceive, amount, symbolClassName, symbol }: AmountProps) => {
   return sudtAmount ? (
-    <div className={show && !sudtAmount.includes('-') ? styles.isReceive : ''}>
-      {show ? `${!sudtAmount.includes('-') ? '+' : ''}${sudtAmount}` : HIDE_BALANCE}&nbsp;
+    <div>
+      <span className={show ? styles.amount : ''} data-direction={isReceive ? 'receive' : 'send'}>
+        {show ? `${isReceive ? '+' : ''}${sudtAmount}` : HIDE_BALANCE}&nbsp;
+      </span>
       <UANTonkenSymbol
         className={symbolClassName}
         name={item.sudtInfo!.sUDT.tokenName}
@@ -27,7 +29,12 @@ const Amount = ({ sudtAmount, show, item, isReceive, amount, symbolClassName }: 
       />
     </div>
   ) : (
-    <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
+    <div>
+      <span className={show ? styles.amount : ''} data-direction={isReceive ? 'receive' : 'send'}>
+        {amount}
+      </span>
+      &nbsp;{symbol}
+    </div>
   )
 }
 
@@ -36,6 +43,7 @@ export const FormattedTokenAmount = ({ item, show, symbolClassName }: FormattedT
   let sudtAmount = ''
   let copyText = amount
   let isReceive = false
+  let symbol = ''
 
   if (item.blockNumber !== undefined) {
     if (item.nftInfo) {
@@ -43,20 +51,46 @@ export const FormattedTokenAmount = ({ item, show, symbolClassName }: FormattedT
       const { type, data } = item.nftInfo
       amount = show ? `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}` : `${HIDE_BALANCE}mNFT`
       copyText = amount
+      symbol = amount.includes('mNFT') ? 'mNFT' : ''
+      amount = amount.replace('mNFT', '')
       isReceive = type === 'receive'
     } else if (item.sudtInfo?.sUDT) {
       if (item.sudtInfo.sUDT.decimal) {
         sudtAmount = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
         copyText = `${sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal)} ${item.sudtInfo.sUDT.symbol}`
+        isReceive = !sudtAmount.includes('-')
       }
     } else {
-      amount = show ? `${shannonToCKBFormatter(item.value, true)} CKB` : `${HIDE_BALANCE} CKB`
+      amount = show ? `${shannonToCKBFormatter(item.value, true)}` : `${HIDE_BALANCE}`
       isReceive = !amount.includes('-')
-      copyText = amount
+      copyText = `${amount} CKB`
+      symbol = 'CKB'
     }
   }
 
-  const props = { sudtAmount, show, item, isReceive, amount, symbolClassName }
+  const props = { sudtAmount, show, item, isReceive, amount, symbolClassName, symbol }
+
+  return show ? (
+    <CopyZone content={copyText}>
+      <Amount {...props} />
+    </CopyZone>
+  ) : (
+    <Amount {...props} />
+  )
+}
+
+export const FormattedCKBBalanceChange = ({ item, show, symbolClassName }: FormattedTokenAmountProps) => {
+  let amount = '--'
+  let copyText = amount
+  let isReceive = false
+
+  if (item.blockNumber !== undefined) {
+    amount = show ? `${shannonToCKBFormatter(item.value, true)}` : `${HIDE_BALANCE}`
+    isReceive = !amount.includes('-')
+    copyText = amount
+  }
+
+  const props = { show, item, isReceive, amount, symbolClassName }
 
   return show ? (
     <CopyZone content={copyText}>

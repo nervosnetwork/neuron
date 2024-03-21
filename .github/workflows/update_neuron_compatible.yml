@@ -11,6 +11,7 @@ jobs:
   update-neuron-compatible:
     name: Update Neuron compatibility table
     runs-on: ubuntu-latest
+    environment: neuron-bot
     permissions:
       pull-requests: write # open PR
       contents: write # update version files
