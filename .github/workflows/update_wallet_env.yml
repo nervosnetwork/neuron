@@ -7,6 +7,10 @@ jobs:
   ready-for-release:
     name: Update ckb node assume valid target
     runs-on: ubuntu-latest
+    environment: neuron-bot
+    permissions:
+      pull-requests: write # open PR
+      contents: write # update version files
     if: ${{ startsWith(github.ref_name, 'rc/') }}
     steps:
       - name: Create Branch

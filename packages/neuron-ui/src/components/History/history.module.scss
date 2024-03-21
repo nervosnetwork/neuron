@@ -135,6 +135,14 @@ body {
 
     .infoOperationBox {
       display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+
+      div {
+        display: flex;
+        gap: 20px;
+        flex: 1;
+      }
       gap: 20px;
 
       .explorerNavButton,
@@ -155,6 +163,16 @@ body {
             fill: var(--primary-color);
           }
         }
+      }
+
+      .amendButton {
+        float: rights;
+        padding: 4px 16px;
+        font-size: 14px;
+        height: auto;
+        width: auto;
+        min-width: 0;
+        border-radius: 4px;
       }
     }
   }

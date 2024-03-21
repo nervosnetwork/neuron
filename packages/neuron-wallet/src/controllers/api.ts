@@ -452,6 +452,7 @@ export default class ApiController {
           password: string
           description?: string
           multisigConfig?: MultisigConfigModel
+          amendHash?: string
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -876,6 +877,10 @@ export default class ApiController {
       return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
     })
 
+    handle('get-transaction-size', async (_, params) => {
+      return this.#transactionsController.getTransactionSize(params)
+    })
+
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,
@@ -962,7 +967,7 @@ export default class ApiController {
         params: {
           outPoints: OutPoint[]
           locked: boolean
-          password: string
+          password?: string
           lockScripts: CKBComponents.Script[]
         }
       ) => {

@@ -21,6 +21,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     environment: Release
+    permissions:
+      contents: write
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
@@ -136,28 +138,28 @@ jobs:
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Neuron-Mac
+          name: Neuron-Mac-x64
           path: release/Neuron-*-mac-x64.zip
 
       - name: Upload Neuron App Zip(arm64)
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Neuron-Mac
+          name: Neuron-Mac-arm64
           path: release/Neuron-*-mac-arm64.zip
 
       - name: Upload Neuron Dmg
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Neuron-Dmg
+          name: Neuron-Dmg-x64
           path: release/Neuron-*-x64.dmg
 
       - name: Upload Neuron Dmg(arm64)
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: Neuron-Dmg
+          name: Neuron-Dmg-arm64
           path: release/Neuron-*-arm64.dmg
 
       - name: Upload Neuron Win
