@@ -9,6 +9,9 @@ jobs:
   merge-to-dev:
     name: Merge into develop
     runs-on: ubuntu-latest
+    environment: Release
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@master
       - name: Request

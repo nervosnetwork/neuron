@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { showPageNotice, useDispatch } from 'states'
 import { openExternal } from 'services/remote'
 
@@ -9,6 +9,9 @@ import { ExplorerIcon, Copy, DetailIcon } from 'widgets/Icons/icon'
 import { useTranslation } from 'react-i18next'
 import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import Tooltip from 'widgets/Tooltip'
+import { getTransaction as getOnChainTransaction } from 'services/chain'
+
+import Button from 'widgets/Button'
 import styles from './history.module.scss'
 
 type RowExtendProps = {
@@ -23,6 +26,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [t] = useTranslation()
+  const [amendabled, setAmendabled] = useState(false)
 
   const { onChangeEditStatus, onSubmitDescription } = useLocalDescription('transaction', id, dispatch)
 
@@ -39,6 +43,14 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
             navigate(`${RoutePath.History}/${btn.dataset.hash}`)
             break
           }
+          case 'amend': {
+            if (column?.sudtInfo) {
+              navigate(`${RoutePath.History}/amendSUDTSend/${btn.dataset.hash}`)
+              return
+            }
+            navigate(`${RoutePath.History}/amend/${btn.dataset.hash}`)
+            break
+          }
           default: {
             // ignore
           }
@@ -48,13 +60,34 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
     [isMainnet]
   )
 
-  const { blockNumber, hash, description } = column
-  const confirmations = blockNumber ? 1 + bestBlockNumber - +blockNumber : 0
-  const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
+  const { blockNumber, hash, description, status } = column
+  const confirmations = bestBlockNumber && blockNumber ? 1 + bestBlockNumber - +blockNumber : null
+  const confirmationsLabel =
+    // eslint-disable-next-line no-nested-ternary
+    confirmations === null || confirmations < 0
+      ? '--'
+      : confirmations > 1000
+      ? '1,000+'
+      : localNumberFormatter(confirmations)
   const onCopy = useCallback(() => {
     window.navigator.clipboard.writeText(hash)
     showPageNotice('common.copied')(dispatch)
   }, [hash, dispatch])
+
+  useEffect(() => {
+    if (status !== 'success') {
+      if (column.type === 'send' && !column.nftInfo && !column.nervosDao) {
+        getOnChainTransaction(hash).then(tx => {
+          // @ts-expect-error Replace-By-Fee (RBF)
+          const { min_replace_fee: minReplaceFee } = tx
+          if (minReplaceFee) {
+            setAmendabled(true)
+          }
+        })
+      }
+    }
+    setAmendabled(false)
+  }, [status, hash, setAmendabled])
 
   return (
     <tr>
@@ -83,7 +116,6 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
               </Tooltip>
             </div>
           </div>
-
           <div className={styles.infoBlock}>
             <div className={styles.infoBlockTitle}>{t('history.transaction-hash')}</div>
             <div className={styles.txHash}>
@@ -92,28 +124,40 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
             </div>
           </div>
           <div className={styles.infoOperationBox}>
-            <button
-              type="button"
-              className={styles.explorerNavButton}
-              title={t('history.view-in-explorer-button-title')}
-              onClick={onActionBtnClick}
-              data-hash={hash}
-              data-action="explorer"
-            >
-              <ExplorerIcon />
-              <span>{t('history.view-in-explorer')}</span>
-            </button>
-            <button
-              type="button"
-              className={styles.detailNavButton}
-              title={t('history.view-detail-button-title')}
-              onClick={onActionBtnClick}
-              data-hash={hash}
-              data-action="detail"
-            >
-              <DetailIcon />
-              <span>{t('history.view-detail')}</span>
-            </button>
+            <div>
+              <button
+                type="button"
+                className={styles.explorerNavButton}
+                onClick={onActionBtnClick}
+                data-hash={hash}
+                data-action="explorer"
+              >
+                <ExplorerIcon />
+                <span>{t('history.view-in-explorer')}</span>
+              </button>
+              <button
+                type="button"
+                className={styles.detailNavButton}
+                onClick={onActionBtnClick}
+                data-hash={hash}
+                data-action="detail"
+              >
+                <DetailIcon />
+                <span>{t('history.view-detail')}</span>
+              </button>
+            </div>
+
+            {amendabled ? (
+              <Button
+                type="reset"
+                className={styles.amendButton}
+                onClick={onActionBtnClick}
+                data-hash={hash}
+                data-action="amend"
+              >
+                <span>{t('history.amend')}</span>
+              </Button>
+            ) : null}
           </div>
         </div>
       </td>

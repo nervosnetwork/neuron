@@ -416,6 +416,7 @@ export default class WalletsController {
       password: string
       description?: string
       multisigConfig?: MultisigConfigModel
+      amendHash?: string
     },
     skipSign = false
   ) {
@@ -438,7 +439,8 @@ export default class WalletsController {
         Transaction.fromObject(params.tx),
         params.password,
         false,
-        skipSign
+        skipSign,
+        params.amendHash
       )
     }
     const description = params.description || params.tx.description || ''

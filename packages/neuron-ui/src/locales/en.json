@@ -253,7 +253,9 @@
       "release-on": "Release on",
       "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})",
       "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
-      "submit-transaction": "Submit the transaction"
+      "submit-transaction": "Submit the transaction",
+      "transaction-confirmed": "Transaction Confirmed",
+      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended."
     },
     "receive": {
       "title": "Receive",
@@ -323,6 +325,7 @@
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
+      "amend": "Amend",
       "opening": "Opening",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
@@ -1201,6 +1204,7 @@
       },
       "cell-detail-dialog": {
         "title": "Cell Detail",
+        "transaction-hash": "Transaction Hash",
         "capacity-used": "Used Capacity",
         "data": "Data",
         "total": "Total",
@@ -1235,7 +1239,8 @@
       "password-placeholder": "Please input wallet password",
       "lock": "Lock",
       "unlock": "Unlock",
-      "consume": "Consume"
+      "consume": "Consume",
+      "verify": "Verify"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",
