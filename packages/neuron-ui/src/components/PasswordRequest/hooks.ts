@@ -56,9 +56,10 @@ export default ({
     switch (actionType) {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
+      case 'send-acp-sudt-to-new-cell':
+        return OfflineSignType.SendAcpSUDTToNewCell
       case 'send-ckb-asset':
       case 'send-acp-ckb-to-new-cell':
-      case 'send-acp-sudt-to-new-cell':
       case 'transfer-to-sudt':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
