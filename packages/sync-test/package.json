@@ -1,0 +1,23 @@
+{
+  "name": "sync-test",
+  "productName": "Neuron",
+  "description": "CKB Neuron Wallet",
+  "homepage": "https://www.nervos.org/",
+  "version": "0.112.0",
+  "private": true,
+  "author": {
+    "name": "Nervos Core Dev",
+    "email": "dev@nervos.org",
+    "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "scripts": {
+    "sync-test": "jest demo.test.ts"
+  },
+  "dependencies": {
+    "@types/tar": "6.1.10"
+  }
+}
