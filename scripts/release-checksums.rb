@@ -13,14 +13,15 @@ macos_arm64_zip = "https://github.com/nervosnetwork/neuron/releases/download/#{t
 macos_x64_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-x64.dmg"
 macos_arm64_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-arm64.dmg"
 
-linux_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-x86_64.AppImage"
+linux_x64_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-x86_64.AppImage"
+linux_arm64_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-arm64.AppImage"
 
 def get_sha256_checksum(url)
   content = URI.open(url).read
   Digest::SHA256.hexdigest(content)
 end
 
-windows_exe_sha256, macos_x64_zip_sha256, macos_arm64_zip_sha256, macos_x64_dmg_sha256, macos_arm64_dmg_sha256, linux_appimage_sha256 = [windows_exe, macos_x64_zip, macos_arm64_zip, macos_x64_dmg, macos_arm64_dmg, linux_appimage].map do |url|
+windows_exe_sha256, macos_x64_zip_sha256, macos_arm64_zip_sha256, macos_x64_dmg_sha256, macos_arm64_dmg_sha256, linux_appimage_sha256 = [windows_exe, macos_x64_zip, macos_arm64_zip, macos_x64_dmg, macos_arm64_dmg, linux_x64_appimage, linux_arm64_appimage].map do |url|
   Thread.new { get_sha256_checksum(url) }
 end.map(&:value)
 
