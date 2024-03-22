@@ -1,16 +1,16 @@
 import initDB from '../../src/database/chain/ormconfig'
-import { getConnection as originGetConnection } from 'typeorm'
 import { TransactionPersistor } from '../../src/services/tx'
 import AssetAccount from '../../src/models/asset-account'
 import OutputEntity from '../../src/database/chain/entities/output'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
+import { getConnection as originGetConnection } from '../../src/database/chain/connection'
 
 export const initConnection = (genesisBlockHash?: string) => {
   return initDB(genesisBlockHash ?? ':memory:')
 }
 
 export const closeConnection = () => {
-  return originGetConnection('full').close()
+  return originGetConnection('full').destroy()
 }
 
 export const getConnection = () => {

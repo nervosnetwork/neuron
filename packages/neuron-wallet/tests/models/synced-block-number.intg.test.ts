@@ -1,5 +1,3 @@
-import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
-
 const stubbedSyncedBlockNumberSubjectNext = jest.fn()
 const stubbedLoggerInfo = jest.fn()
 
@@ -13,6 +11,8 @@ jest.mock('utils/logger', () => {
     info: () => stubbedLoggerInfo(),
   }
 })
+
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 describe('SyncedBlockNumber model', () => {
   let SyncedBlockNumber: any
