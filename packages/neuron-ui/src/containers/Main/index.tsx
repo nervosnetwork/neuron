@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useEffect } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -12,6 +12,7 @@ import { AddSimple } from 'widgets/Icons/icon'
 import DataPathDialog from 'widgets/DataPathDialog'
 import NoDiskSpaceWarn from 'widgets/Icons/NoDiskSpaceWarn.png'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
+import { keepScreenAwake } from 'services/localCache'
 import styles from './main.module.scss'
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode, useNoDiskSpace } from './hooks'
 
@@ -86,6 +87,12 @@ const MainContent = () => {
     onConfirmMigrate,
   } = useNoDiskSpace(navigate)
   const needConfirm = newCkbDataPath && newCkbDataPath !== oldCkbDataPath
+
+  useEffect(() => {
+    if (keepScreenAwake.get()) {
+      wakeScreen()
+    }
+  }, [])
 
   return (
     <div onContextMenu={onContextMenu}>

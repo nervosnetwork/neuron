@@ -393,7 +393,8 @@
         "version": "Version",
         "language": "Langue",
         "select-language": "Sélectionner la langue",
-        "apply": "Appliquer"
+        "apply": "Appliquer",
+        "keep-awake": "Maintenir l'écran allumé pendant la synchronisation"
       },
       "wallet-manager": {
         "edit-wallet": {

@@ -11,6 +11,7 @@ export enum LocalCacheKey {
   LoadedWalletIDs = 'loadedWalletIDs',
   ImportedWallet = 'ImportedWallet',
   ShownNodeId = 'ShownNodeId',
+  ScreenAwake = 'ScreenAwake',
 }
 
 export const addresses = {
@@ -163,5 +164,15 @@ export const lastShowInternalNodeIds = {
   },
   save: (type: NetworkType, id: string) => {
     window.localStorage.setItem(`${type}_${LocalCacheKey.ShownNodeId}`, id)
+  },
+}
+
+export const keepScreenAwake = {
+  get: () => {
+    const value = window.localStorage.getItem(LocalCacheKey.ScreenAwake)
+    return !!value && value === 'true'
+  },
+  save: (value: boolean) => {
+    window.localStorage.setItem(LocalCacheKey.ScreenAwake, value.toString())
   },
 }
