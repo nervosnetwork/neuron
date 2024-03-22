@@ -10,7 +10,6 @@ const CommandSubject = new Subject<{
     | 'import-xpubkey'
     | 'import-hardware'
     | 'load-transaction-json'
-    | 'migrate-acp'
     | 'sign-verify'
     | 'multisig-address'
   payload: string | null

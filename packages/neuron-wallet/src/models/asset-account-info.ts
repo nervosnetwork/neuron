@@ -359,6 +359,19 @@ export default class AssetAccountInfo {
       extensions: [],
     }
   }
+
+  public getAcpCellDep(codeHash: string) {
+    switch (codeHash) {
+      case this.anyoneCanPayInfo.codeHash:
+        return this.anyoneCanPayCellDep
+      case this.legacyAnyoneCanPayInfo.codeHash:
+        return this.legacyAnyoneCanPayInfo.cellDep
+      case this.pwAnyoneCanPayInfo.codeHash:
+        return this.pwAnyoneCanPayInfo.cellDep
+      default:
+        break
+    }
+  }
 }
 
 function toSporeScript(info: ScriptCellInfo): SporeScript {

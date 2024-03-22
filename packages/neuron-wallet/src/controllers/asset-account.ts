@@ -7,11 +7,8 @@ import { ResponseCode } from '../utils/const'
 import NetworksService from '../services/networks'
 import AssetAccountInfo from '../models/asset-account-info'
 import TransactionSender from '../services/transaction-sender'
-import { BrowserWindow, dialog } from 'electron'
+import { dialog } from 'electron'
 import { t } from 'i18next'
-import WalletsService from '../services/wallets'
-import CommandSubject from '../models/subjects/command'
-import SyncApiController, { SyncStatus } from './sync-api'
 import { TransactionGenerator } from '../services/tx'
 import OutPoint from '../models/chain/out-point'
 import SudtTokenInfoService from '../services/sudt-token-info'
@@ -68,8 +65,6 @@ export interface GenerateWithdrawChequeTxParams {
 }
 
 export default class AssetAccountController {
-  private displayedACPMigrationDialogByWalletIds: Set<string> = new Set()
-
   public async getAll(params: {
     walletID: string
   }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
@@ -219,82 +214,6 @@ export default class AssetAccountController {
       status: ResponseCode.Success,
       result: txHash,
     }
-  }
-
-  public async showACPMigrationDialog(
-    allowMultipleOpen: boolean | undefined
-  ): Promise<Controller.Response<boolean | undefined>> {
-    const walletsService = WalletsService.getInstance()
-    const currentWallet = walletsService.getCurrent()
-    if (!currentWallet) {
-      return {
-        status: ResponseCode.Success,
-      }
-    }
-    const walletId = currentWallet.id
-
-    if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
-      return {
-        status: ResponseCode.Success,
-      }
-    }
-
-    const syncStatus = await SyncApiController.getInstance().getSyncStatus()
-
-    if (syncStatus !== SyncStatus.SyncCompleted || BrowserWindow.getAllWindows().length !== 1) {
-      return {
-        status: ResponseCode.Success,
-      }
-    }
-
-    const window = BrowserWindow.getFocusedWindow()
-    if (!window) {
-      return {
-        status: ResponseCode.Success,
-      }
-    }
-
-    const tx = await TransactionGenerator.generateMigrateLegacyACPTx(walletId)
-    if (!tx) {
-      return {
-        status: ResponseCode.Success,
-      }
-    }
-
-    this.displayedACPMigrationDialogByWalletIds.add(walletId)
-
-    const I18N_PATH = `messageBox.acp-migration`
-    return dialog
-      .showMessageBox({
-        type: 'info',
-        buttons: ['skip', 'migrate'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
-        defaultId: 1,
-        title: t(`${I18N_PATH}.title`),
-        message: t(`${I18N_PATH}.message`),
-        detail: t(`${I18N_PATH}.detail`),
-        cancelId: 0,
-        noLink: true,
-      })
-      .then(({ response }) => {
-        switch (response) {
-          case 1: {
-            CommandSubject.next({
-              winID: window.id,
-              type: 'migrate-acp',
-              payload: walletId,
-              dispatchToUI: true,
-            })
-            return true
-          }
-          case 0:
-          default:
-            return false
-        }
-      })
-      .then(result => ({
-        status: ResponseCode.Success,
-        result,
-      }))
   }
 
   public async generateCreateChequeTx(params: GenerateCreateChequeTxParams): Promise<Controller.Response<Transaction>> {
