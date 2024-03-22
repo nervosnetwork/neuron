@@ -1,7 +1,11 @@
 @import '../../styles/mixin.scss';
 
+.container {
+  width: 680px;
+}
+
 .slider {
-  margin-top: 16px;
+  margin-top: 10px;
 
   :global(.ms-Slider-thumb) {
     top: -8px;
@@ -32,10 +36,31 @@
   margin-top: 16px;
 }
 
-.depositValueLabel {
-  line-height: 20px;
-  color: var(--secondary-text-color);
-  font-size: 14px;
+.depositValueLabelWrap {
+  display: flex;
+
+  .depositValueLabel {
+    line-height: 20px;
+    color: var(--secondary-text-color);
+    font-size: 14px;
+  }
+  .tooltip {
+    margin-left: 120px;
+  }
+  .tip {
+    width: 400px;
+    word-break: normal;
+    white-space: normal;
+    line-height: 180%;
+  }
+
+  svg {
+    margin: 2px 4px 0;
+    cursor: pointer;
+    path {
+      fill: var(--primary-color);
+    }
+  }
 }
 
 .fee {
@@ -43,46 +68,49 @@
   justify-content: space-between;
   font-size: 14px;
   line-height: 20px;
+  margin-top: 4px;
   color: var(--main-text-color);
+  gap: 24px;
 
   & > div {
-    &:nth-last-child(1) {
-      width: 230px;
-      text-align: right;
+    &:first-child {
+      flex-shrink: 0;
     }
   }
 }
 
-.notice {
-  $lineHeight: 24px;
-  display: flex;
-  box-sizing: border-box;
-  margin-top: 22px;
-  border: 1px solid rgba(252, 136, 0, 0.2);
-  padding: 7px 54px;
-  border-radius: 4px;
-  background: #fff6eb;
-  color: #f68c2a;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: $lineHeight;
-  text-align: center;
-
-  & > svg {
-    $size: 14px;
-    flex-shrink: 0;
-    margin: calc(($lineHeight - $size) / 2) 4px 0 0;
-    width: $size;
-    height: $size;
-
-    g[fill='#D50000'] {
-      fill: currentColor;
+.rewards {
+  padding: 6px 16px;
+  background: var(--tag-green-bg-color);
+  border-radius: 8px;
+  margin-top: 14px;
+  div {
+    display: flex;
+    justify-content: space-between;
+    color: var(--primary-color);
+    p {
+      margin: 0;
+      padding: 4px 0;
+      font-size: 14px;
+      line-height: 20px;
     }
   }
+}
 
-  @media (prefers-color-scheme: dark) {
-    border-color: #4b391c;
-    background: #4b391c;
+.acpContent {
+  display: flex;
+  .tip {
+    min-width: 190px;
+    word-break: normal;
+    white-space: normal;
+    line-height: 180%;
+  }
+  svg {
+    margin: 2px 4px 0;
+    cursor: pointer;
+    path {
+      fill: var(--primary-color);
+    }
   }
 }
 
@@ -90,7 +118,7 @@
   font-weight: 500;
   font-size: 12px;
   background: inherit;
-  color: #f68c2a;
+  color: var(--primary-color);
   border: none;
   padding: 0;
   margin: 0;
@@ -111,6 +139,7 @@
     gap: 8px;
 
     & > svg {
+      flex-shrink: 0;
       path {
         fill: #e5e5e5;
 

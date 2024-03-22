@@ -275,3 +275,36 @@ export const useOnDepositDialogCancel = ({
     clearGeneratedTx()
   }, [dispatch, onCloseDepositDialog, resetDepositValue, clearGeneratedTx])
 }
+
+export const useDepositRewards = ({
+  depositValue,
+  maxDepositValue,
+  disabled,
+  globalAPC,
+}: {
+  depositValue: string
+  maxDepositValue: string | null
+  disabled: boolean
+  globalAPC: number
+}) => {
+  const [annualRewards, monthRewards] = useMemo(() => {
+    if (disabled) return ['0', '0']
+
+    const value = CKBToShannonFormatter(
+      (Number(maxDepositValue || depositValue) - MIN_DEPOSIT_AMOUNT).toFixed(MAX_DECIMAL_DIGITS).toString()
+    )
+
+    const dpc = globalAPC / 365 / 100
+
+    const mRewards = (Number(value) * dpc * 30).toFixed(0).toString()
+
+    const rewerds = (Number(value) * dpc * 360).toFixed(0).toString()
+
+    return [rewerds, mRewards]
+  }, [depositValue, maxDepositValue, disabled, globalAPC])
+
+  return {
+    annualRewards,
+    monthRewards,
+  }
+}
