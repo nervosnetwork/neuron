@@ -176,6 +176,10 @@ declare namespace State {
     loadedTransaction: any
     pageNotice?: PageNotice
     showWaitForFullySynced: boolean
+    lockWindowInfo?: {
+      locked: boolean
+      encryptedPassword?: string
+    }
   }
 
   interface NetworkProperty {

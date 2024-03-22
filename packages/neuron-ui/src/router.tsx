@@ -1,5 +1,6 @@
 import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
+import LockWindow from 'containers/LockWindow'
 import Main from 'containers/Main'
 import Navbar from 'containers/Navbar'
 import { RoutePath } from 'utils'
@@ -50,11 +51,11 @@ const mainRouterConfig: RouteObject[] = [
   {
     path: '/',
     element: (
-      <>
+      <LockWindow>
         <Navbar />
         <Main />
         <PasswordRequest />
-      </>
+      </LockWindow>
     ),
     children: [
       {

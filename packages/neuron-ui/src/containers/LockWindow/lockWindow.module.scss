@@ -1,0 +1,55 @@
+.loading {
+  text-align: center;
+  margin-top: 20vh;
+}
+
+.lockContainer {
+  text-align: center;
+  margin-top: 25vh;
+
+  .title {
+    margin: 10px 0 24px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--main-text-color);
+  }
+
+  .notice {
+    margin-top: 24px;
+    color: var(--secondary-text-color);
+    &[data-has-err='true'] {
+      color: var(--error-color);
+    }
+  }
+
+  .passwordContainer {
+    &[data-has-err='true'] {
+      input {
+        border-color: var(--error-color);
+      }
+    }
+  }
+
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(-10deg);
+    }
+  }
+
+  .lockedImg {
+    width: 88px;
+    height: 88px;
+
+    &.animation {
+      animation: rotating 0.5s linear 2 alternate;
+    }
+  }
+
+  .video {
+    width: 88px;
+    height: 88px;
+  }
+}

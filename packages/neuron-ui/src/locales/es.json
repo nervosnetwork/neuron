@@ -386,7 +386,21 @@
         "version": "Versión",
         "language": "Idioma",
         "select-language": "Seleccionar Idioma",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "lock-password": "Contraseña de bloqueo de pantalla",
+        "set-lock-password": "Establecer contraseña de bloqueo de pantalla",
+        "change-lock-password": "Modificar contraseña de bloqueo de pantalla",
+        "lock-window": {
+          "set-password": "Establecer contraseña",
+          "confirm-password": "Confirmar contraseña",
+          "enter-current-password": "Ingresar contraseña actual",
+          "enter-new-password": "Ingresar nueva contraseña",
+          "password-error": "Contraseña incorrecta",
+          "different-password": "Las contraseñas ingresadas no coinciden",
+          "set-password-success": "Contraseña establecida exitosamente",
+          "change-password-success": "Contraseña modificada exitosamente",
+          "reset": "Reestablecer"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -1229,6 +1243,12 @@
         "size": "tamaño",
         "lock-time": "Período de Bloqueo"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron bloqueada",
+      "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
     }
   }
 }

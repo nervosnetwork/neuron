@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
@@ -12,6 +12,7 @@ import { AddSimple } from 'widgets/Icons/icon'
 import DataPathDialog from 'widgets/DataPathDialog'
 import NoDiskSpaceWarn from 'widgets/Icons/NoDiskSpaceWarn.png'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
+import LockWindowDialog from 'components/GeneralSetting/LockWindowDialog'
 import styles from './main.module.scss'
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode, useNoDiskSpace } from './hooks'
 
@@ -19,7 +20,7 @@ const MainContent = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const {
-    app: { isAllowedToFetchList = true, globalAlertDialog },
+    app: { isAllowedToFetchList = true, globalAlertDialog, lockWindowInfo },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
@@ -51,6 +52,7 @@ const MainContent = () => {
     onOpenEditorDialog,
   } = useCheckNode(sameUrlNetworks, networkID)
 
+  const [isLockDialogShow, setIsLockDialogShow] = useState(false)
   useSubscription({
     walletID,
     chain,
@@ -59,6 +61,8 @@ const MainContent = () => {
     dispatch,
     location,
     showSwitchNetwork,
+    lockWindowInfo,
+    setIsLockDialogShow,
   })
 
   useOnCurrentWalletChange({
@@ -173,6 +177,13 @@ const MainContent = () => {
         currentPath={newCkbDataPath}
         onCancel={onCloseMigrateDialog}
         onConfirm={onConfirmMigrate}
+      />
+      <LockWindowDialog
+        show={isLockDialogShow}
+        encryptedPassword={lockWindowInfo?.encryptedPassword}
+        onCancel={() => {
+          setIsLockDialogShow(false)
+        }}
       />
     </div>
   )
