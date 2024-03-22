@@ -22,6 +22,7 @@ import LightSynchronizer from './light-synchronizer'
 import { generateRPC } from '../../utils/ckb-rpc'
 import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 import { NetworkType } from '../../models/network'
+import WalletService from '../../services/wallets'
 
 export default class Queue {
   #lockHashes: string[]
@@ -254,6 +255,9 @@ export default class Queue {
         .map(addr => addr.walletId)
     )
     if (process.send) {
+      this.#indexerConnector!.needGenerateAddress = await WalletService.getInstance().checkNeedGenerateAddress([
+        ...walletIds,
+      ])
       process.send({ channel: 'check-and-save-wallet-address', message: [...walletIds] })
     } else {
       throw new ShouldInChildProcess()
