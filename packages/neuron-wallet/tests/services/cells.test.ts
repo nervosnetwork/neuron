@@ -630,7 +630,7 @@ describe('CellsService', () => {
           )
         ).rejects.toThrow(new LiveCapacityNotEnough())
       })
-      it('left capcity not enough for a cell throw CapacityNotEnoughForChange', async () => {
+      it('left capacity not enough for a cell throw CapacityNotEnoughForChange', async () => {
         await createMultisigCell(toShannon('1000'), OutputStatus.Sent, multisigInfo)
         await expect(
           CellsService.gatherInputs(
@@ -660,7 +660,7 @@ describe('CellsService', () => {
           )
         ).rejects.toThrow(new LiveCapacityNotEnough())
       })
-      it('left capcity not enough for a cell throw CapacityNotEnoughForChange', async () => {
+      it('left capacity not enough for a cell throw CapacityNotEnoughForChange', async () => {
         await expect(
           CellsService.gatherInputs(
             toShannon('990'),
