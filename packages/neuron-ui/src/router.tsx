@@ -9,6 +9,8 @@ import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
 import History from 'components/History'
 import HistoryDetailPage from 'components/HistoryDetailPage'
+import AmendSend from 'components/AmendSend'
+import AmendSUDTSend from 'components/AmendSUDTSend'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
@@ -22,6 +24,8 @@ import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
 import CellManagement from 'components/CellManagement'
+import BroadcastTransaction from 'components/BroadcastTransaction'
+import SendTxDetail from 'components/SendTxDetail'
 
 const toolsRouters = [
   {
@@ -35,6 +39,10 @@ const toolsRouters = [
   {
     path: RoutePath.MultisigAddress,
     element: <MultisigAddress />,
+  },
+  {
+    path: RoutePath.BroadcastTransaction,
+    element: <BroadcastTransaction />,
   },
 ]
 
@@ -114,6 +122,16 @@ const mainRouterConfig: RouteObject[] = [
         ],
       },
       {
+        path: RoutePath.SendTxDetail,
+        element: (
+          <>
+            <SendTxDetail />
+            <Outlet />
+          </>
+        ),
+        children: [...toolsRouters],
+      },
+      {
         path: RoutePath.History,
         children: [
           {
@@ -121,6 +139,26 @@ const mainRouterConfig: RouteObject[] = [
             element: (
               <>
                 <History />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: 'amend/:hash',
+            element: (
+              <>
+                <AmendSend />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: 'amendSUDTSend/:hash',
+            element: (
+              <>
+                <AmendSUDTSend />
                 <Outlet />
               </>
             ),

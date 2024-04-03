@@ -291,5 +291,12 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
         }
       }
     }
+    &[data-placement='top'] {
+      &[data-trigger-next-to-child='true'] {
+        & .tip {
+          margin-bottom: 2px;
+        }
+      }
+    }
   }
 }

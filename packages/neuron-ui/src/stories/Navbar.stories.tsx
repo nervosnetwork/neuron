@@ -3,7 +3,7 @@ import Navbar from 'containers/Navbar'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import { initStates } from 'states'
 
-const wallets: State.WalletIdentity[] = [{ id: 'wallet id', name: 'wallet name' }]
+const wallets: State.WalletIdentity[] = [{ id: 'wallet id', name: 'wallet name', extendedKey: '' }]
 
 const meta: Meta<typeof Navbar> = {
   component: Navbar,

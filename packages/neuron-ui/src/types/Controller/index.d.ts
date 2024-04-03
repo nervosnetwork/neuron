@@ -35,7 +35,11 @@ declare namespace Controller {
     newPassword?: string
     name?: string
     device?: any
-    startBlockNumber?: string
+  }
+
+  interface UpdateWalletStartBlockNumberParams {
+    id: string
+    startBlockNumber: string
   }
 
   interface RequestPasswordParams {
@@ -46,6 +50,11 @@ declare namespace Controller {
   interface DeleteWalletParams {
     id: string
     password: string
+  }
+
+  interface ReplaceWalletParams {
+    existingWalletId: string
+    importedWalletId: string
   }
 
   interface BackupWalletParams {
@@ -60,6 +69,7 @@ declare namespace Controller {
     tx: any
     password?: string
     description?: string
+    amendHash?: string
     multisigConfig?: {
       id: number
       walletId: string
@@ -280,6 +290,7 @@ declare namespace Controller {
       tx: any
       password?: string
       skipLastInputs?: boolean
+      amendHash?: string
     }
     type Response = Hash
   }

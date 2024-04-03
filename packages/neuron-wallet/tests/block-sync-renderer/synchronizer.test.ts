@@ -2,7 +2,7 @@ import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { Connector, type LumosCell, type LumosCellQuery } from '../../src/block-sync-renderer/sync/connector'
+import { Synchronizer, type LumosCell, type LumosCellQuery } from '../../src/block-sync-renderer/sync/synchronizer'
 import AddressMeta from '../../src/database/address/meta'
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache'
 import { ScriptHashType } from '../../src/models/chain/script'
@@ -15,7 +15,7 @@ const stubbedCellCollectorConstructor = jest.fn()
 const stubbedBlockTipsSubscribe = jest.fn()
 const stubbedCellCellectFn = jest.fn()
 
-class TestConnector extends Connector {
+class TestSynchronizer extends Synchronizer {
   async connect() {}
   async processTxsInNextBlockNumber(): Promise<void> {
     return stubbedProcessTxsInNextBlockNumberFn()
@@ -113,7 +113,7 @@ describe('unit tests for IndexerConnector', () => {
     const STUB_URI = 'stub_uri'
 
     it('inits lumos indexer with a node url and indexer folder path', () => {
-      new TestConnector({
+      new TestSynchronizer({
         addresses: [],
         nodeUrl,
         indexerUrl: STUB_URI,
@@ -122,18 +122,22 @@ describe('unit tests for IndexerConnector', () => {
     })
 
     it('init with addresses', () => {
-      const connector = new TestConnector({
+      const synchronizer = new TestSynchronizer({
         addresses: [addressObj1, addressObj2],
         nodeUrl,
         indexerUrl: STUB_URI,
       })
-      expect(connector.getAddressesByWalletId().get(walletId1)?.[0]).toStrictEqual(AddressMeta.fromObject(addressObj1))
-      expect(connector.getAddressesByWalletId().get(walletId2)?.[0]).toStrictEqual(AddressMeta.fromObject(addressObj2))
+      expect(synchronizer.getAddressesByWalletId().get(walletId1)?.[0]).toStrictEqual(
+        AddressMeta.fromObject(addressObj1)
+      )
+      expect(synchronizer.getAddressesByWalletId().get(walletId2)?.[0]).toStrictEqual(
+        AddressMeta.fromObject(addressObj2)
+      )
     })
   })
 
   describe('#getTxHashesWithNextUnprocessedBlockNumber', () => {
-    const connector = new TestConnector({
+    const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
       indexerUrl: '',
@@ -141,7 +145,7 @@ describe('unit tests for IndexerConnector', () => {
     it('no cached tx', async () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
       // @ts-ignore private method
-      const result = await connector.getTxHashesWithNextUnprocessedBlockNumber()
+      const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
       expect(result).toStrictEqual([undefined, []])
     })
     it('get cached tx and sort by block number', async () => {
@@ -152,7 +156,6 @@ describe('unit tests for IndexerConnector', () => {
                 txHash: 'hash1',
                 blockNumber: 10,
                 lockHash: script.computeHash(),
-                address,
                 walletId,
               }),
             ]
@@ -161,31 +164,30 @@ describe('unit tests for IndexerConnector', () => {
                 txHash: 'hash2',
                 blockNumber: 2,
                 lockHash: script.computeHash(),
-                address,
                 walletId,
               }),
             ]
       )
       // @ts-ignore private method
-      const result = await connector.getTxHashesWithNextUnprocessedBlockNumber()
+      const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
       expect(result).toStrictEqual(['2', ['hash2']])
     })
   })
 
   describe('#notifyAndSyncNext', () => {
-    const connector = new TestConnector({
+    const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
       indexerUrl: '',
     })
-    connector.blockTipsSubject.subscribe(stubbedBlockTipsSubscribe)
+    synchronizer.blockTipsSubject.subscribe(stubbedBlockTipsSubscribe)
 
     it('exist unprocessed block and no current process block', async () => {
       //@ts-ignore private property
-      connector.processingBlockNumber = undefined
+      synchronizer.processingBlockNumber = undefined
       stubbedNextUnprocessedBlockFn.mockResolvedValue('10')
       //@ts-ignore private method
-      await connector.notifyAndSyncNext(100)
+      await synchronizer.notifyAndSyncNext(100)
       expect(stubbedBlockTipsSubscribe).toHaveBeenCalledWith({
         cacheTipNumber: 10,
         indexerTipNumber: 100,
@@ -194,10 +196,10 @@ describe('unit tests for IndexerConnector', () => {
     })
     it('exist unprocessed block and has current process block', async () => {
       //@ts-ignore private property
-      connector.processingBlockNumber = '5'
+      synchronizer.processingBlockNumber = '5'
       stubbedNextUnprocessedBlockFn.mockResolvedValue('10')
       //@ts-ignore private method
-      await connector.notifyAndSyncNext(100)
+      await synchronizer.notifyAndSyncNext(100)
       expect(stubbedBlockTipsSubscribe).toHaveBeenCalledWith({
         cacheTipNumber: 10,
         indexerTipNumber: 100,
@@ -206,10 +208,10 @@ describe('unit tests for IndexerConnector', () => {
     })
     it('no unprocessed block', async () => {
       //@ts-ignore private property
-      connector.processingBlockNumber = '5'
+      synchronizer.processingBlockNumber = '5'
       stubbedNextUnprocessedBlockFn.mockResolvedValue(undefined)
       //@ts-ignore private method
-      await connector.notifyAndSyncNext(100)
+      await synchronizer.notifyAndSyncNext(100)
       expect(stubbedBlockTipsSubscribe).toHaveBeenCalledWith({
         cacheTipNumber: 100,
         indexerTipNumber: 100,
@@ -263,7 +265,7 @@ describe('unit tests for IndexerConnector', () => {
     }
     const fakeCells = [fakeCell1, fakeCell2]
 
-    const connector = new TestConnector({
+    const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
       indexerUrl: '',
@@ -291,7 +293,7 @@ describe('unit tests for IndexerConnector', () => {
         ])
 
         //@ts-ignore
-        cells = await connector.getLiveCellsByScript(query)
+        cells = await synchronizer.getLiveCellsByScript(query)
       })
       it('transform the query parameter', () => {
         expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
@@ -373,13 +375,13 @@ describe('unit tests for IndexerConnector', () => {
 
         const promises = Promise.all([
           new Promise<void>(resolve => {
-            connector.getLiveCellsByScript(query1).then(cells => {
+            synchronizer.getLiveCellsByScript(query1).then(cells => {
               results.push(cells)
               resolve()
             })
           }),
           new Promise<void>(resolve => {
-            connector.getLiveCellsByScript(query2).then(cells => {
+            synchronizer.getLiveCellsByScript(query2).then(cells => {
               results.push(cells)
               resolve()
             })
@@ -399,7 +401,7 @@ describe('unit tests for IndexerConnector', () => {
         it('throws error', async () => {
           let err
           try {
-            await connector.getLiveCellsByScript({ lock: null, type: null, data: null })
+            await synchronizer.getLiveCellsByScript({ lock: null, type: null, data: null })
           } catch (error) {
             err = error
           }

@@ -33,7 +33,6 @@ import NetworksController from '../controllers/networks'
 import UpdateController from '../controllers/update'
 import MultisigController from '../controllers/multisig'
 import Transaction from '../models/chain/transaction'
-import OutPoint from '../models/chain/out-point'
 import SignMessageController from '../controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from '../models/system-script-info'
@@ -64,6 +63,8 @@ import { resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
+import { CKBLightRunner } from '../services/light-runner'
+import { OutPoint } from '@ckb-lumos/base'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -332,21 +333,51 @@ export default class ApiController {
     })
 
     handle(
-      'update-wallet',
+      'update-wallet-start-block-number',
       async (
         _,
-        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumber?: string }
+        params: {
+          id: string
+          startBlockNumber: string
+        }
       ) => {
         const res = this.#walletsController.update(params)
-        if (params.startBlockNumber) {
+        const network = NetworksService.getInstance().getCurrent()
+        if (network.type !== NetworkType.Light) {
+          throw new Error('Only Light client can set start block number')
+        }
+        const lastSetStartBlockNumber = WalletsService.getInstance().getCurrent()?.toJSON().startBlockNumber
+        if (lastSetStartBlockNumber && +params.startBlockNumber < +lastSetStartBlockNumber) {
+          await CKBLightRunner.getInstance().clearNodeCache()
+        } else {
           resetSyncTaskQueue.asyncPush(true)
         }
         return res
       }
     )
 
+    handle(
+      'update-wallet',
+      async (
+        _,
+        params: {
+          id: string
+          password?: string
+          name?: string
+          newPassword?: string
+        }
+      ) => {
+        const res = this.#walletsController.update(params)
+        return res
+      }
+    )
+
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
       return this.#walletsController.delete({ id, password })
+    })
+
+    handle('replace-wallet', async (_, { existingWalletId = '', importedWalletId = '' }) => {
+      return this.#walletsController.replaceWallet(existingWalletId, importedWalletId)
     })
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
@@ -385,6 +416,7 @@ export default class ApiController {
           password: string
           description?: string
           multisigConfig?: MultisigConfigModel
+          amendHash?: string
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -403,7 +435,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints?: CKBComponents.OutPoint[]
+          consumeOutPoints?: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -420,7 +452,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints: CKBComponents.OutPoint[]
+          consumeOutPoints: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -520,6 +552,10 @@ export default class ApiController {
       }
     )
 
+    handle('calculate-unlock-dao-maximum-withdraw', async (_, unlockHash: string) => {
+      return this.#daoController.calculateUnlockDaoMaximumWithdraw(unlockHash)
+    })
+
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
       return this.#customizedAssetsController.getCustomizedAssetCells(params)
@@ -601,6 +637,26 @@ export default class ApiController {
       return { status: ResponseCode.Success, result: true }
     })
 
+    handle('get-first-sync-info', () => {
+      const currentNetwork = NetworksService.getInstance().getCurrent()
+      return {
+        status: ResponseCode.Success,
+        result: {
+          isFirstSync: SettingsService.getInstance().isFirstSync && currentNetwork.type === NetworkType.Default,
+          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+          ckbNodeDataPath: SettingsService.getInstance().getNodeDataPath(),
+        },
+      }
+    })
+
+    handle('start-sync', () => {
+      SettingsService.getInstance().isFirstSync = false
+      this.#networksController.activate(this.#networksController.currentID().result)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
@@ -608,21 +664,34 @@ export default class ApiController {
       }
     })
 
-    handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
-      if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+    handle(
+      'set-ckb-node-data-path',
+      async (
+        _,
+        { dataPath, clearCache, onlySetPath }: { dataPath: string; clearCache: boolean; onlySetPath?: boolean }
+      ) => {
+        if (onlySetPath) {
+          SettingsService.getInstance().setNodeDataPath(dataPath)
+          return {
+            status: ResponseCode.Success,
+            result: SettingsService.getInstance().getNodeDataPath(),
+          }
+        }
+        if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+          return {
+            status: ResponseCode.Fail,
+            message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          }
+        }
+        await cleanChain()
+        SettingsService.getInstance().setNodeDataPath(dataPath)
+        await startMonitor('ckb', true)
         return {
-          status: ResponseCode.Fail,
-          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          status: ResponseCode.Success,
+          result: SettingsService.getInstance().getNodeDataPath(),
         }
       }
-      await cleanChain()
-      SettingsService.getInstance().setNodeDataPath(dataPath)
-      await startMonitor('ckb', true)
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().getNodeDataPath(),
-      }
-    })
+    )
 
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
@@ -768,6 +837,14 @@ export default class ApiController {
       return this.#offlineSignController.broadcastTransaction(params)
     })
 
+    handle('broadcast-signed-transaction', async (_, params) => {
+      return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
+    })
+
+    handle('get-transaction-size', async (_, params) => {
+      return this.#transactionsController.getTransactionSize(params)
+    })
+
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,
@@ -796,8 +873,8 @@ export default class ApiController {
       return this.#multisigController.deleteConfig(params)
     })
 
-    handle('get-multisig-config', async (_, walletId: string) => {
-      return this.#multisigController.getConfig(walletId)
+    handle('get-multisig-config', async () => {
+      return this.#multisigController.getConfig()
     })
 
     handle('import-multisig-config', async (_, walletId: string) => {
@@ -852,9 +929,9 @@ export default class ApiController {
       async (
         _,
         params: {
-          outPoints: CKBComponents.OutPoint[]
+          outPoints: OutPoint[]
           locked: boolean
-          password: string
+          password?: string
           lockScripts: CKBComponents.Script[]
         }
       ) => {

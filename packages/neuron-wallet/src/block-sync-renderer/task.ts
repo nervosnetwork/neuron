@@ -1,4 +1,4 @@
-import type { LumosCellQuery } from './sync/connector'
+import type { LumosCellQuery } from './sync/synchronizer'
 import initConnection from '../database/chain/ormconfig'
 import { register as registerTxStatusListener } from './tx-status-listener'
 import SyncQueue from './sync/queue'
@@ -86,7 +86,11 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
     }
 
     case 'queryIndexer': {
-      res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
+      try {
+        res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
+      } catch (error) {
+        logger.error(`Block Sync Task: queryIndexer:\t`, error)
+      }
       break
     }
     case 'append_scripts': {
@@ -103,5 +107,9 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
 }
 
 process.on('message', listener)
+
+process.on('unhandledRejection', reason => {
+  logger.error('Unhandled Rejection in task:\tReason:', reason)
+})
 
 registerTxStatusListener()

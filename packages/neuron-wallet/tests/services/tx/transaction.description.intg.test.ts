@@ -1,7 +1,6 @@
-import initConnection from '../../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
 import TxDescription from '../../../src/database/chain/entities/tx-description'
 import { get, set } from '../../../src/services/tx/transaction-description'
+import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
 
 describe('transaction description service', () => {
   const txs = [
@@ -10,11 +9,11 @@ describe('transaction description service', () => {
     { walletId: 'w3', txHash: 'hash3', description: 'desc3' },
   ]
   beforeAll(async () => {
-    await initConnection('')
+    await initConnection()
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

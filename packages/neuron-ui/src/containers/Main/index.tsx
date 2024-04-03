@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
 import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
@@ -9,8 +9,11 @@ import Button from 'widgets/Button'
 import RadioGroup from 'widgets/RadioGroup'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import { AddSimple } from 'widgets/Icons/icon'
+import DataPathDialog from 'widgets/DataPathDialog'
+import NoDiskSpaceWarn from 'widgets/Icons/NoDiskSpaceWarn.png'
+import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
 import styles from './main.module.scss'
-import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode } from './hooks'
+import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode, useNoDiskSpace } from './hooks'
 
 const MainContent = () => {
   const navigate = useNavigate()
@@ -70,6 +73,19 @@ const MainContent = () => {
     dismissGlobalAlertDialog()(dispatch)
   }, [dispatch])
   const { isMigrateDialogShow, onCancel, onBackUp, onConfirm } = useMigrate()
+  const {
+    isNoDiskSpaceDialogShow,
+    oldCkbDataPath,
+    newCkbDataPath,
+    setNewCkbDataPath,
+    onCancel: onCloseNoDiskDialog,
+    onConfirm: onContinueSync,
+    isMigrateDataDialogShow,
+    onMigrate,
+    onCloseMigrateDialog,
+    onConfirmMigrate,
+  } = useNoDiskSpace(navigate)
+  const needConfirm = newCkbDataPath && newCkbDataPath !== oldCkbDataPath
 
   return (
     <div onContextMenu={onContextMenu}>
@@ -139,6 +155,25 @@ const MainContent = () => {
           id="new"
         />
       ) : null}
+      <DataPathDialog
+        show={isNoDiskSpaceDialogShow}
+        icon={<img className={styles.noDiskSpace} src={NoDiskSpaceWarn} alt="No disk space" />}
+        confirmText={
+          needConfirm ? t('main.no-disk-space-dialog.migrate-data') : t('main.no-disk-space-dialog.continue-sync')
+        }
+        dataPath={newCkbDataPath || oldCkbDataPath}
+        text={<Trans i18nKey="main.no-disk-space-dialog.tip" />}
+        onCancel={onCloseNoDiskDialog}
+        onConfirm={needConfirm ? onMigrate : onContinueSync}
+        onChangeDataPath={setNewCkbDataPath}
+      />
+      <MigrateCkbDataDialog
+        show={isMigrateDataDialogShow}
+        prevPath={oldCkbDataPath}
+        currentPath={newCkbDataPath}
+        onCancel={onCloseMigrateDialog}
+        onConfirm={onConfirmMigrate}
+      />
     </div>
   )
 }

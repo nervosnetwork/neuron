@@ -12,13 +12,13 @@ import AddressParser from '../../models/address-parser'
 import Multisig from '../../models/multisig'
 import BlockHeader from '../../models/chain/block-header'
 import TxAddressFinder from './tx-address-finder'
-import IndexerConnector from './indexer-connector'
+import FullSynchronizer from './full-synchronizer'
 import IndexerCacheService from './indexer-cache-service'
 import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import { ShouldInChildProcess } from '../../exceptions'
-import { AppendScript, BlockTips, Connector } from './connector'
-import LightConnector from './light-connector'
+import { AppendScript, BlockTips, Synchronizer } from './synchronizer'
+import LightSynchronizer from './light-synchronizer'
 import { generateRPC } from '../../utils/ckb-rpc'
 import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 import { NetworkType } from '../../models/network'
@@ -30,7 +30,7 @@ export default class Queue {
   #indexerUrl: string
   #addresses: AddressInterface[]
   #rpcService: RpcService
-  #indexerConnector: Connector | undefined
+  #indexerConnector: Synchronizer | undefined
   #checkAndSaveQueue: QueueObject<{ txHashes: CKBComponents.Hash[]; params: unknown }> | undefined
   #lockArgsSet: Set<string> = new Set()
 
@@ -67,9 +67,9 @@ export default class Queue {
     logger.info('Queue:\tstart')
     try {
       if (this.#url === BUNDLED_LIGHT_CKB_URL) {
-        this.#indexerConnector = new LightConnector(this.#addresses, this.#url)
+        this.#indexerConnector = new LightSynchronizer(this.#addresses, this.#url)
       } else {
-        this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl, this.#nodeType)
+        this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#indexerUrl, this.#nodeType)
       }
       await this.#indexerConnector!.connect()
     } catch (error) {
@@ -110,7 +110,7 @@ export default class Queue {
     })
   }
 
-  getIndexerConnector = (): Connector => this.#indexerConnector!
+  getIndexerConnector = (): Synchronizer => this.#indexerConnector!
 
   stop = () => this.#indexerConnector!.stop()
 

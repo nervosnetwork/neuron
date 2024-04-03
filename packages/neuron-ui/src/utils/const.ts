@@ -49,7 +49,7 @@ export const DEFAULT_SUDT_FIELDS = {
   CKBSymbol: 'CKB',
   CKBDecimal: '8',
 }
-export const LOCALES = ['zh', 'zh-TW', 'en', 'en-US'] as const
+export const LOCALES = ['zh', 'zh-TW', 'en', 'en-US', 'fr', 'es'] as const
 
 // address property
 export const SHORT_ADDR_LENGTH = 46

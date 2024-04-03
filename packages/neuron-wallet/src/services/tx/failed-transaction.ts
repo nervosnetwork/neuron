@@ -1,9 +1,12 @@
-import { getConnection, In } from 'typeorm'
+import { In, Not } from 'typeorm'
+import { getConnection } from '../../database/chain/connection'
 import OutputEntity from '../../database/chain/entities/output'
+import InputEntity from '../../database/chain/entities/input'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import { OutputStatus } from '../../models/chain/output'
 import TransactionsService from './transaction-service'
 import { TransactionStatus } from '../../models/chain/transaction'
+import AmendTransactionEntity from '../../database/chain/entities/amend-transaction'
 
 export class FailedTransaction {
   public static pendings = async (): Promise<TransactionEntity[]> => {
@@ -16,6 +19,65 @@ export class FailedTransaction {
       .getMany()
 
     return pendingTransactions
+  }
+
+  public static processAmendFailedTxs = async () => {
+    const failedTransactions = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        status: TransactionStatus.Failed,
+      })
+      .select('tx.hash', 'hash')
+      .getRawMany()
+
+    if (!failedTransactions.length) return
+
+    const failedHashes = failedTransactions.map(item => item.hash)
+
+    const amendTxs = await getConnection()
+      .getRepository(AmendTransactionEntity)
+      .createQueryBuilder('amend')
+      .where([
+        { amendHash: In(failedHashes), hash: Not(In(failedHashes)) },
+        { hash: In(failedHashes), amendHash: Not(In(failedHashes)) },
+      ])
+      .getMany()
+
+    if (!amendTxs) return
+
+    const removeTxs: string[] = []
+    amendTxs.forEach(({ hash, amendHash }) => {
+      if (failedHashes.includes(hash)) {
+        removeTxs.push(hash)
+      }
+      if (failedHashes.includes(amendHash)) {
+        removeTxs.push(amendHash)
+      }
+    })
+
+    await getConnection().manager.transaction(async transactionalEntityManager => {
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where({ hash: In(removeTxs) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(OutputEntity)
+        .where({ outPointTxHash: In(removeTxs) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(InputEntity)
+        .where({ outPointTxHash: In(removeTxs) })
+        .execute()
+    })
   }
 
   // update tx status to TransactionStatus.Failed

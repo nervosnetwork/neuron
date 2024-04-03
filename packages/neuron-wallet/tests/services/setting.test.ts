@@ -3,6 +3,7 @@ import SettingsService from '../../src/services/settings'
 const readSyncMock = jest.fn()
 const writeSyncMock = jest.fn()
 const resolveMock = jest.fn()
+const joinMock = jest.fn()
 const getLocaleMock = jest.fn()
 const getPathMock = jest.fn()
 const updateApplicationMenuMock = jest.fn()
@@ -11,6 +12,7 @@ function resetMock() {
   readSyncMock.mockReset()
   writeSyncMock.mockReset()
   resolveMock.mockReset()
+  joinMock.mockReset()
   getLocaleMock.mockReset()
   getPathMock.mockReset()
   updateApplicationMenuMock.mockReset()
@@ -45,6 +47,7 @@ jest.mock('electron', () => ({
 
 jest.mock('path', () => ({
   resolve: () => resolveMock(),
+  join: () => joinMock(),
 }))
 
 jest.mock('env', () => ({
@@ -72,7 +75,11 @@ describe('SettingsService', () => {
     })
     it('set', () => {
       SettingsService.getInstance().locale = 'zh'
+      SettingsService.getInstance().locale = 'fr'
+      SettingsService.getInstance().locale = 'es'
       expect(writeSyncMock).toBeCalledWith('locale', 'zh')
+      expect(writeSyncMock).toBeCalledWith('locale', 'fr')
+      expect(writeSyncMock).toBeCalledWith('locale', 'es')
       expect(updateApplicationMenuMock).toHaveBeenCalled()
     })
     it('set exception', () => {

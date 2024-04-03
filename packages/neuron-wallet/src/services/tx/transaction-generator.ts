@@ -260,12 +260,14 @@ export class TransactionGenerator {
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
       const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
+      output.isChangeCell = true
 
       tx.addOutput(output)
     }
 
     tx.outputs = ArrayUtils.shuffle(tx.outputs)
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
+    tx.hash = tx.computeHash()
 
     return tx
   }

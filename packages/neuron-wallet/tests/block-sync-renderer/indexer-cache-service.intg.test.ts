@@ -1,11 +1,10 @@
 import { when } from 'jest-when'
-import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import AddressMeta from '../../src/database/address/meta'
 import { AddressType } from '../../src/models/keys/address'
 import { AddressVersion } from '../../src/models/address'
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../src/services/rpc-service'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
@@ -129,11 +128,11 @@ const fakeTx3 = {
 
 describe('indexer cache service', () => {
   beforeAll(async () => {
-    await initConnection('')
+    await initConnection()
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

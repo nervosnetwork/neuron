@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus, clsx, localNumberFormatter, getSyncLeftTime } from 'utils'
 import { Confirming, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as UnexpandStatus } from 'widgets/Icons/UnexpandStatus.svg'
 import { ReactComponent as StartBlock } from 'widgets/Icons/StartBlock.svg'
@@ -13,12 +13,16 @@ const SyncDetail = ({
   onOpenValidTarget,
   isLightClient,
   onOpenSetStartBlock,
+  startBlockNumber,
+  estimate,
 }: {
   syncBlockNumbers: string
   isLookingValidTarget: boolean
   onOpenValidTarget: (e: React.SyntheticEvent) => void
   isLightClient: boolean
   onOpenSetStartBlock: () => void
+  startBlockNumber?: string
+  estimate?: number
 }) => {
   const [t] = useTranslation()
   return (
@@ -42,10 +46,20 @@ const SyncDetail = ({
           </div>
         </div>
       )}
+      {isLightClient && startBlockNumber ? (
+        <div className={styles.item}>
+          <div className={styles.title}>{t('network-status.tooltip.start-block-number')}:</div>
+          <div className={styles.number}>{localNumberFormatter(startBlockNumber)}</div>
+        </div>
+      ) : null}
+      <div className={styles.item}>
+        <div className={styles.title}>{t('network-status.left-time')}</div>
+        <div className={styles.number}>{getSyncLeftTime(estimate)}</div>
+      </div>
       {isLightClient && (
         <div
           role="link"
-          className={styles.action}
+          className={clsx(styles.action, styles.setStartBlockNumber)}
           onClick={onOpenSetStartBlock}
           onKeyPress={onOpenSetStartBlock}
           tabIndex={-1}
@@ -70,6 +84,8 @@ const SyncStatus = ({
   isMigrate,
   isLightClient,
   onOpenSetStartBlock,
+  startBlockNumber,
+  estimate,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
@@ -80,6 +96,8 @@ const SyncStatus = ({
   isMigrate: boolean
   isLightClient: boolean
   onOpenSetStartBlock: () => void
+  startBlockNumber?: string
+  estimate?: number
 }>) => {
   const [t] = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
@@ -116,6 +134,8 @@ const SyncStatus = ({
           onOpenValidTarget={onOpenValidTarget}
           isLightClient={isLightClient}
           onOpenSetStartBlock={onOpenSetStartBlock}
+          startBlockNumber={startBlockNumber}
+          estimate={estimate}
         />
       }
       trigger="click"

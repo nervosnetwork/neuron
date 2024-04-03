@@ -31,6 +31,7 @@ declare namespace State {
     lock: CKBComponents.Script | null
     type?: CKBComponents.Script
     data?: string
+    status?: string
   }
 
   interface DetailedOutput {
@@ -40,6 +41,7 @@ declare namespace State {
     outPoint: CKBComponents.OutPoint
     type?: CKBComponents.Script
     data?: string
+    isChangeCell?: boolean
   }
   interface DetailedTransaction extends Transaction {
     blockHash: string
@@ -50,7 +52,9 @@ declare namespace State {
     outputs: DetailedOutput[]
     outputsCount: string
     witnesses: string[]
-    size: number
+    size?: number
+    isLastChange?: boolean
+    cycles?: string
   }
   interface Output {
     address: string | undefined
@@ -122,6 +126,8 @@ declare namespace State {
       blake160s: string[]
     }
     onSuccess?: () => void
+    showType?: 'Global' | ''
+    amendHash?: string
   }
 
   interface SUDTAccount {
@@ -138,7 +144,7 @@ declare namespace State {
   type GlobalAlertDialog = {
     show?: boolean
     title?: string
-    message?: string
+    message?: React.ReactNode
     type: 'success' | 'failed' | 'warning'
     action?: 'ok' | 'cancel' | 'all'
     onClose?: () => void
@@ -202,6 +208,8 @@ declare namespace State {
     device?: DeviceInfo
     isHD?: boolean
     isWatchOnly?: boolean
+    startBlockNumber?: string
+    extendedKey: string
   }
 
   interface DeviceInfo {

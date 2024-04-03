@@ -1,7 +1,6 @@
 import type { OutPoint } from '@ckb-lumos/base'
-import { getConnection } from 'typeorm'
 import CellLocalInfoService from '../../src/services/cell-local-info'
-import { closeConnection, initConnection } from '../setupAndTeardown'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
 
 const outPoints = [

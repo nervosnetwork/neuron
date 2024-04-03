@@ -78,6 +78,13 @@ export class WalletFunctionNotSupported extends Error {
   }
 }
 
+export class DuplicateImportWallet extends Error {
+  public code = 118
+  constructor(errorStr: string) {
+    super(errorStr)
+  }
+}
+
 export default {
   WalletNotFound,
   CurrentWalletNotSet,
@@ -88,4 +95,5 @@ export default {
   LiveCapacityNotEnough,
   CapacityNotEnoughForChange,
   InvalidKeystore,
+  DuplicateImportWallet,
 }

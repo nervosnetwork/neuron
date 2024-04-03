@@ -1,16 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
-import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCkbNode } from 'services/remote'
+import {
+  VerifyExternalCkbNodeRes,
+  checkForUpdates,
+  getVersion,
+  openExternal,
+  verifyExternalCkbNode,
+} from 'services/remote'
 import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
 import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
 import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
-
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`/wizard/`, `/keystore/`, RoutePath.ImportHardware]
@@ -107,6 +112,10 @@ const Navbar = () => {
     }
   }, [network?.readonly])
 
+  const gotoCompatile = useCallback(() => {
+    openExternal(`https://neuron.magickbase.com${i18n.language.startsWith('zh') ? '/zh' : ''}/download`)
+  }, [i18n.language])
+
   useEffect(() => {
     // isUpdated is true or version is not empty means check update has return
     if (!verifyCkbResult || (isUpdated !== true && !version)) {
@@ -121,7 +130,17 @@ const Navbar = () => {
     } else if (!verifyCkbResult.ckbIsCompatible) {
       showGlobalAlertDialog({
         type: 'warning',
-        message: t('navbar.ckb-node-compatible', { version: getVersion() }),
+        message: (
+          <Trans
+            i18nKey="navbar.ckb-node-compatible"
+            values={{ version: getVersion(), btnText: t('navbar.learn-more') }}
+            components={[
+              <button type="button" className={styles.learnMore} onClick={gotoCompatile}>
+                {t('navbar.learn-more')}
+              </button>,
+            ]}
+          />
+        ),
         action: 'ok',
       })(dispatch)
     } else if (!verifyCkbResult.withIndexer) {

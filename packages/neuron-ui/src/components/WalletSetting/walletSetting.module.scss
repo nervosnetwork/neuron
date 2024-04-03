@@ -7,14 +7,19 @@
   padding: 0 0 5px 8px;
 }
 
-.addWrap {
+.actionWrap {
   position: relative;
-  display: inline-block;
+  display: flex;
+  gap: 24px;
   margin: 16px 0 0 14px;
 }
 
-.addBtn {
+.actionBtn {
   @include icon-hover-button();
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .actions {

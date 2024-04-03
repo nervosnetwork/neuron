@@ -1,24 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  getCkbNodeDataPath,
-  invokeShowOpenDialog,
-  startProcessMonitor,
-  stopProcessMonitor,
-  setCkbNodeDataPath,
-} from 'services/remote'
+import { getCkbNodeDataPath, invokeShowOpenDialog, startProcessMonitor, stopProcessMonitor } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 
 const type = 'ckb'
 
 export const useDataPath = (network?: State.Network) => {
   const [t] = useTranslation()
-  const [isSaving, setIsSaving] = useState(false)
-  const [savingType, setSavingType] = useState<string | null>()
-  const [prevPath, setPrevPath] = useState<string>()
-  const [currentPath, setCurrentPath] = useState<string | undefined>()
+  const [prevPath, setPrevPath] = useState('')
+  const [currentPath, setCurrentPath] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [faidMessage, setFaidMessage] = useState('')
 
   useEffect(() => {
     getCkbNodeDataPath().then(res => {
@@ -50,29 +41,11 @@ export const useDataPath = (network?: State.Network) => {
     })
   }, [setIsDialogOpen, type])
   const onConfirm = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      setFaidMessage('')
-      const { dataset } = e.currentTarget
-      setIsSaving(true)
-      setSavingType(dataset.syncType)
-      setCkbNodeDataPath({
-        dataPath: currentPath!,
-        clearCache: type === 'ckb' && dataset?.resync === 'true',
-      })
-        .then(res => {
-          if (isSuccessResponse(res)) {
-            setPrevPath(currentPath)
-            setIsDialogOpen(false)
-          } else {
-            setFaidMessage(typeof res.message === 'string' ? res.message : res.message.content!)
-          }
-        })
-        .finally(() => {
-          setIsSaving(false)
-          setSavingType(null)
-        })
+    (dataPath: string) => {
+      setPrevPath(dataPath)
+      setIsDialogOpen(false)
     },
-    [currentPath, setIsDialogOpen, setPrevPath]
+    [setIsDialogOpen, setPrevPath]
   )
   return {
     prevPath,
@@ -80,11 +53,7 @@ export const useDataPath = (network?: State.Network) => {
     onSetting,
     onCancel,
     onConfirm,
-    isSaving,
-    savingType,
     isDialogOpen,
-    faidMessage,
-    setFaidMessage,
   }
 }
 

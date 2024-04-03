@@ -49,3 +49,15 @@
 .warning {
   color: var(--error-color);
 }
+
+.hardwareSignInPage {
+  .container {
+    width: 100%;
+  }
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}

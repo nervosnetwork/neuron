@@ -1,5 +1,6 @@
-import { Brackets, getConnection, In, IsNull, type ObjectLiteral } from 'typeorm'
+import { Brackets, In, IsNull, Not, type ObjectLiteral } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { getConnection } from '../database/chain/connection'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
   CapacityNotEnough,
@@ -32,7 +33,7 @@ import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { bytes } from '@ckb-lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
-import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
+import { getClusterById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
 import NetworksService from './networks'
 import { LOCKTIME_ARGS_LENGTH, MIN_CELL_CAPACITY } from '../utils/const'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
@@ -383,10 +384,7 @@ export default class CellsService {
             return
           }
 
-          const clusterCell = await getClusterCellById(
-            clusterId,
-            assetAccountInfo.getSporeConfig(currentNetwork.remote)
-          )
+          const clusterCell = await getClusterById(clusterId, assetAccountInfo.getSporeConfig(currentNetwork.remote))
           const { name, description } = unpackToRawClusterData(clusterCell.data)
           clusterInfos[clusterId] = { name, description }
         } catch {
@@ -747,7 +745,13 @@ export default class CellsService {
       {}
     )
     useCells.every(cell => {
-      const input: Input = new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
+      const input: Input = Input.fromObject({
+        previousOutput: cell.outPoint(),
+        since: '0',
+        capacity: cell.capacity,
+        lock: cell.lockScript(),
+        status: cell.status as OutputStatus,
+      })
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
@@ -1374,5 +1378,42 @@ export default class CellsService {
           return TypeScriptCategory.Unknown
       }
     }
+  }
+
+  public static async getDaoWithdrawAndDeposit(unlockHash: string) {
+    const inputEntities = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where({
+        transactionHash: unlockHash,
+        data: Not('0x'),
+        typeCodeHash: SystemScriptInfo.DAO_CODE_HASH,
+        typeHashType: SystemScriptInfo.DAO_HASH_TYPE,
+      })
+      .getMany()
+    if (!inputEntities.length) throw new Error(`No unlock transaction use ${unlockHash} as input`)
+    const inputPreviousTxHashes = inputEntities.map(v => v.outPointTxHash)
+    const outputEntities = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where({ outPointTxHash: In(inputPreviousTxHashes), depositTxHash: Not(IsNull()) })
+      .getMany()
+    if (!outputEntities.length) throw new Error(`${unlockHash} is not a DAO transaction`)
+    return inputEntities
+      .map(v => {
+        const withdrawOutput = outputEntities.find(
+          o => o.outPointTxHash === v.outPointTxHash && o.outPointIndex === v.outPointIndex
+        )
+        if (!withdrawOutput) return
+        return {
+          withdrawBlockHash: withdrawOutput.transaction.blockHash,
+          depositOutPoint: OutPoint.fromSDK({
+            txHash: withdrawOutput!.depositTxHash,
+            index: withdrawOutput!.depositIndex,
+          }),
+        }
+      })
+      .filter((v): v is { withdrawBlockHash: string; depositOutPoint: OutPoint } => !!v)
   }
 }
