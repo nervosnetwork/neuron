@@ -26,6 +26,11 @@ const platform = (): string => {
   }
 }
 
+enum NeedMigrateMsg {
+  Wants = 'CKB wants to migrate the data into new format',
+  Recommends = 'CKB recommends migrating your data into a new format',
+}
+
 const { app } = env
 let ckb: ChildProcess | null = null
 
@@ -124,10 +129,7 @@ export const startCkbNode = async () => {
   currentProcess.stderr?.on('data', data => {
     const dataString: string = data.toString()
     logger.error('CKB:\trun fail:', dataString)
-    if (
-      dataString.includes('CKB wants to migrate the data into new format') ||
-      dataString.includes('CKB recommends migrating your data into a new format')
-    ) {
+    if (dataString.includes(NeedMigrateMsg.Wants) || dataString.includes(NeedMigrateMsg.Recommends)) {
       MigrateSubject.next({ type: 'need-migrate' })
     }
   })
