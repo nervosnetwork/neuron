@@ -19,7 +19,6 @@
     "url": "https://github.com/nervosnetwork/neuron/issues"
   },
   "devDependencies": {
-    "@playwright/test": "1.43.0",
-    "jimp": "0.22.12"
+    "@playwright/test": "1.43.0"
   }
 }
