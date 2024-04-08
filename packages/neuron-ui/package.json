@@ -100,6 +100,7 @@
     "jest-styled-components": "7.2.0",
     "react-app-rewired": "2.2.1",
     "react-scripts": "5.0.1",
+    "react-refresh": "0.11.0",
     "react-test-renderer": "18.2.0",
     "storybook": "7.6.6",
     "storybook-addon-react-router-v6": "2.0.10",
