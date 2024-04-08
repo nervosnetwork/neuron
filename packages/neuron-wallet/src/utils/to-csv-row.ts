@@ -1,5 +1,5 @@
 import { t } from 'i18next'
-import shannonToCKB from '../utils/shannonToCKB'
+import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
 import sudtValueToAmount from '../utils/sudt-value-to-amount'
 import Transaction from '../models/chain/transaction'
 import { DEFAULT_UDT_SYMBOL } from '../utils/const'
@@ -41,7 +41,12 @@ const toCSVRow = (
       txType = +tx.sudtInfo.amount <= 0 ? `UDT ${SEND_TYPE}` : `UDT ${RECEIVE_TYPE}`
     }
   } else {
-    amount = shannonToCKB(BigInt(tx.value ?? ''))
+    amount = new Intl.NumberFormat('en-US', {
+      useGrouping: false,
+      signDisplay: 'always',
+      minimumFractionDigits: ckbDecimals,
+      maximumFractionDigits: ckbDecimals,
+    }).format(Number(formatUnit(BigInt(tx.value ?? '0'), 'ckb')))
     if (tx.nervosDao) {
       txType = `Nervos DAO`
     } else if (['create', 'destroy'].includes(tx.type || '')) {
