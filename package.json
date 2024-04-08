@@ -64,7 +64,8 @@
   "dependencies": {},
   "resolutions": {
     "@types/react": "18.2.45",
-    "react-i18next": ">=11.16.4"
+    "react-i18next": ">=11.16.4",
+    "react-refresh": "0.14.0"
   },
   "volta": {
     "node": "20.10.0"
