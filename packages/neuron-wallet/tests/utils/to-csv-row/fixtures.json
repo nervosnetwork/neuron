@@ -35,11 +35,11 @@
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
-        "value": "-900000000",
+        "value": "-12345678",
         "description": "description"
       }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-0.12345678,,\"description\"\n"
   },
   "Nervos DAO": {
     "data": {
@@ -49,11 +49,11 @@
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
-        "value": "-900000000",
+        "value": "-123456789",
         "description": "description"
       }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-1.23456789,,\"description\"\n"
   },
   "Receive unknown UDT": {
     "data": {
@@ -251,11 +251,11 @@
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
-        "value": "-900000000",
+        "value": "12345678900000000",
         "description": "description"
       }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Create CKB Asset Account,-9.00000000,,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Create CKB Asset Account,+123456789.00000000,,\"description\"\n"
   },
   "Destroy CKB Asset Account": {
     "data": {
@@ -265,10 +265,10 @@
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
-        "value": "-900000000",
+        "value": "-12345678900000000",
         "description": "description"
       }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Destroy CKB Asset Account,-9.00000000,,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Destroy CKB Asset Account,-123456789.00000000,,\"description\"\n"
   }
 }

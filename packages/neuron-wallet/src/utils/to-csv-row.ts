@@ -1,5 +1,5 @@
 import { t } from 'i18next'
-import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
+import { BIish, formatUnit, ckbDecimals } from '@ckb-lumos/bi'
 import sudtValueToAmount from '../utils/sudt-value-to-amount'
 import Transaction from '../models/chain/transaction'
 import { DEFAULT_UDT_SYMBOL } from '../utils/const'
@@ -7,6 +7,15 @@ import { DEFAULT_UDT_SYMBOL } from '../utils/const'
 export const formatDatetime = (datetime: Date) => {
   const isoFmt = datetime.toISOString()
   return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
+}
+
+export const formatAmount = (value: BIish) => {
+  return new Intl.NumberFormat('en-US', {
+    useGrouping: false,
+    signDisplay: 'always',
+    minimumFractionDigits: ckbDecimals,
+    maximumFractionDigits: ckbDecimals,
+  }).format(formatUnit(value, 'ckb') as any)
 }
 
 const toCSVRow = (
@@ -41,12 +50,7 @@ const toCSVRow = (
       txType = +tx.sudtInfo.amount <= 0 ? `UDT ${SEND_TYPE}` : `UDT ${RECEIVE_TYPE}`
     }
   } else {
-    amount = new Intl.NumberFormat('en-US', {
-      useGrouping: false,
-      signDisplay: 'always',
-      minimumFractionDigits: ckbDecimals,
-      maximumFractionDigits: ckbDecimals,
-    }).format(Number(formatUnit(BigInt(tx.value ?? '0'), 'ckb')))
+    amount = formatAmount(BigInt(tx.value ?? '0'))
     if (tx.nervosDao) {
       txType = `Nervos DAO`
     } else if (['create', 'destroy'].includes(tx.type || '')) {
