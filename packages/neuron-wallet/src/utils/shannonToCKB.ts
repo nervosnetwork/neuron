@@ -1,18 +1,12 @@
-const DECIMAL = 8
+import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
 
 const shannonToCKB = (shannon: bigint) => {
-  if (shannon === BigInt(0)) {
-    return `+0.${'0'.repeat(DECIMAL)}`
-  }
-
-  const isNegative = shannon < 0
-  const absStr = isNegative ? `${shannon}`.slice(1) : `${shannon}`
-  if (absStr.length <= DECIMAL) {
-    return `${isNegative ? '-' : '+'}0.${absStr.padStart(DECIMAL, '0')}`
-  }
-  const int = absStr.slice(0, -1 * DECIMAL)
-  const dec = absStr.slice(-1 * DECIMAL)
-  return `${isNegative ? '-' : '+'}${int}.${dec}`
+  return new Intl.NumberFormat('en-US', {
+    useGrouping: false,
+    signDisplay: 'always',
+    minimumFractionDigits: ckbDecimals,
+    maximumFractionDigits: ckbDecimals,
+  }).format(formatUnit(shannon, 'ckb') as any)
 }
 
 export default shannonToCKB
