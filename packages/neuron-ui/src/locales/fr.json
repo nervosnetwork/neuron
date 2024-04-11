@@ -699,6 +699,9 @@
       "compensation-accumulated": "{{blockNumber}} blocs de compensation accumulée",
       "withdraw-alert": "Astuce : il ne reste que {{epochs}} époques (~{{hours}} heures) jusqu'à la fin de votre période de verrouillage actuelle. Si vous souhaitez retirer pendant cette période de verrouillage, veuillez envoyer une demande de retrait à temps. Il reste {{nextLeftEpochs}} époques (~{{days}} jours) jusqu'à la fin de votre prochaine période de verrouillage.",
       "balance-not-reserved": "Ne pas réserver de CKBytes pour les futures opérations DAO (non recommandé)",
+      "estimated-rewards": "Récompenses estimées de {{days}} jours",
+      "estimated-apc": "Estimation de APC",
+      "estimated-apc-tooltip": "Estimation de Compensation Annuel",
       "deposit-amount": "Montant du dépôt (CKB)",
       "deposit-record": {
         "deposited-at": "Déposé",
