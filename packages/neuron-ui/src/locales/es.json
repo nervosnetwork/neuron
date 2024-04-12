@@ -386,7 +386,8 @@
         "version": "Versión",
         "language": "Idioma",
         "select-language": "Seleccionar Idioma",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "keep-awake": "Mantener la pantalla encendida durante la sincronización"
       },
       "wallet-manager": {
         "edit-wallet": {

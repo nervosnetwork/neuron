@@ -387,7 +387,8 @@
         "version": "版本",
         "language": "系统语言",
         "select-language": "选择语言",
-        "apply": "应用"
+        "apply": "应用",
+        "keep-awake": "同步期间保持屏幕唤醒"
       },
       "wallet-manager": {
         "edit-wallet": {
