@@ -14,9 +14,19 @@
     "decimal": "12",
     "expected": "+0"
   },
+  "null value and null decimal": {
+    "value": null,
+    "decimal": null,
+    "expected": "+0"
+  },
   "zero value": {
     "value": "0",
     "decimal": "1",
+    "expected": "+0"
+  },
+  "zero value and null decimal": {
+    "value": "0",
+    "decimal": null,
     "expected": "+0"
   },
   "negative value": {
