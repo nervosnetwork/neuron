@@ -341,12 +341,12 @@ export default class ApiController {
           startBlockNumber: string
         }
       ) => {
-        const res = this.#walletsController.update(params)
         const network = NetworksService.getInstance().getCurrent()
         if (network.type !== NetworkType.Light) {
           throw new Error('Only Light client can set start block number')
         }
         const lastSetStartBlockNumber = WalletsService.getInstance().getCurrent()?.toJSON().startBlockNumber
+        const res = this.#walletsController.update(params)
         if (lastSetStartBlockNumber && +params.startBlockNumber < +lastSetStartBlockNumber) {
           await CKBLightRunner.getInstance().clearNodeCache()
         } else {
