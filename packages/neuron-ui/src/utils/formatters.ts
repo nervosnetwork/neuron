@@ -1,3 +1,4 @@
+import { formatUnit } from '@ckb-lumos/bi'
 import { molecule } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
 import { TFunction } from 'i18next'
@@ -236,45 +237,18 @@ export const sudtValueToAmount = (
   value: string | null = '0',
   decimal: string = '0',
   showPositiveSign = false,
-  separator = ','
+  showCommaSeparator = true
 ) => {
-  if (value === null) {
-    return showPositiveSign ? '+0' : '0'
+  if (Number.isNaN(Number(value))) {
+    console.warn(`Invalid sudt value: ${value}`)
   }
-  if (Number.isNaN(+value)) {
-    console.warn(`sUDT value is not a valid number`)
-    return showPositiveSign ? '+0' : '0'
-  }
-  let sign = ''
-  if (value.startsWith('-')) {
-    sign = '-'
-  } else if (showPositiveSign) {
-    sign = '+'
-  }
-  const unsignedValue = value.replace(/^-?0*/, '')
-  const dec = +decimal
-  if (dec === 0) {
-    return +unsignedValue ? `${sign}${unsignedValue}` : '0'
-  }
-  let unsignedSUDTValue = ''
-  if (unsignedValue.length <= dec) {
-    unsignedSUDTValue = `0.${unsignedValue.padStart(dec, '0')}`.replace(/\.?0+$/, '')
-  } else {
-    const decimalFraction = `.${unsignedValue.slice(-dec)}`.replace(/\.?0+$/, '')
-    const int = unsignedValue.slice(0, -dec).replace(/\^0+/, '')
-    unsignedSUDTValue = `${(
-      int
-        .split('')
-        .reverse()
-        .join('')
-        .match(/\d{1,3}/g) || ['0']
-    )
-      .join(separator)
-      .split('')
-      .reverse()
-      .join('')}${decimalFraction}`
-  }
-  return `${sign}${+unsignedSUDTValue === 0 ? '0' : unsignedSUDTValue}`
+  const val = value === null || Number.isNaN(+value) ? '0' : value
+  const [int, dec = ''] = formatUnit(val, +decimal).split('.')
+  const fmt = new Intl.NumberFormat('en-US', {
+    useGrouping: showCommaSeparator,
+    signDisplay: showPositiveSign ? 'always' : 'auto',
+  })
+  return `${fmt.format(int as any)}${dec ? `.${dec}` : ''}`
 }
 
 export const sUDTAmountFormatter = (amount: string) => {
