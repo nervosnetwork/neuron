@@ -248,6 +248,7 @@ export const sudtValueToAmount = (
     useGrouping: showCommaSeparator,
     signDisplay: showPositiveSign ? 'always' : 'auto',
   })
+  // use any type to avoid TS errors since string is not listed in the args IntlFormatter.prototype.format definition but it works
   return `${fmt.format(int as any)}${dec ? `.${dec}` : ''}`
 }
 
