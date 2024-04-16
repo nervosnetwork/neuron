@@ -2,7 +2,7 @@
 
 ### CKB Node & Light Client
 
-- [CKB@v0.114.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.114.0) was released on Feb. 29st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB@v0.115.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.115.0) was released on Apr. 1st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
 - [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
 
 ### Assumed valid target
