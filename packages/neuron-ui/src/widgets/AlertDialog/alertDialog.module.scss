@@ -15,6 +15,9 @@
     font-weight: 500;
     margin: 14px 0 16px 0;
     color: var(--main-text-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .message {
