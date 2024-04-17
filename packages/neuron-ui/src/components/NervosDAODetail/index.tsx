@@ -99,7 +99,7 @@ const TabsVariantWithTxTypes = ({
           {isIncomeShow ? (
             <div className={clsx(styles.fieldValue, styles.fullRow, styles.income)}>
               <CopyZone
-                content={shannonToCKBFormatter(transaction.value, false, '')}
+                content={shannonToCKBFormatter(transaction.value, false, false)}
                 className={styles.incomeCopy}
                 maskRadius={8}
               >

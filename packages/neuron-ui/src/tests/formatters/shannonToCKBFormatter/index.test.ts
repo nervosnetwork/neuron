@@ -10,6 +10,6 @@ describe(`Verify shannon to CKB formatter`, () => {
   })
 
   test.each(fixtureTable)(`%s shannons => %s CKB with sign`, (shannons: string, expected: string) => {
-    expect(shannonToCKBFormatter(shannons, true)).toBe(+shannons > 0 ? `+${expected}` : expected)
+    expect(shannonToCKBFormatter(shannons, true)).toBe(+shannons >= 0 ? `+${expected}` : expected)
   })
 })

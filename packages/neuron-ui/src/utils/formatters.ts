@@ -1,6 +1,6 @@
-import { formatUnit } from '@ckb-lumos/bi'
 import { molecule } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
+import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
 import { TFunction } from 'i18next'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
@@ -104,40 +104,16 @@ export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit =
   }
 }
 
-export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolean, delimiter: string = ',') => {
+export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolean, showCommaSeparator = true) => {
   if (Number.isNaN(+shannon)) {
-    console.warn(`Shannon is not a valid number`)
+    console.warn(`Invalid shannon value: ${shannon}`)
     return shannon
   }
-  if (shannon === null) {
-    return '0'
-  }
-  let sign = ''
-  if (shannon.startsWith('-')) {
-    sign = '-'
-  } else if (showPositiveSign) {
-    sign = '+'
-  }
-  const unsignedShannon = shannon.replace(/^-?0*/, '')
-  let unsignedCKB = ''
-  if (unsignedShannon.length <= 8) {
-    unsignedCKB = `0.${unsignedShannon.padStart(8, '0')}`.replace(/\.?0+$/, '')
-  } else {
-    const decimal = `.${unsignedShannon.slice(-8)}`.replace(/\.?0+$/, '')
-    const int = unsignedShannon.slice(0, -8).replace(/\^0+/, '')
-    unsignedCKB = `${(
-      int
-        .split('')
-        .reverse()
-        .join('')
-        .match(/\d{1,3}/g) || ['0']
-    )
-      .join(delimiter)
-      .split('')
-      .reverse()
-      .join('')}${decimal}`
-  }
-  return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
+  return new Intl.NumberFormat('en-US', {
+    useGrouping: showCommaSeparator,
+    signDisplay: showPositiveSign ? 'always' : 'auto',
+    maximumFractionDigits: ckbDecimals,
+  }).format(formatUnit(BigInt(shannon ?? '0'), 'ckb') as any)
 }
 
 export const localNumberFormatter = (num: string | number | bigint = 0) => {

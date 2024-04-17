@@ -220,7 +220,7 @@ export const DAORecord = ({
         ) : (
           <CopyZone
             className={clsx(styles.amount, styles.withCopy)}
-            content={shannonToCKBFormatter(capacity, false, '')}
+            content={shannonToCKBFormatter(capacity, false, false)}
           >
             {`${shannonToCKBFormatter(capacity)} CKB`}
           </CopyZone>
