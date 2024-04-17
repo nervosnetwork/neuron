@@ -707,6 +707,8 @@
       "estimated-apc": "预计年化锁定补贴率",
       "estimated-apc-tooltip": "预计年化锁定补贴率",
       "deposit-amount": "存入金额 (CKB)",
+      "attention": "请注意： 一旦存入 Nervos DAO，您的存款将被锁定至少 180 个epochs（约 30 天）。",
+      "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
@@ -736,7 +738,7 @@
           "withdrawn": "已提取"
         },
         "stage-messages": {
-          "pending": "正在存入...",
+          "deposit-in-progress": "正在存入...",
           "immature-for-withdraw": "{{hours}} 小时内无法提取 CKB",
           "immature-for-unlock": "{{hours}} 小时内无法解锁 CKB",
           "next-compensation-cycle": "下一补偿周期约在 {{days}} 天后开始",
@@ -763,6 +765,16 @@
       "cell-from-cellbase": "来自 Cellbase",
       "cancel": "取消",
       "next": "下一步"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "最低存入额",
+      "single-compensation-cycle": "单补偿周期",
+      "single-compensation-cycle-description": "180 个Epochs（约 30 天）",
+      "withdraw": "提取",
+      "withdraw-description": "任意时间",
+      "unlock": "解锁",
+      "unlock-description": "当前补偿周期结束后",
+      "get": "好的"
     },
     "lock-info-dialog": {
       "address-info": "地址信息",

@@ -238,10 +238,10 @@ export const useBalanceReserved = () => {
 }
 
 export const useOnDepositDialogSubmit = ({
-  onCloseDepositDialog,
+  onDepositSuccess,
   walletID,
 }: {
-  onCloseDepositDialog: () => void
+  onDepositSuccess: () => void
   walletID: string
 }) => {
   const dispatch = useDispatch()
@@ -251,10 +251,10 @@ export const useOnDepositDialogSubmit = ({
       payload: {
         walletID,
         actionType: 'send',
+        onSuccess: onDepositSuccess,
       },
     })
-    onCloseDepositDialog()
-  }, [dispatch, walletID, onCloseDepositDialog])
+  }, [dispatch, walletID, onDepositSuccess])
 }
 
 export const useOnDepositDialogCancel = ({

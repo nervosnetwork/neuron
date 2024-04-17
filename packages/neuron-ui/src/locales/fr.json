@@ -704,6 +704,8 @@
       "estimated-apc": "Estimation de APC",
       "estimated-apc-tooltip": "Estimation de Compensation Annuel",
       "deposit-amount": "Montant du dépôt (CKB)",
+      "attention": "Attention : Une fois déposés dans la DAO Nervos, vos dépôts seront bloqués pendant au moins 180 époques (environ 30 jours).",
+      "deposit-submitted": "Dépôt de garantie",
       "deposit-record": {
         "deposited-at": "Déposé",
         "completed-at": "Terminé",
@@ -733,7 +735,7 @@
           "withdrawn": "Retiré"
         },
         "stage-messages": {
-          "pending": "En attente...",
+          "deposit-in-progress": "En attente...",
           "immature-for-withdraw": "Les CKB ne peuvent pas être retirés pendant les {{ hours }} prochaines heures",
           "immature-for-unlock": "Les CKB ne peuvent pas être déverrouillés pendant les {{ hours }} prochaines heures",
           "next-compensation-cycle": "Le prochain cycle de compensation commencera dans environ {{days}} jours",
@@ -760,6 +762,16 @@
       "cell-from-cellbase": "De cellbase",
       "cancel": "Annuler",
       "next": "Suivant"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Dépôt minimum",
+      "single-compensation-cycle": "Cycle de compensation unique",
+      "single-compensation-cycle-description": "180 Époque (environ 30 jours)",
+      "withdraw": "Retirer",
+      "withdraw-description": "A tout moment",
+      "unlock": "Déverrouiller",
+      "unlock-description": "Après le cycle de compensation en cours",
+      "get": "Obtenir"
     },
     "lock-info-dialog": {
       "address-info": "Informations sur l'adresse",

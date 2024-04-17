@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
-import { useState as useGlobalState, useDispatch } from 'states'
+import { useState as useGlobalState, useDispatch, showPageNotice } from 'states'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import appState from 'states/init/app'
 
@@ -16,22 +17,21 @@ import {
   useClearGeneratedTx,
 } from 'utils'
 
-import { openExternal } from 'services/remote'
-
+import DepositRulesDialog from 'components/DepositRulesDialog'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 import PageContainer from 'components/PageContainer'
 import CopyZone from 'widgets/CopyZone'
-import { ArrowNext, Attention, Deposit, EyesClose, EyesOpen } from 'widgets/Icons/icon'
+import { ArrowNext, Attention, Deposit, EyesClose, EyesOpen, SortV2 } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 import { HIDE_BALANCE } from 'utils/const'
+import Tooltip from 'widgets/Tooltip'
+import Button from 'widgets/Button'
 
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import hooks, { useDepositDialog } from './hooks'
 import styles from './nervosDAO.module.scss'
-
-const DAO_DOCS_URL = 'https://docs.nervos.org/docs/basics/guides/crypto%20wallets/neuron/#deposit-ckb-into-nervos-dao'
 
 const NervosDAO = () => {
   const [tabIdx, setTabIdx] = useState('0')
@@ -42,6 +42,7 @@ const NervosDAO = () => {
       tipDao,
       tipBlockTimestamp,
       epoch,
+      pageNotice,
     },
     wallet,
     nervosDAO: { records },
@@ -53,6 +54,7 @@ const NervosDAO = () => {
     settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [t, { language }] = useTranslation()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const [isPrivacyMode, setIsPrivacyMode] = useState(false)
@@ -63,6 +65,8 @@ const NervosDAO = () => {
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const clearGeneratedTx = useClearGeneratedTx()
   const { showDepositDialog, onOpenDepositDialog, onCloseDepositDialog } = useDepositDialog()
+  const [showRules, setShowRules] = useState(false)
+  const [isDescDirection, setIsDescDirection] = useState(true)
 
   const onWithdrawDialogDismiss = hooks.useOnWithdrawDialogDismiss(setActiveRecord)
 
@@ -84,17 +88,27 @@ const NervosDAO = () => {
     suggestFeeRate,
   })
 
+  const onDepositSuccess = useCallback(() => {
+    onCloseDepositDialog()
+    showPageNotice('nervos-dao.deposit-submitted')(dispatch)
+  }, [dispatch, onCloseDepositDialog])
+
   const onActionClick = hooks.useOnActionClick({
     records,
     clearGeneratedTx,
     dispatch,
     walletID: wallet.id,
     setActiveRecord,
+    navigate,
   })
 
   const handleOpenRules = useCallback(() => {
-    openExternal(DAO_DOCS_URL)
-  }, [])
+    setShowRules(true)
+  }, [setShowRules])
+
+  const handleCloseRules = useCallback(() => {
+    setShowRules(false)
+  }, [setShowRules])
 
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
 
@@ -116,6 +130,10 @@ const NervosDAO = () => {
     networkID,
   })
 
+  const toggleDirection = useCallback(() => {
+    setIsDescDirection(!isDescDirection)
+  }, [setIsDescDirection, isDescDirection])
+
   const MemoizedRecords = useMemo(() => {
     const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
       const {
@@ -136,30 +154,51 @@ const NervosDAO = () => {
       return record.status === 'dead'
     })
 
-    if (tabIdx === '1') {
+    if (tabIdx === '0') {
+      filteredRecord.sort((r1, r2) =>
+        isDescDirection
+          ? +r2.depositInfo!.timestamp! - +r1.depositInfo!.timestamp!
+          : +r1.depositInfo!.timestamp! - +r2.depositInfo!.timestamp!
+      )
+    } else if (tabIdx === '1') {
       filteredRecord.sort((r1, r2) => +r2.unlockInfo!.timestamp! - +r1.unlockInfo!.timestamp!)
     }
 
     return (
       <>
-        <div role="presentation" className={styles.recordTab} style={{ '--selected-tab': tabIdx }} onClick={onTabClick}>
-          <div className={styles.underline} />
-          <button
-            className={clsx({ [styles.active]: tabIdx === '0' }, styles.tab)}
-            type="button"
-            role="tab"
-            data-idx="0"
+        <div className={styles.tabContainer}>
+          <div
+            role="presentation"
+            className={styles.recordTab}
+            style={{ '--selected-tab': tabIdx }}
+            onClick={onTabClick}
           >
-            {t('nervos-dao.deposit-records')}
-          </button>
-          <button
-            className={clsx({ [styles.active]: tabIdx === '1' }, styles.tab)}
-            type="button"
-            role="tab"
-            data-idx="1"
-          >
-            {t('nervos-dao.completed-records')}
-          </button>
+            <div className={styles.underline} />
+            <button
+              className={clsx({ [styles.active]: tabIdx === '0' }, styles.tab)}
+              type="button"
+              role="tab"
+              data-idx="0"
+            >
+              {t('nervos-dao.deposit-records')}
+            </button>
+            <button
+              className={clsx({ [styles.active]: tabIdx === '1' }, styles.tab)}
+              type="button"
+              role="tab"
+              data-idx="1"
+            >
+              {t('nervos-dao.completed-records')}
+            </button>
+          </div>
+
+          {tabIdx === '0' ? (
+            <Tooltip tip={t('Deposit Time')} placement="left-top">
+              <Button type="text" className={styles.sortBtn} data-desc={isDescDirection} onClick={toggleDirection}>
+                <SortV2 />
+              </Button>
+            </Tooltip>
+          ) : null}
         </div>
         {filteredRecord.length ? (
           <div className={styles.records}>
@@ -205,6 +244,8 @@ const NervosDAO = () => {
     tabIdx,
     setTabIdx,
     isPrivacyMode,
+    isDescDirection,
+    toggleDirection,
   ])
 
   useEffect(() => {
@@ -223,6 +264,7 @@ const NervosDAO = () => {
         isTxGenerated={!!send.generatedTx}
         suggestFeeRate={suggestFeeRate}
         globalAPC={globalAPC}
+        onDepositSuccess={onDepositSuccess}
       />
     )
   }, [
@@ -276,6 +318,7 @@ const NervosDAO = () => {
           )}
         </div>
       }
+      notice={pageNotice}
     >
       <div className={styles.header}>
         <div className={styles.daoOverview}>
@@ -366,8 +409,11 @@ const NervosDAO = () => {
       </div>
 
       <div className={styles.recordsContainer}>{MemoizedRecords}</div>
+
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
+
+      <DepositRulesDialog show={showRules} onClose={handleCloseRules} />
     </PageContainer>
   )
 }

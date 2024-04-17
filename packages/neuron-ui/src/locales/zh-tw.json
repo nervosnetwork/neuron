@@ -708,6 +708,8 @@
       "estimated-apc": "預計年化鎖定補貼率",
       "estimated-apc-tooltip": "預計年化鎖定補貼率",
       "deposit-amount": "存入金額 (CKB)",
+      "attention": "請注意： 一旦存入 Nervos DAO，您的存款將被鎖定至少 180 個epoch（約 30 天）。",
+      "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入於",
         "completed-at": "已取出",
@@ -737,7 +739,7 @@
           "withdrawn": "已提取"
         },
         "stage-messages": {
-          "pending": "正在存入...",
+          "deposit-in-progress": "正在存入...",
           "immature-for-withdraw": "{{hours}} 小時內無法提取 CKB",
           "immature-for-unlock": "{{hours}} 小時內無法解鎖 CKB",
           "next-compensation-cycle": "下一補償週期約在 {{days}} 天后開始",
@@ -747,6 +749,37 @@
           "unlocking": "解鎖中..."
         }
       }
+    },
+    "nervos-dao-detail": {
+      "tx-detail": "交易詳情",
+      "deposited": "存入",
+      "withdrawn": "發起提取",
+      "unlocked": "解鎖",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "區塊高度",
+      "datetime": "時間",
+      "income": "收入",
+      "index": "序號",
+      "address": "地址",
+      "amount": "數量",
+      "cell-from-cellbase": "來自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "最低存入額",
+      "single-compensation-cycle": "單一補償週期",
+      "single-compensation-cycle-description": "180 個Epochs（約 30 天）",
+      "withdraw": "提取",
+      "withdraw-description": "任意時間",
+      "unlock": "解鎖",
+      "unlock-description": "目前補償週期結束後",
+      "get": "好的"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已棄用格式的地址"
     },
     "updates": {
       "check-updates": "檢查更新",

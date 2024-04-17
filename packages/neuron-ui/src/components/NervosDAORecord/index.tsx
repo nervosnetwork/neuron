@@ -122,7 +122,7 @@ export const DAORecord = ({
         break
       }
       case CellStatus.Depositing: {
-        message = t('nervos-dao.compensation-period.stage-messages.pending')
+        message = t('nervos-dao.compensation-period.stage-messages.deposit-in-progress')
         break
       }
       case CellStatus.Deposited: {
@@ -149,7 +149,7 @@ export const DAORecord = ({
   const isWithdrawnDisabled = CellStatus.Deposited === cellStatus && !hasCkbBalance
   const isActionAvailable =
     connectionStatus === 'online' &&
-    [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus) &&
+    [CellStatus.Deposited, CellStatus.Unlockable, CellStatus.Depositing].includes(cellStatus) &&
     !isWithdrawnDisabled
 
   const depositOutPointKey = depositOutPoint
@@ -305,7 +305,11 @@ export const DAORecord = ({
                 data-index={index}
                 onClick={onClick}
                 disabled={!isActionAvailable}
-                label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
+                label={
+                  cellStatus === CellStatus.Depositing
+                    ? t('nervos-dao.deposit-record.view-tx-detail')
+                    : t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)
+                }
               />
             )}
           </div>

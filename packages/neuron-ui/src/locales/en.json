@@ -691,7 +691,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
-      "deposit-rules": "Deposit rules",
+      "deposit-rules": "Deposit Rules",
       "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",
@@ -714,6 +714,8 @@
       "estimated-apc": "Estimated APC",
       "estimated-apc-tooltip": "Estimated Annual Percentage Compensation",
       "deposit-amount": "Deposit Amount (CKB)",
+      "attention": "Attention: Once deposited into the Nervos DAO, your deposits will be locked for at least 180 epochs (about 30 days).",
+      "deposit-submitted": "Deposit submitted",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -743,7 +745,7 @@
           "withdrawn": "Withdrawn"
         },
         "stage-messages": {
-          "pending": "Pending...",
+          "deposit-in-progress": "Deposit in progress",
           "immature-for-withdraw": "CKB cannot be withdrawn for the next {{ hours }} hours",
           "immature-for-unlock": "CKB cannot be unlocked for the next {{ hours }} hours",
           "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
@@ -770,6 +772,16 @@
       "cell-from-cellbase": "From cellbase",
       "cancel": "Cancel",
       "next": "Next"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Minimum Deposit",
+      "single-compensation-cycle": "Single Compensation Cycle",
+      "single-compensation-cycle-description": "180 Epoch (About 30 days)",
+      "withdraw": "Withdraw",
+      "withdraw-description": "Any Time",
+      "unlock": "Unlock",
+      "unlock-description": "After the current compensation cycle",
+      "get": "Get"
     },
     "lock-info-dialog": {
       "address-info": "Address Information",
