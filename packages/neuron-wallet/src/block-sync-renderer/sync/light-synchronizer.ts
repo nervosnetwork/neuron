@@ -262,6 +262,7 @@ export default class LightSynchronizer extends Synchronizer {
           previousTxHashes.add(previousTxHash)
         }
       })
+    if (!previousTxHashes.size) return
     await this.lightRpc.createBatchRequest([...previousTxHashes].map(v => ['fetchTransaction' as keyof Base, v])).exec()
   }
 
