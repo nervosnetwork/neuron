@@ -118,7 +118,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
             return `${HIDE_BALANCE} CKB`
           }
           return (
-            <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
+            <CopyZone content={shannonToCKBFormatter(balance, false, false)} className={styles.copyBalance}>
               <span className="textOverflow">{`${shannonToCKBFormatter(balance)} CKB`}</span>
             </CopyZone>
           )
