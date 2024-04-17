@@ -394,7 +394,8 @@
         "version": "Version",
         "language": "Language",
         "select-language": "Select Language",
-        "apply": "Apply"
+        "apply": "Apply",
+        "keep-awake": "Keep the screen awake during synchronization"
       },
       "wallet-manager": {
         "edit-wallet": {

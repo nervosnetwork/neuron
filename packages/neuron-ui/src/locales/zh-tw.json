@@ -389,7 +389,8 @@
         "version": "版本",
         "language": "語言",
         "select-language": "選擇語言",
-        "apply": "應用"
+        "apply": "應用",
+        "keep-awake": "同步期間保持屏幕喚醒"
       },
       "wallet-manager": {
         "edit-wallet": {
