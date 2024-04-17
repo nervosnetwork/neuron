@@ -742,8 +742,10 @@
           "immature-for-withdraw": "{{hours}} 小时内无法提取 CKB",
           "immature-for-unlock": "{{hours}} 小时内无法解锁 CKB",
           "next-compensation-cycle": "下一补偿周期约在 {{days}} 天后开始",
+          "next-compensation-cycle-hours": "下一补偿周期约在 {{hours}} 小时后开始",
           "withdrawing": "正在提取...",
           "compensation-cycle-will-end": "补偿周期约在 {{days}} 天后结束",
+          "compensation-cycle-will-end-hours": "补偿周期约在 {{hours}} 小时后结束",
           "compensation-cycle-has-ended": "补偿周期已结束, 可以解锁 CKB",
           "unlocking": "解锁中..."
         }

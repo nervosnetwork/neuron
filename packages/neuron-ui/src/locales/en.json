@@ -749,8 +749,10 @@
           "immature-for-withdraw": "CKB cannot be withdrawn for the next {{ hours }} hours",
           "immature-for-unlock": "CKB cannot be unlocked for the next {{ hours }} hours",
           "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
+          "next-compensation-cycle-hours": "The next compensation cycle will start in approximately {{hours}} hours",
           "withdrawing": "Withdrawing...",
           "compensation-cycle-will-end": "Compensation cycle ends in approximately {{days}} days",
+          "compensation-cycle-will-end-hours": "Compensation cycle ends in approximately {{hours}} hours",
           "compensation-cycle-has-ended": "Cycle has ended, CKB is ready to be unlocked",
           "unlocking": "Unlocking..."
         }

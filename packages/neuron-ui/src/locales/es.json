@@ -728,11 +728,13 @@
         },
         "stage-messages": {
           "deposit-in-progress": "Depósito en curso...",
-          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ horas }} horas",
-          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ horas }} horas",
-          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{días}} días",
+          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ hours }} horas",
+          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ hours }} horas",
+          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{days}} días",
+          "next-compensation-cycle-hours": "El siguiente ciclo de compensación comenzará en aproximadamente {{hours}} horas",
           "withdrawing": "Retirando...",
-          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{días}} días",
+          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{days}} días",
+          "compensation-cycle-will-end-hours": "El ciclo de compensación termina en aproximadamente {{hours}} horas",
           "compensation-cycle-has-ended": "El ciclo ha terminado, CKB está listo para ser desbloqueado",
           "unlocking": "Desbloqueando..."
         }

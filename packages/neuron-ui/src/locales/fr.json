@@ -739,8 +739,10 @@
           "immature-for-withdraw": "Les CKB ne peuvent pas être retirés pendant les {{ hours }} prochaines heures",
           "immature-for-unlock": "Les CKB ne peuvent pas être déverrouillés pendant les {{ hours }} prochaines heures",
           "next-compensation-cycle": "Le prochain cycle de compensation commencera dans environ {{days}} jours",
+          "next-compensation-cycle-hours": "Le prochain cycle de compensation commencera dans environ {{hours}} heures",
           "withdrawing": "Retrait en cours...",
           "compensation-cycle-will-end": "La période de compensation se termine dans environ {{days}} jours",
+          "compensation-cycle-will-end-hours": "La période de compensation se termine dans environ {{hours}} heures",
           "compensation-cycle-has-ended": "Le cycle est terminé, les CKB sont prêts à être déverrouillés",
           "unlocking": "Déverrouillage en cours..."
         }

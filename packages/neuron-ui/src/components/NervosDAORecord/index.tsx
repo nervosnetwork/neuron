@@ -92,7 +92,14 @@ export const DAORecord = ({
   )
 
   const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
-  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
+
+  let leftHours = ''
+  let leftDays = ''
+  if (leftEpochs < EPOCHS_PER_DAY) {
+    leftHours = parseInt(`${leftEpochs * (24 / EPOCHS_PER_DAY)}`, 10).toString()
+  } else {
+    leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
+  }
 
   const compensation = BigInt(withdrawCapacity || capacity) - BigInt(capacity)
 
@@ -126,13 +133,27 @@ export const DAORecord = ({
         break
       }
       case CellStatus.Deposited: {
-        message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
+        if (leftHours) {
+          message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle-hours', {
+            hours: leftHours || '--',
+          })
+        } else {
+          message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', {
+            days: leftDays || '--',
+          })
+        }
         break
       }
       case CellStatus.Locked: {
-        message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
-          days: leftDays || '--',
-        })
+        if (leftHours) {
+          message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end-hours', {
+            hours: leftHours || '--',
+          })
+        } else {
+          message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
+            days: leftDays || '--',
+          })
+        }
         break
       }
       default: {
