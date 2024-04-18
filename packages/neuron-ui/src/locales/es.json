@@ -386,7 +386,8 @@
         "version": "Versión",
         "language": "Idioma",
         "select-language": "Seleccionar Idioma",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "keep-awake": "Mantener la pantalla encendida durante la sincronización"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -692,6 +693,9 @@
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
       "balance-not-reserved": "No reservar ningún CKBytes para futuras operaciones de DAO (no se recomienda)",
+      "estimated-rewards": "Recompensas estimadas de {{días}} días",
+      "estimated-apc": "Estimación APC",
+      "estimated-apc-tooltip": "Estimación de Compensación Anual",
       "deposit-amount": "Cantidad a Depositar (CKB)",
       "deposit-record": {
         "deposited-at": "Depositado",
