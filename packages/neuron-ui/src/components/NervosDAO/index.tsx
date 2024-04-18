@@ -23,7 +23,7 @@ import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 import PageContainer from 'components/PageContainer'
 import CopyZone from 'widgets/CopyZone'
-import { ArrowNext, Attention, Deposit, EyesClose, EyesOpen, SortV2 } from 'widgets/Icons/icon'
+import { ArrowNext, Attention, Deposit, EyesClose, EyesOpen, DepositTimeSort } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -195,7 +195,7 @@ const NervosDAO = () => {
           {tabIdx === '0' ? (
             <Tooltip tip={t('Deposit Time')} placement="left-top">
               <Button type="text" className={styles.sortBtn} data-desc={isDescDirection} onClick={toggleDirection}>
-                <SortV2 />
+                <DepositTimeSort />
               </Button>
             </Tooltip>
           ) : null}

@@ -714,7 +714,7 @@
       "estimated-apc": "Estimated APC",
       "estimated-apc-tooltip": "Estimated Annual Percentage Compensation",
       "deposit-amount": "Deposit Amount (CKB)",
-      "attention": "Attention: Once deposited into the Nervos DAO, your deposits will be locked for at least 180 epochs (about 30 days).",
+      "attention": "Attention: Once deposited into the Nervos DAO, your deposits will be locked for at least 180 Epochs (about 30 days).",
       "deposit-submitted": "Deposit submitted",
       "deposit-record": {
         "deposited-at": "Deposited",
@@ -778,9 +778,9 @@
     "deposit-rules": {
       "minimum-deposit": "Minimum Deposit",
       "single-compensation-cycle": "Single Compensation Cycle",
-      "single-compensation-cycle-description": "180 Epoch (About 30 days)",
+      "single-compensation-cycle-description": "180 Epochs (About 30 days)",
       "withdraw": "Withdraw",
-      "withdraw-description": "Any Time",
+      "withdraw-description": "Anytime",
       "unlock": "Unlock",
       "unlock-description": "After the current compensation cycle",
       "get": "Get"

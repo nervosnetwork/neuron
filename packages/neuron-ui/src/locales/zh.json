@@ -707,7 +707,7 @@
       "estimated-apc": "预计年化锁定补贴率",
       "estimated-apc-tooltip": "预计年化锁定补贴率",
       "deposit-amount": "存入金额 (CKB)",
-      "attention": "请注意： 一旦存入 Nervos DAO，您的存款将被锁定至少 180 个epochs（约 30 天）。",
+      "attention": "请注意： 一旦存入 Nervos DAO，您的存款将被锁定至少 180 个 Epochs（约 30 天）。",
       "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入于",
@@ -771,7 +771,7 @@
     "deposit-rules": {
       "minimum-deposit": "最低存入额",
       "single-compensation-cycle": "单补偿周期",
-      "single-compensation-cycle-description": "180 个Epochs（约 30 天）",
+      "single-compensation-cycle-description": "180 个 Epochs（约 30 天）",
       "withdraw": "提取",
       "withdraw-description": "任意时间",
       "unlock": "解锁",

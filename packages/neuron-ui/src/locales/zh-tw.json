@@ -708,7 +708,7 @@
       "estimated-apc": "預計年化鎖定補貼率",
       "estimated-apc-tooltip": "預計年化鎖定補貼率",
       "deposit-amount": "存入金額 (CKB)",
-      "attention": "請注意： 一旦存入 Nervos DAO，您的存款將被鎖定至少 180 個epoch（約 30 天）。",
+      "attention": "請注意： 一旦存入 Nervos DAO，您的存款將被鎖定至少 180 個 Epochs（約 30 天）。",
       "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入於",
@@ -772,7 +772,7 @@
     "deposit-rules": {
       "minimum-deposit": "最低存入額",
       "single-compensation-cycle": "單一補償週期",
-      "single-compensation-cycle-description": "180 個Epochs（約 30 天）",
+      "single-compensation-cycle-description": "180 個 Epochs（約 30 天）",
       "withdraw": "提取",
       "withdraw-description": "任意時間",
       "unlock": "解鎖",
