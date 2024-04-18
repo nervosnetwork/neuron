@@ -18,6 +18,7 @@ const DepositRulesDialog = ({ show, onClose }: { show: boolean; onClose: () => v
     >
       <div className={styles.content}>
         {[
+          // TODO: calculating by the capacity of the lock
           ['deposit-rules.minimum-deposit', '102 CKB'],
           ['deposit-rules.single-compensation-cycle', 'deposit-rules.single-compensation-cycle-description'],
           ['deposit-rules.withdraw', 'deposit-rules.withdraw-description'],
