@@ -74,7 +74,7 @@ export const useSetBlockNumber = ({
   )
   const onOpenAddressInExplorer = useCallback(() => {
     const explorerUrl = getExplorerUrl(isMainnet)
-    openExternal(`${explorerUrl}/address/${firstAddress}`)
+    openExternal(`${explorerUrl}/address/${firstAddress}?sort=time`)
   }, [firstAddress, isMainnet])
   const onViewBlock = useCallback(() => {
     const explorerUrl = getExplorerUrl(isMainnet)
