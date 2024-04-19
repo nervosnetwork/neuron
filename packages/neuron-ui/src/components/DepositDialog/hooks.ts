@@ -136,7 +136,7 @@ export const useGenerateDaoDepositTx = ({
             payload: res,
           })
           if (isDepositAll) {
-            setMaxDepositValue(shannonToCKBFormatter(res?.outputs[0]?.capacity ?? '0', false, ''))
+            setMaxDepositValue(shannonToCKBFormatter(res?.outputs[0]?.capacity ?? '0', false, false))
             if (!isBalanceReserved) {
               setErrorMessage(t('messages.remain-ckb-for-withdraw'))
             }
@@ -181,7 +181,7 @@ export const useDepositValue = (balance: string, showDepositDialog: boolean) => 
       const amount = shannonToCKBFormatter(
         ((BigInt(percent) * BigInt(balance)) / BigInt(PERCENT_100)).toString(),
         false,
-        ''
+        false
       )
       setDepositValue(padFractionDigitsIfDecimal(amount, 8))
     },

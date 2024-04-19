@@ -95,19 +95,16 @@ export default class AddressService {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
-    const unusedReceivingCount = unusedReceivingAddresses.length
-    const unusedChangeCount = unusedChangeAddresses.length
-    if (unusedReceivingCount > this.minUnusedAddressCount && unusedChangeCount > this.minUnusedAddressCount) {
-      return undefined
-    }
+    const [receivingCount, changeCount] = await this.getAddressCountsToFillGapLimit(
+      walletId,
+      receivingAddressCount,
+      changeAddressCount
+    )
+    if (!receivingCount && !changeCount) return undefined
     const maxReceivingAddressIndex = await this.maxAddressIndex(walletId, AddressType.Receiving)
     const maxChangeAddressIndex = await this.maxAddressIndex(walletId, AddressType.Change)
     const nextReceivingIndex = maxReceivingAddressIndex === undefined ? 0 : maxReceivingAddressIndex + 1
     const nextChangeIndex = maxChangeAddressIndex === undefined ? 0 : maxChangeAddressIndex + 1
-
-    const receivingCount: number = unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount
-    const changeCount: number = unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount
 
     const currentGeneratedAddresses = await this.generateAndSave(
       walletId,
@@ -138,6 +135,20 @@ export default class AddressService {
     })
 
     return allGeneratedAddresses
+  }
+
+  public static async getAddressCountsToFillGapLimit(
+    walletId: string,
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
+  ) {
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
+    const unusedReceivingCount = unusedReceivingAddresses.length
+    const unusedChangeCount = unusedChangeAddresses.length
+    return [
+      unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount,
+      unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount,
+    ]
   }
 
   public static async generateAndSaveForExtendedKey({

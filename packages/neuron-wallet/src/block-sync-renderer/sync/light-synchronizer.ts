@@ -267,6 +267,10 @@ export default class LightSynchronizer extends Synchronizer {
   }
 
   private async updateBlockStartNumber(blockNumber: number) {
+    if (this._needGenerateAddress || !this.pollingIndexer) {
+      logger.info('LightConnector:\twait for generating address')
+      return
+    }
     const scripts = await this.lightRpc.getScripts()
     await SyncProgressService.updateBlockNumber(
       scripts.map(v => v.script.args),
