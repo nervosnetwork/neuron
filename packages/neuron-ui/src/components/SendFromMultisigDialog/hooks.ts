@@ -189,7 +189,7 @@ export const useSendInfo = ({
             ...v.slice(0, v.length - 1),
             {
               ...v[v.length - 1],
-              amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, ''),
+              amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, false),
               disabled: true,
             },
           ])

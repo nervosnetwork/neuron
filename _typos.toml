@@ -1,6 +1,8 @@
 [default.extend-words]
 thur = "thur"
 numer = "numer"
+HD = "HD"
+hd = "hd"
 
 # defined in database schema
 lastest = "lastest"

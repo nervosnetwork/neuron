@@ -262,10 +262,15 @@ export default class LightSynchronizer extends Synchronizer {
           previousTxHashes.add(previousTxHash)
         }
       })
+    if (!previousTxHashes.size) return
     await this.lightRpc.createBatchRequest([...previousTxHashes].map(v => ['fetchTransaction' as keyof Base, v])).exec()
   }
 
   private async updateBlockStartNumber(blockNumber: number) {
+    if (this._needGenerateAddress || !this.pollingIndexer) {
+      logger.info('LightConnector:\twait for generating address')
+      return
+    }
     const scripts = await this.lightRpc.getScripts()
     await SyncProgressService.updateBlockNumber(
       scripts.map(v => v.script.args),

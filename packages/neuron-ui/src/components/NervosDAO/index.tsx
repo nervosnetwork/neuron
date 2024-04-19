@@ -222,6 +222,7 @@ const NervosDAO = () => {
         isDepositing={sending}
         isTxGenerated={!!send.generatedTx}
         suggestFeeRate={suggestFeeRate}
+        globalAPC={globalAPC}
       />
     )
   }, [
@@ -233,6 +234,7 @@ const NervosDAO = () => {
     sending,
     send.generatedTx,
     suggestFeeRate,
+    globalAPC,
   ])
 
   const MemoizedWithdrawDialog = useMemo(() => {
@@ -260,7 +262,7 @@ const NervosDAO = () => {
 
   const onlineAndSynced = ConnectionStatus.Online === connectionStatus && SyncStatus.SyncCompleted === syncStatus
 
-  const isEnglish = language === 'en' || language.startsWith('en-')
+  const isChinese = language === 'zh' || language.startsWith('zh-')
 
   return (
     <PageContainer
@@ -286,7 +288,7 @@ const NervosDAO = () => {
                 </>
               ) : (
                 <CopyZone
-                  content={shannonToCKBFormatter(`${free}`, false, '')}
+                  content={shannonToCKBFormatter(`${free}`, false, false)}
                   name={t('nervos-dao.copy-balance')}
                   className={styles.balance}
                 >
@@ -301,7 +303,7 @@ const NervosDAO = () => {
             <div className={styles.value}>
               {onlineAndSynced && !isPrivacyMode ? (
                 <CopyZone
-                  content={shannonToCKBFormatter(`${locked}`, false, '')}
+                  content={shannonToCKBFormatter(`${locked}`, false, false)}
                   name={t('nervos-dao.copy-balance')}
                   className={styles.balance}
                 >
@@ -321,7 +323,7 @@ const NervosDAO = () => {
           <div className={clsx(styles.field, styles.apc)}>
             <div className={styles.name}>
               {t(`nervos-dao.apc`)}
-              {isEnglish && (
+              {isChinese ? null : (
                 <span className={styles.tooltip} data-tooltip={t(`nervos-dao.apc-tooltip`)}>
                   <Attention />
                 </span>

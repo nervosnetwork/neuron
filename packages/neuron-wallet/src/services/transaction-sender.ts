@@ -674,8 +674,8 @@ export default class TransactionSender {
 
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
-    const depositeOutput = await CellsService.getLiveCell(outPoint)
-    if (!depositeOutput) {
+    const depositOutput = await CellsService.getLiveCell(outPoint)
+    if (!depositOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -690,7 +690,7 @@ export default class TransactionSender {
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
       outPoint,
-      depositeOutput,
+      depositOutput,
       depositBlockHeader!.number,
       depositBlockHeader!.hash,
       changeAddress!.address,
@@ -736,13 +736,13 @@ export default class TransactionSender {
     if (!withdrawOutput.depositOutPoint) {
       throw new Error('DAO has not finish step first withdraw')
     }
-    const depositeTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
-    if (!depositeTx?.txStatus.blockHash) {
-      throw new Error(`Get deposite block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
+    const depositTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
+    if (!depositTx?.txStatus.blockHash) {
+      throw new Error(`Get deposit block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
     }
-    const depositBlockHeader = await rpcService.getHeader(depositeTx.txStatus.blockHash)
+    const depositBlockHeader = await rpcService.getHeader(depositTx.txStatus.blockHash)
     if (!depositBlockHeader) {
-      throw new Error(`Get Header failed with blockHash ${depositeTx.txStatus.blockHash}`)
+      throw new Error(`Get Header failed with blockHash ${depositTx.txStatus.blockHash}`)
     }
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
     const depositCapacity: bigint = BigInt(withdrawOutput.capacity)

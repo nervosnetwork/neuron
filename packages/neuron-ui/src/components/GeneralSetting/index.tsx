@@ -8,8 +8,10 @@ import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { ReactComponent as Update } from 'widgets/Icons/Update.svg'
 import { cancelCheckUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
-import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
+import { uniformTimeFormatter, bytesFormatter, clsx, wakeScreen, releaseWakeLock } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
+import Switch from 'widgets/Switch'
+import { keepScreenAwake } from 'services/localCache'
 import styles from './generalSetting.module.scss'
 import { useCheckUpdate, useUpdateDownloadStatus } from './hooks'
 
@@ -173,13 +175,29 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
     }
   }, [updater.errorMsg, setErrorMsg])
 
+  const [isScreenKeepAwake, setIsScreenKeepAwake] = useState(keepScreenAwake.get())
+  const onChangeScreenKeepAwake = useCallback((v: boolean) => {
+    keepScreenAwake.save(v)
+    setIsScreenKeepAwake(v)
+    if (v) {
+      wakeScreen()
+    } else {
+      releaseWakeLock()
+    }
+  }, [])
+
   return (
     <div className={styles.container}>
       <div className={clsx(styles.content, `${newVersion ? styles.showVersion : ''}`)} data-new-version-tip="New">
         <p>
           {t('settings.general.version')} v{newVersion || currentVersion}
         </p>
-        <button type="button" onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate} data-method="check">
+        <button
+          type="button"
+          data-button-type="text"
+          onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate}
+          data-method="check"
+        >
           <Update />
           {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
@@ -189,6 +207,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         <p>{t('settings.general.language')}</p>
         <button
           type="button"
+          data-button-type="text"
           onClick={() => {
             setShowLangDialog(true)
           }}
@@ -196,6 +215,10 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
           <LanguageSelect />
           {t(`settings.locale.${i18n.language}`)}
         </button>
+      </div>
+      <div className={clsx(styles.content, styles.lockWindow)}>
+        <p>{t('settings.general.keep-awake')}</p>
+        <Switch checked={isScreenKeepAwake} onChange={onChangeScreenKeepAwake} />
       </div>
 
       <AlertDialog
