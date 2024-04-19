@@ -288,7 +288,7 @@ const NervosDAO = () => {
                 </>
               ) : (
                 <CopyZone
-                  content={shannonToCKBFormatter(`${free}`, false, '')}
+                  content={shannonToCKBFormatter(`${free}`, false, false)}
                   name={t('nervos-dao.copy-balance')}
                   className={styles.balance}
                 >
@@ -303,7 +303,7 @@ const NervosDAO = () => {
             <div className={styles.value}>
               {onlineAndSynced && !isPrivacyMode ? (
                 <CopyZone
-                  content={shannonToCKBFormatter(`${locked}`, false, '')}
+                  content={shannonToCKBFormatter(`${locked}`, false, false)}
                   name={t('nervos-dao.copy-balance')}
                   className={styles.balance}
                 >
