@@ -178,7 +178,7 @@ const Overview = () => {
               )}
             </span>
             {showBalance ? (
-              <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
+              <CopyZone content={shannonToCKBFormatter(balance, false, false)} className={styles.copyBalance}>
                 <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
               </CopyZone>
             ) : (
@@ -191,7 +191,7 @@ const Overview = () => {
                 <Lock />
                 <span className={styles.lockedTitle}>{t('overview.locked-balance')}&nbsp;:</span>
                 {showBalance ? (
-                  <CopyZone content={shannonToCKBFormatter(balance, false, '')}>
+                  <CopyZone content={shannonToCKBFormatter(balance, false, false)}>
                     <span className={styles.lockedBalance}>{shannonToCKBFormatter(lockedBalance)}</span>
                   </CopyZone>
                 ) : (

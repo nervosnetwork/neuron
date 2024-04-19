@@ -17,7 +17,7 @@ const Balance = ({ balance, connectionStatus, syncStatus }: BalanceProps) => {
   return (
     <>
       <span>{`${t('overview.balance')}:`}</span>
-      <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
+      <CopyZone content={shannonToCKBFormatter(balance, false, false)} name={t('overview.copy-balance')}>
         <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
       </CopyZone>
       <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
