@@ -70,6 +70,7 @@ declare namespace Controller {
     password?: string
     description?: string
     amendHash?: string
+    skipLastInputs?: boolean
     multisigConfig?: {
       id: number
       walletId: string

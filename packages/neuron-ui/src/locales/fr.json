@@ -254,7 +254,8 @@
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
       "submit-transaction": "Soumettre la transaction",
       "transaction-confirmed": "Transaction confirmée",
-      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée."
+      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée.",
+      "amend-pending-transaction": "Modifier une transaction en cours"
     },
     "receive": {
       "title": "Recevoir",

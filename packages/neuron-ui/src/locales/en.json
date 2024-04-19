@@ -255,7 +255,8 @@
       "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
       "submit-transaction": "Submit the transaction",
       "transaction-confirmed": "Transaction Confirmed",
-      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended."
+      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended.",
+      "amend-pending-transaction": "Amend Pending Transaction"
     },
     "receive": {
       "title": "Receive",

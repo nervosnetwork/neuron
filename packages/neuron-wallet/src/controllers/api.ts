@@ -417,6 +417,7 @@ export default class ApiController {
           description?: string
           multisigConfig?: MultisigConfigModel
           amendHash?: string
+          skipLastInputs?: boolean
         }
       ) => {
         return this.#walletsController.sendTx({

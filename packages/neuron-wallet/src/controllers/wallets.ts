@@ -417,6 +417,7 @@ export default class WalletsController {
       description?: string
       multisigConfig?: MultisigConfigModel
       amendHash?: string
+      skipLastInputs?: boolean
     },
     skipSign = false
   ) {
@@ -438,7 +439,7 @@ export default class WalletsController {
         params.walletID,
         Transaction.fromObject(params.tx),
         params.password,
-        false,
+        params.skipLastInputs || false,
         skipSign,
         params.amendHash
       )

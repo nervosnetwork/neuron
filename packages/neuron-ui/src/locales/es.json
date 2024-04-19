@@ -247,7 +247,8 @@
       "allow-use-sent-cell": "Se permite el uso de salidas no confirmadas en esta transacción.",
       "submit-transaction": "Enviar la transacción",
       "transaction-confirmed": "Transacción confirmada",
-      "transaction-cannot-amend": "La transacción actual está confirmada y no puede modificarse."
+      "transaction-cannot-amend": "La transacción actual está confirmada y no puede modificarse.",
+      "amend-pending-transaction": "Modificar transacción pendiente"
     },
     "receive": {
       "title": "Recibir",

@@ -249,7 +249,8 @@
       "allow-use-sent-cell": "允許使用待確認的 Outputs 構建交易",
       "submit-transaction": "發起交易",
       "transaction-confirmed": "交易已確認",
-      "transaction-cannot-amend": "目前交易已確認，無法修改。"
+      "transaction-cannot-amend": "目前交易已確認，無法修改。",
+      "amend-pending-transaction": "修改待處理交易"
     },
     "receive": {
       "title": "收款",
