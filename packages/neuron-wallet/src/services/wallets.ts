@@ -110,6 +110,10 @@ export abstract class Wallet {
     }
   }
 
+  public async needsGenerateAddress() {
+    return false
+  }
+
   public abstract checkAndGenerateAddresses(
     isImporting?: boolean,
     receivingAddressCount?: number,
@@ -177,6 +181,11 @@ export class FileKeystoreWallet extends Wallet {
 
   keystoreFileName = () => {
     return `${this.id}.json`
+  }
+
+  public async needsGenerateAddress() {
+    const [receiveCount, changeCount] = await AddressService.getAddressCountsToFillGapLimit(this.id)
+    return receiveCount !== 0 || changeCount !== 0
   }
 
   public checkAndGenerateAddresses = async (
@@ -363,6 +372,16 @@ export default class WalletService {
       const wallet = this.get(walletId)
       await wallet.checkAndGenerateAddresses()
     }
+  }
+
+  public async checkNeedGenerateAddress(walletIds: string[]) {
+    for (const walletId of new Set(walletIds)) {
+      const wallet = this.get(walletId)
+      if (await wallet.needsGenerateAddress()) {
+        return true
+      }
+    }
+    return false
   }
 
   public create = (props: WalletProperties) => {
