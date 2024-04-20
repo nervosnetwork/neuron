@@ -29,7 +29,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
   const navigate = useNavigate()
   const [t] = useTranslation()
   const [amendabled, setAmendabled] = useState(false)
-  const [amendPendingTxHash, setAmendPendingTxHash] = useState('')
+  const [amendPendingTx, setAmendPendingTx] = useState<State.Transaction>()
 
   const { onChangeEditStatus, onSubmitDescription } = useLocalDescription('transaction', id, dispatch)
 
@@ -48,14 +48,12 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
           }
           case 'amend': {
             if (column.type === 'send' && !column.nftInfo && !column.nervosDao) {
+              if (column?.sudtInfo) {
+                navigate(`${RoutePath.History}/amendSUDTSend/${btn.dataset.hash}`)
+              }
               navigate(`${RoutePath.History}/amend/${btn.dataset.hash}`)
-              return
             }
-            if (column?.sudtInfo) {
-              navigate(`${RoutePath.History}/amendSUDTSend/${btn.dataset.hash}`)
-              return
-            }
-            setAmendPendingTxHash(btn.dataset.hash)
+            setAmendPendingTx(column)
 
             break
           }
@@ -83,7 +81,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
   }, [hash, dispatch])
 
   useEffect(() => {
-    if (status !== 'success' && !isWatchOnly) {
+    if (status !== 'success' && column.type !== 'receive' && !isWatchOnly) {
       getOnChainTransaction(hash).then(tx => {
         // @ts-expect-error Replace-By-Fee (RBF)
         const { min_replace_fee: minReplaceFee } = tx
@@ -96,8 +94,8 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
   }, [status, hash, setAmendabled])
 
   const onCloseAmendDialog = useCallback(() => {
-    setAmendPendingTxHash('')
-  }, [setAmendPendingTxHash])
+    setAmendPendingTx(undefined)
+  }, [setAmendPendingTx])
 
   return (
     <>
@@ -173,9 +171,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
           </div>
         </td>
       </tr>
-      {amendPendingTxHash ? (
-        <AmendPendingTransactionDialog hash={amendPendingTxHash} onClose={onCloseAmendDialog} />
-      ) : null}
+      {amendPendingTx ? <AmendPendingTransactionDialog tx={amendPendingTx} onClose={onCloseAmendDialog} /> : null}
     </>
   )
 }

@@ -41,6 +41,7 @@ declare namespace State {
     outPoint: CKBComponents.OutPoint
     type?: CKBComponents.Script
     data?: string
+    daoData?: string
     isChangeCell?: boolean
   }
   interface DetailedTransaction extends Transaction {

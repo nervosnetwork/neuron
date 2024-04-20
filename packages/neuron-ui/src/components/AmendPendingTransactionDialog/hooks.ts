@@ -11,12 +11,12 @@ import {
 import { isSuccessResponse, ErrorCode } from 'utils'
 
 export const useInitialize = ({
-  hash,
+  tx,
   walletID,
   t,
   onClose,
 }: {
-  hash: string
+  tx: State.Transaction
   walletID: string
   t: TFunction
   onClose: () => void
@@ -43,7 +43,7 @@ export const useInitialize = ({
   }, [price, size])
 
   const fetchInitData = useCallback(async () => {
-    const res = await getOnChainTransaction(hash)
+    const res = await getOnChainTransaction(tx.hash)
     const {
       // @ts-expect-error Replace-By-Fee (RBF)
       min_replace_fee: minFee,
@@ -54,16 +54,16 @@ export const useInitialize = ({
       setShowConfirmedAlert(true)
     }
 
-    const txRes = await getSentTransaction({ hash, walletID })
+    const txRes = await getSentTransaction({ hash: tx.hash, walletID })
 
     if (isSuccessResponse(txRes)) {
-      const tx = txRes.result
+      const txResult = txRes.result
       setTransaction({
-        ...tx,
+        ...txResult,
         outputsData,
       })
 
-      const sizeRes = await getTransactionSize(tx)
+      const sizeRes = await getTransactionSize(txResult)
 
       if (isSuccessResponse(sizeRes) && typeof sizeRes.result === 'number') {
         setSize(sizeRes.result)
@@ -74,7 +74,7 @@ export const useInitialize = ({
         }
       }
     }
-  }, [hash, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
+  }, [tx, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
 
   useEffect(() => {
     fetchInitData()
@@ -92,7 +92,7 @@ export const useInitialize = ({
   const onSubmit = useCallback(async () => {
     try {
       // @ts-expect-error Replace-By-Fee (RBF)
-      const { min_replace_fee: minFee } = await getOnChainTransaction(hash)
+      const { min_replace_fee: minFee } = await getOnChainTransaction(tx.hash)
       if (!minFee) {
         setShowConfirmedAlert(true)
         return
@@ -106,7 +106,7 @@ export const useInitialize = ({
       try {
         const skipLastInputs = generatedTx.inputs.length > generatedTx.witnesses.length
 
-        const res = await sendTx({ walletID, tx: generatedTx, password, skipLastInputs, amendHash: hash })
+        const res = await sendTx({ walletID, tx: generatedTx, password, skipLastInputs, amendHash: tx.hash })
 
         if (isSuccessResponse(res)) {
           onClose()
@@ -126,7 +126,7 @@ export const useInitialize = ({
     } catch {
       // ignore
     }
-  }, [walletID, hash, setShowConfirmedAlert, setPwdError, password, generatedTx, setSending])
+  }, [walletID, tx, setShowConfirmedAlert, setPwdError, password, generatedTx, setSending])
 
   return {
     fee,

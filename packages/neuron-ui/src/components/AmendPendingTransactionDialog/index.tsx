@@ -10,7 +10,7 @@ import AlertDialog from 'widgets/AlertDialog'
 import styles from './amendPendingTransactionDialog.module.scss'
 import { useInitialize } from './hooks'
 
-const AmendPendingTransactionDialog = ({ hash, onClose }: { hash: string; onClose: () => void }) => {
+const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction; onClose: () => void }) => {
   const {
     wallet: { id: walletID = '', addresses },
     chain: { networkID },
@@ -36,7 +36,7 @@ const AmendPendingTransactionDialog = ({ hash, onClose }: { hash: string; onClos
     setGeneratedTx,
     sending,
   } = useInitialize({
-    hash,
+    tx,
     walletID,
     t,
     onClose,
@@ -52,7 +52,7 @@ const AmendPendingTransactionDialog = ({ hash, onClose }: { hash: string; onClos
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value: inputValue } = e.currentTarget
 
-      const value = inputValue.split('.')[0].replace(/[^\d]/, '')
+      const value = inputValue.split('.')[0].replace(/[^\d]/g, '')
       setPrice(value)
     },
     [setPrice]
@@ -141,11 +141,16 @@ const AmendPendingTransactionDialog = ({ hash, onClose }: { hash: string; onClos
     if (transaction) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
+        if (item.output.data === '0x0000000000000000') {
+          // eslint-disable-next-line no-param-reassign
+          item.output.daoData = '0x0000000000000000'
+        }
         return {
           ...item.output,
           capacity,
         }
       })
+
       setGeneratedTx({
         ...transaction,
         outputs,
