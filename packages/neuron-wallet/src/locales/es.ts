@@ -44,6 +44,7 @@ export default {
         label: 'Ventana',
         minimize: 'Minimizar',
         close: 'Cerrar Ventana',
+        lock: 'Ventana bloqueada',
       },
       help: {
         label: 'Ayuda',

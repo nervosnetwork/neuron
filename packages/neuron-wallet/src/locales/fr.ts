@@ -44,6 +44,7 @@ export default {
         label: 'Fenêtre',
         minimize: 'Réduire',
         close: 'Fermer la fenêtre',
+        lock: 'Fenêtre verrouillée',
       },
       help: {
         label: 'Aide',
