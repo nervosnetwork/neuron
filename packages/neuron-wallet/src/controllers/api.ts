@@ -842,10 +842,6 @@ export default class ApiController {
       return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
     })
 
-    handle('get-transaction-size', async (_, params) => {
-      return this.#transactionsController.getTransactionSize(params)
-    })
-
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,

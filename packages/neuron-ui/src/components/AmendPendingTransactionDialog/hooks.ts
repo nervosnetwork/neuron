@@ -2,13 +2,9 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { PasswordIncorrectException } from 'exceptions'
 import { TFunction } from 'i18next'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
-import {
-  getTransaction as getSentTransaction,
-  getTransactionSize,
-  sendTx,
-  invokeShowErrorMessage,
-} from 'services/remote'
-import { isSuccessResponse, ErrorCode } from 'utils'
+import { getTransaction as getSentTransaction, sendTx, invokeShowErrorMessage } from 'services/remote'
+import { isSuccessResponse, ErrorCode, shannonToCKBFormatter } from 'utils'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
 export const useInitialize = ({
   tx,
@@ -63,15 +59,11 @@ export const useInitialize = ({
         outputsData,
       })
 
-      const sizeRes = await getTransactionSize(txResult)
-
-      if (isSuccessResponse(sizeRes) && typeof sizeRes.result === 'number') {
-        setSize(sizeRes.result)
-        if (minFee) {
-          const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(sizeRes.result)).toString()
-          setMinPrice(mPrice)
-          setPrice(mPrice)
-        }
+      setSize(txResult.size)
+      if (minFee) {
+        const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(txResult.size)).toString()
+        setMinPrice(mPrice)
+        setPrice(mPrice)
       }
     }
   }, [tx, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
@@ -144,6 +136,98 @@ export const useInitialize = ({
     pwdError,
     sending,
     setSending,
+  }
+}
+
+export const useOutputs = ({
+  transaction,
+  isMainnet,
+  addresses,
+  sUDTAccounts,
+  fee,
+}: {
+  transaction: State.GeneratedTx | null
+  isMainnet: boolean
+  addresses: State.Address[]
+  sUDTAccounts: State.SUDTAccount[]
+  fee: bigint
+}) => {
+  const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
+    if (outputs.length === 1) {
+      return scriptToAddress(outputs[0].lock, isMainnet)
+    }
+
+    const change = outputs.find(output => {
+      const address = scriptToAddress(output.lock, isMainnet)
+      return !!addresses.find(item => item.address === address && item.type === 1)
+    })
+
+    if (change) {
+      return scriptToAddress(change.lock, isMainnet)
+    }
+
+    const receive = outputs.find(output => {
+      const address = scriptToAddress(output.lock, isMainnet)
+      return !!addresses.find(item => item.address === address && item.type === 0)
+    })
+    if (receive) {
+      return scriptToAddress(receive.lock, isMainnet)
+    }
+
+    const sudt = outputs.find(output => {
+      const address = scriptToAddress(output.lock, isMainnet)
+      return !!sUDTAccounts.find(item => item.address === address)
+    })
+    if (sudt) {
+      return scriptToAddress(sudt.lock, isMainnet)
+    }
+    return ''
+  }
+
+  const items: {
+    address: string
+    amount: string
+    capacity: string
+    isLastOutput: boolean
+    output: State.DetailedOutput
+  }[] = useMemo(() => {
+    if (transaction && transaction.outputs.length) {
+      const lastOutputAddress = getLastOutputAddress(transaction.outputs)
+      return transaction.outputs.map(output => {
+        const address = scriptToAddress(output.lock, isMainnet)
+        return {
+          capacity: output.capacity,
+          address,
+          output,
+          amount: shannonToCKBFormatter(output.capacity || '0'),
+          isLastOutput: address === lastOutputAddress,
+        }
+      })
+    }
+    return []
+  }, [transaction?.outputs])
+
+  const outputsCapacity = useMemo(() => {
+    const outputList = items.filter(item => !item.isLastOutput)
+    return outputList.reduce((total, cur) => {
+      return total + BigInt(cur.capacity || '0')
+    }, BigInt(0))
+  }, [items])
+
+  const lastOutputsCapacity = useMemo(() => {
+    if (transaction) {
+      const inputsCapacity = transaction.inputs.reduce((total, cur) => {
+        return total + BigInt(cur.capacity || '0')
+      }, BigInt(0))
+
+      return inputsCapacity - outputsCapacity - fee
+    }
+    return -1
+  }, [transaction, fee, outputsCapacity])
+
+  return {
+    items,
+    lastOutputsCapacity,
   }
 }
 

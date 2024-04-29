@@ -50,10 +50,12 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
             if (column.type === 'send' && !column.nftInfo && !column.nervosDao) {
               if (column?.sudtInfo) {
                 navigate(`${RoutePath.History}/amendSUDTSend/${btn.dataset.hash}`)
+              } else {
+                navigate(`${RoutePath.History}/amend/${btn.dataset.hash}`)
               }
-              navigate(`${RoutePath.History}/amend/${btn.dataset.hash}`)
+            } else {
+              setAmendPendingTx(column)
             }
-            setAmendPendingTx(column)
 
             break
           }
@@ -81,6 +83,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
   }, [hash, dispatch])
 
   useEffect(() => {
+    setAmendabled(false)
     if (status !== 'success' && column.type !== 'receive' && !isWatchOnly) {
       getOnChainTransaction(hash).then(tx => {
         // @ts-expect-error Replace-By-Fee (RBF)
@@ -90,7 +93,6 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
         }
       })
     }
-    setAmendabled(false)
   }, [status, hash, setAmendabled])
 
   const onCloseAmendDialog = useCallback(() => {

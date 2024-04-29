@@ -10,7 +10,6 @@ import Transaction from '../models/chain/transaction'
 
 import { set as setDescription, get as getDescription } from '../services/tx/transaction-description'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
-import TransactionSize from '../models/transaction-size'
 
 export default class TransactionsController {
   public async getAll(
@@ -145,14 +144,6 @@ export default class TransactionsController {
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)
       throw err
-    }
-  }
-
-  public async getTransactionSize(tx: Transaction) {
-    const size = TransactionSize.tx(Transaction.fromObject(tx))
-    return {
-      status: ResponseCode.Success,
-      result: size,
     }
   }
 }

@@ -122,9 +122,6 @@ const AmendSend = () => {
   const outputsCapacity = useMemo(() => {
     const outputList = items.filter(item => !item.isLastOutput)
     return outputList.reduce((total, cur) => {
-      if (Number.isNaN(+(cur.capacity || ''))) {
-        return total
-      }
       return total + BigInt(cur.capacity || '0')
     }, BigInt(0))
   }, [items])
@@ -134,9 +131,6 @@ const AmendSend = () => {
   const lastOutputsCapacity = useMemo(() => {
     if (transaction) {
       const inputsCapacity = transaction.inputs.reduce((total, cur) => {
-        if (Number.isNaN(+(cur.capacity || ''))) {
-          return total
-        }
         return total + BigInt(cur.capacity || '0')
       }, BigInt(0))
 

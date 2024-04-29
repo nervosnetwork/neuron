@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions } from 'states/stateProvider/reducer'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
-import { getTransaction as getSentTransaction, getTransactionSize, getTransactionList } from 'services/remote'
+import { getTransaction as getSentTransaction, getTransactionList } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 
 export const useInitialize = ({
@@ -74,15 +74,11 @@ export const useInitialize = ({
 
       setTransaction({ ...tx, outputsData })
 
-      const sizeRes = await getTransactionSize(tx)
-
-      if (isSuccessResponse(sizeRes) && typeof sizeRes.result === 'number') {
-        setSize(sizeRes.result)
-        if (minFee) {
-          const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(sizeRes.result)).toString()
-          setMinPrice(mPrice)
-          setPrice(mPrice)
-        }
+      setSize(tx.size)
+      if (minFee) {
+        const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(tx.size)).toString()
+        setMinPrice(mPrice)
+        setPrice(mPrice)
       }
     }
   }, [hash, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
