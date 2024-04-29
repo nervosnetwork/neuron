@@ -100,7 +100,7 @@ export default class SettingsService extends Store {
 
   private onLocaleChanged = (lng: Locale) => {
     BrowserWindow.getAllWindows().forEach(bw => bw.webContents.send('set-locale', lng))
-    updateApplicationMenu(null)
+    updateApplicationMenu(BrowserWindow.getFocusedWindow())
   }
 
   migrateDataPath() {
