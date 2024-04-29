@@ -42,6 +42,7 @@ jest.mock('../../src/services/networks', () => {
 jest.mock('electron', () => ({
   BrowserWindow: {
     getAllWindows: jest.fn().mockReturnValue([]),
+    getFocusedWindow: jest.fn().mockReturnValue(null),
   },
 }))
 
