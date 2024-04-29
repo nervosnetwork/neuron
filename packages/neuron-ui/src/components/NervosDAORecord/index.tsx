@@ -18,7 +18,7 @@ import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 import { Clock } from 'widgets/Icons/icon'
 import { Link } from 'react-router-dom'
 import { HIDE_BALANCE } from 'utils/const'
-
+import Spinner from 'widgets/Spinner'
 import Tooltip from 'widgets/Tooltip'
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
@@ -96,7 +96,7 @@ export const DAORecord = ({
   let leftHours = ''
   let leftDays = ''
   if (leftEpochs < EPOCHS_PER_DAY) {
-    leftHours = parseInt(`${leftEpochs * (24 / EPOCHS_PER_DAY)}`, 10).toString()
+    leftHours = (parseInt(`${leftEpochs * (24 / EPOCHS_PER_DAY)}`, 10) || 1).toString()
   } else {
     leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
   }
@@ -300,7 +300,14 @@ export const DAORecord = ({
                 />
               )}
             </div>
-            <span className={styles.message}>{message}</span>
+            {CellStatus.Depositing === cellStatus ? (
+              <p className={styles.depositingMsg}>
+                {message}
+                <Spinner className={styles.spinner} />
+              </p>
+            ) : (
+              <span className={styles.message}>{message}</span>
+            )}
           </div>
 
           <div className={styles.action}>

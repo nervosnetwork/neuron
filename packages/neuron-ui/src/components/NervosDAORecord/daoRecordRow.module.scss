@@ -19,6 +19,20 @@
     justify-content: space-between;
   }
 
+  .spinner {
+    width: 14px;
+    height: 14px;
+  }
+
+  .depositingMsg {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .compensationAndAPC {
     display: flex;
     align-items: center;
