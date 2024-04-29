@@ -183,6 +183,15 @@ describe('queue', () => {
         },
       }
     })
+    jest.doMock('../../src/services/wallets', () => {
+      return {
+        getInstance() {
+          return {
+            checkNeedGenerateAddress: jest.fn(),
+          }
+        },
+      }
+    })
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
   })
