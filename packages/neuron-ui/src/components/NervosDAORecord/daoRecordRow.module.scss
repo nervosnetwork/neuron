@@ -260,7 +260,7 @@
   .action {
     display: flex;
     flex-direction: column;
-    align-items: end;
+    align-items: flex-end;
     gap: 12px;
     .lockWarn {
       color: var(--warn-text-color);
