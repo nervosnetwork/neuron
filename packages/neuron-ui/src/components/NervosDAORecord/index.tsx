@@ -113,15 +113,18 @@ export const DAORecord = ({
   })
 
   let message = ''
+  let showLoading = false
 
   if (ConnectionStatus.Online === connectionStatus) {
     switch (cellStatus) {
       case CellStatus.Unlocking: {
         message = t('nervos-dao.compensation-period.stage-messages.unlocking')
+        showLoading = true
         break
       }
       case CellStatus.Withdrawing: {
         message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
+        showLoading = true
         break
       }
       case CellStatus.Unlockable: {
@@ -130,6 +133,7 @@ export const DAORecord = ({
       }
       case CellStatus.Depositing: {
         message = t('nervos-dao.compensation-period.stage-messages.deposit-in-progress')
+        showLoading = true
         break
       }
       case CellStatus.Deposited: {
@@ -300,7 +304,7 @@ export const DAORecord = ({
                 />
               )}
             </div>
-            {CellStatus.Depositing === cellStatus ? (
+            {showLoading ? (
               <p className={styles.depositingMsg}>
                 {message}
                 <Spinner className={styles.spinner} />
