@@ -732,7 +732,8 @@
         "days-hours": "{{days}} days {{hours}} hours",
         "no-deposit": "No Deposit",
         "no-completed": "No Completed",
-        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit"
+        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit",
+        "lock-warn": "Lock to end of current compensation cycle"
       },
       "compensation-period": {
         "tooltip": {

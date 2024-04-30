@@ -722,7 +722,8 @@
         "days-hours": "{{days}} jours {{hours}} heures",
         "no-deposit": "Aucun dépôt",
         "no-completed": "Aucun terminé",
-        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO."
+        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO.",
+        "lock-warn": "Verrouillage à la fin du cycle de compensation en cours"
       },
       "compensation-period": {
         "tooltip": {

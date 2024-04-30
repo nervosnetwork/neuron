@@ -726,7 +726,8 @@
         "days-hours": "{{days}} 天 {{hours}} 小時",
         "no-deposit": "沒有存入記錄",
         "no-completed": "沒有解鎖記錄",
-        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款"
+        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款",
+        "lock-warn": "鎖定至當前補償週期結束"
       },
       "compensation-period": {
         "tooltip": {

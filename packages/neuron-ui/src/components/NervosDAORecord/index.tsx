@@ -315,6 +315,9 @@ export const DAORecord = ({
           </div>
 
           <div className={styles.action}>
+            {cellStatus === CellStatus.Locked ? (
+              <div className={styles.lockWarn}>{t('nervos-dao.deposit-record.lock-warn')}</div>
+            ) : null}
             {isWithdrawnDisabled ? (
               <Tooltip
                 tip={<div>{t('nervos-dao.deposit-record.insufficient-balance-to-unlock')}</div>}

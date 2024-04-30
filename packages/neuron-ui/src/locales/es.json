@@ -714,7 +714,9 @@
         "compensated-period": "Período de Compensación",
         "days-hours": "{{days}} días {{hours}} horas",
         "no-deposit": "Sin Depósito",
-        "no-completed": "Sin Completar"
+        "no-completed": "Sin Completar",
+        "insufficient-balance-to-unlock": "El saldo no es suficiente para que la comisión de transacción desbloquee el depósito",
+        "lock-warn": "Bloqueo al final del ciclo de compensación actual"
       },
       "compensation-period": {
         "tooltip": {

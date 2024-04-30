@@ -258,6 +258,26 @@
   }
 
   .action {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: 12px;
+    .lockWarn {
+      color: var(--warn-text-color);
+      font-weight: 500;
+      font-size: 12px;
+      position: relative;
+      &::before {
+        content: '';
+        height: 6px;
+        width: 6px;
+        border-radius: 100%;
+        position: absolute;
+        left: -10px;
+        top: calc(50% - 3px);
+        background: var(--warn-text-color);
+      }
+    }
     button {
       width: 216px;
       line-height: 56px;
