@@ -326,6 +326,47 @@ describe('test light synchronizer', () => {
       )
       expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
     })
+    it('when set the wallet start block number is bigger than current synced block number', async () => {
+      getScriptsMock.mockResolvedValue([{ script, blockNumber: '0xaa' }])
+      const addressMeta = AddressMeta.fromObject({
+        walletId: 'walletId',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script.args,
+      })
+      getWalletMinLocalSavedBlockNumberMock.mockResolvedValue({})
+      walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumber: '0xffff' }])
+      const connect = new LightSynchronizer([addressMeta], '')
+      //@ts-ignore
+      await connect.initSyncProgress()
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateDefaultLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
+    })
   })
 
   describe('test initSync', () => {

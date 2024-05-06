@@ -207,7 +207,11 @@ export default class LightSynchronizer extends Synchronizer {
     const otherTypeSyncBlockNumber = await SyncProgressService.getOtherTypeSyncBlockNumber()
     const addScripts = [
       ...allScripts
-        .filter(v => !existSyncscripts[scriptToHash(v.script)])
+        .filter(
+          v =>
+            !existSyncscripts[scriptToHash(v.script)] ||
+            +existSyncscripts[scriptToHash(v.script)].blockNumber < +(walletStartBlockMap[v.walletId] ?? 0)
+        )
         .map(v => {
           const blockNumber = Math.max(
             parseInt(walletStartBlockMap[v.walletId] ?? '0x0'),
