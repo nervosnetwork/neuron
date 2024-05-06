@@ -120,7 +120,6 @@ type Action =
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
   | 'migrate-acp'
-  | 'check-migrate-acp'
   | 'get-sudt-token-info'
   | 'generate-destroy-asset-account-tx'
   | 'get-sudt-type-script-hash'

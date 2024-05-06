@@ -66,7 +66,7 @@ import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
 import { OutPoint } from '@ckb-lumos/base'
 
-export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
+export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
   #walletsController = new WalletsController()
@@ -112,10 +112,6 @@ export default class ApiController {
       case 'backup-wallet': {
         // delete/backup wallet with wallet id
         this.#walletsController.requestPassword(params, command)
-        break
-      }
-      case 'migrate-acp': {
-        this.#assetAccountController.showACPMigrationDialog(false)
         break
       }
       default: {
@@ -780,11 +776,6 @@ export default class ApiController {
 
     handle('get-asset-account', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.getAccount(params)
-    })
-
-    handle('check-migrate-acp', async () => {
-      const allowMultipleOpen = true
-      return this.#assetAccountController.showACPMigrationDialog(allowMultipleOpen)
     })
 
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
