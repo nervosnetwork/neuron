@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ckbCore } from 'services/chain'
+import { generateAddress } from '@ckb-lumos/helpers'
+import { predefined } from '@ckb-lumos/config-manager'
 import { shannonToCKBFormatter, useDidMount, isSuccessResponse, CONSTANTS } from 'utils'
 import { getSystemCodeHash, getAllNetworks, getCurrentNetworkID } from 'services/remote'
 import CopyZone from 'widgets/CopyZone'
@@ -13,7 +14,6 @@ const { MAINNET_CLIENT_LIST } = CONSTANTS
 const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
   const [t] = useTranslation()
   const [isMainnet, setIsMainnet] = useState(false)
-  const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
   const [systemCodeHash, setSystemCodeHash] = useState<string>('')
   const [inputVisible, setInputVisible] = useState(true)
   const [activeInputIndex, setActiveInputIndex] = useState(0)
@@ -24,7 +24,6 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
         setSystemCodeHash(res.result)
       }
     })
-
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
       .then(([networksRes, idRes]) => {
         if (isSuccessResponse(networksRes) && isSuccessResponse(idRes)) {
@@ -47,6 +46,7 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
     }
   })
 
+  const config = isMainnet ? predefined.LINA : predefined.AGGRON4
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>, activeIndex: number, isInput: boolean) =>
       cells.map((cell, index) => {
@@ -56,21 +56,12 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
         } else {
           try {
             if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
-              address = ckbCore.utils.bech32Address(cell.lock.args, {
-                prefix: addressPrefix,
-                type: ckbCore.utils.AddressType.HashIdx,
-                codeHashOrCodeHashIndex: '0x00',
-              })
+              address = generateAddress(cell.lock, { config })
             } else {
-              address = ckbCore.utils.fullPayloadToAddress({
-                args: cell.lock.args,
-                prefix: addressPrefix,
-                type:
-                  cell.lock.hashType === 'data'
-                    ? ckbCore.utils.AddressType.DataCodeHash
-                    : ckbCore.utils.AddressType.TypeCodeHash,
-                codeHash: cell.lock.codeHash,
-              })
+              address = generateAddress(
+                { ...cell.lock, hashType: cell.lock.hashType === 'data' ? 'data' : 'type' },
+                { config }
+              )
             }
           } catch (err) {
             console.error(err)
@@ -106,7 +97,7 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
           </tr>
         )
       }),
-    [t, addressPrefix, systemCodeHash]
+    [t, isMainnet, systemCodeHash]
   )
 
   const inputBody = useMemo(() => {

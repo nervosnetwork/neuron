@@ -1,4 +1,5 @@
-import { ckbCore } from 'services/chain'
+import { addressToScript } from '@ckb-lumos/helpers'
+import { predefined } from '@ckb-lumos/config-manager'
 import {
   FieldInvalidException,
   MainnetAddressRequiredException,
@@ -6,15 +7,6 @@ import {
   AddressEmptyException,
   AddressNotMatchException,
 } from 'exceptions'
-import {
-  NEW_LONG_ADDR_PREFIX,
-  LONG_DATA_PREFIX,
-  LONG_TYPE_PREFIX,
-  SHORT_ADDR_LENGTH,
-  SHORT_ADDR_DEFAULT_LOCK_PREFIX,
-  SHORT_ADDR_MULTISIGN_LOCK_PREFIX,
-  SHORT_ADDR_SUDT_LOCK_PREFIX,
-} from 'utils/const'
 import {
   DefaultLockInfo,
   MultiSigLockInfo,
@@ -44,32 +36,11 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
     throw new TestnetAddressRequiredException()
   }
 
-  let parsed = ''
-
   try {
-    parsed = ckbCore.utils.parseAddress(address, 'hex')
+    return Boolean(addressToScript(address, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 }))
   } catch (err) {
     throw new FieldInvalidException(FIELD_NAME, address)
   }
-
-  if (
-    parsed.startsWith(LONG_DATA_PREFIX) ||
-    parsed.startsWith(LONG_TYPE_PREFIX) ||
-    parsed.startsWith(NEW_LONG_ADDR_PREFIX)
-  ) {
-    return true
-  }
-
-  if (
-    (!parsed.startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX) &&
-      !parsed.startsWith(SHORT_ADDR_MULTISIGN_LOCK_PREFIX) &&
-      !parsed.startsWith(SHORT_ADDR_SUDT_LOCK_PREFIX)) ||
-    address.length !== SHORT_ADDR_LENGTH
-  ) {
-    throw new FieldInvalidException(FIELD_NAME, address)
-  }
-
-  return true
 }
 
 const addressTagMap = {
@@ -82,7 +53,7 @@ const addressTagMap = {
 
 export function validateSpecificAddress(address: string, isMainnet: boolean, tagName: keyof typeof addressTagMap) {
   validateAddress(address, isMainnet)
-  const script = ckbCore.utils.addressToScript(address)
+  const script = addressToScript(address, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 })
   const lockInfo = addressTagMap[tagName][isMainnet ? 0 : 1] // first is lock on Lina
   if (script.codeHash !== lockInfo.CodeHash || script.hashType !== lockInfo.HashType) {
     throw new AddressNotMatchException(tagName)
