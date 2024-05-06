@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { ckbCore } from 'services/chain'
+import { number, bytes } from '@ckb-lumos/codec'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
 import {
@@ -144,7 +144,7 @@ export const useSpecialAssetColumnInfo = ({
 
       switch (assetInfo.lock) {
         case PresetScript.Locktime: {
-          const targetEpochInfo = epochParser(ckbCore.utils.toUint64Le(`0x${lock.args.slice(-16)}`))
+          const targetEpochInfo = epochParser(bytes.hexify(number.Uint64LE.pack(`0x${lock.args.slice(-16)}`)))
           const currentEpochInfo = epochParser(epoch)
           const targetEpochFraction =
             Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
