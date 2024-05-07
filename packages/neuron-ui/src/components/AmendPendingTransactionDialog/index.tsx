@@ -27,13 +27,13 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
     transaction,
     onSubmit,
     minPrice,
-    showConfirmedAlert,
+    isConfirmedAlertShown,
     password,
     onPwdChange,
     pwdError,
     generatedTx,
     setGeneratedTx,
-    sending,
+    isSending,
   } = useInitialize({
     tx,
     walletID,
@@ -86,7 +86,7 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
     }
   }, [lastOutputsCapacity, transaction, items, setGeneratedTx])
 
-  const disabled = !!(sending || !generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT)
+  const disabled = !!(isSending || !generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT)
 
   return (
     <>
@@ -97,7 +97,7 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
         onConfirm={onSubmit}
         confirmText={t('send.send')}
         disabled={disabled}
-        isLoading={sending}
+        isLoading={isSending}
       >
         <div className={styles.content}>
           <TextField
@@ -135,7 +135,7 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
         </div>
       </Dialog>
       <AlertDialog
-        show={showConfirmedAlert}
+        show={isConfirmedAlertShown}
         title={t('send.transaction-confirmed')}
         message={t('send.transaction-cannot-amend')}
         type="warning"

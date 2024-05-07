@@ -41,7 +41,7 @@ const AmendSend = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, showConfirmedAlert } =
+  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, isConfirmedAlertShown } =
     useInitialize({
       hash,
       walletID,
@@ -246,7 +246,7 @@ const AmendSend = () => {
       </form>
 
       <AlertDialog
-        show={showConfirmedAlert}
+        show={isConfirmedAlertShown}
         title={t('send.transaction-confirmed')}
         message={t('send.transaction-cannot-amend')}
         type="warning"

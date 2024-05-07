@@ -49,7 +49,7 @@ const AmendSUDTSend = () => {
     transaction,
     onSubmit,
     minPrice,
-    showConfirmedAlert,
+    isConfirmedAlertShown,
     sudtInfo,
     description,
     onDescriptionChange,
@@ -206,7 +206,7 @@ const AmendSUDTSend = () => {
         </div>
       </form>
       <AlertDialog
-        show={showConfirmedAlert}
+        show={isConfirmedAlertShown}
         title={t('send.transaction-confirmed')}
         message={t('send.transaction-cannot-amend')}
         type="warning"

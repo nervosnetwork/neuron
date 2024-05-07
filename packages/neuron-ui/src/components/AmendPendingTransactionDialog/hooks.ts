@@ -4,6 +4,7 @@ import { TFunction } from 'i18next'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
 import { getTransaction as getSentTransaction, sendTx, invokeShowErrorMessage } from 'services/remote'
 import { isSuccessResponse, ErrorCode, shannonToCKBFormatter } from 'utils'
+import { FEE_RATIO } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
 export const useInitialize = ({
@@ -24,12 +25,12 @@ export const useInitialize = ({
   const [price, setPrice] = useState('0')
   const [password, setPassword] = useState('')
   const [pwdError, setPwdError] = useState('')
-  const [sending, setSending] = useState(false)
+  const [isSending, setIsSending] = useState(false)
 
-  const [showConfirmedAlert, setShowConfirmedAlert] = useState(false)
+  const [isConfirmedAlertShown, setIsConfirmedAlertShown] = useState(false)
 
   const fee = useMemo(() => {
-    const ratio = BigInt(1000)
+    const ratio = BigInt(FEE_RATIO)
     const base = BigInt(size) * BigInt(price)
     const curFee = base / ratio
     if (curFee * ratio < base) {
@@ -47,7 +48,7 @@ export const useInitialize = ({
     } = res
 
     if (!minFee) {
-      setShowConfirmedAlert(true)
+      setIsConfirmedAlertShown(true)
     }
 
     const txRes = await getSentTransaction({ hash: tx.hash, walletID })
@@ -61,12 +62,12 @@ export const useInitialize = ({
 
       setSize(txResult.size)
       if (minFee) {
-        const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(txResult.size)).toString()
+        const mPrice = ((BigInt(minFee) * BigInt(FEE_RATIO)) / BigInt(txResult.size)).toString()
         setMinPrice(mPrice)
         setPrice(mPrice)
       }
     }
-  }, [tx, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
+  }, [tx, setIsConfirmedAlertShown, setPrice, setTransaction, setSize, setMinPrice])
 
   useEffect(() => {
     fetchInitData()
@@ -86,14 +87,14 @@ export const useInitialize = ({
       // @ts-expect-error Replace-By-Fee (RBF)
       const { min_replace_fee: minFee } = await getOnChainTransaction(tx.hash)
       if (!minFee) {
-        setShowConfirmedAlert(true)
+        setIsConfirmedAlertShown(true)
         return
       }
 
       if (!generatedTx) {
         return
       }
-      setSending(true)
+      setIsSending(true)
 
       try {
         const skipLastInputs = generatedTx.inputs.length > generatedTx.witnesses.length
@@ -113,12 +114,12 @@ export const useInitialize = ({
       } catch (err) {
         console.warn(err)
       } finally {
-        setSending(false)
+        setIsSending(false)
       }
     } catch {
       // ignore
     }
-  }, [walletID, tx, setShowConfirmedAlert, setPwdError, password, generatedTx, setSending])
+  }, [walletID, tx, setIsConfirmedAlertShown, setPwdError, password, generatedTx, setIsSending])
 
   return {
     fee,
@@ -129,13 +130,13 @@ export const useInitialize = ({
     transaction,
     setTransaction,
     minPrice,
-    showConfirmedAlert,
+    isConfirmedAlertShown,
     onSubmit,
     password,
     onPwdChange,
     pwdError,
-    sending,
-    setSending,
+    isSending,
+    setIsSending,
   }
 }
 

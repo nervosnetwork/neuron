@@ -85,3 +85,5 @@ export const ADDRESS_HEAD_TAIL_LENGTH = 34
 export const PlaceHolderArgs = `0x${'00'.repeat(21)}`
 
 export const DAO_DATA = '0x0000000000000000'
+
+export const FEE_RATIO = 1000
