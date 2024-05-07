@@ -175,9 +175,11 @@ export default class LightSynchronizer extends Synchronizer {
     if (!this.addressMetas.length && !appendScripts.length) {
       return
     }
+    const existSyncArgses = await SyncProgressService.getExistingSyncArgses()
     const syncScripts = await this.lightRpc.getScripts()
+    const retainedSyncScripts = syncScripts.filter(v => existSyncArgses.has(v.script.args))
     const existSyncscripts: Record<string, LightScriptFilter> = {}
-    syncScripts.forEach(v => {
+    retainedSyncScripts.forEach(v => {
       existSyncscripts[scriptToHash(v.script)] = v
     })
     const currentWalletId = WalletService.getInstance().getCurrent()?.id
@@ -205,7 +207,11 @@ export default class LightSynchronizer extends Synchronizer {
     const otherTypeSyncBlockNumber = await SyncProgressService.getOtherTypeSyncBlockNumber()
     const addScripts = [
       ...allScripts
-        .filter(v => !existSyncscripts[scriptToHash(v.script)])
+        .filter(
+          v =>
+            !existSyncscripts[scriptToHash(v.script)] ||
+            +existSyncscripts[scriptToHash(v.script)].blockNumber < +(walletStartBlockMap[v.walletId] ?? 0)
+        )
         .map(v => {
           const blockNumber = Math.max(
             parseInt(walletStartBlockMap[v.walletId] ?? '0x0'),
@@ -228,7 +234,7 @@ export default class LightSynchronizer extends Synchronizer {
       ...allScripts.map(v => scriptToHash(v.script)),
       ...appendScripts.map(v => scriptToHash(v.script)),
     ])
-    const deleteScript = syncScripts.filter(v => !allScriptHashes.has(scriptToHash(v.script)))
+    const deleteScript = retainedSyncScripts.filter(v => !allScriptHashes.has(scriptToHash(v.script)))
     await this.lightRpc.setScripts(deleteScript, 'delete')
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
     await SyncProgressService.initSyncProgress(addScripts)

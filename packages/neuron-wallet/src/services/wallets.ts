@@ -16,6 +16,7 @@ import { getConnection } from '../database/chain/connection'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import SyncProgressService from './sync-progress'
 
 const fileService = FileService.getInstance()
 
@@ -435,6 +436,7 @@ export default class WalletService {
     this.setCurrent(newWallet.id)
 
     await AddressService.deleteByWalletId(existingWalletId)
+    await SyncProgressService.deleteWalletSyncProgress(existingWalletId)
 
     const newWallets = wallets.filter(w => w.id !== existingWalletId)
     this.listStore.writeSync(this.walletsKey, [...newWallets, newWallet])
@@ -489,6 +491,7 @@ export default class WalletService {
     }
 
     await AddressService.deleteByWalletId(id)
+    await SyncProgressService.deleteWalletSyncProgress(id)
 
     this.listStore.writeSync(this.walletsKey, newWallets)
 
