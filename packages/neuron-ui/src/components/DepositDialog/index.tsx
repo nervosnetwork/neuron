@@ -8,6 +8,7 @@ import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import { Attention, Success } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
 import Tooltip from 'widgets/Tooltip'
+import Alert from 'widgets/Alert'
 import styles from './depositDialog.module.scss'
 import {
   useBalanceReserved,
@@ -31,6 +32,7 @@ interface DepositDialogProps {
   suggestFeeRate: number
   walletID: string
   globalAPC: number
+  onDepositSuccess: () => void
 }
 
 const RfcLink = React.memo(() => (
@@ -57,6 +59,7 @@ const DepositDialog = ({
   isTxGenerated,
   suggestFeeRate,
   globalAPC,
+  onDepositSuccess,
 }: DepositDialogProps) => {
   const [t, { language }] = useTranslation()
   const disabled = !isTxGenerated
@@ -73,7 +76,7 @@ const DepositDialog = ({
     showDepositDialog: show,
     slidePercent,
   })
-  const onConfirm = useOnDepositDialogSubmit({ onCloseDepositDialog, walletID })
+  const onConfirm = useOnDepositDialogSubmit({ onDepositSuccess, walletID })
   const onCancel = useOnDepositDialogCancel({ onCloseDepositDialog, resetDepositValue, setIsBalanceReserved })
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -189,6 +192,9 @@ const DepositDialog = ({
               <p>{globalAPC}%</p>
             </div>
           </div>
+          <Alert status="warn" className={styles.notification}>
+            <span>{t('nervos-dao.attention')}</span>
+          </Alert>
         </form>
       )}
     </Dialog>
