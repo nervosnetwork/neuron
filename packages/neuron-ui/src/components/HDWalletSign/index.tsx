@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { generateAddress } from '@ckb-lumos/helpers'
+import { encodeToAddress, generateAddress } from '@ckb-lumos/helpers'
 import { predefined } from '@ckb-lumos/config-manager'
 import { shannonToCKBFormatter, useDidMount, isSuccessResponse, CONSTANTS } from 'utils'
 import { getSystemCodeHash, getAllNetworks, getCurrentNetworkID } from 'services/remote'
@@ -57,11 +57,10 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
           try {
             if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
               address = generateAddress(cell.lock, { config })
+            } else if (['data', 'type', 'data1', 'data2'].includes(cell.lock.hashType)) {
+              address = encodeToAddress(cell.lock, { config })
             } else {
-              address = generateAddress(
-                { ...cell.lock, hashType: cell.lock.hashType === 'data' ? 'data' : 'type' },
-                { config }
-              )
+              throw new Error(`Invalid lock script hash type ${cell.lock.hashType}`)
             }
           } catch (err) {
             console.error(err)
