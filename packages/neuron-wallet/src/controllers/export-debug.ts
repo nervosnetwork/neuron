@@ -13,6 +13,7 @@ import SettingsService from '../services/settings'
 import { generateRPC } from '../utils/ckb-rpc'
 import { CKBLightRunner } from '../services/light-runner'
 import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from '../utils/const'
+import WalletsService from '../services/wallets'
 
 export default class ExportDebugController {
   #I18N_PATH = 'export-debug-info'
@@ -78,6 +79,7 @@ export default class ExportDebugController {
     ])
     const { platform, arch } = process
     const release = os.release()
+    const wallets = WalletsService.getInstance().getAll()
     const status = {
       neuron: {
         version: neuronVersion,
@@ -95,30 +97,30 @@ export default class ExportDebugController {
         release,
         vcredist,
       },
+      wallets: wallets.map((v, idx) => ({
+        idx,
+        startBlockNumber: v.startBlockNumber,
+      })),
     }
     this.archive.append(JSON.stringify(status), {
       name: 'status.json',
     })
   }
 
-  private addBundledCKBLog = () => {
-    const name = 'bundled-ckb.log'
-    const SIZE_TO_READ = 32_000
-
-    return new Promise((resolve, reject) => {
-      const logPath = path.resolve(SettingsService.getInstance().getNodeDataPath(), 'data', 'logs', 'run.log')
-      if (!fs.existsSync(logPath)) {
+  private readLastSizeOfFile(filepath: string, size = 32_000) {
+    return new Promise<string>((resolve, reject) => {
+      if (!fs.existsSync(filepath)) {
         return reject(new Error('File not found'))
       }
 
-      const fileStats = fs.statSync(logPath)
-      const position = fileStats.size - SIZE_TO_READ
+      const fileStats = fs.statSync(filepath)
+      const position = fileStats.size - size
 
-      fs.open(logPath, 'r', (openErr, fd) => {
+      fs.open(filepath, 'r', (openErr, fd) => {
         if (openErr) {
           return reject(openErr)
         }
-        fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
+        fs.read(fd, Buffer.alloc(size), 0, size, position, (readErr, _, buffer) => {
           fs.close(fd, closeErr => {
             const err = closeErr || readErr
             if (err) {
@@ -129,20 +131,30 @@ export default class ExportDebugController {
         })
       })
     })
-      .then((log: string) => {
-        this.archive.append(log, { name })
-      })
-      .catch(err => {
-        this.archive.append(err.message, { name })
-      })
+  }
+
+  private addBundledCKBLog = async () => {
+    const name = 'bundled-ckb.log'
+    try {
+      const logPath = path.resolve(SettingsService.getInstance().getNodeDataPath(), 'data', 'logs', 'run.log')
+      const log = await this.readLastSizeOfFile(logPath)
+      this.archive.append(log, { name })
+    } catch (error) {
+      this.archive.append(error.message, { name })
+    }
   }
 
   private async addHdPublicKeyInfoCsv() {
     try {
       const addressMetas = await AddressService.getAddressesByAllWallets()
-      let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
+      const wallets = WalletsService.getInstance().getAll()
+      const idToIdx = new Map<string, number>()
+      wallets.forEach((v, idx) => idToIdx.set(v.id, idx))
+      let csv = 'index,addressType,addressIndex,publicKeyInBlake160\n'
       for (const addressMeta of addressMetas) {
-        const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
+        const row = `${idToIdx.get(addressMeta.walletId) ?? addressMeta.walletId},${addressMeta.addressType},${
+          addressMeta.addressIndex
+        },${addressMeta.blake160}\n`
         csv += row
       }
       const csvFileName = 'hd_public_key_info.csv'
@@ -162,14 +174,16 @@ export default class ExportDebugController {
     })
   }
 
-  private addBundledCKBLightClientLog() {
+  private async addBundledCKBLightClientLog() {
     const mainnetLogPath = CKBLightRunner.getInstance().getLogPath(LIGHT_CLIENT_MAINNET)
-    const testnetLogPath = CKBLightRunner.getInstance().getLogPath(LIGHT_CLIENT_TESTNET)
     if (fs.existsSync(mainnetLogPath)) {
-      this.archive.file(mainnetLogPath, { name: 'bundled-ckb-lignt-client-mainnet.log' })
+      const mainnetLog = await this.readLastSizeOfFile(mainnetLogPath)
+      this.archive.append(mainnetLog, { name: 'bundled-ckb-lignt-client-mainnet.log' })
     }
+    const testnetLogPath = CKBLightRunner.getInstance().getLogPath(LIGHT_CLIENT_TESTNET)
     if (fs.existsSync(testnetLogPath)) {
-      this.archive.file(testnetLogPath, { name: 'bundled-ckb-lignt-client-testnet.log' })
+      const testnetLog = await this.readLastSizeOfFile(testnetLogPath)
+      this.archive.append(testnetLog, { name: 'bundled-ckb-lignt-client-testnet.log' })
     }
   }
 }
