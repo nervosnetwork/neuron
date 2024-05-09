@@ -3401,25 +3401,6 @@
     pump "^3.0.0"
     tar-fs "^2.1.1"
 
-"@nervosnetwork/ckb-sdk-core@0.109.0":
-  version "0.109.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.109.0.tgz#9ac514e119c3fb2e1cde28437351b06e92700a06"
-  integrity sha512-c0pMKrZxVG0zRaPOMY+sV7CubW+Fr1YGEj/c3iEZadlXQPeeZ7wdhblG/F4oEtGebRv2lO+F8gTL9FwQlHAXRw==
-  dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "0.109.0"
-    "@nervosnetwork/ckb-sdk-utils" "0.109.0"
-    "@nervosnetwork/ckb-types" "0.109.0"
-    tslib "2.3.1"
-
-"@nervosnetwork/ckb-sdk-rpc@0.109.0":
-  version "0.109.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.109.0.tgz#89a46227c22a56820260d5d72e976b6b4420d650"
-  integrity sha512-qkb2TBMb/gqECNqzVlrx9p6V4TdyYcGlN4sOgjVrrDQw7wVcezZFMjj6usNZZLxzbyEmjksTxbAucUnbftumxA==
-  dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.109.0"
-    axios "0.21.4"
-    tslib "2.3.1"
-
 "@nervosnetwork/ckb-sdk-utils@0.109.0":
   version "0.109.0"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.109.0.tgz#4ac4b70f5649bd641c6cc35c70e0130f043cc98f"
@@ -7160,13 +7141,6 @@ axe-core@^4.6.2:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.7.2.tgz#040a7342b20765cb18bb50b628394c21bccc17a0"
   integrity sha512-zIURGIS1E1Q4pcrMjp+nnEh+16G56eG/MUllJH8yEvw7asDo7Ac9uhC9KIH5jzpITueEZolfYglnCGIuSBz39g==
-
-axios@0.21.4:
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
-  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
-  dependencies:
-    follow-redirects "^1.14.0"
 
 axios@^0.27.2:
   version "0.27.2"
@@ -10950,7 +10924,7 @@ flow-parser@0.*:
   resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.210.1.tgz#6e04775dc2ebd5bde6a37de38532836678a5ac3e"
   integrity sha512-M0SdOwD0wZHhk6K/AOaPReBnw2vB7p9KUFUFZHJRsU3ZMl/+WVrMpmb8AfEM6GXZ5mEssCx9vHugxxJg1ieoew==
 
-follow-redirects@^1.0.0, follow-redirects@^1.14.0, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
+follow-redirects@^1.0.0, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
   version "1.15.6"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
   integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
