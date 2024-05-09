@@ -53,6 +53,8 @@
     "@ckb-lumos/bi": "0.21.1",
     "@ckb-lumos/base": "0.21.1",
     "@ckb-lumos/codec": "0.21.1",
+    "@ckb-lumos/helpers": "0.21.1",
+    "@ckb-lumos/config-manager": "0.21.1",
     "@nervosnetwork/ckb-sdk-core": "0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "0.109.0",
     "canvg": "2.0.0",
