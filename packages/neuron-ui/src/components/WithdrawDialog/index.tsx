@@ -50,7 +50,7 @@ const WithdrawDialog = ({
           getHeader(tx.txStatus.blockHash).then(header => {
             setWithdrawValue(
               calculateMaximumWithdraw(
-                tx.transaction.outputs[+record.outPoint.index],
+                tx.transaction.outputs[+record.outPoint.index] as CKBComponents.CellOutput,
                 tx.transaction.outputsData[+record.outPoint.index],
                 header.dao,
                 tipDao
