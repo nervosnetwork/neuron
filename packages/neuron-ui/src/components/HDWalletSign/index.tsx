@@ -57,10 +57,8 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
           try {
             if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
               address = generateAddress(cell.lock, { config })
-            } else if (['data', 'type', 'data1', 'data2'].includes(cell.lock.hashType)) {
-              address = encodeToAddress(cell.lock, { config })
             } else {
-              throw new Error(`Invalid lock script hash type ${cell.lock.hashType}`)
+              address = encodeToAddress(cell.lock, { config })
             }
           } catch (err) {
             console.error(err)
