@@ -1,8 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { encodeToAddress, generateAddress } from '@ckb-lumos/helpers'
-import { predefined } from '@ckb-lumos/config-manager'
-import { shannonToCKBFormatter, useDidMount, isSuccessResponse, CONSTANTS } from 'utils'
+import { scriptToAddress, shannonToCKBFormatter, useDidMount, isSuccessResponse, CONSTANTS } from 'utils'
 import { getSystemCodeHash, getAllNetworks, getCurrentNetworkID } from 'services/remote'
 import CopyZone from 'widgets/CopyZone'
 import { DeviceSignIndex as DeviceSignIndexSubject } from 'services/subjects'
@@ -46,7 +44,6 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
     }
   })
 
-  const config = isMainnet ? predefined.LINA : predefined.AGGRON4
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>, activeIndex: number, isInput: boolean) =>
       cells.map((cell, index) => {
@@ -55,11 +52,10 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
           address = t('transaction.cell-from-cellbase')
         } else {
           try {
-            if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
-              address = generateAddress(cell.lock, { config })
-            } else {
-              address = encodeToAddress(cell.lock, { config })
-            }
+            address = scriptToAddress(cell.lock, {
+              isMainnet,
+              deprecated: cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type',
+            })
           } catch (err) {
             console.error(err)
           }

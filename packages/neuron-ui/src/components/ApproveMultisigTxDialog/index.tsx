@@ -2,12 +2,10 @@ import React, { useMemo } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { MultisigConfig, OfflineSignJSON } from 'services/remote'
 import { useState as useGlobalState } from 'states'
-import { encodeToAddress } from '@ckb-lumos/helpers'
-import { predefined } from '@ckb-lumos/config-manager'
 import Tooltip from 'widgets/Tooltip'
 import { Copy } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
-import { shannonToCKBFormatter } from 'utils'
+import { scriptToAddress, shannonToCKBFormatter } from 'utils'
 import ScriptTag from 'components/ScriptTag'
 import Dialog from 'widgets/Dialog'
 import getMultisigSignStatus from 'utils/getMultisigSignStatus'
@@ -16,10 +14,7 @@ import styles from './approveMultisigTx.module.scss'
 
 const Cell = React.memo(
   ({ cell, isMainnet }: { cell: State.DetailedInput | State.DetailedOutput; isMainnet: boolean }) => {
-    const address = useMemo(
-      () => (cell.lock ? encodeToAddress(cell.lock, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 }) : ''),
-      [cell, isMainnet]
-    )
+    const address = useMemo(() => (cell.lock ? scriptToAddress(cell.lock, { isMainnet }) : ''), [cell, isMainnet])
     return (
       <div className={styles.cellItem}>
         <div>

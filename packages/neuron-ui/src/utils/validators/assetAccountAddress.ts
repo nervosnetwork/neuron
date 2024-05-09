@@ -1,5 +1,4 @@
-import { addressToScript } from '@ckb-lumos/helpers'
-import { predefined } from '@ckb-lumos/config-manager'
+import { addressToScript } from 'utils'
 import { FieldRequiredException, FieldInvalidException, AddressDeprecatedException } from 'exceptions'
 import { DEPRECATED_CODE_HASH } from 'utils/const'
 import { isSecp256k1Address } from 'utils/is'
@@ -25,7 +24,7 @@ export const validateAssetAccountAddress = ({
       return true
     }
 
-    const lockScript = addressToScript(address, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 })
+    const lockScript = addressToScript(address, { isMainnet })
 
     if ([DEPRECATED_CODE_HASH.AcpOnAggron, DEPRECATED_CODE_HASH.AcpOnLina].includes(lockScript.codeHash)) {
       throw new AddressDeprecatedException()

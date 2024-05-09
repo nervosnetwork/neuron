@@ -1,5 +1,4 @@
-import { addressToScript } from '@ckb-lumos/helpers'
-import { predefined } from '@ckb-lumos/config-manager'
+import { addressToScript } from 'utils'
 import {
   FieldInvalidException,
   MainnetAddressRequiredException,
@@ -37,7 +36,7 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
   }
 
   try {
-    return Boolean(addressToScript(address, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 }))
+    return Boolean(addressToScript(address, { isMainnet }))
   } catch (err) {
     throw new FieldInvalidException(FIELD_NAME, address)
   }
@@ -53,7 +52,7 @@ const addressTagMap = {
 
 export function validateSpecificAddress(address: string, isMainnet: boolean, tagName: keyof typeof addressTagMap) {
   validateAddress(address, isMainnet)
-  const script = addressToScript(address, { config: isMainnet ? predefined.LINA : predefined.AGGRON4 })
+  const script = addressToScript(address, { isMainnet })
   const lockInfo = addressTagMap[tagName][isMainnet ? 0 : 1] // first is lock on Lina
   if (script.codeHash !== lockInfo.CodeHash || script.hashType !== lockInfo.HashType) {
     throw new AddressNotMatchException(tagName)

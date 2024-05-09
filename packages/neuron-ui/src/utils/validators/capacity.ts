@@ -1,7 +1,7 @@
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { CapacityTooSmallException } from 'exceptions'
 import { bytes as byteUtils } from '@ckb-lumos/codec'
-import { addressToScript } from '@ckb-lumos/helpers'
+import { addressToScript } from 'utils'
 
 export const validateCapacity = (item: State.Output) => {
   const { amount, unit, address } = item
