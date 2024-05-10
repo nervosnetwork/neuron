@@ -18,7 +18,7 @@
     "start": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-app-rewired start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
-    "build": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-app-rewired build",
+    "build": "cross-env CI=false DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-app-rewired build",
     "clean": "npx rimraf build",
     "precommit": "lint-staged",
     "storybook": "storybook dev -p 9009 -s public",
