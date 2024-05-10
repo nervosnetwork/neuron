@@ -5,7 +5,7 @@ import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
 import { getSUDTAmount, isSuccessResponse } from 'utils'
 import { generateSudtMigrateAcpTx } from 'services/remote'
-import { AppActions, useDispatch } from 'states'
+import { AppActions, showGlobalAlertDialog, useDispatch } from 'states'
 import { useTokenInfo, TokenInfoType } from './hooks'
 import styles from './sUDTMigrateToNewAccountDialog.module.scss'
 
@@ -83,14 +83,11 @@ const SUDTMigrateToNewAccountDialog = ({
           })
         }
       } else {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: typeof res.message === 'string' ? res.message : res.message.content!,
-          },
-        })
+        showGlobalAlertDialog({
+          type: 'failed',
+          message: typeof res.message === 'string' ? res.message : res.message.content!,
+          action: 'ok',
+        })(dispatch)
       }
     })
   }, [cell, t, onCloseDialog, walletID, tokenInfo, dispatch, sudtAmount])

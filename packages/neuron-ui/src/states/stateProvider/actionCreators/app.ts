@@ -1,5 +1,9 @@
 import { NeuronWalletActions, AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { getNeuronWalletState } from 'services/remote'
+import {
+  getLockWindowInfo as getLockWindowInfoAPI,
+  updateLockWindowInfo as updateLockWindowInfoAPI,
+  getNeuronWalletState,
+} from 'services/remote'
 import initStates from 'states/init'
 import { RoutePath, ErrorCode, addressesToBalance, isSuccessResponse } from 'utils'
 import { WalletWizardPath } from 'components/WalletWizard'
@@ -150,3 +154,25 @@ export const showPageNotice =
       })
     }, 2000)
   }
+
+export const getLockWindowInfo = (dispatch: StateDispatch) => {
+  return getLockWindowInfoAPI().then(res => {
+    if (isSuccessResponse(res) && res.result) {
+      dispatch({
+        type: AppActions.SetLockWindowInfo,
+        payload: res.result,
+      })
+    }
+  })
+}
+
+export const updateLockWindowInfo = (params: { locked?: boolean; password?: string }) => (dispatch: StateDispatch) => {
+  updateLockWindowInfoAPI(params).then(res => {
+    if (isSuccessResponse(res) && res.result) {
+      dispatch({
+        type: AppActions.SetLockWindowInfo,
+        payload: res.result,
+      })
+    }
+  })
+}

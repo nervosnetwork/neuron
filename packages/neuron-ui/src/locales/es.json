@@ -386,7 +386,22 @@
         "version": "Versión",
         "language": "Idioma",
         "select-language": "Seleccionar Idioma",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "keep-awake": "Mantener la pantalla encendida durante la sincronización",
+        "lock-password": "Contraseña de bloqueo de pantalla",
+        "set-lock-password": "Establecer contraseña de bloqueo de pantalla",
+        "change-lock-password": "Modificar contraseña de bloqueo de pantalla",
+        "lock-window": {
+          "set-password": "Establecer contraseña",
+          "confirm-password": "Confirmar contraseña",
+          "enter-current-password": "Ingresar contraseña actual",
+          "enter-new-password": "Ingresar nueva contraseña",
+          "password-error": "Contraseña incorrecta",
+          "different-password": "Las contraseñas ingresadas no coinciden",
+          "set-password-success": "Contraseña establecida exitosamente",
+          "change-password-success": "Contraseña modificada exitosamente",
+          "reset": "Reestablecer"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -692,7 +707,12 @@
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
       "balance-not-reserved": "No reservar ningún CKBytes para futuras operaciones de DAO (no se recomienda)",
+      "estimated-rewards": "Recompensas estimadas de {{días}} días",
+      "estimated-apc": "Estimación APC",
+      "estimated-apc-tooltip": "Estimación de Compensación Anual",
       "deposit-amount": "Cantidad a Depositar (CKB)",
+      "attention": "Atención: Una vez depositado en el DAO de Nervos, sus depósitos estarán bloqueados durante al menos 180 épocas (unos 30 días).",
+      "deposit-submitted": "Depósito presentado",
       "deposit-record": {
         "deposited-at": "Depositado",
         "completed-at": "Completado",
@@ -708,7 +728,9 @@
         "compensated-period": "Período de Compensación",
         "days-hours": "{{days}} días {{hours}} horas",
         "no-deposit": "Sin Depósito",
-        "no-completed": "Sin Completar"
+        "no-completed": "Sin Completar",
+        "insufficient-balance-to-unlock": "El saldo no es suficiente para que la comisión de transacción desbloquee el depósito",
+        "lock-warn": "Bloqueo al final del ciclo de compensación actual"
       },
       "compensation-period": {
         "tooltip": {
@@ -721,12 +743,14 @@
           "withdrawn": "Retirado"
         },
         "stage-messages": {
-          "pending": "Pendiente...",
-          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ horas }} horas",
-          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ horas }} horas",
-          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{días}} días",
+          "deposit-in-progress": "Depósito en curso...",
+          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ hours }} horas",
+          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ hours }} horas",
+          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{days}} días",
+          "next-compensation-cycle-hours": "El siguiente ciclo de compensación comenzará en aproximadamente {{hours}} horas",
           "withdrawing": "Retirando...",
-          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{días}} días",
+          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{days}} días",
+          "compensation-cycle-will-end-hours": "El ciclo de compensación termina en aproximadamente {{hours}} horas",
           "compensation-cycle-has-ended": "El ciclo ha terminado, CKB está listo para ser desbloqueado",
           "unlocking": "Desbloqueando..."
         }
@@ -748,6 +772,16 @@
       "cell-from-cellbase": "Desde cellbase",
       "cancel": "Cancelar",
       "next": "Siguiente"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Depósito mínimo",
+      "single-compensation-cycle": "Ciclo de compensación único",
+      "single-compensation-cycle-description": "180 Época (unos 30 días)",
+      "withdraw": "Retirar",
+      "withdraw-description": "En cualquier momento",
+      "unlock": "Desbloquear",
+      "unlock-description": "Después del ciclo de compensación actual",
+      "get": "Visite"
     },
     "lock-info-dialog": {
       "address-info": "Información de dirección",
@@ -1229,6 +1263,12 @@
         "size": "tamaño",
         "lock-time": "Período de Bloqueo"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "La ventana de Neuron está bloqueada",
+      "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
     }
   }
 }

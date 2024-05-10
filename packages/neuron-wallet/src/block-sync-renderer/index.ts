@@ -64,7 +64,7 @@ export const resetSyncTask = async (startTask = true) => {
 
   if (startTask) {
     await WalletService.getInstance().maintainAddressesIfNecessary()
-    await TransactionPersistor.checkTxLock()
+    await CommonUtils.retry(3, 5000, TransactionPersistor.checkTxLock)
     await CommonUtils.sleep(3000)
     await createBlockSyncTask()
   }

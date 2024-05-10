@@ -394,7 +394,22 @@
         "version": "Version",
         "language": "Language",
         "select-language": "Select Language",
-        "apply": "Apply"
+        "apply": "Apply",
+        "keep-awake": "Keep the screen awake during synchronization",
+        "lock-password": "Lock window password",
+        "set-lock-password": "Set lock window password",
+        "change-lock-password": "Change lock window password",
+        "lock-window": {
+          "set-password": "Set Password",
+          "confirm-password": "Confirm Password",
+          "enter-current-password": "Enter Password",
+          "enter-new-password": "Enter new password",
+          "password-error": "Password error",
+          "different-password": "Two entered passwords do not match",
+          "set-password-success": "Password set successfully",
+          "change-password-success": "Password change successfully.",
+          "reset": "Reset"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -690,7 +705,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
-      "deposit-rules": "Deposit rules",
+      "deposit-rules": "Deposit Rules",
       "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",
@@ -709,7 +724,12 @@
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "balance-not-reserved": "Don't reserve any CKBytes for future DAO operations (Not recommended)",
+      "estimated-rewards": "Estimated Rewards of {{days}} days",
+      "estimated-apc": "Estimated APC",
+      "estimated-apc-tooltip": "Estimated Annual Percentage Compensation",
       "deposit-amount": "Deposit Amount (CKB)",
+      "attention": "Attention: Once deposited into the Nervos DAO, your deposits will be locked for at least 180 Epochs (about 30 days).",
+      "deposit-submitted": "Deposit submitted",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -726,7 +746,8 @@
         "days-hours": "{{days}} days {{hours}} hours",
         "no-deposit": "No Deposit",
         "no-completed": "No Completed",
-        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit"
+        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit",
+        "lock-warn": "Lock to end of current compensation cycle"
       },
       "compensation-period": {
         "tooltip": {
@@ -739,12 +760,14 @@
           "withdrawn": "Withdrawn"
         },
         "stage-messages": {
-          "pending": "Pending...",
+          "deposit-in-progress": "Deposit in progress",
           "immature-for-withdraw": "CKB cannot be withdrawn for the next {{ hours }} hours",
           "immature-for-unlock": "CKB cannot be unlocked for the next {{ hours }} hours",
           "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
+          "next-compensation-cycle-hours": "The next compensation cycle will start in approximately {{hours}} hours",
           "withdrawing": "Withdrawing...",
           "compensation-cycle-will-end": "Compensation cycle ends in approximately {{days}} days",
+          "compensation-cycle-will-end-hours": "Compensation cycle ends in approximately {{hours}} hours",
           "compensation-cycle-has-ended": "Cycle has ended, CKB is ready to be unlocked",
           "unlocking": "Unlocking..."
         }
@@ -766,6 +789,16 @@
       "cell-from-cellbase": "From cellbase",
       "cancel": "Cancel",
       "next": "Next"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Minimum Deposit",
+      "single-compensation-cycle": "Single Compensation Cycle",
+      "single-compensation-cycle-description": "180 Epochs (About 30 days)",
+      "withdraw": "Withdraw",
+      "withdraw-description": "Anytime",
+      "unlock": "Unlock",
+      "unlock-description": "After the current compensation cycle",
+      "get": "Get"
     },
     "lock-info-dialog": {
       "address-info": "Address Information",
@@ -1250,6 +1283,12 @@
         "size": "Size",
         "lock-time": "Lock Time"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron's window has been locked",
+      "enter-lock-password": "Enter lock password",
+      "lock-password-error": "Lock windows password error",
+      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}"
     }
   }
 }

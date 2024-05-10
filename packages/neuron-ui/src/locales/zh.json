@@ -387,7 +387,22 @@
         "version": "版本",
         "language": "系统语言",
         "select-language": "选择语言",
-        "apply": "应用"
+        "apply": "应用",
+        "keep-awake": "同步期间保持屏幕唤醒",
+        "lock-password": "锁屏密码",
+        "set-lock-password": "设置锁屏密码",
+        "change-lock-password": "修改锁屏密码",
+        "lock-window": {
+          "set-password": "设置密码",
+          "confirm-password": "确认密码",
+          "enter-current-password": "输入当前密码",
+          "enter-new-password": "输入新密码",
+          "password-error": "密码错误",
+          "different-password": "两次输入密码不一致",
+          "set-password-success": "密码设置成功",
+          "change-password-success": "密码修改成功",
+          "reset": "重新设置"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -702,7 +717,12 @@
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
       "balance-not-reserved": "不预留未来操作手续费（不建议）",
+      "estimated-rewards": "{{days}}天预计奖励",
+      "estimated-apc": "预计年化锁定补贴率",
+      "estimated-apc-tooltip": "预计年化锁定补贴率",
       "deposit-amount": "存入金额 (CKB)",
+      "attention": "请注意： 一旦存入 Nervos DAO，您的存款将被锁定至少 180 个 Epochs（约 30 天）。",
+      "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
@@ -719,7 +739,8 @@
         "days-hours": "{{days}} 天 {{hours}} 小时",
         "no-deposit": "没有存入记录",
         "no-completed": "没有解锁记录",
-        "insufficient-balance-to-unlock": "没有足够余额支付交易费用以解锁 DAO 存款"
+        "insufficient-balance-to-unlock": "没有足够余额支付交易费用以解锁 DAO 存款",
+        "lock-warn": "锁定至当前补偿周期结束"
       },
       "compensation-period": {
         "tooltip": {
@@ -732,12 +753,14 @@
           "withdrawn": "已提取"
         },
         "stage-messages": {
-          "pending": "正在存入...",
+          "deposit-in-progress": "正在存入...",
           "immature-for-withdraw": "{{hours}} 小时内无法提取 CKB",
           "immature-for-unlock": "{{hours}} 小时内无法解锁 CKB",
           "next-compensation-cycle": "下一补偿周期约在 {{days}} 天后开始",
+          "next-compensation-cycle-hours": "下一补偿周期约在 {{hours}} 小时后开始",
           "withdrawing": "正在提取...",
           "compensation-cycle-will-end": "补偿周期约在 {{days}} 天后结束",
+          "compensation-cycle-will-end-hours": "补偿周期约在 {{hours}} 小时后结束",
           "compensation-cycle-has-ended": "补偿周期已结束, 可以解锁 CKB",
           "unlocking": "解锁中..."
         }
@@ -759,6 +782,16 @@
       "cell-from-cellbase": "来自 Cellbase",
       "cancel": "取消",
       "next": "下一步"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "最低存入额",
+      "single-compensation-cycle": "单补偿周期",
+      "single-compensation-cycle-description": "180 个 Epochs（约 30 天）",
+      "withdraw": "提取",
+      "withdraw-description": "任意时间",
+      "unlock": "解锁",
+      "unlock-description": "当前补偿周期结束后",
+      "get": "好的"
     },
     "lock-info-dialog": {
       "address-info": "地址信息",
@@ -1242,6 +1275,12 @@
         "size": "大小",
         "lock-time": "锁定时间"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron 窗口已锁定",
+      "enter-lock-password": "输入锁屏密码",
+      "lock-password-error": "锁屏密码错误",
+      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试"
     }
   }
 }

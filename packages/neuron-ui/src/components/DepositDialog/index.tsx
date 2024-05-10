@@ -7,6 +7,8 @@ import { openExternal } from 'services/remote'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import { Attention, Success } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
+import Tooltip from 'widgets/Tooltip'
+import Alert from 'widgets/Alert'
 import styles from './depositDialog.module.scss'
 import {
   useBalanceReserved,
@@ -14,6 +16,7 @@ import {
   useGenerateDaoDepositTx,
   useOnDepositDialogCancel,
   useOnDepositDialogSubmit,
+  useDepositRewards,
 } from './hooks'
 
 const NERVOS_DAO_RFC_URL =
@@ -28,6 +31,8 @@ interface DepositDialogProps {
   isTxGenerated: boolean
   suggestFeeRate: number
   walletID: string
+  globalAPC: number
+  onDepositSuccess: () => void
 }
 
 const RfcLink = React.memo(() => (
@@ -53,8 +58,10 @@ const DepositDialog = ({
   isDepositing,
   isTxGenerated,
   suggestFeeRate,
+  globalAPC,
+  onDepositSuccess,
 }: DepositDialogProps) => {
-  const [t] = useTranslation()
+  const [t, { language }] = useTranslation()
   const disabled = !isTxGenerated
   const { isBalanceReserved, onIsBalanceReservedChange, setIsBalanceReserved } = useBalanceReserved()
   const { depositValue, onChangeDepositValue, slidePercent, onSliderChange, resetDepositValue } = useDepositValue(
@@ -69,7 +76,7 @@ const DepositDialog = ({
     showDepositDialog: show,
     slidePercent,
   })
-  const onConfirm = useOnDepositDialogSubmit({ onCloseDepositDialog, walletID })
+  const onConfirm = useOnDepositDialogSubmit({ onDepositSuccess, walletID })
   const onCancel = useOnDepositDialogCancel({ onCloseDepositDialog, resetDepositValue, setIsBalanceReserved })
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -81,6 +88,14 @@ const DepositDialog = ({
     },
     [disabled, onConfirm]
   )
+  const { annualRewards, monthRewards } = useDepositRewards({
+    depositValue,
+    maxDepositValue,
+    disabled,
+    globalAPC,
+  })
+
+  const isChinese = language === 'zh' || language.startsWith('zh-')
 
   return (
     <Dialog
@@ -91,14 +106,27 @@ const DepositDialog = ({
       onConfirm={onConfirm}
       cancelText={t('nervos-dao.cancel')}
       confirmText={t('nervos-dao.proceed')}
+      className={styles.container}
     >
       {isDepositing ? (
         <Spinner size={SpinnerSize.large} />
       ) : (
         <form onSubmit={onSubmit}>
-          <label className={styles.depositValueLabel} htmlFor="depositValue">{`${t(
-            'nervos-dao.deposit-amount'
-          )}`}</label>
+          <div className={styles.depositValueLabelWrap}>
+            <label className={styles.depositValueLabel} htmlFor="depositValue">{`${t(
+              'nervos-dao.deposit-amount'
+            )}`}</label>
+            <Tooltip
+              tipClassName={styles.tooltip}
+              tip={
+                <div className={styles.tip}>
+                  <Trans i18nKey="nervos-dao.deposit-terms" components={[<RfcLink />]} />
+                </div>
+              }
+            >
+              <Attention />
+            </Tooltip>
+          </div>
           <Slider
             className={styles.slider}
             value={slidePercent}
@@ -120,6 +148,11 @@ const DepositDialog = ({
           />
 
           <div className={styles.fee}>
+            <div>
+              <span>{t('nervos-dao.fee')}</span>
+              <span>{`${shannonToCKBFormatter(fee)}`}</span>
+            </div>
+
             <div className={styles.isBalanceReserved}>
               <input
                 type="checkbox"
@@ -132,19 +165,36 @@ const DepositDialog = ({
                 {t(`nervos-dao.balance-not-reserved`)}
               </label>
             </div>
-
-            <div>
-              <span>{t('nervos-dao.fee')}</span>
-              <span>{`${shannonToCKBFormatter(fee)}`}</span>
-            </div>
           </div>
 
-          <div className={styles.notice}>
-            <Attention />
+          <div className={styles.rewards}>
             <div>
-              <Trans i18nKey="nervos-dao.deposit-terms" components={[<RfcLink />]} />
+              <p>{t(`nervos-dao.estimated-rewards`, { days: 30 })}</p>
+              <p>{shannonToCKBFormatter(monthRewards)} CKB</p>
+            </div>
+            <div>
+              <p>{t(`nervos-dao.estimated-rewards`, { days: 360 })}</p>
+              <p>{shannonToCKBFormatter(annualRewards)} CKB</p>
+            </div>
+            <div>
+              <div className={styles.acpContent}>
+                {t(`nervos-dao.estimated-apc`)}
+                {isChinese ? null : (
+                  <Tooltip
+                    placement="top"
+                    showTriangle
+                    tip={<p className={styles.tip}>{t(`nervos-dao.estimated-apc-tooltip`)}</p>}
+                  >
+                    <Attention />
+                  </Tooltip>
+                )}
+              </div>
+              <p>{globalAPC}%</p>
             </div>
           </div>
+          <Alert status="warn" className={styles.notification}>
+            <span>{t('nervos-dao.attention')}</span>
+          </Alert>
         </form>
       )}
     </Dialog>

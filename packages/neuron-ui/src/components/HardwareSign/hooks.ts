@@ -85,6 +85,8 @@ export default ({
     switch (offlineSignJSON?.type) {
       case OfflineSignType.CreateSUDTAccount:
         return 'create-sudt-account'
+      case OfflineSignType.SendAcpSUDTToNewCell:
+        return 'send-acp-sudt-to-new-cell'
       case OfflineSignType.SendSUDT:
         return 'send-sudt'
       case OfflineSignType.UnlockDAO:

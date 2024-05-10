@@ -103,7 +103,7 @@ const updateTransactionWith =
             if (type === 'all') {
               const fmtItems = items.map((item, i) => ({
                 ...item,
-                amount: shannonToCKBFormatter(res.result.outputs[i].capacity, false, ''),
+                amount: shannonToCKBFormatter(res.result.outputs[i].capacity, false, false),
               }))
               const totalAmount = outputsToTotalAmount(fmtItems)
               setTotalAmount(totalAmount)
