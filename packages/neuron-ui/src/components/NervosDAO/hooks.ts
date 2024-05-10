@@ -2,7 +2,8 @@ import { useEffect, useCallback, useState } from 'react'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
-import { calculateAPC, CONSTANTS, isSuccessResponse } from 'utils'
+import { NavigateFunction } from 'react-router-dom'
+import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
 import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
 import { ckbCore, getHeader } from 'services/chain'
@@ -131,6 +132,7 @@ export const useOnWithdrawDialogSubmit = ({
               payload: {
                 walletID,
                 actionType: 'send',
+                onSuccess: () => {},
               },
             })
           } else {
@@ -158,12 +160,14 @@ export const useOnActionClick = ({
   dispatch,
   walletID,
   setActiveRecord,
+  navigate,
 }: {
   records: Readonly<State.NervosDAORecord[]>
   clearGeneratedTx: () => void
   dispatch: React.Dispatch<StateAction>
   walletID: string
   setActiveRecord: React.Dispatch<State.NervosDAORecord>
+  navigate: NavigateFunction
 }) =>
   useCallback(
     (e: any) => {
@@ -174,7 +178,9 @@ export const useOnActionClick = ({
       }
       const record = records.find(r => r.outPoint.txHash === outPoint.txHash && r.outPoint.index === outPoint.index)
       if (record) {
-        if (record.depositOutPoint) {
+        if (record.status === 'sent') {
+          navigate(`${RoutePath.History}/${record.depositInfo?.txHash}`)
+        } else if (record.depositOutPoint) {
           generateDaoClaimTx({
             walletID,
             withdrawingOutPoint: record.outPoint,
@@ -192,6 +198,7 @@ export const useOnActionClick = ({
                   payload: {
                     walletID,
                     actionType: 'send',
+                    onSuccess: () => {},
                   },
                 })
               } else {

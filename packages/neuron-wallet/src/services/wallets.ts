@@ -16,6 +16,7 @@ import { getConnection } from '../database/chain/connection'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import SyncProgressService from './sync-progress'
 
 const fileService = FileService.getInstance()
 
@@ -110,6 +111,10 @@ export abstract class Wallet {
     }
   }
 
+  public async needsGenerateAddress() {
+    return false
+  }
+
   public abstract checkAndGenerateAddresses(
     isImporting?: boolean,
     receivingAddressCount?: number,
@@ -177,6 +182,11 @@ export class FileKeystoreWallet extends Wallet {
 
   keystoreFileName = () => {
     return `${this.id}.json`
+  }
+
+  public async needsGenerateAddress() {
+    const [receiveCount, changeCount] = await AddressService.getAddressCountsToFillGapLimit(this.id)
+    return receiveCount !== 0 || changeCount !== 0
   }
 
   public checkAndGenerateAddresses = async (
@@ -365,6 +375,16 @@ export default class WalletService {
     }
   }
 
+  public async checkNeedGenerateAddress(walletIds: string[]) {
+    for (const walletId of new Set(walletIds)) {
+      const wallet = this.get(walletId)
+      if (await wallet.needsGenerateAddress()) {
+        return true
+      }
+    }
+    return false
+  }
+
   public create = (props: WalletProperties) => {
     if (!props) {
       throw new IsRequired('wallet property')
@@ -416,6 +436,7 @@ export default class WalletService {
     this.setCurrent(newWallet.id)
 
     await AddressService.deleteByWalletId(existingWalletId)
+    await SyncProgressService.deleteWalletSyncProgress(existingWalletId)
 
     const newWallets = wallets.filter(w => w.id !== existingWalletId)
     this.listStore.writeSync(this.walletsKey, [...newWallets, newWallet])
@@ -470,6 +491,7 @@ export default class WalletService {
     }
 
     await AddressService.deleteByWalletId(id)
+    await SyncProgressService.deleteWalletSyncProgress(id)
 
     this.listStore.writeSync(this.walletsKey, newWallets)
 

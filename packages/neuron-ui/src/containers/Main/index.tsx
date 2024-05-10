@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -12,6 +12,8 @@ import { AddSimple } from 'widgets/Icons/icon'
 import DataPathDialog from 'widgets/DataPathDialog'
 import NoDiskSpaceWarn from 'widgets/Icons/NoDiskSpaceWarn.png'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
+import { keepScreenAwake } from 'services/localCache'
+import LockWindowDialog from 'components/GeneralSetting/LockWindowDialog'
 import styles from './main.module.scss'
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode, useNoDiskSpace } from './hooks'
 
@@ -19,7 +21,7 @@ const MainContent = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const {
-    app: { isAllowedToFetchList = true, globalAlertDialog },
+    app: { isAllowedToFetchList = true, globalAlertDialog, lockWindowInfo },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
@@ -51,6 +53,7 @@ const MainContent = () => {
     onOpenEditorDialog,
   } = useCheckNode(sameUrlNetworks, networkID)
 
+  const [isLockDialogShow, setIsLockDialogShow] = useState(false)
   useSubscription({
     walletID,
     chain,
@@ -59,6 +62,8 @@ const MainContent = () => {
     dispatch,
     location,
     showSwitchNetwork,
+    lockWindowInfo,
+    setIsLockDialogShow,
   })
 
   useOnCurrentWalletChange({
@@ -86,6 +91,12 @@ const MainContent = () => {
     onConfirmMigrate,
   } = useNoDiskSpace(navigate)
   const needConfirm = newCkbDataPath && newCkbDataPath !== oldCkbDataPath
+
+  useEffect(() => {
+    if (keepScreenAwake.get()) {
+      wakeScreen()
+    }
+  }, [])
 
   return (
     <div onContextMenu={onContextMenu}>
@@ -173,6 +184,13 @@ const MainContent = () => {
         currentPath={newCkbDataPath}
         onCancel={onCloseMigrateDialog}
         onConfirm={onConfirmMigrate}
+      />
+      <LockWindowDialog
+        show={isLockDialogShow}
+        encryptedPassword={lockWindowInfo?.encryptedPassword}
+        onCancel={() => {
+          setIsLockDialogShow(false)
+        }}
       />
     </div>
   )

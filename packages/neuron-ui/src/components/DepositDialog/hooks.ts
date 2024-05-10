@@ -136,7 +136,7 @@ export const useGenerateDaoDepositTx = ({
             payload: res,
           })
           if (isDepositAll) {
-            setMaxDepositValue(shannonToCKBFormatter(res?.outputs[0]?.capacity ?? '0', false, ''))
+            setMaxDepositValue(shannonToCKBFormatter(res?.outputs[0]?.capacity ?? '0', false, false))
             if (!isBalanceReserved) {
               setErrorMessage(t('messages.remain-ckb-for-withdraw'))
             }
@@ -181,7 +181,7 @@ export const useDepositValue = (balance: string, showDepositDialog: boolean) => 
       const amount = shannonToCKBFormatter(
         ((BigInt(percent) * BigInt(balance)) / BigInt(PERCENT_100)).toString(),
         false,
-        ''
+        false
       )
       setDepositValue(padFractionDigitsIfDecimal(amount, 8))
     },
@@ -238,10 +238,10 @@ export const useBalanceReserved = () => {
 }
 
 export const useOnDepositDialogSubmit = ({
-  onCloseDepositDialog,
+  onDepositSuccess,
   walletID,
 }: {
-  onCloseDepositDialog: () => void
+  onDepositSuccess: () => void
   walletID: string
 }) => {
   const dispatch = useDispatch()
@@ -251,10 +251,10 @@ export const useOnDepositDialogSubmit = ({
       payload: {
         walletID,
         actionType: 'send',
+        onSuccess: onDepositSuccess,
       },
     })
-    onCloseDepositDialog()
-  }, [dispatch, walletID, onCloseDepositDialog])
+  }, [dispatch, walletID, onDepositSuccess])
 }
 
 export const useOnDepositDialogCancel = ({
@@ -274,4 +274,37 @@ export const useOnDepositDialogCancel = ({
     setIsBalanceReserved(true)
     clearGeneratedTx()
   }, [dispatch, onCloseDepositDialog, resetDepositValue, clearGeneratedTx])
+}
+
+export const useDepositRewards = ({
+  depositValue,
+  maxDepositValue,
+  disabled,
+  globalAPC,
+}: {
+  depositValue: string
+  maxDepositValue: string | null
+  disabled: boolean
+  globalAPC: number
+}) => {
+  const [annualRewards, monthRewards] = useMemo(() => {
+    if (disabled) return ['0', '0']
+
+    const value = CKBToShannonFormatter(
+      (Number(maxDepositValue || depositValue) - MIN_DEPOSIT_AMOUNT).toFixed(MAX_DECIMAL_DIGITS).toString()
+    )
+
+    const dpc = globalAPC / 365 / 100
+
+    const mRewards = (Number(value) * dpc * 30).toFixed(0).toString()
+
+    const rewerds = (Number(value) * dpc * 360).toFixed(0).toString()
+
+    return [rewerds, mRewards]
+  }, [depositValue, maxDepositValue, disabled, globalAPC])
+
+  return {
+    annualRewards,
+    monthRewards,
+  }
 }

@@ -27,10 +27,6 @@ export const getHoldSUDTCellCapacity = remoteApi<{ address: string; tokenID: str
 
 export const sendSUDTTransaction = remoteApi<Controller.SendSUDTTransaction.Params>('send-to-anyone-can-pay')
 
-export const checkMigrateAcp = remoteApi<Controller.CheckMigrateAcp.Params, Controller.CheckMigrateAcp.Response>(
-  'check-migrate-acp'
-)
-
 export const migrateAcp = remoteApi<Controller.MigrateAcp.Params>('migrate-acp')
 
 export const getSUDTTokenInfo = remoteApi<Controller.GetSUDTTokenInfo.Params, Controller.GetSUDTTokenInfo.Response>(

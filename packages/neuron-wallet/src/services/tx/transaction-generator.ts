@@ -1456,9 +1456,9 @@ export class TransactionGenerator {
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const sudtCellDep = assetAccountInfo.sudtCellDep
-    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     let outputs: Output[] = []
     let acpInputCell: Input | null = null
+    const acpCodeHashes = new Set([sudtCell.lock.codeHash])
     if (acpAddress) {
       if (!inputSudtCell.type) {
         throw new MigrateSudtCellNoTypeError()
@@ -1473,6 +1473,7 @@ export class TransactionGenerator {
       const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(receiverAcpCell.data)
       const sudtCellAmount = BufferUtils.readBigUInt128LE(inputSudtCell.data)
       const receiverAcpOutputAmount = receiverAcpInputAmount + sudtCellAmount
+      inputSudtCell.setLock(SystemScriptInfo.generateSecpScript(inputSudtCell.lock.args))
       inputSudtCell.setData('0x')
       inputSudtCell.setType(null)
       outputs = [
@@ -1494,6 +1495,7 @@ export class TransactionGenerator {
         since: '0',
       })
       sudtMigrateAcpInputs.push(acpInputCell)
+      acpCodeHashes.add(receiverAcpCell.lock().codeHash)
     } else {
       const addresses = await currentWallet.getNextReceivingAddresses()
       const usedBlake160s = new Set(
@@ -1504,10 +1506,11 @@ export class TransactionGenerator {
       outputs = [inputSudtCell]
     }
 
+    const acpCellDeps = [...acpCodeHashes].map(v => assetAccountInfo.getAcpCellDep(v))
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, sudtCellDep, ...acpCellDeps.filter((v): v is CellDep => !!v)],
       inputs: sudtMigrateAcpInputs,
       outputs: outputs,
       outputsData: outputs.map(v => v.data || '0x'),

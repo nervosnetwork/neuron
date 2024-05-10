@@ -1,3 +1,32 @@
+# 0.114.3 (2024-04-16)
+
+### CKB Node & Light Client
+
+- [CKB@v0.115.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.115.0) was released on Apr. 1st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x9443ad8da9172d484367bc5467988cba7a0c46028398309edfdda7d2d79be897`(at height `12,703,957`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3123)
+
+---
+
+## New features
+
+- #3054: Displaying DAO rewards.(@devchenyan)
+- #3066: Support keeping screen awake.(@yanguoyu)
+
+## Bug fixes
+
+- #3055: Fix sending sudt to a new acp cell with extra 142 CKB by offline sign.(@yanguoyu)
+- #3103: Handle MacOS crash properly on quitting.(@devchenyan)
+
+## New Contributors
+
+- @twhy made their first contribution in https://github.com/nervosnetwork/neuron/pull/3110
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.2...v0.114.3
+
 # 0.114.2 (2024-03-15)
 
 ### CKB Node & Light Client

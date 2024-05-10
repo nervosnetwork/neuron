@@ -389,7 +389,22 @@
         "version": "版本",
         "language": "語言",
         "select-language": "選擇語言",
-        "apply": "應用"
+        "apply": "應用",
+        "keep-awake": "同步期間保持屏幕喚醒",
+        "lock-password": "鎖屏密碼",
+        "set-lock-password": "設置鎖屏密碼",
+        "change-lock-password": "修改鎖屏密碼",
+        "lock-window": {
+          "set-password": "設置密碼",
+          "confirm-password": "確認密碼",
+          "enter-current-password": "輸入當前密碼",
+          "enter-new-password": "輸入新密碼",
+          "password-error": "密碼錯誤",
+          "different-password": "兩次輸入密碼不壹致",
+          "set-password-success": "密碼設置成功",
+          "change-password-success": "密碼修改成功",
+          "reset": "重新設置"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -703,6 +718,12 @@
       "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
       "balance-not-reserved": "（不建議）不預留未來操作手續費",
+      "estimated-rewards": "{{days}}天預計獎勵",
+      "estimated-apc": "預計年化鎖定補貼率",
+      "estimated-apc-tooltip": "預計年化鎖定補貼率",
+      "deposit-amount": "存入金額 (CKB)",
+      "attention": "請注意： 一旦存入 Nervos DAO，您的存款將被鎖定至少 180 個 Epochs（約 30 天）。",
+      "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入於",
         "completed-at": "已取出",
@@ -719,7 +740,8 @@
         "days-hours": "{{days}} 天 {{hours}} 小時",
         "no-deposit": "沒有存入記錄",
         "no-completed": "沒有解鎖記錄",
-        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款"
+        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款",
+        "lock-warn": "鎖定至當前補償週期結束"
       },
       "compensation-period": {
         "tooltip": {
@@ -732,16 +754,49 @@
           "withdrawn": "已提取"
         },
         "stage-messages": {
-          "pending": "正在存入...",
+          "deposit-in-progress": "正在存入...",
           "immature-for-withdraw": "{{hours}} 小時內無法提取 CKB",
           "immature-for-unlock": "{{hours}} 小時內無法解鎖 CKB",
           "next-compensation-cycle": "下一補償週期約在 {{days}} 天后開始",
+          "next-compensation-cycle-hours": "下一補償週期約在 {{hours}} 小時后開始",
           "withdrawing": "正在提取...",
           "compensation-cycle-will-end": "補償週期約在 {{days}} 天后結束",
+          "compensation-cycle-will-end-hours": "補償週期約在 {{hours}} 小時后結束",
           "compensation-cycle-has-ended": "補償週期已結束, 可以解鎖 CKB",
           "unlocking": "解鎖中..."
         }
       }
+    },
+    "nervos-dao-detail": {
+      "tx-detail": "交易詳情",
+      "deposited": "存入",
+      "withdrawn": "發起提取",
+      "unlocked": "解鎖",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "區塊高度",
+      "datetime": "時間",
+      "income": "收入",
+      "index": "序號",
+      "address": "地址",
+      "amount": "數量",
+      "cell-from-cellbase": "來自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "最低存入額",
+      "single-compensation-cycle": "單一補償週期",
+      "single-compensation-cycle-description": "180 個 Epochs（約 30 天）",
+      "withdraw": "提取",
+      "withdraw-description": "任意時間",
+      "unlock": "解鎖",
+      "unlock-description": "目前補償週期結束後",
+      "get": "好的"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已棄用格式的地址"
     },
     "updates": {
       "check-updates": "檢查更新",
@@ -1217,6 +1272,12 @@
         "size": "大小",
         "lock-time": "鎖定時間"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron 窗口已鎖定",
+      "enter-lock-password": "輸入鎖屏密碼",
+      "lock-password-error": "鎖屏密碼錯誤",
+      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試"
     }
   }
 }
