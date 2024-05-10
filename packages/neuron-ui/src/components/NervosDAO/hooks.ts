@@ -6,7 +6,7 @@ import { NavigateFunction } from 'react-router-dom'
 import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
 import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
-import { ckbCore, getHeader } from 'services/chain'
+import { rpc, getHeader } from 'services/chain'
 import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 
 const { MILLISECONDS_IN_YEAR, MEDIUM_FEE_RATE } = CONSTANTS
@@ -239,23 +239,23 @@ export const useUpdateWithdrawList = ({
       return
     }
     const depositOutPointHashes = records.map(v => v.depositOutPoint?.txHash ?? v.outPoint.txHash)
-    ckbCore.rpc
+    rpc
       .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
         depositOutPointHashes.map(v => ['getTransaction', v])
       )
       .exec()
-      .then(txs => {
+      .then((txs: CKBComponents.TransactionWithStatus[]) => {
         const committedTx = txs.filter(v => v.txStatus.status === 'committed')
         const blockHashes = [
           ...(committedTx.map(v => v.txStatus.blockHash).filter(v => !!v) as string[]),
           ...(records.map(v => (v.depositOutPoint ? v.blockHash : null)).filter(v => !!v) as string[]),
         ]
-        return ckbCore.rpc
+        return rpc
           .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
             blockHashes.map(v => ['getHeader', v])
           )
           .exec()
-          .then(blockHeaders => {
+          .then((blockHeaders: CKBComponents.BlockHeader[]) => {
             const hashHeaderMap = new Map<CKBComponents.Hash, string>()
             blockHeaders.forEach((header, idx) => {
               hashHeaderMap.set(blockHashes[idx], header.dao)
@@ -308,10 +308,10 @@ export const useUpdateWithdrawList = ({
 
 const getBlockHashes = (txHashes: string[]) => {
   const batchParams: ['getTransaction', string][] = txHashes.map(v => ['getTransaction', v])
-  return ckbCore.rpc
+  return rpc
     .createBatchRequest<'getTransaction', [string], CKBComponents.TransactionWithStatus[]>(batchParams)
     .exec()
-    .then(res => {
+    .then((res: CKBComponents.TransactionWithStatus[]) => {
       return res.map((v, idx) => ({
         txHash: txHashes[idx],
         blockHash: v.txStatus.blockHash,
@@ -334,7 +334,7 @@ export const useUpdateDepositEpochList = ({
   useEffect(() => {
     if (connectionStatus === 'online') {
       getBlockHashes(records.map(v => v.depositOutPoint?.txHash).filter(v => !!v) as string[]).then(
-        depositBlockHashes => {
+        (depositBlockHashes: { txHash: string; blockHash: string | null }[]) => {
           const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
           records.forEach(record => {
@@ -349,10 +349,10 @@ export const useUpdateDepositEpochList = ({
               recordKeyIdx.push(v.txHash)
             }
           })
-          ckbCore.rpc
+          rpc
             .createBatchRequest<'getHeader', any, CKBComponents.BlockHeader[]>(batchParams)
             .exec()
-            .then(res => {
+            .then((res: CKBComponents.BlockHeader[]) => {
               const epochList = new Map()
               records.forEach(record => {
                 const key = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash

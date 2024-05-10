@@ -29,7 +29,7 @@ import {
   ShowGlobalDialog as ShowGlobalDialogSubject,
   NoDiskSpace,
 } from 'services/subjects'
-import { ckbCore, getTipHeader } from 'services/chain'
+import { rpc, getTipHeader } from 'services/chain'
 import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
@@ -78,13 +78,13 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
     }
     clearInterval(timer!)
     if (chainURL) {
-      ckbCore.setNode(chainURL)
+      rpc.setNode({ url: chainURL })
       syncBlockchainInfo()
       timer = setInterval(() => {
         syncBlockchainInfo()
       }, SYNC_INTERVAL_TIME)
     } else {
-      ckbCore.setNode('')
+      rpc.setNode({ url: '' })
     }
     return () => {
       clearInterval(timer)
