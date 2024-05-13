@@ -19,8 +19,10 @@ function multisigSerialize(blake160s: string[], r: number = 0, m: number = 1, n:
   return `0x${MULTI_DEFAULT_S}${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
 }
 
+const MULTISIGN_HASH_LENGTH = 42
+
 function multisigHash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {
-  return ckbHash(multisigSerialize(blake160s, r, m, n)).slice(0, 42)
+  return ckbHash(multisigSerialize(blake160s, r, m, n)).slice(0, MULTISIGN_HASH_LENGTH)
 }
 
 export function getMultisigAddress(blake160s: string[], r: number, m: number, n: number, isMainnet: boolean) {
