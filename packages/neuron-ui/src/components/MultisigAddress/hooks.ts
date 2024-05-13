@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
-import { isSuccessResponse, getMultisigAddress, DefaultLockInfo } from 'utils'
+import { isSuccessResponse, getMultisigAddress, DefaultLockInfo, addressToScript, scriptToAddress } from 'utils'
 import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
@@ -16,7 +16,6 @@ import {
   getMultisigSyncProgress,
 } from 'services/remote'
 import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
-import { addressToScript, scriptToAddress } from 'utils/scriptAndAddress'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')

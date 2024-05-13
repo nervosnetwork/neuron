@@ -3,7 +3,7 @@ import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
 import { NavigateFunction } from 'react-router-dom'
-import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
 import { rpc, getHeader } from 'services/chain'

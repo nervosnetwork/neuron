@@ -1,4 +1,4 @@
-import { addressToScript } from 'utils/scriptAndAddress'
+import { addressToScript } from 'utils'
 import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'
 import {
   ResponseCode,

@@ -7,11 +7,11 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
-import { scriptToAddress } from 'utils/scriptAndAddress'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   useGoBack,
+  scriptToAddress,
   shannonToCKBFormatter,
   sudtValueToAmount,
   sUDTAmountFormatter,

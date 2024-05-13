@@ -1,5 +1,5 @@
 import React from 'react'
-import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import {
   MultiSigLockInfo,
   LocktimeLockInfo,

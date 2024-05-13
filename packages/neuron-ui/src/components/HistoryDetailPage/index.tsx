@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { scriptToAddress } from 'utils/scriptAndAddress'
 import { calculateUnlockDaoMaximumWithdraw, getTransaction } from 'services/remote'
 import { showPageNotice, transactionState, useDispatch, useState as useGlobalState } from 'states'
-import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
@@ -18,6 +17,7 @@ import Breadcrum from 'widgets/Breadcrum'
 
 import {
   ErrorCode,
+  scriptToAddress,
   localNumberFormatter,
   uniformTimeFormatter,
   shannonToCKBFormatter,

@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toShortAddress } from 'utils/scriptAndAddress'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import { AddressQrCodeWithCopyZone } from 'components/Receive'
 import Dialog from 'widgets/Dialog'
 import Alert from 'widgets/Alert'
 
-import { CONSTANTS } from 'utils'
+import { CONSTANTS, toShortAddress } from 'utils'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import styles from './sUDTReceiveDialog.module.scss'
 

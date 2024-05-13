@@ -1,4 +1,4 @@
-import { toShortAddress } from 'utils/scriptAndAddress'
+import { toShortAddress } from 'utils'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { copyCanvas, downloadCanvas } from 'widgets/QRCode'
 

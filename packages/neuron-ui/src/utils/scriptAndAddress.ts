@@ -1,4 +1,4 @@
-import { Script } from '@ckb-lumos/base'
+import { type Script } from '@ckb-lumos/base'
 import { predefined } from '@ckb-lumos/config-manager'
 import { encodeToAddress, parseAddress, generateAddress } from '@ckb-lumos/helpers'
 

@@ -11,9 +11,8 @@ import {
   updateWallet,
   getPlatform,
 } from 'services/remote'
-import { ErrorCode, clsx, errorFormatter, isSuccessResponse, useDidMount } from 'utils'
+import { ErrorCode, clsx, errorFormatter, isSuccessResponse, toLongAddress, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
-import { toLongAddress } from 'utils/scriptAndAddress'
 import Alert from 'widgets/Alert'
 import styles from './receive.module.scss'
 

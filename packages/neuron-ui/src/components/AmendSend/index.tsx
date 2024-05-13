@@ -8,11 +8,11 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
 import { MIN_AMOUNT } from 'utils/const'
-import { scriptToAddress } from 'utils/scriptAndAddress'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   useGoBack,
+  scriptToAddress,
   shannonToCKBFormatter,
   RoutePath,
   isSecp256k1Address,
