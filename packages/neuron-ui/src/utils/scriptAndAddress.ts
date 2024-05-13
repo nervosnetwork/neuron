@@ -4,9 +4,7 @@ import { encodeToAddress, parseAddress, generateAddress } from '@ckb-lumos/helpe
 
 const { LINA: MAINNET, AGGRON4: TESTNET } = predefined
 
-export const CONFIGS = {
-  MAINNET,
-  TESTNET,
+const CONFIGS = {
   [MAINNET.PREFIX]: MAINNET,
   [TESTNET.PREFIX]: TESTNET,
 }
@@ -25,19 +23,11 @@ export const addressToScript = (address: string, { isMainnet = true }: { isMainn
   return parseAddress(address, { config })
 }
 
-export const toLongAddress = (address: string) => {
-  try {
-    return scriptToAddress(addressToScript(address), { isMainnet: address.startsWith(MAINNET.PREFIX) })
-  } catch {
-    return ''
-  }
-}
-
-export const toShortAddress = (address: string) => {
+export const addressToAddress = (address: string, { deprecated = false }: { deprecated?: boolean } = {}) => {
   try {
     return scriptToAddress(addressToScript(address), {
       isMainnet: address.startsWith(MAINNET.PREFIX),
-      deprecated: true,
+      deprecated,
     })
   } catch {
     return ''

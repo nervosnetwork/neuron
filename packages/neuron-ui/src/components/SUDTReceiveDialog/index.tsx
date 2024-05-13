@@ -5,7 +5,7 @@ import { AddressQrCodeWithCopyZone } from 'components/Receive'
 import Dialog from 'widgets/Dialog'
 import Alert from 'widgets/Alert'
 
-import { CONSTANTS, toShortAddress } from 'utils'
+import { CONSTANTS, addressToAddress } from 'utils'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import styles from './sUDTReceiveDialog.module.scss'
 
@@ -23,7 +23,7 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
   const [isInShortFormat, setIsInShortFormat] = useState(false)
   const { address, accountName, tokenName, symbol } = data
 
-  const displayedAddr = isInShortFormat ? toShortAddress(address) : address
+  const displayedAddr = isInShortFormat ? addressToAddress(address, { deprecated: true }) : address
 
   return (
     <Dialog

@@ -11,7 +11,7 @@ import {
   updateWallet,
   getPlatform,
 } from 'services/remote'
-import { ErrorCode, clsx, errorFormatter, isSuccessResponse, toLongAddress, useDidMount } from 'utils'
+import { ErrorCode, clsx, errorFormatter, isSuccessResponse, addressToAddress, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
 import Alert from 'widgets/Alert'
 import styles from './receive.module.scss'
@@ -27,7 +27,7 @@ const verifyAddressEqual = (source: string, target?: string) => {
     return false
   }
   if (source.length !== target.length) {
-    return toLongAddress(source) === toLongAddress(target)
+    return addressToAddress(source) === addressToAddress(target)
   }
   return source === target
 }

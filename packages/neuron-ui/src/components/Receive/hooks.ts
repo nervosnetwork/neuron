@@ -1,4 +1,4 @@
-import { toShortAddress } from 'utils'
+import { addressToAddress } from 'utils'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { copyCanvas, downloadCanvas } from 'widgets/QRCode'
 
@@ -31,7 +31,10 @@ export const useCopyAndDownloadQrCode = () => {
 
 export const useSwitchAddress = (address: string) => {
   const [isInShortFormat, setIsInShortFormat] = useState(false)
-  const showAddress = useMemo(() => (isInShortFormat ? toShortAddress(address) : address), [address, isInShortFormat])
+  const showAddress = useMemo(
+    () => (isInShortFormat ? addressToAddress(address, { deprecated: true }) : address),
+    [address, isInShortFormat]
+  )
   return {
     address: showAddress,
     isInShortFormat,
