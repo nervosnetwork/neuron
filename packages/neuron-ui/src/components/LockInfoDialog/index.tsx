@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import React, { useRef } from 'react'
-import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { scriptToAddress } from 'utils/scriptAndAddress'
 import Dialog from 'widgets/Dialog'
 import { useCopy, useDialog } from 'utils'
 import { Copy } from 'widgets/Icons/icon'
@@ -35,10 +36,7 @@ const ShortAddr = ({
     return null
   }
 
-  const shortAddr = bech32Address(lockScript.args, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-    codeHashOrCodeHashIndex: lock.CodeHashIndex,
-  })
+  const shortAddr = scriptToAddress(lockScript, { isMainnet, deprecated: true })
 
   return (
     <>

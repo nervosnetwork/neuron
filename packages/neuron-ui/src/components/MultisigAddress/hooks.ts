@@ -15,7 +15,8 @@ import {
   OfflineSignJSON,
   getMultisigSyncProgress,
 } from 'services/remote'
-import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { addressToScript, scriptToAddress } from 'utils/scriptAndAddress'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
@@ -124,7 +125,7 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
               codeHash: DefaultLockInfo.CodeHash,
               hashType: DefaultLockInfo.HashType,
             },
-            isMainnet
+            { isMainnet }
           )
         ),
         fullPayload: getMultisigAddress(entity.blake160s, entity.r, entity.m, entity.n, isMainnet),
@@ -324,7 +325,7 @@ export const useSubscription = ({
   const hashToPayload = useMemo(
     () =>
       configs.reduce<Record<string, string>>(
-        (pre, cur) => ({ ...pre, [scriptToHash(addressToScript(cur.fullPayload))]: cur.fullPayload }),
+        (pre, cur) => ({ ...pre, [computeScriptHash(addressToScript(cur.fullPayload))]: cur.fullPayload }),
         {}
       ),
     [configs]

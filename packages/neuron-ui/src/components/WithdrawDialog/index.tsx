@@ -5,7 +5,7 @@ import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpo
 import { getTransaction, getHeader } from 'services/chain'
 import Dialog from 'widgets/Dialog'
 import { Attention } from 'widgets/Icons/icon'
-import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
+import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/common-scripts/lib/dao'
 import styles from './withdrawDialog.module.scss'
 
 const { WITHDRAW_EPOCHS } = CONSTANTS
@@ -49,12 +49,14 @@ const WithdrawDialog = ({
         if (tx.txStatus.blockHash) {
           getHeader(tx.txStatus.blockHash).then(header => {
             setWithdrawValue(
-              calculateMaximumWithdraw(
-                tx.transaction.outputs[+record.outPoint.index] as CKBComponents.CellOutput,
-                tx.transaction.outputsData[+record.outPoint.index],
+              calculateMaximumWithdrawCompatible(
+                {
+                  cellOutput: tx.transaction.outputs[+record.outPoint.index],
+                  data: tx.transaction.outputsData[+record.outPoint.index],
+                },
                 header.dao,
                 tipDao
-              )
+              ).toHexString()
             )
           })
         }

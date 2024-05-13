@@ -1,4 +1,4 @@
-import { AddressPrefix, addressToScript, bech32Address } from '@nervosnetwork/ckb-sdk-utils'
+import { toShortAddress } from 'utils/scriptAndAddress'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { copyCanvas, downloadCanvas } from 'widgets/QRCode'
 
@@ -29,19 +29,9 @@ export const useCopyAndDownloadQrCode = () => {
   }
 }
 
-const toShortAddr = (addr: string) => {
-  try {
-    const script = addressToScript(addr)
-    const isMainnet = addr.startsWith(AddressPrefix.Mainnet)
-    return bech32Address(script.args, { prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet })
-  } catch {
-    return ''
-  }
-}
-
 export const useSwitchAddress = (address: string) => {
   const [isInShortFormat, setIsInShortFormat] = useState(false)
-  const showAddress = useMemo(() => (isInShortFormat ? toShortAddr(address) : address), [address, isInShortFormat])
+  const showAddress = useMemo(() => (isInShortFormat ? toShortAddress(address) : address), [address, isInShortFormat])
   return {
     address: showAddress,
     isInShortFormat,

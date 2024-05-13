@@ -7,7 +7,7 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from 'utils/scriptAndAddress'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
@@ -83,42 +83,42 @@ const AmendSUDTSend = () => {
     const list = sUDTAccounts.map(item => item.address)
 
     const to = transaction?.outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       if (list.includes(address) || (sudtInfo && !output.type)) {
         return false
       }
       return true
     })
     if (to) {
-      return scriptToAddress(to.lock, isMainnet)
+      return scriptToAddress(to.lock, { isMainnet })
     }
-    return scriptToAddress(transaction?.outputs[0].lock, isMainnet)
+    return scriptToAddress(transaction?.outputs[0].lock, { isMainnet })
   }, [transaction?.outputs])
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     const change = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
 
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
     if (change) {
-      return scriptToAddress(change.lock, isMainnet)
+      return scriptToAddress(change.lock, { isMainnet })
     }
 
     const receive = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!addresses.find(item => item.address === address && item.type === 0)
     })
     if (receive) {
-      return scriptToAddress(receive.lock, isMainnet)
+      return scriptToAddress(receive.lock, { isMainnet })
     }
 
     const sudt = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!sUDTAccounts.find(item => item.address === address)
     })
     if (sudt) {
-      return scriptToAddress(sudt.lock, isMainnet)
+      return scriptToAddress(sudt.lock, { isMainnet })
     }
     return ''
   }
@@ -133,7 +133,7 @@ const AmendSUDTSend = () => {
     if (transaction && transaction.outputs.length) {
       const lastOutputAddress = getLastOutputAddress(transaction.outputs)
       return transaction.outputs.map(output => {
-        const address = scriptToAddress(output.lock, isMainnet)
+        const address = scriptToAddress(output.lock, { isMainnet })
         return {
           capacity: output.capacity,
           address,

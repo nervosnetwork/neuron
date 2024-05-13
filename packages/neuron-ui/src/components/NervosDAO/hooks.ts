@@ -3,11 +3,12 @@ import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
 import { NavigateFunction } from 'react-router-dom'
+import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
-import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
 import { rpc, getHeader } from 'services/chain'
-import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
+import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
+import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/common-scripts/lib/dao'
 
 const { MILLISECONDS_IN_YEAR, MEDIUM_FEE_RATE } = CONSTANTS
 
@@ -290,12 +291,14 @@ export const useUpdateWithdrawList = ({
               }
               withdrawList.set(
                 key,
-                calculateMaximumWithdraw(
-                  tx.transaction.outputs[+formattedDepositOutPoint.index],
-                  tx.transaction.outputsData[+formattedDepositOutPoint.index],
+                calculateMaximumWithdrawCompatible(
+                  {
+                    cellOutput: tx.transaction.outputs[+formattedDepositOutPoint.index],
+                    data: tx.transaction.outputsData[+formattedDepositOutPoint.index],
+                  },
                   depositDAO,
                   withdrawDAO
-                )
+                ).toHexString()
               )
             })
             setWithdrawList(withdrawList)

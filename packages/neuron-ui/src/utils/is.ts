@@ -1,4 +1,4 @@
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from 'utils/scriptAndAddress'
 import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'
 import {
   ResponseCode,

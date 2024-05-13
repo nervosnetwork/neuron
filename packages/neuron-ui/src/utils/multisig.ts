@@ -1,4 +1,5 @@
-import { scriptToAddress, blake2b, PERSONAL, hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
+import { ckbHash } from '@ckb-lumos/base/lib/utils'
+import { scriptToAddress } from 'utils/scriptAndAddress'
 import { MultiSigLockInfo } from './enums'
 import { MAX_M_N_NUMBER } from './const'
 
@@ -19,10 +20,7 @@ function multisigSerialize(blake160s: string[], r: number = 0, m: number = 1, n:
 }
 
 function multisigHash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {
-  const serializeResult = multisigSerialize(blake160s, r, m, n)
-  const blake2bHash = blake2b(32, null, null, PERSONAL)
-  blake2bHash.update(hexToBytes(serializeResult))
-  return `0x${blake2bHash.digest('hex')}`.slice(0, 42)
+  return ckbHash(multisigSerialize(blake160s, r, m, n)).slice(0, 42)
 }
 
 export function getMultisigAddress(blake160s: string[], r: number, m: number, n: number, isMainnet: boolean) {
@@ -32,7 +30,7 @@ export function getMultisigAddress(blake160s: string[], r: number, m: number, n:
       codeHash: MultiSigLockInfo.CodeHash,
       hashType: MultiSigLockInfo.HashType,
     },
-    isMainnet
+    { isMainnet }
   )
 }
 

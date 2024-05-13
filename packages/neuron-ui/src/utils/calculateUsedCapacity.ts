@@ -1,3 +1,5 @@
+import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+
 const CODE_HASH_LENGTH = 32
 const HASH_TYPE_LENGTH = 1
 const CAPACITY_LENGTH = 8

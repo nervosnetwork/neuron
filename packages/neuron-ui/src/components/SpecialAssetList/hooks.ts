@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { number, bytes } from '@ckb-lumos/codec'
+import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
 import {

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from 'utils/scriptAndAddress'
 import { calculateUnlockDaoMaximumWithdraw, getTransaction } from 'services/remote'
 import { showPageNotice, transactionState, useDispatch, useState as useGlobalState } from 'states'
+import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
@@ -254,7 +255,7 @@ const HistoryDetailPage = () => {
       address = t('transaction.cell-from-cellbase')
     } else {
       try {
-        address = scriptToAddress(cell.lock, isMainnet)
+        address = scriptToAddress(cell.lock, { isMainnet })
       } catch (err) {
         console.error(err)
       }
