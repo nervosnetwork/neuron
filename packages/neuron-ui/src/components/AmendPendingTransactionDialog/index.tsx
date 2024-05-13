@@ -66,7 +66,7 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
   )
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && lastOutputsCapacity !== undefined) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
         if (item.output.data === DAO_DATA) {
@@ -86,7 +86,13 @@ const AmendPendingTransactionDialog = ({ tx, onClose }: { tx: State.Transaction;
     }
   }, [lastOutputsCapacity, transaction, items, setGeneratedTx])
 
-  const disabled = !!(isSending || !generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT)
+  const disabled = !!(
+    isSending ||
+    !generatedTx ||
+    priceError ||
+    lastOutputsCapacity === undefined ||
+    lastOutputsCapacity < MIN_AMOUNT
+  )
 
   return (
     <>

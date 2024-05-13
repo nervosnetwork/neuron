@@ -136,11 +136,11 @@ const AmendSend = () => {
 
       return inputsCapacity - outputsCapacity - fee
     }
-    return -1
+    return undefined
   }, [transaction, fee, outputsCapacity])
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && lastOutputsCapacity !== undefined) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
         return {
@@ -158,7 +158,8 @@ const AmendSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT
+  const disabled =
+    sending || !send.generatedTx || priceError || lastOutputsCapacity === undefined || lastOutputsCapacity < MIN_AMOUNT
 
   return (
     <PageContainer

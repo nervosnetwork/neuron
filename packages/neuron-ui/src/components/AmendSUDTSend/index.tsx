@@ -105,7 +105,7 @@ const AmendSUDTSend = () => {
   }, [transaction?.outputs])
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && lastOutputsCapacity !== undefined) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
         return {
@@ -126,7 +126,8 @@ const AmendSUDTSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch, experimental?.params?.description, description])
 
-  const disabled = sending || !experimental?.tx || priceError || lastOutputsCapacity < 0
+  const disabled =
+    sending || !experimental?.tx || priceError || lastOutputsCapacity === undefined || lastOutputsCapacity < 0
 
   return (
     <PageContainer

@@ -223,7 +223,7 @@ export const useOutputs = ({
 
       return inputsCapacity - outputsCapacity - fee
     }
-    return -1
+    return undefined
   }, [transaction, fee, outputsCapacity])
 
   return {
