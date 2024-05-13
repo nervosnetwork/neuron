@@ -1,0 +1,28 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  width: 680px;
+
+  .content {
+    background: var(--table-head-background-color);
+    border-radius: 8px;
+
+    .item {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--divide-line-color);
+      font-size: 14px;
+      color: var(--main-text-color);
+      &:last-child {
+        border-bottom: none;
+      }
+      p {
+        margin: 0;
+      }
+      .description {
+        font-weight: 500;
+      }
+    }
+  }
+}

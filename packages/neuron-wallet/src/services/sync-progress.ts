@@ -68,6 +68,11 @@ export default class SyncProgressService {
     return res
   }
 
+  static async getExistingSyncArgses() {
+    const syncProgresses = await getConnection().getRepository(SyncProgress).createQueryBuilder().getMany()
+    return new Set(syncProgresses.map(v => v.args))
+  }
+
   static async getAllSyncStatusToMap() {
     const result: Map<CKBComponents.Hash, SyncProgress> = new Map()
     const syncProgresses = await getConnection()
@@ -131,5 +136,12 @@ export default class SyncProgressService {
       .update(SyncProgress)
       .set({ localSavedBlockNumber: 0, syncedBlockNumber: 0 })
       .execute()
+  }
+
+  static async deleteWalletSyncProgress(walletId: string) {
+    await getConnection().getRepository(SyncProgress).delete({
+      walletId,
+      addressType: SyncAddressType.Default,
+    })
   }
 }

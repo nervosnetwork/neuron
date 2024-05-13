@@ -1,0 +1,30 @@
+@import '../../../styles/mixin.scss';
+
+.content {
+  text-align: center;
+
+  .secTitle {
+    color: var(--secondary-text-color);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .password {
+    margin-top: 24px;
+  }
+
+  .err {
+    color: var(--error-color);
+    margin: 16px 0 24px 0;
+  }
+}
+
+.dialog {
+  width: 680px;
+}
+
+.notice {
+  @include dialog-copy-animation;
+}

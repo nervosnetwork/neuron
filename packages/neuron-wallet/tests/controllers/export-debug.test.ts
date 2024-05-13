@@ -36,7 +36,7 @@ jest.mock('fs', () => {
     createWriteStream: () => null,
     readFileSync: () => JSON.stringify({}),
     writeFileSync: () => jest.fn(),
-    existsSync: () => jest.fn(),
+    existsSync: () => jest.fn()(),
   }
 })
 
@@ -84,6 +84,18 @@ jest.mock('../../src/services/light-runner', () => {
           },
         }
       },
+    },
+  }
+})
+
+jest.mock('../../src/services/wallets', () => {
+  return {
+    getInstance() {
+      return {
+        getAll() {
+          return []
+        },
+      }
     },
   }
 })
@@ -148,7 +160,7 @@ describe('Test ExportDebugController', () => {
       expect(showErrorBoxMock).not.toHaveBeenCalled()
       expect(logger.error).not.toHaveBeenCalled()
 
-      const csv = ['walletId,addressType,addressIndex,publicKeyInBlake160\n', '0,0,0,hash1\n', '1,1,1,hash2\n'].join('')
+      const csv = ['index,addressType,addressIndex,publicKeyInBlake160\n', '0,0,0,hash1\n', '1,1,1,hash2\n'].join('')
       expect(archiveAppendMock).toHaveBeenCalledWith(csv, expect.objectContaining({ name: 'hd_public_key_info.csv' }))
     })
   })

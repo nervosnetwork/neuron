@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getFeeRateStats } from 'services/chain'
+import { getFeeRateStatistics } from 'services/chain'
 import { MEDIUM_FEE_RATE, METHOD_NOT_FOUND } from 'utils/const'
 
 type CountdownOptions = {
@@ -16,7 +16,7 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
   }>({ suggestFeeRate: MEDIUM_FEE_RATE })
 
   const handleGetFeeRateStatis = useCallback(() => {
-    getFeeRateStats()
+    getFeeRateStatistics()
       .then(res => {
         const { mean, median } = res ?? {}
         const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
