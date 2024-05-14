@@ -41,7 +41,7 @@ export default class SudtTokenInfoService {
       .execute()
   }
 
-  static getSudtTokenInfo(typeArgs: string): Promise<SudtTokenInfoEntity | undefined> {
+  static getSudtTokenInfo(typeArgs: string): Promise<SudtTokenInfoEntity | null> {
     return getConnection()
       .getRepository(SudtTokenInfoEntity)
       .createQueryBuilder('info')

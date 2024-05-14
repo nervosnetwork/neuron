@@ -106,13 +106,13 @@ describe('CellLocalInfoService', () => {
   describe('updateLiveCellLockStatus', () => {
     it('create new entity', async () => {
       await CellLocalInfoService.updateLiveCellLockStatus(outPoints, true)
-      await expect(getConnection().getRepository(CellLocalInfo).find({ locked: true })).resolves.toHaveLength(2)
+      await expect(getConnection().getRepository(CellLocalInfo).findBy({ locked: true })).resolves.toHaveLength(2)
     })
     it('update entity locked', async () => {
       await CellLocalInfoService.updateLiveCellLockStatus(outPoints, true)
-      await expect(getConnection().getRepository(CellLocalInfo).find({ locked: true })).resolves.toHaveLength(2)
+      await expect(getConnection().getRepository(CellLocalInfo).findBy({ locked: true })).resolves.toHaveLength(2)
       await CellLocalInfoService.updateLiveCellLockStatus(outPoints, false)
-      await expect(getConnection().getRepository(CellLocalInfo).find({ locked: false })).resolves.toHaveLength(2)
+      await expect(getConnection().getRepository(CellLocalInfo).findBy({ locked: false })).resolves.toHaveLength(2)
     })
   })
 

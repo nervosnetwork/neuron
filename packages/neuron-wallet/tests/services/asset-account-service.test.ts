@@ -132,7 +132,7 @@ describe('AssetAccountService', () => {
   const AssetAccountService = require('../../src/services/asset-account-service').default
 
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
   })
 
   afterAll(async () => {

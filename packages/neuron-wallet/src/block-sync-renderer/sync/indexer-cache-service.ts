@@ -149,7 +149,7 @@ export default class IndexerCacheService {
       cacheBlockNumberEntity =
         (await getConnection()
           .getRepository(SyncInfoEntity)
-          .findOne({ name: SyncInfoEntity.getLastCachedKey(blake160) })) ??
+          .findOneBy({ name: SyncInfoEntity.getLastCachedKey(blake160) })) ??
         SyncInfoEntity.fromObject({
           name: SyncInfoEntity.getLastCachedKey(blake160),
           value: '0x0',
