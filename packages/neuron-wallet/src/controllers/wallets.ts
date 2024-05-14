@@ -5,8 +5,9 @@ import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '..
 import NetworksService from '../services/networks'
 import Keystore from '../models/keys/keystore'
 import Keychain from '../models/keys/keychain'
-import { validateMnemonic, mnemonicToSeedSync } from '../models/keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from '../models/keys/key'
+import { validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
+import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../models/keys/key'
+import { generateMnemonic } from '@ckb-lumos/hd/lib/mnemonic'
 import CommandSubject from '../models/subjects/command'
 import { ResponseCode } from '../utils/const'
 import {

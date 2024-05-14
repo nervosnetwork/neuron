@@ -1,7 +1,7 @@
 import WalletService from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
-import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
+import { mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
 import TransactionSender from '../../src/services/transaction-sender'
 import { signWitnesses } from '../../src/utils/signWitnesses'

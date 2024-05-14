@@ -1,7 +1,8 @@
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
-import Address, { AddressType } from './address'
+import { AddressType } from '@ckb-lumos/hd'
+import Address from './address'
 
 export default class HdPublicKeyInfoModel {
   public walletId: string

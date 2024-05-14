@@ -1,5 +1,5 @@
 import { DeviceInfo } from '../../src/services/hardware/common'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import type { Subscriber } from 'rxjs'
 
 enum Manufacturer {

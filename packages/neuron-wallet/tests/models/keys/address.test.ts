@@ -1,4 +1,5 @@
-import Address, { AddressType, publicKeyToAddress } from '../../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
+import Address, { publicKeyToAddress } from '../../../src/models/keys/address'
 
 describe('address', () => {
   it('path from index', () => {

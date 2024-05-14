@@ -1,5 +1,5 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import SystemScriptInfo from '../../src/models/system-script-info'
 
 const walletId1 = 'w1'

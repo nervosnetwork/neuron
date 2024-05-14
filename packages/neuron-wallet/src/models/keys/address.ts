@@ -1,11 +1,11 @@
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import { AccountExtendedPublicKey } from './key'
 import { systemScripts } from '../../utils/systemScripts'
-import hd from '@ckb-lumos/hd'
+import { key, AddressType } from '@ckb-lumos/hd'
 
-export enum AddressType {
-  Receiving = 0, // External chain
-  Change = 1, // Internal chain
+export enum DefaultAddressNumber {
+  Receiving = 20,
+  Change = 10,
 }
 
 export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
@@ -14,7 +14,7 @@ export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
     {
       codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
       hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
-      args: hd.key.publicKeyToBlake160(pubkey),
+      args: key.publicKeyToBlake160(pubkey),
     },
     isMainnet
   )

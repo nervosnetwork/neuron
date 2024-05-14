@@ -1,7 +1,7 @@
 import Keystore from '../../src/models/keys/keystore'
 import { when } from 'jest-when'
 import { WalletFunctionNotSupported, DuplicateImportWallet } from '../../src/exceptions/wallet'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import { Manufacturer } from '../../src/services/hardware/common'
 
 const stubbedDeletedByWalletIdFn = jest.fn()

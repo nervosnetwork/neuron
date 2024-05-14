@@ -1,10 +1,5 @@
-import {
-  ExtendedPublicKey,
-  AccountExtendedPublicKey,
-  ExtendedPrivateKey,
-  generateMnemonic,
-} from '../../../src/models/keys/key'
-import { AddressType } from '../../../src/models/keys/address'
+import { ExtendedPublicKey, AccountExtendedPublicKey, ExtendedPrivateKey } from '../../../src/models/keys/key'
+import { AddressType } from '@ckb-lumos/hd'
 
 const fixture = {
   privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
@@ -68,12 +63,5 @@ describe('extended private key', () => {
     const extendedKey = new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode).toExtendedPublicKey()
     expect(extendedKey.publicKey).toEqual(fixture.publicKey)
     expect(extendedKey.chainCode).toEqual(fixture.chainCode)
-  })
-})
-
-describe('generate mnemonic', () => {
-  it('generate 12 words code', () => {
-    const mnemonic = generateMnemonic()
-    expect(mnemonic.split(' ').length).toBe(12)
   })
 })

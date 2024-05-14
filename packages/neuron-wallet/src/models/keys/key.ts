@@ -1,8 +1,6 @@
-import crypto from 'crypto'
-
-import Address, { AddressType } from './address'
+import { AddressType } from '@ckb-lumos/hd'
+import Address from './address'
 import Keychain, { privateToPublic } from './keychain'
-import { entropyToMnemonic } from './mnemonic'
 
 export interface PathAndPrivateKey {
   path: string
@@ -94,21 +92,4 @@ export class ExtendedPrivateKey {
   static parse = (serialized: string) => {
     return new ExtendedPrivateKey(serialized.slice(0, 64), serialized.slice(64))
   }
-}
-
-export enum DefaultAddressNumber {
-  Receiving = 20,
-  Change = 10,
-}
-
-export interface Addresses {
-  receiving: Address[]
-  change: Address[]
-}
-
-// Generate 12 words mnemonic code
-export const generateMnemonic = () => {
-  const entropySize = 16
-  const entropy = crypto.randomBytes(entropySize).toString('hex')
-  return entropyToMnemonic(entropy)
 }
