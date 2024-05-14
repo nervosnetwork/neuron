@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'
@@ -8,12 +9,12 @@ import {
   outputsToTotalAmount,
   CKBToShannonFormatter,
   shannonToCKBFormatter,
+  scriptToAddress,
   calculateFee,
   validateOutputs,
   DefaultLockInfo,
   RoutePath,
 } from 'utils'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { PlaceHolderArgs } from 'utils/const'
 import { useNavigate } from 'react-router-dom'
 
@@ -436,7 +437,7 @@ export const useInitialize = ({
               hashType: DefaultLockInfo.HashType,
               args: PlaceHolderArgs,
             },
-            isMainnet
+            { isMainnet }
           ),
       })),
       price,

@@ -8,11 +8,11 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
 import { MIN_AMOUNT } from 'utils/const'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   useGoBack,
+  scriptToAddress,
   shannonToCKBFormatter,
   RoutePath,
   isSecp256k1Address,
@@ -68,11 +68,11 @@ const AmendSend = () => {
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     if (outputs.length === 1) {
-      return scriptToAddress(outputs[0].lock, isMainnet)
+      return scriptToAddress(outputs[0].lock, { isMainnet })
     }
 
     const change = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       if (!isSecp256k1Address(address)) {
         navigate(`${RoutePath.History}/amendSUDTSend/${hash}`, {
           replace: true,
@@ -82,15 +82,15 @@ const AmendSend = () => {
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
     if (change) {
-      return scriptToAddress(change.lock, isMainnet)
+      return scriptToAddress(change.lock, { isMainnet })
     }
 
     const receive = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!addresses.find(item => item.address === address && item.type === 0)
     })
     if (receive) {
-      return scriptToAddress(receive.lock, isMainnet)
+      return scriptToAddress(receive.lock, { isMainnet })
     }
 
     return ''
@@ -106,7 +106,7 @@ const AmendSend = () => {
     if (transaction && transaction.outputs.length) {
       const lastOutputAddress = getLastOutputAddress(transaction.outputs)
       return transaction.outputs.map(output => {
-        const address = scriptToAddress(output.lock, isMainnet)
+        const address = scriptToAddress(output.lock, { isMainnet })
         return {
           capacity: output.capacity,
           address,

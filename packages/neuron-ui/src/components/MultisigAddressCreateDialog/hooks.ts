@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
-import { validateAddress, isSecp256k1Address, getMultisigAddress } from 'utils'
+import { validateAddress, isSecp256k1Address, getMultisigAddress, addressToScript } from 'utils'
 import { useTranslation } from 'react-i18next'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 import { MAX_M_N_NUMBER } from 'utils/const'
 
