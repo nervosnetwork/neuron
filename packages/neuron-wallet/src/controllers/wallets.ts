@@ -4,7 +4,7 @@ import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } f
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
 import Keystore from '../models/keys/keystore'
-import Keychain from '../models/keys/keychain'
+import { Keychain } from '@ckb-lumos/hd'
 import { validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../models/keys/key'
 import { generateMnemonic } from '@ckb-lumos/hd/lib/mnemonic'

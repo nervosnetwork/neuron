@@ -1,6 +1,6 @@
-import { AddressType } from '@ckb-lumos/hd'
+import { AddressType, Keychain } from '@ckb-lumos/hd'
+import { privateToPublic } from '@ckb-lumos/hd/lib/key'
 import Address from './address'
-import Keychain, { privateToPublic } from './keychain'
 
 export interface PathAndPrivateKey {
   path: string

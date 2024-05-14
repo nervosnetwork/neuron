@@ -9,7 +9,6 @@ import { Address } from '../models/address'
 import FeeMode from '../models/fee-mode'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import Keychain from '../models/keys/keychain'
 import Input from '../models/chain/input'
 import OutPoint from '../models/chain/out-point'
 import Output from '../models/chain/output'
@@ -43,7 +42,7 @@ import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
-import hd from '@ckb-lumos/hd'
+import { key, Keychain } from '@ckb-lumos/hd'
 import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/common-scripts'
@@ -429,7 +428,7 @@ export default class TransactionSender {
     if (!wallet.isHardware()) {
       // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
-      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
+      emptyWitness.lock = key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]
