@@ -3,10 +3,9 @@ import { t } from 'i18next'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
-import Keystore from '../models/keys/keystore'
-import { Keychain } from '@ckb-lumos/hd'
+import { Keychain, Keystore, ExtendedPrivateKey } from '@ckb-lumos/hd'
 import { validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../models/keys/key'
+import { AccountExtendedPublicKey } from '../models/keys/key'
 import { generateMnemonic } from '@ckb-lumos/hd/lib/mnemonic'
 import CommandSubject from '../models/subjects/command'
 import { ResponseCode } from '../utils/const'
@@ -107,8 +106,8 @@ export default class WalletsController {
       throw new InvalidMnemonic()
     }
     const extendedKey = new ExtendedPrivateKey(
-      masterKeychain.privateKey.toString('hex'),
-      masterKeychain.chainCode.toString('hex')
+      `0x${masterKeychain.privateKey.toString('hex')}`,
+      `0x${masterKeychain.chainCode.toString('hex')}`
     )
     const keystore = Keystore.create(extendedKey, password)
 

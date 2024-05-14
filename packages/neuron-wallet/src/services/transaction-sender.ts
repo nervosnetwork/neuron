@@ -927,8 +927,8 @@ export default class TransactionSender {
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
-      Buffer.from(masterPrivateKey.privateKey, 'hex'),
-      Buffer.from(masterPrivateKey.chainCode, 'hex')
+      Buffer.from(masterPrivateKey.privateKey.slice(2), 'hex'),
+      Buffer.from(masterPrivateKey.chainCode.slice(2), 'hex')
     )
 
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)

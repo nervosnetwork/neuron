@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
-import Keystore from '../models/keys/keystore'
+import { Keystore } from '@ckb-lumos/hd'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
 import { AccountExtendedPublicKey } from '../models/keys/key'
