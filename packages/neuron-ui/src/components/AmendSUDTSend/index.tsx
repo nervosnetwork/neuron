@@ -7,11 +7,11 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   useGoBack,
+  scriptToAddress,
   shannonToCKBFormatter,
   sudtValueToAmount,
   sUDTAmountFormatter,
@@ -92,16 +92,16 @@ const AmendSUDTSend = () => {
     const list = sUDTAccounts.map(item => item.address)
 
     const to = transaction?.outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       if (list.includes(address) || (sudtInfo && !output.type)) {
         return false
       }
       return true
     })
     if (to) {
-      return scriptToAddress(to.lock, isMainnet)
+      return scriptToAddress(to.lock, { isMainnet })
     }
-    return scriptToAddress(transaction?.outputs[0].lock, isMainnet)
+    return scriptToAddress(transaction?.outputs[0].lock, { isMainnet })
   }, [transaction?.outputs])
 
   useEffect(() => {
