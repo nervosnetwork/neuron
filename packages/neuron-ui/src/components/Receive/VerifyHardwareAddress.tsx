@@ -11,9 +11,8 @@ import {
   updateWallet,
   getPlatform,
 } from 'services/remote'
-import { ErrorCode, clsx, errorFormatter, isSuccessResponse, useDidMount } from 'utils'
+import { ErrorCode, clsx, errorFormatter, isSuccessResponse, addressToAddress, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
-import { AddressPrefix, addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import Alert from 'widgets/Alert'
 import styles from './receive.module.scss'
 
@@ -23,22 +22,12 @@ export interface VerifyHardwareAddressProps {
   onClose?: () => void
 }
 
-const toLongAddr = (addr: string) => {
-  try {
-    const script = addressToScript(addr)
-    const isMainnet = addr.startsWith(AddressPrefix.Mainnet)
-    return scriptToAddress(script, isMainnet)
-  } catch {
-    return ''
-  }
-}
-
 const verifyAddressEqual = (source: string, target?: string) => {
   if (!target) {
     return false
   }
   if (source.length !== target.length) {
-    return toLongAddr(source) === toLongAddr(target)
+    return addressToAddress(source) === addressToAddress(target)
   }
   return source === target
 }

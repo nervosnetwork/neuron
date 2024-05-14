@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { calculateUnlockDaoMaximumWithdraw, getTransaction } from 'services/remote'
 import { showPageNotice, transactionState, useDispatch, useState as useGlobalState } from 'states'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
@@ -17,6 +17,7 @@ import Breadcrum from 'widgets/Breadcrum'
 
 import {
   ErrorCode,
+  scriptToAddress,
   localNumberFormatter,
   uniformTimeFormatter,
   shannonToCKBFormatter,
@@ -254,7 +255,7 @@ const HistoryDetailPage = () => {
       address = t('transaction.cell-from-cellbase')
     } else {
       try {
-        address = scriptToAddress(cell.lock, isMainnet)
+        address = scriptToAddress(cell.lock, { isMainnet })
       } catch (err) {
         console.error(err)
       }
