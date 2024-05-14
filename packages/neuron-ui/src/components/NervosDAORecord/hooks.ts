@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { getHeader } from 'services/chain'
 import { calculateAPC, CONSTANTS } from 'utils'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 
 const { MILLISECONDS_IN_YEAR } = CONSTANTS
 

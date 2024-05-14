@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals'
 import { MultisigConfig } from 'services/remote'
-import getMultisigSignStatus from 'utils/getMultisigSignStatus'
-import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, getMultisigSignStatus } from 'utils'
+import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
 
 const addresses = [
   'ckt1qyqwh5hmt8j59njztrfz6z0s9wug3nv5qysqrnfm2h',
@@ -18,7 +18,7 @@ const multisigConfig: MultisigConfig = {
   blake160s: addresses.map(v => addressToScript(v).args),
   fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2f2scddm0lvmq36hmzx8nfhw8ucxzslhqussgky',
 }
-const fullPayloadHash = scriptToHash(addressToScript(multisigConfig.fullPayload))
+const fullPayloadHash = computeScriptHash(addressToScript(multisigConfig.fullPayload))
 
 describe('Test getCompensationPeriod', () => {
   // first sign but no match address
