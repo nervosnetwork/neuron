@@ -3,9 +3,8 @@ import { PasswordIncorrectException } from 'exceptions'
 import { TFunction } from 'i18next'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
 import { getTransaction as getSentTransaction, sendTx, invokeShowErrorMessage } from 'services/remote'
-import { isSuccessResponse, ErrorCode, shannonToCKBFormatter } from 'utils'
+import { isSuccessResponse, ErrorCode, shannonToCKBFormatter, scriptToAddress } from 'utils'
 import { FEE_RATIO } from 'utils/const'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
 export const useInitialize = ({
   tx,
@@ -155,32 +154,32 @@ export const useOutputs = ({
 }) => {
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     if (outputs.length === 1) {
-      return scriptToAddress(outputs[0].lock, isMainnet)
+      return scriptToAddress(outputs[0].lock, { isMainnet })
     }
 
     const change = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
 
     if (change) {
-      return scriptToAddress(change.lock, isMainnet)
+      return scriptToAddress(change.lock, { isMainnet })
     }
 
     const receive = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!addresses.find(item => item.address === address && item.type === 0)
     })
     if (receive) {
-      return scriptToAddress(receive.lock, isMainnet)
+      return scriptToAddress(receive.lock, { isMainnet })
     }
 
     const sudt = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!sUDTAccounts.find(item => item.address === address)
     })
     if (sudt) {
-      return scriptToAddress(sudt.lock, isMainnet)
+      return scriptToAddress(sudt.lock, { isMainnet })
     }
     return ''
   }
@@ -195,7 +194,7 @@ export const useOutputs = ({
     if (transaction && transaction.outputs.length) {
       const lastOutputAddress = getLastOutputAddress(transaction.outputs)
       return transaction.outputs.map(output => {
-        const address = scriptToAddress(output.lock, isMainnet)
+        const address = scriptToAddress(output.lock, { isMainnet })
         return {
           capacity: output.capacity,
           address,
