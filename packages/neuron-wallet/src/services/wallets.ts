@@ -1,10 +1,9 @@
 import { v4 as uuid } from 'uuid'
 import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
-import { Keystore } from '@ckb-lumos/hd'
+import { Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { AccountExtendedPublicKey } from '../models/keys/key'
 import { DefaultAddressNumber } from '../models/keys/address'
 import { Address as AddressInterface } from '../models/address'
 
@@ -18,6 +17,7 @@ import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import SyncProgressService from './sync-progress'
+import { Ox } from '../utils/scriptAndAddress'
 
 const fileService = FileService.getInstance()
 
@@ -57,7 +57,7 @@ export abstract class Wallet {
 
     this.id = id
     this.name = name
-    this.extendedKey = extendedKey
+    this.extendedKey = Ox(extendedKey)
     this.device = device
     this.isHD = isHDWallet ?? true
     this.startBlockNumber = startBlockNumber
@@ -150,7 +150,7 @@ export class FileKeystoreWallet extends Wallet {
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+    return AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   public toJSON = () => {
@@ -236,7 +236,7 @@ export class HardwareWallet extends Wallet {
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+    return AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   static fromJSON = (json: WalletProperties) => {
@@ -390,7 +390,7 @@ export default class WalletService {
     if (!props) {
       throw new IsRequired('wallet property')
     }
-
+    props = { ...props, extendedKey: Ox(props.extendedKey) }
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
     if (index !== -1) {

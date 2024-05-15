@@ -1,6 +1,6 @@
-import { AccountExtendedPublicKey } from '../models/keys/key'
+import { AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { AddressType } from '@ckb-lumos/hd'
-import Address, { publicKeyToAddress, DefaultAddressNumber } from '../models/keys/address'
+import { publicKeyToAddress, DefaultAddressNumber } from '../models/keys/address'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import NetworksService from '../services/networks'
@@ -261,25 +261,21 @@ export default class AddressService {
   }
 
   private static toAddress = (addressMetaInfo: AddressMetaInfo): AddressInterface => {
-    const path: string = Address.pathFor(addressMetaInfo.addressType, addressMetaInfo.addressIndex)
-    const address: string = addressMetaInfo.accountExtendedPublicKey.address(
+    const info = addressMetaInfo.accountExtendedPublicKey.publicKeyInfo(
       addressMetaInfo.addressType,
-      addressMetaInfo.addressIndex,
-      NetworksService.getInstance().isMainnet()
-    ).address
+      addressMetaInfo.addressIndex
+    )
 
-    const blake160: string = AddressParser.toBlake160(address)
-
-    const addressInfo: AddressInterface = {
+    const address: AddressInterface = {
       walletId: addressMetaInfo.walletId,
-      address,
-      path,
+      address: publicKeyToAddress(info.publicKey, NetworksService.getInstance().isMainnet()),
+      path: info.path,
       addressType: addressMetaInfo.addressType,
       addressIndex: addressMetaInfo.addressIndex,
-      blake160,
+      blake160: info.blake160,
     }
 
-    return addressInfo
+    return address
   }
 
   private static async maxAddressIndex(walletId: string, addressType: AddressType): Promise<number | undefined> {

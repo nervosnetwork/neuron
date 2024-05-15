@@ -1,7 +1,6 @@
 import WalletService from '../../src/services/wallets'
-import { Keychain, Keystore, ExtendedPrivateKey } from '@ckb-lumos/hd'
+import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
-import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import TransactionSender from '../../src/services/transaction-sender'
 import { signWitnesses } from '../../src/utils/signWitnesses'
 
@@ -53,8 +52,8 @@ describe('get keys with paths', () => {
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      `0x${accountKeychain.publicKey.toString('hex')}`,
+      `0x${accountKeychain.chainCode.toString('hex')}`
     )
 
     const wallet = walletService.create({

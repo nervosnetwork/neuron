@@ -1,7 +1,8 @@
 import { when } from 'jest-when'
 import { WalletFunctionNotSupported, DuplicateImportWallet } from '../../src/exceptions/wallet'
-import { AddressType, Keystore } from '@ckb-lumos/hd'
+import { AddressType, Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { Manufacturer } from '../../src/services/hardware/common'
+import { Ox } from '../../src/utils/scriptAndAddress'
 
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyQueue = jest.fn()
@@ -31,7 +32,6 @@ jest.doMock('../../src/services/addresses', () => {
   }
 })
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
-import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
@@ -53,8 +53,8 @@ describe('wallet service', () => {
   let wallet3: WalletProperties
   let wallet4: WalletProperties
   let wallet5: WalletProperties
-  const fakePublicKey = 'keykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykey'
-  const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
+  const fakePublicKey = 'abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc'
+  const fakeChainCode = '1234123412341234123412341234123412341234123412341234123412341234'
 
   beforeAll(async () => {
     await initConnection()
@@ -98,7 +98,7 @@ describe('wallet service', () => {
     wallet2 = {
       name: 'wallet-test2',
       id: '',
-      extendedKey: 'a',
+      extendedKey: 'b'.repeat(66) + '2'.repeat(64),
       keystore: new Keystore(
         {
           cipher: 'wallet2',
@@ -121,7 +121,7 @@ describe('wallet service', () => {
     wallet3 = {
       name: 'wallet-test3',
       id: '',
-      extendedKey: 'b',
+      extendedKey: 'c'.repeat(66) + '3'.repeat(64),
       keystore: new Keystore(
         {
           cipher: 'wallet3',
@@ -144,7 +144,7 @@ describe('wallet service', () => {
     wallet4 = {
       name: 'wallet-test4',
       id: '',
-      extendedKey: 'a'.repeat(66) + 'b'.repeat(64),
+      extendedKey: Ox('a'.repeat(66) + 'b'.repeat(64)),
       device: {
         manufacturer: Manufacturer.Ledger,
         product: 'Nano S',
@@ -159,7 +159,7 @@ describe('wallet service', () => {
     wallet5 = {
       name: 'wallet-test5',
       id: '',
-      extendedKey: 'a',
+      extendedKey: 'b'.repeat(66) + '2'.repeat(64),
       keystore: new Keystore(
         {
           cipher: 'wallet5',
@@ -208,8 +208,8 @@ describe('wallet service', () => {
       it('returns xpubkey', () => {
         const wallet = walletService.get(createdWallet.id)
         const extendedPublicKey = wallet.accountExtendedPublicKey()
-        expect(extendedPublicKey.publicKey).toEqual(fakePublicKey)
-        expect(extendedPublicKey.chainCode).toEqual(fakeChainCode)
+        expect(extendedPublicKey.publicKey).toEqual(Ox(fakePublicKey))
+        expect(extendedPublicKey.chainCode).toEqual(Ox(fakeChainCode))
       })
     })
     describe('#getDeviceInfo', () => {
@@ -440,14 +440,14 @@ describe('wallet service', () => {
     it('generates addresses for wallets not having addresses', () => {
       expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
         walletId: createdWallet2.id,
-        extendedKey: expect.objectContaining({ publicKey: 'a' }),
+        extendedKey: expect.objectContaining({ publicKey: Ox('b'.repeat(66)) }),
         isImporting: false,
         receivingAddressCount: 20,
         changeAddressCount: 10,
       })
       expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
         walletId: createdWallet3.id,
-        extendedKey: expect.objectContaining({ publicKey: 'b' }),
+        extendedKey: expect.objectContaining({ publicKey: Ox('c'.repeat(66)) }),
         isImporting: false,
         receivingAddressCount: 20,
         changeAddressCount: 10,
@@ -527,7 +527,7 @@ describe('wallet service', () => {
       } catch (error) {
         const { extendedKey, id } = JSON.parse(error.message)
         await walletService.replace(createdWallet2.id, id)
-        expect(extendedKey).toBe('a')
+        expect(extendedKey).toBe(Ox('b'.repeat(66) + '2'.repeat(64)))
         expect(() => walletService.get(createdWallet2.id)).toThrowError()
         expect(walletService.get(id).name).toBe(wallet5.name)
       }

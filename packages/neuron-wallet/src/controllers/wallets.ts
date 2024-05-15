@@ -1,12 +1,11 @@
 import fs from 'fs'
 import { t } from 'i18next'
+import { Ox } from '../utils/scriptAndAddress'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
-import { Keychain, Keystore, ExtendedPrivateKey } from '@ckb-lumos/hd'
-import { validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
-import { AccountExtendedPublicKey } from '../models/keys/key'
-import { generateMnemonic } from '@ckb-lumos/hd/lib/mnemonic'
+import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { generateMnemonic, validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import CommandSubject from '../models/subjects/command'
 import { ResponseCode } from '../utils/const'
 import {
@@ -106,15 +105,15 @@ export default class WalletsController {
       throw new InvalidMnemonic()
     }
     const extendedKey = new ExtendedPrivateKey(
-      `0x${masterKeychain.privateKey.toString('hex')}`,
-      `0x${masterKeychain.chainCode.toString('hex')}`
+      Ox(masterKeychain.privateKey.toString('hex')),
+      Ox(masterKeychain.chainCode.toString('hex'))
     )
     const keystore = Keystore.create(extendedKey, password)
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      Ox(accountKeychain.publicKey.toString('hex')),
+      Ox(accountKeychain.chainCode.toString('hex'))
     )
 
     const walletsService = WalletsService.getInstance()
@@ -173,8 +172,8 @@ export default class WalletsController {
     )
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      Ox(accountKeychain.publicKey.toString('hex')),
+      Ox(accountKeychain.chainCode.toString('hex'))
     )
 
     const walletsService = WalletsService.getInstance()
@@ -273,7 +272,7 @@ export default class WalletsController {
     walletName,
   }: ExtendedPublicKey & { walletName: string }): Promise<Controller.Response<Wallet>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
-    const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(Ox(publicKey), Ox(chainCode))
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.create({
       device: device.deviceInfo,

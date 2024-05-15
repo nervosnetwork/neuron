@@ -4,7 +4,6 @@ import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
 import RpcService from '../services/rpc-service'
-import { PathAndPrivateKey } from '../models/keys/key'
 import { Address } from '../models/address'
 import FeeMode from '../models/fee-mode'
 import TransactionSize from '../models/transaction-size'
@@ -52,6 +51,11 @@ interface SignInfo {
   lockHash: string
   witness: string
   lockArgs: string
+}
+
+interface PathAndPrivateKey {
+  path: string
+  privateKey: string
 }
 
 export default class TransactionSender {

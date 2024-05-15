@@ -1,7 +1,6 @@
 import { scriptToAddress } from '../../utils/scriptAndAddress'
-import { AccountExtendedPublicKey } from './key'
 import { systemScripts } from '../../utils/systemScripts'
-import { key, AddressType } from '@ckb-lumos/hd'
+import { key, AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 
 export enum DefaultAddressNumber {
   Receiving = 20,
