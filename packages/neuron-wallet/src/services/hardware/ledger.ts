@@ -7,8 +7,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from '../../models/chain/transaction'
-import { AddressType } from '@ckb-lumos/hd'
-import Address from '../../models/keys/address'
+import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import logger from '../../utils/logger'
 import NetworksService from '../../services/networks'
 import { generateRPC } from '../../utils/ckb-rpc'
@@ -65,7 +64,7 @@ export default class Ledger extends Hardware {
     }
 
     const signature = await this.ledgerCKB!.signTransaction(
-      path === Address.pathForReceiving(0) ? this.defaultPath : path,
+      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
       rawTx,
       witnesses,
       context,
@@ -78,7 +77,7 @@ export default class Ledger extends Hardware {
   async signMessage(path: string, messageHex: string) {
     const message = this.removePrefix(messageHex)
     const signed = await this.ledgerCKB!.signMessage(
-      path === Address.pathForReceiving(0) ? this.defaultPath : path,
+      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
       message,
       false
     )
@@ -104,7 +103,7 @@ export default class Ledger extends Hardware {
     const networkService = NetworksService.getInstance()
     const isTestnet = !networkService.isMainnet()
     const result = await this.ledgerCKB!.getWalletPublicKey(
-      path === Address.pathForReceiving(0) ? this.defaultPath : path,
+      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
       isTestnet
     )
     return result

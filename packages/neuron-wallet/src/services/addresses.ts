@@ -1,6 +1,5 @@
-import { AccountExtendedPublicKey } from '@ckb-lumos/hd'
-import { AddressType } from '@ckb-lumos/hd'
-import { publicKeyToAddress, DefaultAddressNumber } from '../models/keys/address'
+import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { publicKeyToAddress, DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import NetworksService from '../services/networks'

@@ -4,7 +4,7 @@ import Store from '../models/store'
 import { Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { DefaultAddressNumber } from '../models/keys/address'
+import { DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 
 import FileService from './file'
