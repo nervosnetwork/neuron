@@ -73,7 +73,7 @@
     "sqlite3": "5.1.6",
     "subleveldown": "4.1.4",
     "tslib": "2.6.2",
-    "typeorm": "0.2.45",
+    "typeorm": "0.3.17",
     "undici": "5.28.4",
     "uuid": "8.3.2"
   },

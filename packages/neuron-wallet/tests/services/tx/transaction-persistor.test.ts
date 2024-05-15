@@ -16,7 +16,7 @@ const [tx, tx2] = transactions
 
 describe('TransactionPersistor', () => {
   beforeAll(async () => {
-    await initConnection('')
+    await initConnection()
   })
 
   afterAll(async () => {
@@ -91,7 +91,7 @@ describe('TransactionPersistor', () => {
       expect(loadedTx?.inputs.length).toBe(0)
       expect(loadedTx?.outputs.length).toBe(1)
       expect(loadedTx?.outputs[0].lockArgs).toBe(tx.outputs[0].lock.args)
-      const txLocks = await getConnection().getRepository(TxLockEntity).find({ transactionHash: tx.hash })
+      const txLocks = await getConnection().getRepository(TxLockEntity).findBy({ transactionHash: tx.hash })
       expect(txLocks.length).toBe(1)
       expect(txLocks[0].lockHash).toBe(tx.inputs[0].lock?.computeHash())
     })
@@ -109,7 +109,7 @@ describe('TransactionPersistor', () => {
         .getOne()
       expect(loadedTx?.inputs.length).toBe(1)
       expect(loadedTx?.outputs.length).toBe(2)
-      const txLocks = await getConnection().getRepository(TxLockEntity).find({ transactionHash: tx.hash })
+      const txLocks = await getConnection().getRepository(TxLockEntity).findBy({ transactionHash: tx.hash })
       expect(txLocks.length).toBe(0)
     })
     it('filter with receive cheque and send cheque', async () => {
@@ -139,7 +139,7 @@ describe('TransactionPersistor', () => {
         .getOne()
       expect(loadedTx?.inputs.length).toBe(1)
       expect(loadedTx?.outputs.length).toBe(2)
-      const txLocks = await getConnection().getRepository(TxLockEntity).find({ transactionHash: tx.hash })
+      const txLocks = await getConnection().getRepository(TxLockEntity).findBy({ transactionHash: tx.hash })
       expect(txLocks.length).toBe(0)
     })
     it('filter with multi lock time', async () => {
@@ -162,7 +162,7 @@ describe('TransactionPersistor', () => {
         .getOne()
       expect(loadedTx?.inputs.length).toBe(1)
       expect(loadedTx?.outputs.length).toBe(2)
-      const txLocks = await getConnection().getRepository(TxLockEntity).find({ transactionHash: tx.hash })
+      const txLocks = await getConnection().getRepository(TxLockEntity).findBy({ transactionHash: tx.hash })
       expect(txLocks.length).toBe(0)
     })
   })
@@ -238,7 +238,7 @@ describe('TransactionPersistor', () => {
       //@ts-ignore private method
       await TransactionPersistor.saveWithFetch(tx)
       expect(createMock).toBeCalledTimes(0)
-      const output = await getConnection().getRepository(OutputEntity).findOne({ outPointTxHash: entity.hash })
+      const output = await getConnection().getRepository(OutputEntity).findOneBy({ outPointTxHash: entity.hash })
       expect(output?.status).toBe(OutputStatus.Live)
     })
     it('update live output to dead because refer to input', async () => {
@@ -247,7 +247,7 @@ describe('TransactionPersistor', () => {
       await originalCreate(tx2, OutputStatus.Sent, OutputStatus.Pending)
       //@ts-ignore private method
       await TransactionPersistor.saveWithFetch(tx2)
-      const output = await getConnection().getRepository(OutputEntity).findOne({
+      const output = await getConnection().getRepository(OutputEntity).findOneBy({
         outPointTxHash: tx2.inputs[0].previousOutput?.txHash,
         outPointIndex: tx2.inputs[0].previousOutput?.index,
       })
@@ -262,7 +262,7 @@ describe('TransactionPersistor', () => {
     it('set output to dead if it is in input', async () => {
       await TransactionPersistor.convertTransactionAndSave(tx2, TxSaveType.Sent)
       await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
-      const output = await getConnection().getRepository(OutputEntity).findOne({
+      const output = await getConnection().getRepository(OutputEntity).findOneBy({
         outPointTxHash: tx2.inputs[0].previousOutput?.txHash,
         outPointIndex: tx2.inputs[0].previousOutput?.index,
       })
@@ -300,15 +300,15 @@ describe('TransactionPersistor', () => {
       })
       await getConnection().manager.save([txLocks, hdPublicKeyInfo])
       await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
-      let output = await getConnection().getRepository(OutputEntity).findOne({ outPointTxHash: tx.hash })
-      let input = await getConnection().getRepository(InputEntity).findOne({ transactionHash: tx.hash })
+      let output = await getConnection().getRepository(OutputEntity).findOneBy({ outPointTxHash: tx.hash })
+      let input = await getConnection().getRepository(InputEntity).findOneBy({ transactionHash: tx.hash })
       expect(output).toBeDefined()
       expect(input).toBeDefined()
       await TransactionPersistor.checkTxLock()
-      output = await getConnection().getRepository(OutputEntity).findOne({ outPointTxHash: tx.hash })
-      input = await getConnection().getRepository(InputEntity).findOne({ transactionHash: tx.hash })
-      expect(output).toBeUndefined()
-      expect(input).toBeUndefined()
+      output = await getConnection().getRepository(OutputEntity).findOneBy({ outPointTxHash: tx.hash })
+      input = await getConnection().getRepository(InputEntity).findOneBy({ transactionHash: tx.hash })
+      expect(output).toBeNull()
+      expect(input).toBeNull()
     })
   })
 
@@ -317,8 +317,8 @@ describe('TransactionPersistor', () => {
     let outputEntities: OutputEntity[] = []
     beforeAll(async () => {
       await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
-      inputEntities = await getConnection().getRepository(InputEntity).find({ transactionHash: tx.hash })
-      outputEntities = await getConnection().getRepository(OutputEntity).find({ outPointTxHash: tx.hash })
+      inputEntities = await getConnection().getRepository(InputEntity).findBy({ transactionHash: tx.hash })
+      outputEntities = await getConnection().getRepository(OutputEntity).findBy({ outPointTxHash: tx.hash })
     })
     it('no filter', () => {
       const cells = [...inputEntities, ...outputEntities]

@@ -15,9 +15,9 @@ export default class AssetAccountSubscribe extends UserSettingSubscriber<AssetAc
   async afterInsert(event: InsertEvent<AssetAccount>): Promise<AssetAccount | void> {
     const repo = this.getNeedSyncConnection(event.connection.name)?.getRepository(AssetAccount)
     if (repo && event.entity) {
-      const exist = await repo.findOne({ tokenID: event.entity.tokenID, blake160: event.entity.blake160 })
+      const exist = await repo.findOneBy({ tokenID: event.entity.tokenID, blake160: event.entity.blake160 })
       if (exist) {
-        await repo.upsert(AssetAccount.fromModel(event.entity.toModel()), this.unionKeys)
+        await repo.update(exist.id, AssetAccount.fromModel(event.entity.toModel()))
       } else {
         await repo.save(event.entity)
       }
