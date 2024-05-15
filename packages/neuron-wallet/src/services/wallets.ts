@@ -17,7 +17,7 @@ import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import SyncProgressService from './sync-progress'
-import { Ox } from '../utils/scriptAndAddress'
+import { prefixWith0x } from '../utils/scriptAndAddress'
 
 const fileService = FileService.getInstance()
 
@@ -57,7 +57,7 @@ export abstract class Wallet {
 
     this.id = id
     this.name = name
-    this.extendedKey = Ox(extendedKey)
+    this.extendedKey = prefixWith0x(extendedKey)
     this.device = device
     this.isHD = isHDWallet ?? true
     this.startBlockNumber = startBlockNumber
@@ -390,7 +390,7 @@ export default class WalletService {
     if (!props) {
       throw new IsRequired('wallet property')
     }
-    props = { ...props, extendedKey: Ox(props.extendedKey) }
+    props = { ...props, extendedKey: prefixWith0x(props.extendedKey) }
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
     if (index !== -1) {

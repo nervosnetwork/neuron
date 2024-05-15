@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { t } from 'i18next'
-import { Ox } from '../utils/scriptAndAddress'
+import { prefixWith0x } from '../utils/scriptAndAddress'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
@@ -105,15 +105,15 @@ export default class WalletsController {
       throw new InvalidMnemonic()
     }
     const extendedKey = new ExtendedPrivateKey(
-      Ox(masterKeychain.privateKey.toString('hex')),
-      Ox(masterKeychain.chainCode.toString('hex'))
+      prefixWith0x(masterKeychain.privateKey.toString('hex')),
+      prefixWith0x(masterKeychain.chainCode.toString('hex'))
     )
     const keystore = Keystore.create(extendedKey, password)
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      Ox(accountKeychain.publicKey.toString('hex')),
-      Ox(accountKeychain.chainCode.toString('hex'))
+      prefixWith0x(accountKeychain.publicKey.toString('hex')),
+      prefixWith0x(accountKeychain.chainCode.toString('hex'))
     )
 
     const walletsService = WalletsService.getInstance()
@@ -172,8 +172,8 @@ export default class WalletsController {
     )
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      Ox(accountKeychain.publicKey.toString('hex')),
-      Ox(accountKeychain.chainCode.toString('hex'))
+      prefixWith0x(accountKeychain.publicKey.toString('hex')),
+      prefixWith0x(accountKeychain.chainCode.toString('hex'))
     )
 
     const walletsService = WalletsService.getInstance()
@@ -272,7 +272,7 @@ export default class WalletsController {
     walletName,
   }: ExtendedPublicKey & { walletName: string }): Promise<Controller.Response<Wallet>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
-    const accountExtendedPublicKey = new AccountExtendedPublicKey(Ox(publicKey), Ox(chainCode))
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(prefixWith0x(publicKey), prefixWith0x(chainCode))
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.create({
       device: device.deviceInfo,

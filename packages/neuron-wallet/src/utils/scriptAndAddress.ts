@@ -9,15 +9,14 @@ export enum DefaultAddressNumber {
   Receiving = 20,
 }
 
-export const Ox = (hex: string) => (hex.startsWith('0x') ? hex : `0x${hex}`)
+export const prefixWith0x = (hex: string) => (hex.startsWith('0x') ? hex : `0x${hex}`)
 
 export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
-  const pubkey = publicKey.startsWith('0x') ? publicKey : `0x${publicKey}`
   return scriptToAddress(
     {
       codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
       hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
-      args: key.publicKeyToBlake160(pubkey),
+      args: key.publicKeyToBlake160(prefixWith0x(publicKey)),
     },
     isMainnet
   )
