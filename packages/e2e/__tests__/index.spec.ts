@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 let electronApp: ElectronApplication;
 
 test.beforeAll(async () => {
-  electronApp = await electron.launch({ args: ["./dist/main.js"] });
+  electronApp = await electron.launch({ args: ["../../packages/neuron-wallet/dist/main.js"] });
   electronApp.on("window", async (page) => {
     const filename = page.url()?.split("/").pop();
     console.log(`Window opened: ${filename}`);
