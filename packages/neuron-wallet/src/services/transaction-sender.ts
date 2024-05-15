@@ -18,7 +18,7 @@ import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import { signWitnesses } from '../utils/signWitnesses'
-import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
+import { bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -414,7 +414,7 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
+    const serializedEmptyWitnessSize = bytes.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
     blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
@@ -422,7 +422,7 @@ export default class TransactionSender {
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
-      const byteLength = byteUtils.bytify(wit).byteLength
+      const byteLength = bytes.bytify(wit).byteLength
       blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
@@ -931,14 +931,14 @@ export default class TransactionSender {
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
-      Buffer.from(masterPrivateKey.privateKey.slice(2), 'hex'),
-      Buffer.from(masterPrivateKey.chainCode.slice(2), 'hex')
+      Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
+      Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )
 
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+      privateKey: bytes.hexify(masterKeychain.derivePath(path).privateKey),
     }))
   }
 }

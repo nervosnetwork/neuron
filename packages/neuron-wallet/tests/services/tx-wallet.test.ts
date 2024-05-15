@@ -1,4 +1,5 @@
 import WalletService from '../../src/services/wallets'
+import { bytes } from '@ckb-lumos/codec'
 import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import TransactionSender from '../../src/services/transaction-sender'
@@ -43,17 +44,17 @@ describe('get keys with paths', () => {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterKeychain = Keychain.fromSeed(seed)
     const extendedKey = new ExtendedPrivateKey(
-      `0x${masterKeychain.privateKey.toString('hex')}`,
-      `0x${masterKeychain.chainCode.toString('hex')}`
+      bytes.hexify(masterKeychain.privateKey),
+      bytes.hexify(masterKeychain.chainCode)
     )
-    const p = masterKeychain.derivePath(receivingPath).privateKey.toString('hex')
-    expect(`0x${p}`).toEqual(receivingPrivateKey)
+    const privateKey = bytes.hexify(masterKeychain.derivePath(receivingPath).privateKey)
+    expect(privateKey).toEqual(receivingPrivateKey)
     const keystore = Keystore.create(extendedKey, password)
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      `0x${accountKeychain.publicKey.toString('hex')}`,
-      `0x${accountKeychain.chainCode.toString('hex')}`
+      bytes.hexify(accountKeychain.publicKey),
+      bytes.hexify(accountKeychain.chainCode)
     )
 
     const wallet = walletService.create({
@@ -64,7 +65,7 @@ describe('get keys with paths', () => {
     })
 
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
-    expect(`0x${masterKeychain.privateKey.toString('hex')}`).toEqual(masterPrivateKey.privateKey)
+    expect(bytes.hexify(masterKeychain.privateKey)).toEqual(masterPrivateKey.privateKey)
 
     const pathsAndKeys = new TransactionSender().getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({

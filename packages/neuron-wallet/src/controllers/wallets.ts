@@ -4,6 +4,7 @@ import { prefixWith0x } from '../utils/scriptAndAddress'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
+import { bytes } from '@ckb-lumos/codec'
 import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { generateMnemonic, validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import CommandSubject from '../models/subjects/command'
@@ -105,15 +106,15 @@ export default class WalletsController {
       throw new InvalidMnemonic()
     }
     const extendedKey = new ExtendedPrivateKey(
-      prefixWith0x(masterKeychain.privateKey.toString('hex')),
-      prefixWith0x(masterKeychain.chainCode.toString('hex'))
+      bytes.hexify(masterKeychain.privateKey),
+      bytes.hexify(masterKeychain.chainCode)
     )
     const keystore = Keystore.create(extendedKey, password)
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      prefixWith0x(accountKeychain.publicKey.toString('hex')),
-      prefixWith0x(accountKeychain.chainCode.toString('hex'))
+      bytes.hexify(accountKeychain.publicKey),
+      bytes.hexify(accountKeychain.chainCode)
     )
 
     const walletsService = WalletsService.getInstance()
@@ -172,8 +173,8 @@ export default class WalletsController {
     )
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      prefixWith0x(accountKeychain.publicKey.toString('hex')),
-      prefixWith0x(accountKeychain.chainCode.toString('hex'))
+      bytes.hexify(accountKeychain.publicKey),
+      bytes.hexify(accountKeychain.chainCode)
     )
 
     const walletsService = WalletsService.getInstance()
