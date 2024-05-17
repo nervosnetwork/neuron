@@ -162,13 +162,13 @@ describe('sudt token info service', () => {
     })
 
     it('no token info', async () => {
-      await expect(SudtTokenInfoService.getSudtTokenInfo('0x')).resolves.toBeUndefined()
+      await expect(SudtTokenInfoService.getSudtTokenInfo('0x')).resolves.toBeNull()
     })
 
     it('token info not match', async () => {
       const entity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save([entity.sudtTokenInfo, entity])
-      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`)).resolves.toBeUndefined()
+      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`)).resolves.toBeNull()
     })
 
     it('match token info', async () => {

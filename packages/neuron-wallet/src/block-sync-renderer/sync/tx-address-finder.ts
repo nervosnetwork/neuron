@@ -90,7 +90,7 @@ export default class TxAddressFinder {
     let shouldSync = false
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput!
-      const output = await getConnection().getRepository(OutputEntity).findOne({
+      const output = await getConnection().getRepository(OutputEntity).findOneBy({
         outPointTxHash: outPoint.txHash,
         outPointIndex: outPoint.index,
       })

@@ -1,8 +1,7 @@
 import WalletService from '../../src/services/wallets'
-import Keystore from '../../src/models/keys/keystore'
-import Keychain from '../../src/models/keys/keychain'
-import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
-import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
+import { bytes } from '@ckb-lumos/codec'
+import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
 import TransactionSender from '../../src/services/transaction-sender'
 import { signWitnesses } from '../../src/utils/signWitnesses'
 
@@ -45,17 +44,17 @@ describe('get keys with paths', () => {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterKeychain = Keychain.fromSeed(seed)
     const extendedKey = new ExtendedPrivateKey(
-      masterKeychain.privateKey.toString('hex'),
-      masterKeychain.chainCode.toString('hex')
+      bytes.hexify(masterKeychain.privateKey),
+      bytes.hexify(masterKeychain.chainCode)
     )
-    const p = masterKeychain.derivePath(receivingPath).privateKey.toString('hex')
-    expect(`0x${p}`).toEqual(receivingPrivateKey)
+    const privateKey = bytes.hexify(masterKeychain.derivePath(receivingPath).privateKey)
+    expect(privateKey).toEqual(receivingPrivateKey)
     const keystore = Keystore.create(extendedKey, password)
 
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
-      accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      bytes.hexify(accountKeychain.publicKey),
+      bytes.hexify(accountKeychain.chainCode)
     )
 
     const wallet = walletService.create({
@@ -66,7 +65,7 @@ describe('get keys with paths', () => {
     })
 
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
-    expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
+    expect(bytes.hexify(masterKeychain.privateKey)).toEqual(masterPrivateKey.privateKey)
 
     const pathsAndKeys = new TransactionSender().getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({

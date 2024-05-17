@@ -1,5 +1,5 @@
 import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
-import { AddressType } from '../../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 import { systemScripts } from '../../../src/utils/systemScripts'
 import { NetworkType } from '../../../src/models/network'

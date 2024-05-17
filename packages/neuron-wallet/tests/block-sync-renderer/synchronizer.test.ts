@@ -1,5 +1,5 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Synchronizer, type LumosCell, type LumosCellQuery } from '../../src/block-sync-renderer/sync/synchronizer'

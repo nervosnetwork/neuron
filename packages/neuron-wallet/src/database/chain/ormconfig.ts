@@ -1,4 +1,4 @@
-import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
+import { AbstractLogger, DataSource, LogLevel, LogMessage } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 import fs from 'fs'
@@ -63,7 +63,6 @@ import { CreateCellLocalInfo1701234043432 } from './migrations/1701234043432-Cre
 import { RenameSyncProgress1702781527414 } from './migrations/1702781527414-RenameSyncProgress'
 import { RemoveAddressInIndexerCache1704357651876 } from './migrations/1704357651876-RemoveAddressInIndexerCache'
 import { AmendTransaction1709008125088 } from './migrations/1709008125088-AmendTransaction'
-import { ConnectionName } from './connection'
 import AddressSubscribe from './subscriber/address-subscriber'
 import MultisigConfigSubscribe from './subscriber/multisig-config-subscriber'
 import TxDescriptionSubscribe from './subscriber/tx-description-subscriber'
@@ -71,24 +70,58 @@ import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
 import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
+export type ConnectionName = 'light' | 'full'
 
 const dbPath = (name: string, connectionName: string): string => {
   const filename = `${connectionName}-${name}.sqlite`
   return path.join(env.fileBasePath, 'cells', filename)
 }
 
-const connectOptions = async (
-  genesisBlockHash: string,
-  connectionName: ConnectionName
-): Promise<SqliteConnectionOptions> => {
-  const connectionOptions = await getConnectionOptions()
+class TypeormLogger extends AbstractLogger {
+  /**
+   * Write log to specific output.
+   */
+  protected writeLog(level: LogLevel, logMessage: LogMessage | LogMessage[]) {
+    const messages = this.prepareLogMessages(logMessage, {
+      highlightSql: false,
+    })
+
+    for (let message of messages) {
+      switch (message.type ?? level) {
+        case 'log':
+        case 'schema-build':
+        case 'migration':
+        case 'info':
+        case 'query':
+        case 'warn':
+        case 'query-slow':
+          if (message.prefix) {
+            console.info(message.prefix, message.message)
+          } else {
+            console.info(message.message)
+          }
+          break
+
+        case 'error':
+        case 'query-error':
+          if (message.prefix) {
+            console.error(message.prefix, message.message)
+          } else {
+            console.error(message.message)
+          }
+          break
+      }
+    }
+  }
+}
+
+const getConnectionOptions = (genesisBlockHash: string, connectionName: ConnectionName): SqliteConnectionOptions => {
   const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash, connectionName)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] = ['warn', 'error']
   // (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
-    ...connectionOptions,
     name: connectionName,
     type: 'sqlite',
     database,
@@ -159,33 +192,36 @@ const connectOptions = async (
       SudtTokenInfoSubscribe,
       TxDescriptionSubscribe,
     ],
-    logger: 'simple-console',
+    logger: new TypeormLogger(),
     logging,
+    migrationsRun: true,
     maxQueryExecutionTime: 30,
   }
+}
+
+export const dataSource: Record<ConnectionName, DataSource | null> = {
+  light: null,
+  full: null,
 }
 
 const initConnectionWithType = async (genesisBlockHash: string, connectionName: ConnectionName) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
-    await getConnection(connectionName).close()
+    await dataSource[connectionName]?.destroy()
   } catch (err) {
+    dataSource[connectionName] = null
     // do nothing
   }
-  const connectionOptions = await connectOptions(genesisBlockHash, connectionName)
+  const connectionOptions = getConnectionOptions(genesisBlockHash, connectionName)
+  dataSource[connectionName] = new DataSource(connectionOptions)
 
   try {
-    await createConnection(connectionOptions)
-    await getConnection(connectionName).manager.query(`PRAGMA busy_timeout = 3000;`)
-    await getConnection(connectionName).manager.query(`PRAGMA temp_store = MEMORY;`)
+    await dataSource[connectionName]?.initialize()
+    await dataSource[connectionName]?.manager.query(`PRAGMA busy_timeout = 3000;`)
+    await dataSource[connectionName]?.manager.query(`PRAGMA temp_store = MEMORY;`)
   } catch (err) {
     logger.error(err.message)
   }
-}
-
-export async function initConnection(genesisBlockHash: string) {
-  await initConnectionWithType(genesisBlockHash, 'full')
-  await initConnectionWithType(genesisBlockHash, 'light')
 }
 
 export function migrateDBFile(genesisBlockHash: string) {
@@ -203,4 +239,7 @@ export function migrateDBFile(genesisBlockHash: string) {
   }
 }
 
-export default initConnection
+export default async function initConnection(genesisBlockHash: string) {
+  await initConnectionWithType(genesisBlockHash, 'full')
+  await initConnectionWithType(genesisBlockHash, 'light')
+}

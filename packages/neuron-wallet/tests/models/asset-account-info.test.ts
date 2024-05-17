@@ -2,7 +2,7 @@ import AssetAccountInfo from '../../src/models/asset-account-info'
 import CellDep, { DepType } from '../../src/models/chain/cell-dep'
 import OutPoint from '../../src/models/chain/out-point'
 import { ScriptHashType } from '../../src/models/chain/script'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import AddressMeta from '../../src/database/address/meta'
 
 describe('AssetAccountInfo', () => {
