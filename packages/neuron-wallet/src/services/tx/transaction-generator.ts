@@ -378,6 +378,7 @@ export class TransactionGenerator {
     tx.outputs[outputs.length - 1].setCapacity((totalCapacity - capacitiesExceptLast - finalFee).toString())
     tx.fee = finalFee.toString()
     tx.size = txSize
+    tx.hash = tx.computeHash()
 
     // check
     if (

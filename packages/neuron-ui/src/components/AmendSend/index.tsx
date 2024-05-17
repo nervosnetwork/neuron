@@ -120,7 +120,7 @@ const AmendSend = () => {
   }, [transaction?.outputs])
 
   const outputsCapacity = useMemo(() => {
-    const outputList = items.filter(item => !item.isLastOutput)
+    const outputList = items.length === 1 ? items : items.filter(item => !item.isLastOutput)
     return outputList.reduce((total, cur) => {
       return total + BigInt(cur.capacity || '0')
     }, BigInt(0))
