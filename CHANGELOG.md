@@ -1,3 +1,33 @@
+# 0.116.0 (2024-05-24)
+
+### CKB Node & Light Client
+
+- [CKB@v0.116.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.116.1) was released on May. 11st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6dd077b407d019a0bce0cbad8c34e69a524ae4b2599b9feda2c7491f3559d32c`(at height `13,007,704`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3157)
+
+---
+
+## New features
+
+- 3134: Support 'replace-by-fee' nervos dao transactions and sudt transactions.(@devchenyan)
+- 3144: Reduce size of light client log in debug information and reveal start-block-number in log.(@yanguoyu)
+- 3064: Support locking window by pin code.(@yanguoyu)
+- 3131: Add detailed result for nervos dao transaction.(@devchenyan)
+
+## Bug fixes
+
+- 3121: Locate the first transaction on Explorer directly when users want to set the start-block-number for light client.(@yanguoyu)
+- 3101: Show migration instruction properly.(@devchenyan)
+- 3062: Migrate legacy ACP to active ACP account(@yanguoyu)
+- 3141: Fix some issues about light client synchronizaiton.(@yanguoyu)
+- 3120: Remove all sync data when start-block-number is set less than before.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.3...v0.116.0
+
 # 0.114.3 (2024-04-16)
 
 ### CKB Node & Light Client
