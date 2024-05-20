@@ -41,7 +41,7 @@ const AmendSend = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, showConfirmedAlert } =
+  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, isConfirmedAlertShown } =
     useInitialize({
       hash,
       walletID,
@@ -120,11 +120,8 @@ const AmendSend = () => {
   }, [transaction?.outputs])
 
   const outputsCapacity = useMemo(() => {
-    const outputList = items.filter(item => !item.isLastOutput)
+    const outputList = items.length === 1 ? items : items.filter(item => !item.isLastOutput)
     return outputList.reduce((total, cur) => {
-      if (Number.isNaN(+(cur.capacity || ''))) {
-        return total
-      }
       return total + BigInt(cur.capacity || '0')
     }, BigInt(0))
   }, [items])
@@ -134,19 +131,16 @@ const AmendSend = () => {
   const lastOutputsCapacity = useMemo(() => {
     if (transaction) {
       const inputsCapacity = transaction.inputs.reduce((total, cur) => {
-        if (Number.isNaN(+(cur.capacity || ''))) {
-          return total
-        }
         return total + BigInt(cur.capacity || '0')
       }, BigInt(0))
 
       return inputsCapacity - outputsCapacity - fee
     }
-    return -1
+    return undefined
   }, [transaction, fee, outputsCapacity])
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && lastOutputsCapacity !== undefined) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
         return {
@@ -164,7 +158,8 @@ const AmendSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT
+  const disabled =
+    sending || !send.generatedTx || priceError || lastOutputsCapacity === undefined || lastOutputsCapacity < MIN_AMOUNT
 
   return (
     <PageContainer
@@ -252,7 +247,7 @@ const AmendSend = () => {
       </form>
 
       <AlertDialog
-        show={showConfirmedAlert}
+        show={isConfirmedAlertShown}
         title={t('send.transaction-confirmed')}
         message={t('send.transaction-cannot-amend')}
         type="warning"

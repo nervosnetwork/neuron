@@ -2,8 +2,9 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions } from 'states/stateProvider/reducer'
 import { getTransaction as getOnChainTransaction } from 'services/chain'
-import { getTransaction as getSentTransaction, getTransactionSize, getTransactionList } from 'services/remote'
+import { getTransaction as getSentTransaction, getTransactionList } from 'services/remote'
 import { isSuccessResponse } from 'utils'
+import { FEE_RATIO } from 'utils/const'
 
 export const useInitialize = ({
   hash,
@@ -21,7 +22,7 @@ export const useInitialize = ({
   const [minPrice, setMinPrice] = useState('0')
   const [price, setPrice] = useState('0')
   const [description, setDescription] = useState('')
-  const [showConfirmedAlert, setShowConfirmedAlert] = useState(false)
+  const [isConfirmedAlertShown, setIsConfirmedAlertShown] = useState(false)
   const [sudtInfo, setSudtInfo] = useState<State.Transaction['sudtInfo'] | null>(null)
   const [txValue, setTxValue] = useState('0')
 
@@ -34,7 +35,7 @@ export const useInitialize = ({
   )
 
   const fee = useMemo(() => {
-    const ratio = BigInt(1000)
+    const ratio = BigInt(FEE_RATIO)
     const base = BigInt(size) * BigInt(price)
     const curFee = base / ratio
     if (curFee * ratio < base) {
@@ -50,7 +51,7 @@ export const useInitialize = ({
       transaction: { outputsData },
     } = await getOnChainTransaction(hash)
     if (!minFee) {
-      setShowConfirmedAlert(true)
+      setIsConfirmedAlertShown(true)
     }
 
     const listRes = await getTransactionList({
@@ -74,18 +75,14 @@ export const useInitialize = ({
 
       setTransaction({ ...tx, outputsData })
 
-      const sizeRes = await getTransactionSize(tx)
-
-      if (isSuccessResponse(sizeRes) && typeof sizeRes.result === 'number') {
-        setSize(sizeRes.result)
-        if (minFee) {
-          const mPrice = ((BigInt(minFee) * BigInt(1000)) / BigInt(sizeRes.result)).toString()
-          setMinPrice(mPrice)
-          setPrice(mPrice)
-        }
+      setSize(tx.size)
+      if (minFee) {
+        const mPrice = ((BigInt(minFee) * BigInt(FEE_RATIO)) / BigInt(tx.size)).toString()
+        setMinPrice(mPrice)
+        setPrice(mPrice)
       }
     }
-  }, [hash, setShowConfirmedAlert, setPrice, setTransaction, setSize, setMinPrice])
+  }, [hash, setIsConfirmedAlertShown, setPrice, setTransaction, setSize, setMinPrice])
 
   useEffect(() => {
     fetchInitData()
@@ -104,7 +101,7 @@ export const useInitialize = ({
         // @ts-expect-error Replace-By-Fee (RBF)
         const { min_replace_fee: minFee } = await getOnChainTransaction(hash)
         if (!minFee) {
-          setShowConfirmedAlert(true)
+          setIsConfirmedAlertShown(true)
           return
         }
 
@@ -123,7 +120,7 @@ export const useInitialize = ({
         // ignore
       }
     },
-    [dispatch, walletID, hash, setShowConfirmedAlert, transaction]
+    [dispatch, walletID, hash, setIsConfirmedAlertShown, transaction]
   )
 
   return {
@@ -135,7 +132,7 @@ export const useInitialize = ({
     transaction,
     setTransaction,
     minPrice,
-    showConfirmedAlert,
+    isConfirmedAlertShown,
     onSubmit,
     sudtInfo,
     txValue,
