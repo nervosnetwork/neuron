@@ -57,6 +57,7 @@ import { ReactComponent as DeleteSvg } from './Delete.svg'
 import { ReactComponent as ImportKeystoreSvg } from './SoftWalletImportKeystore.svg'
 import { ReactComponent as ImportHardwareSvg } from './HardWalletImport.svg'
 import { ReactComponent as DepositTimeSortSvg } from './DepositTimeSort.svg'
+import { ReactComponent as QuestionSvg } from './Question.svg'
 
 import styles from './icon.module.scss'
 
@@ -130,3 +131,4 @@ export const Delete = WrapSvg(DeleteSvg)
 export const ImportKeystore = WrapSvg(ImportKeystoreSvg)
 export const ImportHardware = WrapSvg(ImportHardwareSvg)
 export const DepositTimeSort = WrapSvg(DepositTimeSortSvg)
+export const Question = WrapSvg(QuestionSvg)
