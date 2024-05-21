@@ -35,7 +35,8 @@
         "set-start-block-number": "Establecer el número de bloque inicial"
       },
       "migrating": "migrando...",
-      "left-time": "Tiempo restante"
+      "left-time": "Tiempo restante",
+      "left-time-tip": "El tiempo restante es una estimación y está relacionado con la red actual y otros factores, y es solo para referencia."
     },
     "import-hardware": {
       "title": {
@@ -671,7 +672,9 @@
       "block-number": "número de bloque",
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
-      "sync-failed": "Error de sincronización, por favor compruebe la red",
+      "sync-failed": "sincronización fallida",
+      "sync-failed-detail": "Debido a nodos de red u otros problemas, la sincronización ha fallado.",
+      "learn-more": "Saber más",
       "sync-not-start": "La sincronización no se ha iniciado todavía, por favor intente reiniciar Neuron Wallet",
       "connecting": "Conectando"
     },
