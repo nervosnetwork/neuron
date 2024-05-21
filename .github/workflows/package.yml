@@ -42,7 +42,7 @@ jobs:
           cache: "yarn"
 
       - name: Restore
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -51,7 +51,7 @@ jobs:
 
       - name: Add msbuild to PATH
         if: matrix.os == 'windows-2019'
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 

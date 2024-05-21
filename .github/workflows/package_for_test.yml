@@ -53,7 +53,7 @@ jobs:
           cache: "yarn"
 
       - name: Restore
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -62,7 +62,7 @@ jobs:
 
       - name: Add msbuild to PATH
         if: matrix.os == 'windows-2019'
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
@@ -225,7 +225,7 @@ jobs:
 
       - name: Comment by pull request comment event
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |
@@ -242,7 +242,7 @@ jobs:
     steps:
       - name: Comment by pull request comment event when package failed
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ github.event.comment.id }}
           body: Packageing failed in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
