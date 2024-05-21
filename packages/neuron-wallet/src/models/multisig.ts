@@ -2,7 +2,7 @@ import { MultisigPrefixError } from '../exceptions'
 import SystemScriptInfo from './system-script-info'
 import { since } from '@ckb-lumos/base'
 import { bytes, number } from '@ckb-lumos/codec'
-import Blake2b from './blake2b'
+import Blake2b, { BLAKE160_HEX_LENGTH } from './blake2b'
 
 export interface MultisigPrefix {
   S: string
@@ -10,8 +10,6 @@ export interface MultisigPrefix {
   M: string
   N: string
 }
-
-const BLAKE160_HEX_LENGTH = 42
 
 export default class Multisig {
   // 1 epoch = 4h = 240min
