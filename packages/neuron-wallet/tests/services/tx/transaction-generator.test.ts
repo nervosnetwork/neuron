@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
 import { bytes } from '@ckb-lumos/codec'
-import { since, type Cell } from '@ckb-lumos/base'
+import { since } from '@ckb-lumos/base'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
@@ -28,7 +28,7 @@ import {
   SudtAcpHaveDataError,
   TargetOutputNotFoundError,
 } from '../../../src/exceptions'
-import LiveCell from '../../../src/models/chain/live-cell'
+import LiveCell, { CellWithOutPoint } from '../../../src/models/chain/live-cell'
 import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 
 const randomHex = (length: number = 64): string => {
@@ -1096,8 +1096,8 @@ describe('TransactionGenerator', () => {
       tokenID: string | undefined = undefined,
       lockScript: Script = bobAnyoneCanPayLockScript,
       customData: string = '0x'
-    ): Cell => {
-      const liveCell: Cell = {
+    ): CellWithOutPoint => {
+      const liveCell: CellWithOutPoint = {
         blockHash: randomHex(),
         outPoint: {
           txHash: randomHex(),

@@ -1,12 +1,14 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { type Cell } from '@ckb-lumos/base'
+import { type Cell, type OutPoint as IOutPoint } from '@ckb-lumos/base'
 
 const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,
   data1: ScriptHashType.Data1,
   data: ScriptHashType.Data,
 }
+
+export type CellWithOutPoint = Cell & { outPoint: IOutPoint }
 
 export default class LiveCell {
   public txHash: string
@@ -54,7 +56,7 @@ export default class LiveCell {
     return undefined
   }
 
-  public static fromLumos(cell: Cell): LiveCell {
+  public static fromLumos(cell: CellWithOutPoint): LiveCell {
     const type = cell.cellOutput.type
       ? new Script(
           cell.cellOutput.type.codeHash,
@@ -64,8 +66,8 @@ export default class LiveCell {
       : null
 
     return new LiveCell(
-      cell.outPoint!.txHash,
-      cell.outPoint!.index,
+      cell.outPoint.txHash,
+      cell.outPoint.index,
       cell.cellOutput.capacity,
       new Script(
         cell.cellOutput.lock.codeHash,

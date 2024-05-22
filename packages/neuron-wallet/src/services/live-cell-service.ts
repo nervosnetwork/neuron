@@ -1,7 +1,7 @@
 import Script from '../models/chain/script'
-import LiveCell from '../models/chain/live-cell'
+import LiveCell, { CellWithOutPoint } from '../models/chain/live-cell'
 import { queryIndexer } from '../block-sync-renderer/index'
-import { type Cell, type QueryOptions } from '@ckb-lumos/base'
+import { type QueryOptions } from '@ckb-lumos/base'
 
 export default class LiveCellService {
   private static instance: LiveCellService
@@ -16,14 +16,18 @@ export default class LiveCellService {
 
   constructor() {}
 
-  private async getLiveCellsByScript(lock: Script | null, type: Script | null, data: string | null): Promise<Cell[]> {
+  private async getLiveCellsByScript(
+    lock: Script | null,
+    type: Script | null,
+    data: string | null
+  ): Promise<CellWithOutPoint[]> {
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
     }
 
     const query = { lock, type, data } as QueryOptions
     const liveCells = await queryIndexer(query)
-    return liveCells
+    return liveCells as CellWithOutPoint[]
   }
 
   public async getOneByLockScriptAndTypeScript(lock: Script | null, type: Script | null) {
