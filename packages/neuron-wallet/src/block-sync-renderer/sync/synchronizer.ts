@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
+import { type QueryOptions } from '@ckb-lumos/base'
 import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
-import { QueryOptions } from '@ckb-lumos/base'
 import AddressMeta from '../../database/address/meta'
 import { Address } from '../../models/address'
 import { SyncAddressType } from '../../database/chain/entities/sync-progress'
@@ -12,34 +12,6 @@ import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-ca
 export interface BlockTips {
   cacheTipNumber: number
   indexerTipNumber: number | undefined
-}
-
-export interface LumosCellQuery {
-  lock: CKBComponents.Script | null
-  type: CKBComponents.Script | null
-  data: string | null
-}
-
-export interface LumosCell {
-  blockHash: string
-  outPoint: {
-    txHash: string
-    index: string
-  }
-  cellOutput: {
-    capacity: string
-    lock: {
-      codeHash: string
-      args: string
-      hashType: string
-    }
-    type?: {
-      codeHash: string
-      args: string
-      hashType: string
-    }
-  }
-  data?: string
 }
 
 export interface AppendScript {
@@ -57,7 +29,7 @@ export abstract class Synchronizer {
   protected processingBlockNumber?: string
   protected addressesByWalletId: Map<string, AddressMeta[]> = new Map()
   protected pollingIndexer: boolean = false
-  private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
+  private indexerQueryQueue: QueueObject<QueryOptions> | undefined
   protected _needGenerateAddress: boolean = false
 
   abstract connect(): Promise<void>
@@ -155,7 +127,7 @@ export abstract class Synchronizer {
     return false
   }
 
-  public async getLiveCellsByScript(query: LumosCellQuery) {
+  public async getLiveCellsByScript(query: QueryOptions) {
     return new Promise((resolve, reject) => {
       this.indexerQueryQueue!.push(query, (err: any, result: unknown) => {
         if (err) {
@@ -166,7 +138,7 @@ export abstract class Synchronizer {
     })
   }
 
-  private async collectLiveCellsByScript(query: LumosCellQuery) {
+  private async collectLiveCellsByScript(query: QueryOptions) {
     const { lock, type, data } = query
     if (!lock && !type) {
       throw new Error('at least one parameter is required')

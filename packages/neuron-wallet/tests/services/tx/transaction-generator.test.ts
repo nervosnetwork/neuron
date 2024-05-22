@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
-import { since } from '@ckb-lumos/base'
 import { bytes } from '@ckb-lumos/codec'
+import { since, type Cell } from '@ckb-lumos/base'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
@@ -86,7 +86,6 @@ import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-
 import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
 import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
 
 describe('TransactionGenerator', () => {
@@ -1097,8 +1096,8 @@ describe('TransactionGenerator', () => {
       tokenID: string | undefined = undefined,
       lockScript: Script = bobAnyoneCanPayLockScript,
       customData: string = '0x'
-    ): LumosCell => {
-      const liveCell: LumosCell = {
+    ): Cell => {
+      const liveCell: Cell = {
         blockHash: randomHex(),
         outPoint: {
           txHash: randomHex(),
@@ -1109,18 +1108,17 @@ describe('TransactionGenerator', () => {
           lock: {
             codeHash: lockScript.codeHash,
             args: lockScript.args,
-            hashType: lockScript.hashType.toString(),
+            hashType: lockScript.hashType,
           },
         },
         data: '0x',
       }
       if (tokenID) {
         const typeScript = assetAccountInfo.generateSudtScript(tokenID)
-        // @ts-ignore
         liveCell.cellOutput.type = {
           codeHash: typeScript.codeHash,
           args: typeScript.args,
-          hashType: typeScript.hashType.toString(),
+          hashType: typeScript.hashType,
         }
       }
       liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'

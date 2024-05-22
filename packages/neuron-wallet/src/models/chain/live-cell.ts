@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { LumosCell } from '../../block-sync-renderer/sync/synchronizer'
+import { type Cell } from '@ckb-lumos/base'
 
 const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,
@@ -54,7 +54,7 @@ export default class LiveCell {
     return undefined
   }
 
-  public static fromLumos(cell: LumosCell): LiveCell {
+  public static fromLumos(cell: Cell): LiveCell {
     const type = cell.cellOutput.type
       ? new Script(
           cell.cellOutput.type.codeHash,
@@ -64,8 +64,8 @@ export default class LiveCell {
       : null
 
     return new LiveCell(
-      cell.outPoint.txHash,
-      cell.outPoint.index,
+      cell.outPoint!.txHash,
+      cell.outPoint!.index,
       cell.cellOutput.capacity,
       new Script(
         cell.cellOutput.lock.codeHash,

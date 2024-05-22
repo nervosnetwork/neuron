@@ -1,7 +1,7 @@
 import Script from '../models/chain/script'
 import LiveCell from '../models/chain/live-cell'
 import { queryIndexer } from '../block-sync-renderer/index'
-import { LumosCell, LumosCellQuery } from '../block-sync-renderer/sync/synchronizer'
+import { type Cell, type QueryOptions } from '@ckb-lumos/base'
 
 export default class LiveCellService {
   private static instance: LiveCellService
@@ -16,17 +16,13 @@ export default class LiveCellService {
 
   constructor() {}
 
-  private async getLiveCellsByScript(
-    lock: Script | null,
-    type: Script | null,
-    data: string | null
-  ): Promise<LumosCell[]> {
+  private async getLiveCellsByScript(lock: Script | null, type: Script | null, data: string | null): Promise<Cell[]> {
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
     }
 
-    const query: LumosCellQuery = { lock, type, data }
-    const liveCells: LumosCell[] = await queryIndexer(query)
+    const query = { lock, type, data } as QueryOptions
+    const liveCells = await queryIndexer(query)
     return liveCells
   }
 
