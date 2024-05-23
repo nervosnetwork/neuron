@@ -52,6 +52,7 @@ import { ReactComponent as LockSvg } from './Lock.svg'
 import { ReactComponent as LockCellSvg } from './LockCell.svg'
 import { ReactComponent as UnLockSvg } from './Unlock.svg'
 import { ReactComponent as ConsumeSvg } from './Consume.svg'
+import { ReactComponent as ConsolidateSvg } from './Consolidate.svg'
 import { ReactComponent as DetectSvg } from './Detect.svg'
 import { ReactComponent as DeleteSvg } from './Delete.svg'
 import { ReactComponent as ImportKeystoreSvg } from './SoftWalletImportKeystore.svg'
@@ -126,6 +127,7 @@ export const Lock = WrapSvg(LockSvg, styles.withTheme)
 export const LockCell = WrapSvg(LockCellSvg)
 export const UnLock = WrapSvg(UnLockSvg)
 export const Consume = WrapSvg(ConsumeSvg)
+export const Consolidate = WrapSvg(ConsolidateSvg)
 export const Detect = WrapSvg(DetectSvg)
 export const Delete = WrapSvg(DeleteSvg)
 export const ImportKeystore = WrapSvg(ImportKeystoreSvg)

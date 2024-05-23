@@ -1261,12 +1261,17 @@
         "title": "消耗 Cell",
         "warn-consume": "消耗Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
       },
+      "cell-consolidate-dialog": {
+        "title": "合并 Cells",
+        "warn-consume": "所有选中的Cell都将合并到一个新Cell中，请确保没有重要数据需要保留。"
+      },
       "enter-password": "输入密码",
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
       "consume": "消耗",
-      "verify": "验证"
+      "verify": "验证",
+      "consolidate": "合并"
     },
     "send-tx-detail": {
       "page-title": "交易详情",
