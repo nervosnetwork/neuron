@@ -88,7 +88,7 @@ export default class SettingsService extends Store {
 
   private generateEncryptString(str: string) {
     if (safeStorage.isEncryptionAvailable()) {
-      return safeStorage.encryptString(str).toString('utf-8')
+      return safeStorage.encryptString(str).toString('hex')
     }
     const hash = crypto.createHash('sha256')
     hash.update(str)
@@ -108,6 +108,9 @@ export default class SettingsService extends Store {
   }
 
   verifyLockWindowPassword(password: string) {
+    if (safeStorage.isEncryptionAvailable()) {
+      return safeStorage.decryptString(Buffer.from(this.lockWindowInfo.encryptedPassword!, 'hex')) === password
+    }
     const encryptedPassword = this.generateEncryptString(password)
     return SettingsService.getInstance().lockWindowInfo.encryptedPassword === encryptedPassword
   }
