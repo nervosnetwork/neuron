@@ -45,6 +45,7 @@ export default {
         label: '窗口',
         minimize: '最小化',
         close: '关闭窗口',
+        lock: '锁定窗口',
       },
       help: {
         label: '帮助',

@@ -1,12 +1,10 @@
-import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import { Address } from '../../src/models/address'
 import Transaction from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
-import AddressParser from '../../src/models/address-parser'
 import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
@@ -14,8 +12,8 @@ import { NetworkType } from '../../src/models/network'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(
-  '03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3',
-  '37e85a19f54f0a242a35599abac64a71aacc21e3a5860dd024377ffc7e6827d8'
+  '0x03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3',
+  '0x37e85a19f54f0a242a35599abac64a71aacc21e3a5860dd024377ffc7e6827d8'
 )
 
 const preloadedPublicKeys: any = []
@@ -95,21 +93,21 @@ describe('integration tests for AddressService', () => {
   beforeAll(() => {
     for (let addressType = 0; addressType <= 1; addressType++) {
       for (let addressIndex = 0; addressIndex <= 7; addressIndex++) {
-        const address = extendedKey.address(addressType, addressIndex, true)
+        const publicKeyInfo = extendedKey.publicKeyInfo(addressType, addressIndex)
         preloadedPublicKeys.push({
-          address,
           addressType,
           addressIndex,
-          publicKeyHash: AddressParser.toBlake160(address.address),
+          publicKeyInfo,
+          publicKeyHash: publicKeyInfo.blake160,
         })
       }
     }
 
-    const stubbedExtendedKeyAddressFn = when(jest.spyOn(extendedKey, 'address'))
+    const stubbedExtendedPublicKeyInfoFn = when(jest.spyOn(extendedKey, 'publicKeyInfo'))
     for (const addressToMock of preloadedPublicKeys) {
-      stubbedExtendedKeyAddressFn
-        .calledWith(addressToMock.addressType, addressToMock.addressIndex, true)
-        .mockReturnValue(addressToMock.address)
+      stubbedExtendedPublicKeyInfoFn
+        .calledWith(addressToMock.addressType, addressToMock.addressIndex)
+        .mockReturnValue(addressToMock.publicKeyInfo)
     }
   })
 
@@ -123,7 +121,7 @@ describe('integration tests for AddressService', () => {
     let generatedAddresses: Address[]
 
     beforeAll(async () => {
-      await initConnection('')
+      await initConnection()
     })
 
     afterAll(async () => {

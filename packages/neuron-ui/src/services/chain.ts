@@ -1,16 +1,6 @@
-import CKBCore from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 
-export const ckbCore = new CKBCore('')
-export const { getHeader, getBlockchainInfo, getTipHeader, getHeaderByNumber, getFeeRateStats, getTransaction } =
-  ckbCore.rpc
+export const rpc = new CKBRPC('')
 
-export const { toUint64Le, parseEpoch } = ckbCore.utils
-
-export default {
-  ckbCore,
-  getHeader,
-  getTipHeader,
-  getTransaction,
-  toUint64Le,
-  getFeeRateStats,
-}
+export const { getHeader, getBlockchainInfo, getTipHeader, getHeaderByNumber, getFeeRateStatistics, getTransaction } =
+  rpc

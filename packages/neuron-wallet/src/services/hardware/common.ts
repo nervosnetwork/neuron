@@ -1,4 +1,4 @@
-import { AddressType } from '../../models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 
 export enum Manufacturer {
   Ledger = 'Ledger',

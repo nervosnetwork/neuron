@@ -18,7 +18,9 @@ export default class SudtTokenInfoSubscribe extends UserSettingSubscriber<SudtTo
     const repo = this.getNeedSyncConnection(event.connection.name)?.getRepository(SudtTokenInfo)
     if (repo && event.entity) {
       let mergeEntity: SudtTokenInfo | undefined = undefined
-      const existEntity = await event.connection.getRepository(SudtTokenInfo).findOne(event.entity.tokenID)
+      const existEntity = await event.connection
+        .getRepository(SudtTokenInfo)
+        .findOneBy({ tokenID: event.entity.tokenID })
       if (existEntity) {
         mergeEntity = new SudtTokenInfo()
         mergeEntity.tokenID = event.entity.tokenID || existEntity.tokenID

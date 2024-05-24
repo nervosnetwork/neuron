@@ -64,19 +64,10 @@
 }
 
 .fee {
-  display: flex;
-  justify-content: space-between;
   font-size: 14px;
   line-height: 20px;
   margin-top: 4px;
   color: var(--main-text-color);
-  gap: 24px;
-
-  & > div {
-    &:first-child {
-      flex-shrink: 0;
-    }
-  }
 }
 
 .rewards {
@@ -128,6 +119,7 @@
 .isBalanceReserved {
   display: flex;
   align-items: center;
+  margin-top: 12px;
 
   & > input {
     display: none;
@@ -160,5 +152,24 @@
         fill: var(--primary-color);
       }
     }
+  }
+}
+
+.notification {
+  color: var(--notice-text-color);
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  word-break: break-word;
+  margin-top: 12px;
+  background-color: var(--warn-background-color);
+  font-size: 12px;
+  line-height: 24px;
+  padding: 8px 14px;
+  border: 1px solid rgba(252, 136, 0, 0.2);
+  border-radius: 4px;
+  span {
+    font-weight: 500;
   }
 }

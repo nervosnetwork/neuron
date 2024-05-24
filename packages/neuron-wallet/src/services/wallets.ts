@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid'
 import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
-import Keystore from '../models/keys/keystore'
+import { Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { AccountExtendedPublicKey, DefaultAddressNumber } from '../models/keys/key'
+import { DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 
 import FileService from './file'
@@ -16,6 +16,8 @@ import { getConnection } from '../database/chain/connection'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import SyncProgressService from './sync-progress'
+import { prefixWith0x } from '../utils/scriptAndAddress'
 
 const fileService = FileService.getInstance()
 
@@ -55,7 +57,7 @@ export abstract class Wallet {
 
     this.id = id
     this.name = name
-    this.extendedKey = extendedKey
+    this.extendedKey = prefixWith0x(extendedKey)
     this.device = device
     this.isHD = isHDWallet ?? true
     this.startBlockNumber = startBlockNumber
@@ -110,6 +112,10 @@ export abstract class Wallet {
     }
   }
 
+  public async needsGenerateAddress() {
+    return false
+  }
+
   public abstract checkAndGenerateAddresses(
     isImporting?: boolean,
     receivingAddressCount?: number,
@@ -144,7 +150,7 @@ export class FileKeystoreWallet extends Wallet {
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+    return AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   public toJSON = () => {
@@ -177,6 +183,11 @@ export class FileKeystoreWallet extends Wallet {
 
   keystoreFileName = () => {
     return `${this.id}.json`
+  }
+
+  public async needsGenerateAddress() {
+    const [receiveCount, changeCount] = await AddressService.getAddressCountsToFillGapLimit(this.id)
+    return receiveCount !== 0 || changeCount !== 0
   }
 
   public checkAndGenerateAddresses = async (
@@ -225,7 +236,7 @@ export class HardwareWallet extends Wallet {
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+    return AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   static fromJSON = (json: WalletProperties) => {
@@ -365,11 +376,21 @@ export default class WalletService {
     }
   }
 
+  public async checkNeedGenerateAddress(walletIds: string[]) {
+    for (const walletId of new Set(walletIds)) {
+      const wallet = this.get(walletId)
+      if (await wallet.needsGenerateAddress()) {
+        return true
+      }
+    }
+    return false
+  }
+
   public create = (props: WalletProperties) => {
     if (!props) {
       throw new IsRequired('wallet property')
     }
-
+    props = { ...props, extendedKey: prefixWith0x(props.extendedKey) }
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
     if (index !== -1) {
@@ -416,6 +437,7 @@ export default class WalletService {
     this.setCurrent(newWallet.id)
 
     await AddressService.deleteByWalletId(existingWalletId)
+    await SyncProgressService.deleteWalletSyncProgress(existingWalletId)
 
     const newWallets = wallets.filter(w => w.id !== existingWalletId)
     this.listStore.writeSync(this.walletsKey, [...newWallets, newWallet])
@@ -470,6 +492,7 @@ export default class WalletService {
     }
 
     await AddressService.deleteByWalletId(id)
+    await SyncProgressService.deleteWalletSyncProgress(id)
 
     this.listStore.writeSync(this.walletsKey, newWallets)
 

@@ -52,6 +52,10 @@ type Action =
   | 'start-node-ignore-external'
   | 'get-first-sync-info'
   | 'start-sync'
+  | 'get-lock-window-info'
+  | 'update-lock-window-info'
+  | 'verify-lock-window-password'
+  | 'unlock-window'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -116,7 +120,6 @@ type Action =
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
   | 'migrate-acp'
-  | 'check-migrate-acp'
   | 'get-sudt-token-info'
   | 'generate-destroy-asset-account-tx'
   | 'get-sudt-type-script-hash'
@@ -139,7 +142,6 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'broadcast-signed-transaction'
-  | 'get-transaction-size'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft

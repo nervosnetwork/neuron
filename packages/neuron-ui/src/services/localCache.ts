@@ -12,6 +12,7 @@ export enum LocalCacheKey {
   ImportedWallet = 'ImportedWallet',
   ShownNodeId = 'ShownNodeId',
   ScreenAwake = 'ScreenAwake',
+  RetryUnlockWindowInfo = 'RetryUnlockWindowInfo',
 }
 
 export const addresses = {
@@ -174,5 +175,22 @@ export const keepScreenAwake = {
   },
   save: (value: boolean) => {
     window.localStorage.setItem(LocalCacheKey.ScreenAwake, value.toString())
+  },
+}
+
+export const retryUnlockWindow = {
+  reset: () => {
+    window.localStorage.setItem(LocalCacheKey.RetryUnlockWindowInfo, JSON.stringify({ retryTimes: 0 }))
+  },
+  save: (info: { lastRetryTime?: number; retryTimes: number }) => {
+    window.localStorage.setItem(LocalCacheKey.RetryUnlockWindowInfo, JSON.stringify(info))
+  },
+  get: (): { lastRetryTime?: number; retryTimes: number } => {
+    try {
+      const info = window.localStorage.getItem(LocalCacheKey.RetryUnlockWindowInfo)
+      return info ? JSON.parse(info) : { retryTimes: 0 }
+    } catch (error) {
+      return { retryTimes: 0 }
+    }
   },
 }

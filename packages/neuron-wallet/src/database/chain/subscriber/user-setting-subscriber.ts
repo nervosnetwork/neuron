@@ -1,5 +1,6 @@
 import { EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm'
-import { ConnectionName, getConnection, getCurrentConnectionName } from '../connection'
+import { getConnection, getCurrentConnectionName } from '../connection'
+import { ConnectionName } from '../ormconfig'
 
 type Constructor<T> = new (...args: unknown[]) => T
 

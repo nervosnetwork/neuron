@@ -1,8 +1,8 @@
 import React, { FC, useMemo, useState } from 'react'
 import Tabs, { VariantProps } from 'widgets/Tabs'
-import { clsx, localNumberFormatter, shannonToCKBFormatter, isMainnet as isMainnetUtils } from 'utils'
+import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { clsx, localNumberFormatter, shannonToCKBFormatter, scriptToAddress, isMainnet as isMainnetUtils } from 'utils'
 import { useTranslation } from 'react-i18next'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { onEnter } from 'utils/inputDevice'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import { HIDE_BALANCE } from 'utils/const'
@@ -59,7 +59,7 @@ const TabsVariantWithCellsCard = ({
           </div>
         </div>
         {selectedTab.cells.map((cell, index) => {
-          const address = cell.lock != null ? scriptToAddress(cell.lock, isMainnet) : null
+          const address = cell.lock != null ? scriptToAddress(cell.lock, { isMainnet }) : null
           const capacity = cell.capacity ? shannonToCKBFormatter(cell.capacity) : '--'
 
           return (

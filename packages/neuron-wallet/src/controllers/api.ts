@@ -66,7 +66,7 @@ import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
 import { OutPoint } from '@ckb-lumos/base'
 
-export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
+export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
   #walletsController = new WalletsController()
@@ -112,10 +112,6 @@ export default class ApiController {
       case 'backup-wallet': {
         // delete/backup wallet with wallet id
         this.#walletsController.requestPassword(params, command)
-        break
-      }
-      case 'migrate-acp': {
-        this.#assetAccountController.showACPMigrationDialog(false)
         break
       }
       default: {
@@ -306,6 +302,42 @@ export default class ApiController {
       }
     })
 
+    handle('unlock-window', async (_, password: string) => {
+      if (!SettingsService.getInstance().verifyLockWindowPassword(password)) {
+        return {
+          status: ResponseCode.Fail,
+        }
+      }
+      SettingsService.getInstance().updateLockWindowInfo({ locked: false })
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('update-lock-window-info', async (_, params: { locked?: boolean; password?: string }) => {
+      SettingsService.getInstance().updateLockWindowInfo(params)
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('get-lock-window-info', async () => {
+      return {
+        result: SettingsService.getInstance().lockWindowInfo,
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle('verify-lock-window-password', async (_, password: string) => {
+      return {
+        status: SettingsService.getInstance().verifyLockWindowPassword(password)
+          ? ResponseCode.Success
+          : ResponseCode.Fail,
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -341,12 +373,12 @@ export default class ApiController {
           startBlockNumber: string
         }
       ) => {
-        const res = this.#walletsController.update(params)
         const network = NetworksService.getInstance().getCurrent()
         if (network.type !== NetworkType.Light) {
           throw new Error('Only Light client can set start block number')
         }
         const lastSetStartBlockNumber = WalletsService.getInstance().getCurrent()?.toJSON().startBlockNumber
+        const res = this.#walletsController.update(params)
         if (lastSetStartBlockNumber && +params.startBlockNumber < +lastSetStartBlockNumber) {
           await CKBLightRunner.getInstance().clearNodeCache()
         } else {
@@ -417,6 +449,7 @@ export default class ApiController {
           description?: string
           multisigConfig?: MultisigConfigModel
           amendHash?: string
+          skipLastInputs?: boolean
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -746,11 +779,6 @@ export default class ApiController {
       return this.#assetAccountController.getAccount(params)
     })
 
-    handle('check-migrate-acp', async () => {
-      const allowMultipleOpen = true
-      return this.#assetAccountController.showACPMigrationDialog(allowMultipleOpen)
-    })
-
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
       return this.#assetAccountController.migrateAcp(params)
     })
@@ -839,10 +867,6 @@ export default class ApiController {
 
     handle('broadcast-signed-transaction', async (_, params) => {
       return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
-    })
-
-    handle('get-transaction-size', async (_, params) => {
-      return this.#transactionsController.getTransactionSize(params)
     })
 
     handle('sign-and-export-transaction', async (_, params) => {

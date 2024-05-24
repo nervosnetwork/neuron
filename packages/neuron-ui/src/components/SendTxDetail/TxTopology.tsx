@@ -1,6 +1,5 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import React, { FC } from 'react'
-import { shannonToCKBFormatter } from 'utils'
+import { scriptToAddress, shannonToCKBFormatter } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 import CopyZone from 'widgets/CopyZone'
 import { ArrowDownRound } from 'widgets/Icons/icon'
@@ -56,7 +55,7 @@ const TxTopology: FC<{
               // eslint-disable-next-line react/no-array-index-key
               key={idx.toString()}
               label={`Input${idx + 1}`}
-              address={scriptToAddress(v.lock, isMainnet)}
+              address={scriptToAddress(v.lock, { isMainnet })}
               amount={v.capacity}
               inputStatus={v.status === 'sent' ? 'Pending' : 'On-chain'}
             />
@@ -112,7 +111,7 @@ const TxTopology: FC<{
               // eslint-disable-next-line react/no-array-index-key
               key={idx.toString()}
               label={v.isChangeCell ? 'Change' : 'Receive'}
-              address={scriptToAddress(v.lock, isMainnet)}
+              address={scriptToAddress(v.lock, { isMainnet })}
               amount={v.capacity}
             />
           ) : null

@@ -1,4 +1,4 @@
-import { ckbCore } from 'services/chain'
+import { addressToScript } from 'utils'
 import { FieldRequiredException, FieldInvalidException, AddressDeprecatedException } from 'exceptions'
 import { DEPRECATED_CODE_HASH } from 'utils/const'
 import { isSecp256k1Address } from 'utils/is'
@@ -24,7 +24,7 @@ export const validateAssetAccountAddress = ({
       return true
     }
 
-    const lockScript = ckbCore.utils.addressToScript(address)
+    const lockScript = addressToScript(address, { isMainnet })
 
     if ([DEPRECATED_CODE_HASH.AcpOnAggron, DEPRECATED_CODE_HASH.AcpOnLina].includes(lockScript.codeHash)) {
       throw new AddressDeprecatedException()

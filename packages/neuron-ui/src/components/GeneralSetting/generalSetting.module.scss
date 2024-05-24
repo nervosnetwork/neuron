@@ -38,6 +38,11 @@ $action-button-width: 11.25rem;
         margin-right: 4px;
       }
     }
+
+    &.lockWindow {
+      width: auto;
+      min-width: 176px;
+    }
   }
   .showVersion {
     position: relative;

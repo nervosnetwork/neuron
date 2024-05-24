@@ -8,6 +8,7 @@ import {
   updateAddressListAndBalance,
   initAppState,
   showGlobalAlertDialog,
+  updateLockWindowInfo,
 } from 'states/stateProvider/actionCreators'
 
 import {
@@ -28,7 +29,7 @@ import {
   ShowGlobalDialog as ShowGlobalDialogSubject,
   NoDiskSpace,
 } from 'services/subjects'
-import { ckbCore, getTipHeader } from 'services/chain'
+import { rpc, getTipHeader } from 'services/chain'
 import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
@@ -77,13 +78,13 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
     }
     clearInterval(timer!)
     if (chainURL) {
-      ckbCore.setNode(chainURL)
+      rpc.setNode({ url: chainURL })
       syncBlockchainInfo()
       timer = setInterval(() => {
         syncBlockchainInfo()
       }, SYNC_INTERVAL_TIME)
     } else {
-      ckbCore.setNode('')
+      rpc.setNode({ url: '' })
     }
     return () => {
       clearInterval(timer)
@@ -114,6 +115,8 @@ export const useSubscription = ({
   dispatch,
   location,
   showSwitchNetwork,
+  lockWindowInfo,
+  setIsLockDialogShow,
 }: {
   walletID: string
   chain: State.Chain
@@ -122,6 +125,8 @@ export const useSubscription = ({
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
   showSwitchNetwork: () => void
+  lockWindowInfo: State.App['lockWindowInfo']
+  setIsLockDialogShow: (v: boolean) => void
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
 
@@ -304,6 +309,15 @@ export const useSubscription = ({
           case 'multisig-address':
             navigateToolsRouter(type)
             break
+          case 'lock-window':
+            if (lockWindowInfo?.encryptedPassword) {
+              if (!lockWindowInfo.locked) {
+                updateLockWindowInfo({ locked: true })(dispatch)
+              }
+            } else {
+              setIsLockDialogShow(true)
+            }
+            break
           default: {
             break
           }
@@ -332,6 +346,8 @@ export const useSubscription = ({
     dispatch,
     location.pathname,
     showSwitchNetwork,
+    lockWindowInfo,
+    setIsLockDialogShow,
   ])
 }
 

@@ -2,7 +2,7 @@
   "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.114.3",
+  "version": "0.116.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -65,7 +65,8 @@
   "resolutions": {
     "@types/react": "18.2.45",
     "react-i18next": ">=11.16.4",
-    "react-refresh": "0.14.0"
+    "react-refresh": "0.14.0",
+    "node-fetch": "2.6.13"
   },
   "volta": {
     "node": "20.10.0"

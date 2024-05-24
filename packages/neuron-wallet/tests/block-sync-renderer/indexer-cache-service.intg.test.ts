@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
 import AddressMeta from '../../src/database/address/meta'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import { AddressVersion } from '../../src/models/address'
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../src/services/rpc-service'

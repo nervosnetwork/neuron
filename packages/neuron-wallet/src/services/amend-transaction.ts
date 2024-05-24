@@ -3,7 +3,7 @@ import AmendTransactionEntity from '../database/chain/entities/amend-transaction
 
 export default class AmendTransactionService {
   static async save(hash: string, amendHash: string) {
-    const exist = await getConnection().getRepository(AmendTransactionEntity).findOne({
+    const exist = await getConnection().getRepository(AmendTransactionEntity).findOneBy({
       hash,
       amendHash,
     })

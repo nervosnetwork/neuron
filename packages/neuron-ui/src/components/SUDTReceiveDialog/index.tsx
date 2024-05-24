@@ -1,28 +1,15 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import { AddressQrCodeWithCopyZone } from 'components/Receive'
 import Dialog from 'widgets/Dialog'
 import Alert from 'widgets/Alert'
 
-import { CONSTANTS } from 'utils'
+import { CONSTANTS, addressToAddress } from 'utils'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import styles from './sUDTReceiveDialog.module.scss'
 
 const { DEFAULT_SUDT_FIELDS } = CONSTANTS
-const toShortAddr = (addr: string) => {
-  try {
-    const script = addressToScript(addr)
-    const isMainnet = addr.startsWith(AddressPrefix.Mainnet)
-    return bech32Address(script.args, {
-      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-      codeHashOrCodeHashIndex: '0x02',
-    })
-  } catch {
-    return ''
-  }
-}
 
 export interface DataProps {
   address: string
@@ -36,7 +23,7 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
   const [isInShortFormat, setIsInShortFormat] = useState(false)
   const { address, accountName, tokenName, symbol } = data
 
-  const displayedAddr = isInShortFormat ? toShortAddr(address) : address
+  const displayedAddr = isInShortFormat ? addressToAddress(address, { deprecated: true }) : address
 
   return (
     <Dialog

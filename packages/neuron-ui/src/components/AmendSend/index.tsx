@@ -8,11 +8,11 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { GoBack } from 'widgets/Icons/icon'
 import { MIN_AMOUNT } from 'utils/const'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   useGoBack,
+  scriptToAddress,
   shannonToCKBFormatter,
   RoutePath,
   isSecp256k1Address,
@@ -41,7 +41,7 @@ const AmendSend = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, showConfirmedAlert } =
+  const { fee, updateTransactionPrice, onDescriptionChange, transaction, onSubmit, minPrice, isConfirmedAlertShown } =
     useInitialize({
       hash,
       walletID,
@@ -68,11 +68,11 @@ const AmendSend = () => {
 
   const getLastOutputAddress = (outputs: State.DetailedOutput[]) => {
     if (outputs.length === 1) {
-      return scriptToAddress(outputs[0].lock, isMainnet)
+      return scriptToAddress(outputs[0].lock, { isMainnet })
     }
 
     const change = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       if (!isSecp256k1Address(address)) {
         navigate(`${RoutePath.History}/amendSUDTSend/${hash}`, {
           replace: true,
@@ -82,19 +82,28 @@ const AmendSend = () => {
       return !!addresses.find(item => item.address === address && item.type === 1)
     })
     if (change) {
-      return scriptToAddress(change.lock, isMainnet)
+      return scriptToAddress(change.lock, { isMainnet })
     }
 
     const receive = outputs.find(output => {
-      const address = scriptToAddress(output.lock, isMainnet)
+      const address = scriptToAddress(output.lock, { isMainnet })
       return !!addresses.find(item => item.address === address && item.type === 0)
     })
     if (receive) {
-      return scriptToAddress(receive.lock, isMainnet)
+      return scriptToAddress(receive.lock, { isMainnet })
     }
 
     return ''
   }
+
+  const inputsCapacity = useMemo(() => {
+    if (transaction) {
+      return transaction.inputs.reduce((total, cur) => {
+        return total + BigInt(cur.capacity || '0')
+      }, BigInt(0))
+    }
+    return undefined
+  }, [transaction])
 
   const items: {
     address: string
@@ -103,28 +112,29 @@ const AmendSend = () => {
     isLastOutput: boolean
     output: State.DetailedOutput
   }[] = useMemo(() => {
-    if (transaction && transaction.outputs.length) {
+    if (transaction && transaction.outputs.length && inputsCapacity) {
       const lastOutputAddress = getLastOutputAddress(transaction.outputs)
       return transaction.outputs.map(output => {
-        const address = scriptToAddress(output.lock, isMainnet)
+        const address = scriptToAddress(output.lock, { isMainnet })
+        const capacity =
+          transaction.outputs.length === 1 && address === lastOutputAddress
+            ? (inputsCapacity - fee).toString()
+            : output.capacity
         return {
-          capacity: output.capacity,
+          capacity,
           address,
           output,
-          amount: shannonToCKBFormatter(output.capacity || '0'),
+          amount: shannonToCKBFormatter(capacity || '0'),
           isLastOutput: address === lastOutputAddress,
         }
       })
     }
     return []
-  }, [transaction?.outputs])
+  }, [transaction?.outputs, inputsCapacity, fee])
 
   const outputsCapacity = useMemo(() => {
-    const outputList = items.filter(item => !item.isLastOutput)
+    const outputList = items.length === 1 ? items : items.filter(item => !item.isLastOutput)
     return outputList.reduce((total, cur) => {
-      if (Number.isNaN(+(cur.capacity || ''))) {
-        return total
-      }
       return total + BigInt(cur.capacity || '0')
     }, BigInt(0))
   }, [items])
@@ -132,21 +142,18 @@ const AmendSend = () => {
   const totalAmount = shannonToCKBFormatter(outputsCapacity.toString())
 
   const lastOutputsCapacity = useMemo(() => {
-    if (transaction) {
-      const inputsCapacity = transaction.inputs.reduce((total, cur) => {
-        if (Number.isNaN(+(cur.capacity || ''))) {
-          return total
-        }
-        return total + BigInt(cur.capacity || '0')
-      }, BigInt(0))
+    if (inputsCapacity) {
+      if (items.length === 1) {
+        return BigInt(items[0].capacity || '0')
+      }
 
       return inputsCapacity - outputsCapacity - fee
     }
-    return -1
-  }, [transaction, fee, outputsCapacity])
+    return undefined
+  }, [inputsCapacity, fee, outputsCapacity, items])
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && lastOutputsCapacity !== undefined) {
       const outputs = items.map(item => {
         const capacity = item.isLastOutput ? lastOutputsCapacity.toString() : item.capacity
         return {
@@ -164,7 +171,8 @@ const AmendSend = () => {
     }
   }, [lastOutputsCapacity, transaction, items, dispatch])
 
-  const disabled = sending || !send.generatedTx || priceError || lastOutputsCapacity < MIN_AMOUNT
+  const disabled =
+    sending || !send.generatedTx || priceError || lastOutputsCapacity === undefined || lastOutputsCapacity < MIN_AMOUNT
 
   return (
     <PageContainer
@@ -252,7 +260,7 @@ const AmendSend = () => {
       </form>
 
       <AlertDialog
-        show={showConfirmedAlert}
+        show={isConfirmedAlertShown}
         title={t('send.transaction-confirmed')}
         message={t('send.transaction-cannot-amend')}
         type="warning"

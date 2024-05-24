@@ -90,7 +90,7 @@ import { closeConnection, getConnection, initConnection } from '../../setupAndTe
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
 
     // @ts-ignore: Private method
     SystemScriptInfo.getInstance().secpOutPointInfo = new Map<string, OutPoint>([
@@ -2540,6 +2540,21 @@ describe('TransactionGenerator', () => {
           getCurrentMock.mockReturnValueOnce({})
           const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
           const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash)) as Transaction
+          expect(res.outputs).toHaveLength(2)
+          expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+        })
+        it('sudt capacitity is enough with legacy acp address', async () => {
+          const bobLegacyAnyoneCanPayLockScript = assetAccountInfo.generateLegacyAnyoneCanPayScript(
+            '0x36c329ed630d6ce750712a477543672adab57f4c'
+          )
+          const sudtCell = Output.fromObject(sudtCellObject)
+          sudtCell.setLock(bobLegacyAnyoneCanPayLockScript)
+          sudtCell.setCapacity(toShannon('144'))
+          getCurrentMock.mockReturnValueOnce({})
+          const bobAddress = scriptToAddress(bobAnyoneCanPayLockScript)
+          const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobAddress)) as Transaction
+          const legacyACPCellDep = assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep
+          expect(res.cellDeps.find(v => v.outPoint.txHash === legacyACPCellDep.outPoint.txHash)).not.toBe(-1)
           expect(res.outputs).toHaveLength(2)
           expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
         })
