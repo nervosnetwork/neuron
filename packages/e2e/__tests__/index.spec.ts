@@ -40,7 +40,8 @@ test("Launch Neuron", async () => {
   expect(title).toBe("Neuron");
 });
 
-test("Create Wallet", async () => {
+//first operation will use Create Wallet test
+/*test("Create Wallet", async () => {
   await page.getByLabel("导入助记词").click();
   await page.locator("div").filter({ hasText: /^1$/ }).getByRole("textbox").click();
   await page.locator("div").filter({ hasText: /^1$/ }).getByRole("textbox").fill("verb");
@@ -73,3 +74,71 @@ test("Create Wallet", async () => {
   await page.getByLabel("完成创建").click();
   await page.screenshot({ path: "./test-results/createWallet.png" });
 });
+
+
+test("send transaction", async () => {
+  await page.waitForSelector('.syncStatus_synced__JM5ln');
+  await page.getByTitle('总览').click();
+  await page.getByRole('button', {name: '转账'}).click();
+  await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
+  await page.locator("id=amount").fill("103");
+  await page.getByRole('button', {name: '发送'}).click();
+  await page.locator("id=password").fill('Aa111111');
+  await page.getByRole('button',{name: '确认'}).click();
+  await page.waitForTimeout(300000);
+});*/
+
+
+test("nervos dao deposit", async () => {
+  await page.getByTitle('Nervos Dao').click();
+  await page.getByRole('button', {name: '存入'}).click();
+  await page.locator("id=depositValue").fill("104");
+  await page.getByRole('button', {name: '继续'}).click();
+  await page.locator("id=password").fill('Aa111111');
+  await page.getByRole('button',{name: '确认'}).click();
+  await page.waitForTimeout(300000);
+  await expect(page.getByRole('button', {name: '查看交易详情'})).toBeVisible();
+
+});
+
+
+/*test("check transaction history", async () => {
+  await page.getByTitle('交易历史').click();
+  await page.getByPlaceholder('使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索').fill('2024-05-23');
+  let EnterKey = "Enter";
+  page.keyboard.press(EnterKey);
+  await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
+  await page.getByRole('button', {name: '导出交易历史'}).click();
+
+});*/
+
+
+/*test("two cells consume", async () => {
+
+
+});*/
+
+
+/*test("create account in asset accounts", async () => {
+
+
+});*/
+
+
+/*test("amend transaction ", async () => {
+
+
+});*/
+
+
+/*test("claim in customized page ", async () => {
+
+
+});*/
+
+
+
+
+
+
+
