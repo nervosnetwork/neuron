@@ -256,6 +256,7 @@ export class TransactionsService {
       .addSelect('input.transactionHash', 'transactionHash')
       .addSelect('input.outPointTxHash', 'outPointTxHash')
       .addSelect('input.outPointIndex', 'outPointIndex')
+      .addSelect('input.data', 'data')
       .where(
         `
         input.transactionHash IN (:...txHashes) AND
@@ -266,7 +267,13 @@ export class TransactionsService {
           walletId: params.walletID,
         }
       )
-      .getRawMany()
+      .getRawMany<{
+        capacity: string
+        transactionHash: string
+        outPointTxHash: string
+        outPointIndex: string
+        data: string
+      }>()
 
     const outputs = await connection
       .getRepository(OutputEntity)
@@ -284,7 +291,7 @@ export class TransactionsService {
           walletId: params.walletID,
         }
       )
-      .getRawMany()
+      .getRawMany<{ capacity: string; transactionHash: string; daoData: string }>()
 
     const assetAccountInputs = await connection
       .getRepository(InputEntity)
@@ -373,13 +380,17 @@ export class TransactionsService {
     ).filter(o => inputPreviousTxHashes.includes(o.txHash))
 
     const sums = new Map<string, bigint>()
-    const daoFlag = new Map<string, boolean>()
+    const daoInfo = new Map<string, { inputs: typeof inputs; outputs: typeof outputs }>()
     outputs.map(o => {
       const s = sums.get(o.transactionHash) || BigInt(0)
       sums.set(o.transactionHash, s + BigInt(o.capacity))
 
       if (o.daoData) {
-        daoFlag.set(o.transactionHash, true)
+        if (daoInfo.has(o.transactionHash)) {
+          daoInfo.get(o.transactionHash)!.outputs.push(o)
+        } else {
+          daoInfo.set(o.transactionHash, { inputs: [], outputs: [o] })
+        }
       }
     })
 
@@ -391,7 +402,11 @@ export class TransactionsService {
         return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
       })
       if (result) {
-        daoFlag.set(i.transactionHash, true)
+        if (daoInfo.has(i.transactionHash)) {
+          daoInfo.get(i.transactionHash)!.inputs.push(i)
+        } else {
+          daoInfo.set(i.transactionHash, { inputs: [i], outputs: [] })
+        }
       }
     })
 
@@ -477,6 +492,16 @@ export class TransactionsService {
           nftInfo = { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
         }
 
+        const txDaoInfo = daoInfo.get(tx.hash)
+        let daoCapacity: string | undefined
+        if (txDaoInfo) {
+          if (txDaoInfo.inputs.length && !txDaoInfo.outputs.length) {
+            daoCapacity = txDaoInfo.inputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, BigInt(value)).toString()
+          } else if (!txDaoInfo.inputs.length && txDaoInfo.outputs.length) {
+            daoCapacity = `-${txDaoInfo.outputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, BigInt(0)).toString()}`
+          }
+        }
+
         return Transaction.fromObject({
           timestamp: tx.timestamp,
           value: value.toString(),
@@ -484,7 +509,7 @@ export class TransactionsService {
           version: tx.version,
           type: txType,
           assetAccountType: assetAccountType,
-          nervosDao: daoFlag.get(tx.hash!),
+          nervosDao: !!txDaoInfo,
           status: tx.status,
           description: tx.description,
           createdAt: tx.createdAt,
@@ -492,6 +517,7 @@ export class TransactionsService {
           blockNumber: tx.blockNumber,
           sudtInfo: sudtInfo,
           nftInfo: nftInfo,
+          daoCapacity,
         })
       })
     )
