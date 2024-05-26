@@ -142,7 +142,7 @@
       "activity": "Activity",
       "datetime": "Date & Time",
       "status": "Status",
-      "amount": "Amount",
+      "asset": "Asset",
       "address": "Address",
       "sent": "Sent",
       "sending": "Sending",
@@ -313,7 +313,7 @@
         "name": "Wallet Name",
         "type": "Type",
         "balance": "Balance",
-        "amount": "Amount",
+        "asset": "Asset",
         "timestamp": "Time",
         "status": "Status",
         "operation": "Operation"

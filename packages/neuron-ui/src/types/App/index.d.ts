@@ -19,6 +19,7 @@ declare namespace State {
       data: string
     }
     assetAccountType?: 'CKB' | 'sUDT' | string
+    daoCapacity?: string
   }
 
   interface DetailedInput {
