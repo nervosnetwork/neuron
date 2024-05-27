@@ -135,7 +135,7 @@
       "activity": "Actividad",
       "datetime": "Fecha y Hora",
       "status": "Estado",
-      "amount": "Cantidad",
+      "asset": "Activos",
       "address": "Dirección",
       "sent": "Enviado",
       "sending": "Enviando",
@@ -305,7 +305,7 @@
         "name": "Nombre de la Billetera",
         "type": "Tipo",
         "balance": "Saldo",
-        "amount": "Cantidad",
+        "asset": "activos",
         "timestamp": "Tiempo",
         "status": "Estado",
         "operation": "Operación"

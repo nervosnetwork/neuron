@@ -135,7 +135,7 @@
       "activity": "收支活动",
       "datetime": "时间",
       "status": "状态",
-      "amount": "金额",
+      "asset": "资产",
       "address": "地址",
       "sent": "已发送",
       "sending": "正在发送",
@@ -306,7 +306,7 @@
         "name": "钱包名称",
         "type": "类型",
         "balance": "余额",
-        "amount": "金额",
+        "asset": "资产",
         "timestamp": "时间",
         "status": "状态",
         "operation": "操作"

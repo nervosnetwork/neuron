@@ -126,7 +126,7 @@ const History = () => {
       sortable: true,
     },
     {
-      title: t('history.table.amount'),
+      title: t('history.table.asset'),
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,

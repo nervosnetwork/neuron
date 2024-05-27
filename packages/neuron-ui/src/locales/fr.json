@@ -142,7 +142,7 @@
       "activity": "Activité",
       "datetime": "Date et heure",
       "status": "Statut",
-      "amount": "Montant",
+      "asset": "actifs",
       "address": "Adresse",
       "sent": "Envoyé",
       "sending": "Envoi",
@@ -312,7 +312,7 @@
         "name": "Nom du Wallet",
         "type": "Type",
         "balance": "Solde",
-        "amount": "Montant",
+        "asset": "actifs",
         "timestamp": "Heure",
         "status": "Statut",
         "operation": "Opération"
