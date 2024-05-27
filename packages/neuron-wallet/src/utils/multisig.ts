@@ -6,8 +6,7 @@ import { OfflineSignJSON } from 'src/models/offline-sign'
 import Transaction from '../models/chain/transaction'
 import SystemScriptInfo from '../models/system-script-info'
 import Input from '../models/chain/input'
-import { hump } from './hump'
-import { DepType } from '../models/chain/cell-dep'
+import { jsonToHump } from './json-to-hump'
 
 export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signatures: Signatures) => {
   const multisigLockHash = scriptToHash(
@@ -34,10 +33,9 @@ export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signature
 }
 
 export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction => {
-  const { multisig_configs } = tx
-  const txObj = hump(tx.transaction)
-
-  if (multisig_configs) {
+  const { multisig_configs, transaction } = tx
+  const txObj = Transaction.fromObject(jsonToHump(transaction))
+  if (multisig_configs && Object.keys(multisig_configs).length) {
     const args = Object.keys(multisig_configs)[0]
     const lock = SystemScriptInfo.generateMultiSignScript(args)
 
@@ -47,20 +45,8 @@ export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction 
       }
     })
   }
-
-  if (!tx.transaction?.signatures && tx?.signatures) {
-    tx.transaction.signatures = tx.signatures
-    delete tx.signatures
-  }
-
-  if (tx.transaction.cellDeps) {
-    tx.transaction.cellDeps.forEach(item => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      if (item.depType === 'dep_group') {
-        item.depType = DepType.DepGroup
-      }
-    })
+  if (!txObj?.signatures && tx?.signatures) {
+    txObj.signatures = tx.signatures
   }
   return txObj
 }

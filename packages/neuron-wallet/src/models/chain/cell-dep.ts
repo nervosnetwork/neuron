@@ -14,8 +14,9 @@ export default class CellDep {
     this.depType = depType
   }
 
-  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType }): CellDep {
-    return new CellDep(OutPoint.fromObject(outPoint), depType)
+  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType | 'dep_group' }): CellDep {
+    const _depType = depType == 'dep_group' ? DepType.DepGroup : depType
+    return new CellDep(OutPoint.fromObject(outPoint), _depType)
   }
 
   public toSDK(): CKBComponents.CellDep {
