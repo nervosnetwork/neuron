@@ -41,7 +41,7 @@ export abstract class Synchronizer {
   }
 
   constructor({ addresses, nodeUrl }: { addresses: Address[]; nodeUrl: string }) {
-    this.indexer = new CkbIndexer(nodeUrl, nodeUrl)
+    this.indexer = new CkbIndexer(nodeUrl)
     this.addressesByWalletId = addresses
       .map(address => AddressMeta.fromObject(address))
       .reduce((addressesByWalletId, addressMeta) => {

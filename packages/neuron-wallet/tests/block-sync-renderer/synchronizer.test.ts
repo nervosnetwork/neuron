@@ -116,7 +116,7 @@ describe('unit tests for IndexerConnector', () => {
         addresses: [],
         nodeUrl,
       })
-      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, nodeUrl)
+      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
     })
 
     it('init with addresses', () => {

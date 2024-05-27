@@ -92,7 +92,7 @@ describe('unit tests for IndexerConnector', () => {
         new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits lumos indexer with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, nodeUrl)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
       })
     })
     describe('when init without indexer folder path', () => {
@@ -100,7 +100,7 @@ describe('unit tests for IndexerConnector', () => {
         new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits mercury indexer with a node url and a default port', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, nodeUrl)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
       })
     })
   })
