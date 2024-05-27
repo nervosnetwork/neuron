@@ -31,8 +31,7 @@ export interface StartParams {
   genesisHash: string
   url: SyncQueueParams[0]
   addressMetas: SyncQueueParams[1]
-  indexerUrl: SyncQueueParams[2]
-  nodeType: SyncQueueParams[3]
+  nodeType: SyncQueueParams[2]
 }
 
 export type QueryIndexerParams = QueryOptions
@@ -63,7 +62,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       try {
         await initConnection(message.genesisHash)
 
-        syncQueue = new SyncQueue(message.url, message.addressMetas, message.indexerUrl, message.nodeType)
+        syncQueue = new SyncQueue(message.url, message.addressMetas, message.nodeType)
         syncQueue.start()
       } catch (err) {
         logger.error(`Block Sync Task:\t`, err)

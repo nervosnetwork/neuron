@@ -87,14 +87,12 @@ describe('unit tests for IndexerConnector', () => {
   })
 
   describe('#constructor', () => {
-    const STUB_URI = 'stub_uri'
-
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
-        new stubbedFullSynchronizer([], nodeUrl, STUB_URI)
+        new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits lumos indexer with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, nodeUrl)
       })
     })
     describe('when init without indexer folder path', () => {
@@ -102,7 +100,7 @@ describe('unit tests for IndexerConnector', () => {
         new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits mercury indexer with a node url and a default port', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, nodeUrl)
       })
     })
   })
