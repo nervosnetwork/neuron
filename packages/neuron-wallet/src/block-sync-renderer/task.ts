@@ -1,4 +1,4 @@
-import type { LumosCellQuery } from './sync/synchronizer'
+import { type QueryOptions } from '@ckb-lumos/base'
 import initConnection from '../database/chain/ormconfig'
 import { register as registerTxStatusListener } from './tx-status-listener'
 import SyncQueue from './sync/queue'
@@ -35,7 +35,7 @@ export interface StartParams {
   nodeType: SyncQueueParams[3]
 }
 
-export type QueryIndexerParams = LumosCellQuery
+export type QueryIndexerParams = QueryOptions
 
 export const listener = async ({ type, id, channel, message }: WorkerMessage) => {
   if (type === 'kill') {
