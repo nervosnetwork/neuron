@@ -111,22 +111,18 @@ describe('unit tests for IndexerConnector', () => {
   })
 
   describe('#constructor', () => {
-    const STUB_URI = 'stub_uri'
-
     it('inits lumos indexer with a node url and indexer folder path', () => {
       new TestSynchronizer({
         addresses: [],
         nodeUrl,
-        indexerUrl: STUB_URI,
       })
-      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
     })
 
     it('init with addresses', () => {
       const synchronizer = new TestSynchronizer({
         addresses: [addressObj1, addressObj2],
         nodeUrl,
-        indexerUrl: STUB_URI,
       })
       expect(synchronizer.getAddressesByWalletId().get(walletId1)?.[0]).toStrictEqual(
         AddressMeta.fromObject(addressObj1)
@@ -141,7 +137,6 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
     it('no cached tx', async () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
@@ -179,7 +174,6 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
     synchronizer.blockTipsSubject.subscribe(stubbedBlockTipsSubscribe)
 
@@ -271,7 +265,6 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
 
     describe('when success', () => {

@@ -29,11 +29,7 @@ export default class LightSynchronizer extends Synchronizer {
   private addressMetas: AddressMeta[]
 
   constructor(addresses: Address[], nodeUrl: string) {
-    super({
-      addresses,
-      nodeUrl,
-      indexerUrl: nodeUrl,
-    })
+    super({ addresses, nodeUrl })
     this.lightRpc = new LightRPC(nodeUrl)
     this.addressMetas = addresses.map(address => AddressMeta.fromObject(address))
     // fetch some dep cell

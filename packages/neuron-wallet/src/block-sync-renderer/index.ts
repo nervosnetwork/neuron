@@ -177,7 +177,6 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: network.remote,
       nodeType: network.type,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
