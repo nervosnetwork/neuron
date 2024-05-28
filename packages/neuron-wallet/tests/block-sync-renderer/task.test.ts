@@ -70,7 +70,8 @@ describe(`Block Sync Task`, () => {
       expect(stubbedSyncQueue).toHaveBeenCalledWith(
         STUB_START_MESSAGE.message.url,
         STUB_START_MESSAGE.message.addressMetas,
-        STUB_START_MESSAGE.message.nodeType
+        STUB_START_MESSAGE.message.nodeType,
+        undefined
       )
       expect(stubbedSyncQueueStart).toHaveBeenCalled()
     })
