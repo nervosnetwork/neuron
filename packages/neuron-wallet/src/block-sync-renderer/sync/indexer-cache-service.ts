@@ -84,6 +84,7 @@ export default class IndexerCacheService {
             lock: lockScript,
             fromBlock: lastCacheBlockNumber.value,
             toBlock: currentHeaderBlockNumber,
+            groupByTransaction: true,
           },
           this.rpcService.url,
           {
