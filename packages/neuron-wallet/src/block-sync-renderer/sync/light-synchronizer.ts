@@ -23,6 +23,7 @@ import NetworksService from '../../services/networks'
 import { getConnection } from '../../database/chain/connection'
 
 const unpackGroup = molecule.vector(blockchain.OutPoint)
+const THRESHOLD_BLOCK_NUMBER_IN_DIFF_WALLET = 100_000
 
 export default class LightSynchronizer extends Synchronizer {
   private lightRpc: LightRPC
@@ -167,6 +168,18 @@ export default class LightSynchronizer extends Synchronizer {
     await getConnection('light').manager.save(updatedSyncProgress, { chunk: 100 })
   }
 
+  private static async getWalletsSyncedMinBlockNumber() {
+    const walletMinBlockNumber = await SyncProgressService.getWalletMinLocalSavedBlockNumber()
+    const wallets = await WalletService.getInstance().getAll()
+    return wallets.reduce<Record<string, number>>(
+      (pre, cur) => ({
+        ...pre,
+        [cur.id]: Math.max(parseInt(cur.startBlockNumber ?? '0x0'), walletMinBlockNumber?.[cur.id] ?? 0),
+      }),
+      {}
+    )
+  }
+
   private async initSyncProgress(appendScripts: AppendScript[] = []) {
     if (!this.addressMetas.length && !appendScripts.length) {
       return
@@ -174,13 +187,13 @@ export default class LightSynchronizer extends Synchronizer {
     const existSyncArgses = await SyncProgressService.getExistingSyncArgses()
     const syncScripts = await this.lightRpc.getScripts()
     const retainedSyncScripts = syncScripts.filter(v => existSyncArgses.has(v.script.args))
-    const existSyncscripts: Record<string, LightScriptFilter> = {}
+    const existSyncScripts: Record<string, LightScriptFilter> = {}
     retainedSyncScripts.forEach(v => {
-      existSyncscripts[scriptToHash(v.script)] = v
+      existSyncScripts[scriptToHash(v.script)] = v
     })
+    const walletMinBlockNumber = await LightSynchronizer.getWalletsSyncedMinBlockNumber()
     const currentWalletId = WalletService.getInstance().getCurrent()?.id
     const allScripts = this.addressMetas
-      .filter(v => (currentWalletId ? v.walletId === currentWalletId : true))
       .map(addressMeta => {
         const lockScripts = [
           addressMeta.generateDefaultLockScript(),
@@ -194,32 +207,32 @@ export default class LightSynchronizer extends Synchronizer {
         }))
       })
       .flat()
-    const walletMinBlockNumber = await SyncProgressService.getWalletMinLocalSavedBlockNumber()
-    const wallets = await WalletService.getInstance().getAll()
-    const walletStartBlockMap = wallets.reduce<Record<string, string | undefined>>(
-      (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumber }),
-      {}
-    )
+      .filter(v => {
+        return (
+          !currentWalletId ||
+          v.walletId === currentWalletId ||
+          walletMinBlockNumber[v.walletId] >
+            walletMinBlockNumber[currentWalletId] - THRESHOLD_BLOCK_NUMBER_IN_DIFF_WALLET
+        )
+      })
     const otherTypeSyncBlockNumber = await SyncProgressService.getOtherTypeSyncBlockNumber()
     const addScripts = [
       ...allScripts
-        .filter(
-          v =>
-            !existSyncscripts[scriptToHash(v.script)] ||
-            +existSyncscripts[scriptToHash(v.script)].blockNumber < +(walletStartBlockMap[v.walletId] ?? 0)
-        )
-        .map(v => {
-          const blockNumber = Math.max(
-            parseInt(walletStartBlockMap[v.walletId] ?? '0x0'),
-            walletMinBlockNumber?.[v.walletId] ?? 0
+        .filter(v => {
+          const scriptHash = scriptToHash(v.script)
+          return (
+            !existSyncScripts[scriptHash] ||
+            +existSyncScripts[scriptHash].blockNumber < walletMinBlockNumber[v.walletId]
           )
+        })
+        .map(v => {
           return {
             ...v,
-            blockNumber: `0x${blockNumber.toString(16)}`,
+            blockNumber: `0x${walletMinBlockNumber[v.walletId].toString(16)}`,
           }
         }),
       ...appendScripts
-        .filter(v => !existSyncscripts[scriptToHash(v.script)])
+        .filter(v => !existSyncScripts[scriptToHash(v.script)])
         .map(v => ({
           ...v,
           blockNumber: `0x${(otherTypeSyncBlockNumber[scriptToHash(v.script)] ?? 0).toString(16)}`,
