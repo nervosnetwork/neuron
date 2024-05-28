@@ -1,3 +1,22 @@
+# 0.116.1 (2024-05-28)
+
+### CKB Node & Light Client
+
+- [CKB@v0.116.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.116.1) was released on May. 11st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6dd077b407d019a0bce0cbad8c34e69a524ae4b2599b9feda2c7491f3559d32c`(at height `13,007,704`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3157)
+
+---
+
+## Bug fixes
+
+- 3173: Fix importing an account from a hardware wallet.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.116.0...v0.116.1
+
 # 0.116.0 (2024-05-24)
 
 ### CKB Node & Light Client
