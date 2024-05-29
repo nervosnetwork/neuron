@@ -132,7 +132,6 @@ type Action =
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'
-  | 'get-device-firmware-version'
   | 'get-device-public-key'
   | 'get-device-extended-public-key'
   | 'connect-device'
