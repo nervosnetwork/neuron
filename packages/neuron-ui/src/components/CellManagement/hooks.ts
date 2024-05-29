@@ -257,13 +257,14 @@ export const useAction = ({
     [liveCells, selectedOutPoints, setOperateCells, dispatch, navigate]
   )
 
-  const getToAddress = useCallback(() => {
+  const getConsolidateAddress = useCallback(() => {
     const { addresses } = wallet
-    const isSingleAddress = addresses.length === 1
-    if (isSingleAddress) {
+    if (addresses.length === 1) {
       return addresses[0].address
     }
-    return addresses.find(a => a.type === 0 && a.txCount === 0)?.address ?? ''
+    const unusedReceiveAddress = addresses.find(a => a.type === 0 && a.txCount === 0)?.address ?? ''
+
+    return unusedReceiveAddress
   }, [wallet])
 
   const onActionConfirm = useCallback(async () => {
@@ -301,12 +302,12 @@ export const useAction = ({
           type: AppActions.UpdateConsumeCells,
           payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
         })
-        navigate(`${RoutePath.Send}?isSendMax=true&toAddress=${getToAddress()}`)
+        navigate(`${RoutePath.Send}?isSendMax=true&toAddress=${getConsolidateAddress()}`)
         break
       default:
         break
     }
-  }, [action, operateCells, dispatch, navigate, password, getToAddress])
+  }, [action, operateCells, dispatch, navigate, password, getConsolidateAddress])
   const onActionCancel = useCallback(() => {
     setAction(undefined)
     setOperateCells([])
