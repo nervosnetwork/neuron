@@ -1,9 +1,9 @@
-import { jsonToHump } from '../../../src/utils/json-to-hump'
+import { deepCamelizeKeys } from '../../../src/utils/deep-camelize-keys'
 import fixtures from './fixtures.json'
 
 describe('test json to hump', () => {
   it('json to hump', () => {
-    const result = jsonToHump(fixtures.value)
+    const result = deepCamelizeKeys(fixtures.value)
     expect(fixtures.expected).toEqual(result)
   })
 })

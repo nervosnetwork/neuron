@@ -6,7 +6,7 @@ import { OfflineSignJSON } from 'src/models/offline-sign'
 import Transaction from '../models/chain/transaction'
 import SystemScriptInfo from '../models/system-script-info'
 import Input from '../models/chain/input'
-import { jsonToHump } from './json-to-hump'
+import { deepCamelizeKeys } from './deep-camelize-keys'
 
 export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signatures: Signatures) => {
   const multisigLockHash = scriptToHash(
@@ -34,7 +34,8 @@ export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signature
 
 export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction => {
   const { multisig_configs, transaction } = tx
-  const txObj = Transaction.fromObject(jsonToHump(transaction))
+  // @ts-expect-error
+  const txObj = Transaction.fromObject(deepCamelizeKeys(transaction))
   if (multisig_configs && Object.keys(multisig_configs).length) {
     const args = Object.keys(multisig_configs)[0]
     const lock = SystemScriptInfo.generateMultiSignScript(args)
