@@ -104,16 +104,6 @@ export default class Ledger extends Hardware {
     return conf!.version
   }
 
-  async getFirmwareVersion(): Promise<string> {
-    const res: Buffer = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
-    const byteArray = [...res]
-    const data = byteArray.slice(0, byteArray.length - 2)
-    const versionLength = data[4]
-    const version = Buffer.from(data.slice(5, 5 + versionLength)).toString()
-
-    return version
-  }
-
   async getPublicKey(path: string) {
     const networkService = NetworksService.getInstance()
     const isTestnet = !networkService.isMainnet()
