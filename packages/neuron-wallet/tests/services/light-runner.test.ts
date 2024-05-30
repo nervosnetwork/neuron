@@ -337,32 +337,46 @@ describe('test light runner', () => {
 
   describe('test update config', () => {
     it('port is used', async () => {
-      getUsablePortMock.mockResolvedValueOnce(9001)
+      getUsablePortMock.mockResolvedValueOnce(9001).mockResolvedValueOnce(8119)
       lightDataPathMock.mockReturnValue('lightDataPath')
       resolveMock.mockImplementation((...v: string[]) => v.join(''))
       joinMock.mockImplementation((...v: string[]) => v.join(''))
       await CKBLightRunner.getInstance().updateConfig()
       expect(CKBLightRunner.getInstance().port).toEqual(9001)
       expect(updateTomlMock).toHaveBeenCalledWith('lightDataPath./ckb_light.toml', {
-        store: `path = "lightDataPath./store"`,
-        network: `path = "lightDataPath./network"`,
-        rpc: `listen_address = "127.0.0.1:9001"`,
+        store: {
+          path: `"lightDataPath./store"`,
+        },
+        network: {
+          listen_addresses: '["/ip4/0.0.0.0/tcp/8119"]',
+          path: `"lightDataPath./network"`,
+        },
+        rpc: {
+          listen_address: `"127.0.0.1:9001"`,
+        },
       })
       //reset port
       getUsablePortMock.mockResolvedValueOnce(9000)
       await CKBLightRunner.getInstance().updateConfig()
     })
     it('port is not used', async () => {
-      getUsablePortMock.mockResolvedValueOnce(9000)
+      getUsablePortMock.mockResolvedValueOnce(9000).mockResolvedValueOnce(8118)
       lightDataPathMock.mockReturnValue('lightDataPath')
       resolveMock.mockImplementation((...v: string[]) => v.join(''))
       joinMock.mockImplementation((...v: string[]) => v.join(''))
       await CKBLightRunner.getInstance().updateConfig()
       expect(CKBLightRunner.getInstance().port).toEqual(9000)
       expect(updateTomlMock).toHaveBeenCalledWith('lightDataPath./ckb_light.toml', {
-        store: `path = "lightDataPath./store"`,
-        network: `path = "lightDataPath./network"`,
-        rpc: `listen_address = "127.0.0.1:9000"`,
+        store: {
+          path: `"lightDataPath./store"`,
+        },
+        network: {
+          listen_addresses: '["/ip4/0.0.0.0/tcp/8118"]',
+          path: `"lightDataPath./network"`,
+        },
+        rpc: {
+          listen_address: `"127.0.0.1:9000"`,
+        },
       })
     })
   })

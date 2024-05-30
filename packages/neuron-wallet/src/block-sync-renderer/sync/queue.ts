@@ -20,7 +20,6 @@ import { ShouldInChildProcess } from '../../exceptions'
 import { AppendScript, BlockTips, Synchronizer } from './synchronizer'
 import LightSynchronizer from './light-synchronizer'
 import { generateRPC } from '../../utils/ckb-rpc'
-import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 import { NetworkType } from '../../models/network'
 import WalletService from '../../services/wallets'
 
@@ -65,7 +64,7 @@ export default class Queue {
   start = async () => {
     logger.info('Queue:\tstart')
     try {
-      if (this.#url === BUNDLED_LIGHT_CKB_URL) {
+      if (this.#nodeType === NetworkType.Light) {
         this.#indexerConnector = new LightSynchronizer(this.#addresses, this.#url)
       } else {
         this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#nodeType)
