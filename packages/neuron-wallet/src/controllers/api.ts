@@ -836,10 +836,6 @@ export default class ApiController {
       return this.#hardwareController.getCkbAppVersion()
     })
 
-    handle('get-device-firmware-version', async () => {
-      return this.#hardwareController.getFirmwareVersion()
-    })
-
     handle('get-device-extended-public-key', async () => {
       return this.#hardwareController.getExtendedPublicKey()
     })
