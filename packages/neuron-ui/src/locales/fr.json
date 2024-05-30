@@ -1261,7 +1261,7 @@
       },
       "cell-consolidate-dialog": {
         "title": "Consolider",
-        "warn-consume": "Toutes les cellules sélectionnées seront consolidées dans une nouvelle cellule. Veuillez vous assurer qu'aucune donnée importante ne doit être conservée."
+        "warn-consume": "Toutes les cellules sélectionnées seront consolidées dans une nouvelle cellule. Assurez-vous que les cellules sélectionnées ne contiennent pas de données importantes."
       },
       "enter-password": "Entrez le mot de passe",
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",

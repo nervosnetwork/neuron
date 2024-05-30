@@ -1251,7 +1251,7 @@
       },
       "cell-consolidate-dialog": {
         "title": "Consolidar",
-        "warn-consume": " Todas las Cell seleccionadas se consolidarán en una nueva celda, asegúrese de que no haya datos importantes que necesiten ser retenidos"
+        "warn-consume": "Todas las celdas seleccionadas se consolidarán en una nueva celda, asegúrese de que las celdas seleccionadas no contienen datos importantes."
       },
       "enter-password": "Ingresar Contraseña",
       "password-placeholder": "Ingrese la contraseña de la billetera",

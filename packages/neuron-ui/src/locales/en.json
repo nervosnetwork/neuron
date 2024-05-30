@@ -1271,7 +1271,7 @@
       },
       "cell-consolidate-dialog": {
         "title": "Consolidate Cells",
-        "warn-consume": "All selected cells will be consolidated into a new cell, make sure that no cells containing important data are selected."
+        "warn-consume": "All selected cells will be consolidated into a new cell, make sure that selected cells do not contain important data."
       },
       "enter-password": "Enter Password",
       "password-placeholder": "Please input wallet password",
