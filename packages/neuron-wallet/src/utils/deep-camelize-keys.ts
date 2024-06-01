@@ -1,4 +1,4 @@
-function snakeToCamel(key: string) {
+export function snakeToCamel(key: string) {
   let keyArr = key.split('_')
   for (let i = 0; i < keyArr.length; i++) {
     if (i !== 0) {
@@ -24,4 +24,4 @@ export function deepCamelizeKeys(param: Json): Json {
   return param
 }
 
-export default { deepCamelizeKeys }
+export default { deepCamelizeKeys, snakeToCamel }

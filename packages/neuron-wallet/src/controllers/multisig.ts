@@ -216,7 +216,7 @@ export default class MultisigController {
     const tx = result.json
     const lockHash = scriptToHash(addressToScript(fullPayload))
 
-    if (tx.transaction && tx?.multisig_configs) {
+    if (tx.transaction) {
       tx.transaction = parseMultisigTxJsonFromCkbCli(tx)
     }
 

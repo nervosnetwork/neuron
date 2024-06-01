@@ -1,4 +1,5 @@
 import OutPoint from './out-point'
+import { snakeToCamel } from '../../utils/deep-camelize-keys'
 
 export enum DepType {
   Code = 'code',
@@ -14,8 +15,8 @@ export default class CellDep {
     this.depType = depType
   }
 
-  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType | 'dep_group' }): CellDep {
-    const _depType = depType == 'dep_group' ? DepType.DepGroup : depType
+  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType }): CellDep {
+    const _depType = snakeToCamel(depType) as DepType
     return new CellDep(OutPoint.fromObject(outPoint), _depType)
   }
 
