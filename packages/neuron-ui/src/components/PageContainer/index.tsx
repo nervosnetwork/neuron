@@ -117,7 +117,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
           <div className={styles.syncStatus}>
             <SyncStatusComponent
               syncStatus={syncStatus}
-              connectionStatus={isOpenMultisigWithLight ? 'offline' : connectionStatus}
+              connectionStatus={isOpenMultisigWithLight ? 'pause' : connectionStatus}
               syncPercents={syncPercents}
               syncBlockNumbers={syncBlockNumbers}
               isLookingValidTarget={isLookingValidTarget}
