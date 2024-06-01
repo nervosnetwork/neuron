@@ -1,4 +1,6 @@
 export function snakeToCamel(key: string) {
+  if (!key) return ''
+
   let keyArr = key.split('_')
   for (let i = 0; i < keyArr.length; i++) {
     if (i !== 0) {

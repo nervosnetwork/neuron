@@ -123,7 +123,7 @@ export default class Transaction {
     this.description = description
     this.nervosDao = nervosDao
     this.assetAccountType = assetAccountType
-    this.version = BigInt(version).toString()
+    this.version = BigInt(version || '0x0').toString()
     this.value = value ? BigInt(value).toString() : value
     this.fee = fee ? BigInt(fee).toString() : fee
     this.interest = interest ? BigInt(interest).toString() : interest
