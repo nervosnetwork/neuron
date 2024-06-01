@@ -9,7 +9,7 @@ import DataUpdateSubject from '../models/subjects/data-update'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import TxDbChangedSubject from '../models/subjects/tx-db-changed-subject'
-import { LumosCellQuery, LumosCell } from './sync/synchronizer'
+import { type Cell, type QueryOptions } from '@ckb-lumos/base'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
 import logger from '../utils/logger'
 import CommonUtils from '../utils/common'
@@ -88,7 +88,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   await resetSyncTaskQueue.asyncPush(shouldSync)
 }
 
-export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
+export const queryIndexer = async (query: QueryOptions): Promise<Cell[]> => {
   const _child = child
   if (!_child) {
     return []
@@ -102,7 +102,7 @@ export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> 
   return registerRequest(_child, msg).catch(err => {
     logger.error(`Sync:\tfailed to register query indexer task`, err)
     return []
-  }) as Promise<LumosCell[]>
+  }) as Promise<Cell[]>
 }
 
 export const createBlockSyncTask = async () => {
@@ -177,7 +177,6 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: network.remote,
       nodeType: network.type,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }

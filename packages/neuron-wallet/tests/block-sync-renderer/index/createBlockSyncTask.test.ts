@@ -75,7 +75,6 @@ describe(`Create block sync task`, () => {
       message: {
         addressMetas: STUB_ADDRESS_METAS,
         genesisHash: STUB_NETWORK.genesisHash,
-        indexerUrl: STUB_NETWORK.remote,
         nodeType: NetworkType.Normal,
         url: STUB_NETWORK.remote,
       },

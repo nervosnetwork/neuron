@@ -37,6 +37,8 @@ const MainContent = () => {
     [network, networks]
   )
 
+  const isLightClientNetwork = network?.type === 2
+
   useSyncChainData({
     chainURL: network?.remote ?? '',
     dispatch,
@@ -98,6 +100,48 @@ const MainContent = () => {
     }
   }, [])
 
+  const dialogProps = (function getDialogProps() {
+    if (isLightClientNetwork) {
+      return {
+        onConfirm: onCloseSwitchNetwork,
+        children: t('main.external-node-detected-dialog.external-node-is-light'),
+      }
+    }
+    if (sameUrlNetworks.length) {
+      return {
+        onConfirm: onSwitchNetwork,
+        children: (
+          <>
+            <span className={styles.chooseNetworkTip}>
+              {t('main.external-node-detected-dialog.body-tips-with-network')}
+            </span>
+            <div className={styles.networks}>
+              <RadioGroup
+                onChange={onChangeSelected}
+                options={sameUrlNetworks.map(v => ({
+                  value: v.id,
+                  label: `${v.name} (${v.remote})`,
+                }))}
+                inputIdPrefix="main-switch"
+              />
+            </div>
+            <div className={styles.addNetwork}>
+              <Button type="text" onClick={onOpenEditorDialog}>
+                <AddSimple />
+                {t('main.external-node-detected-dialog.add-network')}
+              </Button>
+            </div>
+          </>
+        ),
+      }
+    }
+    return {
+      onConfirm: onOpenEditorDialog,
+      confirmText: t('main.external-node-detected-dialog.add-network'),
+      children: t('main.external-node-detected-dialog.body-tips-without-network'),
+    }
+  })()
+
   return (
     <div onContextMenu={onContextMenu}>
       <Outlet />
@@ -124,39 +168,13 @@ const MainContent = () => {
       <Dialog
         show={isSwitchNetworkShow}
         onCancel={onCloseSwitchNetwork}
-        onConfirm={sameUrlNetworks.length ? onSwitchNetwork : onOpenEditorDialog}
-        confirmText={sameUrlNetworks.length ? undefined : t('main.external-node-detected-dialog.add-network')}
+        onConfirm={dialogProps.onConfirm}
+        confirmText={dialogProps.confirmText}
         cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
         title={t('main.external-node-detected-dialog.title')}
         className={styles.networkDialog}
       >
-        {sameUrlNetworks.length ? (
-          <span className={styles.chooseNetworkTip}>
-            {t('main.external-node-detected-dialog.body-tips-with-network')}
-          </span>
-        ) : (
-          t('main.external-node-detected-dialog.body-tips-without-network')
-        )}
-        {sameUrlNetworks.length ? (
-          <>
-            <div className={styles.networks}>
-              <RadioGroup
-                onChange={onChangeSelected}
-                options={sameUrlNetworks.map(v => ({
-                  value: v.id,
-                  label: `${v.name} (${v.remote})`,
-                }))}
-                inputIdPrefix="main-switch"
-              />
-            </div>
-            <div className={styles.addNetwork}>
-              <Button type="text" onClick={onOpenEditorDialog}>
-                <AddSimple />
-                {t('main.external-node-detected-dialog.add-network')}
-              </Button>
-            </div>
-          </>
-        ) : null}
+        {dialogProps.children}
       </Dialog>
       {showEditorDialog ? (
         <NetworkEditorDialog

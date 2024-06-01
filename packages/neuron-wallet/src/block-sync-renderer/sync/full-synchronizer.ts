@@ -10,8 +10,8 @@ import IndexerCacheService from './indexer-cache-service'
 export default class FullSynchronizer extends Synchronizer {
   private rpcService: RpcService
 
-  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string, nodeType: NetworkType) {
-    super({ addresses, nodeUrl, indexerUrl })
+  constructor(addresses: Address[], nodeUrl: string, nodeType: NetworkType) {
+    super({ addresses, nodeUrl })
     this.rpcService = new RpcService(nodeUrl, nodeType)
   }
 

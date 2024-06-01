@@ -1205,7 +1205,8 @@
         "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
         "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡",
-        "ignore-external-node": "忽略外部節點"
+        "ignore-external-node": "忽略外部節點",
+        "external-node-is-light": "由於輕客戶端的安全假設不同，Neuron 不支持外部輕客戶端節點。您想連接到 \"Light Client\" 嗎？"
       },
       "no-disk-space-dialog": {
         "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",

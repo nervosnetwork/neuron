@@ -1192,7 +1192,8 @@
         "body-tips-without-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, agregue una nueva opción de red para el nodo externo.",
         "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
         "add-network": "Agregar red",
-        "ignore-external-node": "Ignorar nodo externo"
+        "ignore-external-node": "Ignorar nodo externo",
+        "external-node-is-light": "Debido a las diferentes suposiciones de seguridad del cliente ligero, Neuron no admite nodos de cliente ligero externos. ¿Desea conectarse a un \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",

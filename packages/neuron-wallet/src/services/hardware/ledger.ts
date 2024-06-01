@@ -12,6 +12,20 @@ import logger from '../../utils/logger'
 import NetworksService from '../../services/networks'
 import { generateRPC } from '../../utils/ckb-rpc'
 
+const UNCOMPRESSED_KEY_LENGTH = 130
+const compressPublicKey = (key: string) => {
+  if (key.length !== UNCOMPRESSED_KEY_LENGTH) {
+    return key
+  }
+
+  const publicKey = Buffer.from(key, 'hex')
+  const compressedPublicKey = Buffer.alloc(33)
+    // '03' for odd value, '02' for even value
+    .fill(publicKey[64] & 1 ? '03' : '02', 0, 1, 'hex')
+    .fill(publicKey.subarray(1, 33), 1, 33)
+  return compressedPublicKey.toString('hex')
+}
+
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
   private transport: Transport | null = null
@@ -41,8 +55,9 @@ export default class Ledger extends Hardware {
 
   public async getExtendedPublicKey(): Promise<ExtendedPublicKey> {
     const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.defaultPath)
+    // The ledger wallet's public key is unzipped, so zip it to 33 bytes https://en.bitcoin.it/wiki/BIP_0032 serializes the coordinate pair P
     return {
-      publicKey: public_key,
+      publicKey: compressPublicKey(public_key),
       chainCode: chain_code,
     }
   }
@@ -87,16 +102,6 @@ export default class Ledger extends Hardware {
   async getAppVersion(): Promise<string> {
     const conf = await this.ledgerCKB?.getAppConfiguration()
     return conf!.version
-  }
-
-  async getFirmwareVersion(): Promise<string> {
-    const res: Buffer = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
-    const byteArray = [...res]
-    const data = byteArray.slice(0, byteArray.length - 2)
-    const versionLength = data[4]
-    const version = Buffer.from(data.slice(5, 5 + versionLength)).toString()
-
-    return version
   }
 
   async getPublicKey(path: string) {
