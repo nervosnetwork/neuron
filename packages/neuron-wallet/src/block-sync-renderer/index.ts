@@ -16,15 +16,13 @@ import CommonUtils from '../utils/common'
 import queueWrapper from '../utils/queue'
 import env from '../env'
 import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-db-changed-subject'
-import Multisig from '../services/multisig'
-import { SyncAddressType } from '../database/chain/entities/sync-progress'
-import { debounceTime } from 'rxjs/operators'
 import { TransactionPersistor } from '../services/tx'
 
 let network: Network | null
 let child: ChildProcess | null = null
 let requestId = 0
 let requests = new Map<number, Record<'resolve' | 'reject', (val?: unknown) => unknown>>()
+let isSyncMultisigWithLight = false
 
 export const killBlockSyncTask = async () => {
   const _child = child
@@ -178,6 +176,7 @@ export const createBlockSyncTask = async () => {
       url: network.remote,
       addressMetas,
       nodeType: network.type,
+      syncMultisig: isSyncMultisigWithLight,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {
@@ -199,17 +198,10 @@ export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =
 
 AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
 WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
-MultisigConfigDbChangedSubject.getSubject()
-  .pipe(debounceTime(1000))
-  .subscribe(async () => {
-    if (!child) {
-      return
-    }
-    const appendScripts = await Multisig.getMultisigConfigForLight()
-    const msg: Required<
-      WorkerMessage<{ walletId: string; script: CKBComponents.Script; addressType: SyncAddressType }[]>
-    > = { type: 'call', channel: 'append_scripts', id: requestId++, message: appendScripts }
-    return registerRequest(child, msg).catch(err => {
-      logger.error(`Sync:\ffailed to append script to light client`, err)
-    })
-  })
+MultisigConfigDbChangedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
+
+export async function changeMultisigSyncStatus(status: boolean) {
+  logger.info(`Sync:\t ${status ? 'start' : 'stop'} multisig sync`)
+  isSyncMultisigWithLight = status
+  await resetSyncTask(true)
+}

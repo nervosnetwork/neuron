@@ -239,7 +239,7 @@ declare namespace State {
     balance: string
     addresses: Address[]
   }
-  type ConnectionStatus = 'online' | 'offline' | 'connecting'
+  type ConnectionStatus = 'online' | 'offline' | 'connecting' | 'pause'
 
   type SyncState = Readonly<{
     cacheTipBlockNumber: number

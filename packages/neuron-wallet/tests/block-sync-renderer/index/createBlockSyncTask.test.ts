@@ -77,6 +77,7 @@ describe(`Create block sync task`, () => {
         genesisHash: STUB_NETWORK.genesisHash,
         nodeType: NetworkType.Normal,
         url: STUB_NETWORK.remote,
+        syncMultisig: false,
       },
     })
   })

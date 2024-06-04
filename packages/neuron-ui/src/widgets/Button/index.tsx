@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ButtonHTMLAttributes } from 'react'
 import Spinner from 'widgets/Spinner'
 import styles from './button.module.scss'
 
@@ -20,13 +20,9 @@ const Button = React.forwardRef(
     }: {
       type?: 'default' | 'cancel' | 'ok' | 'submit' | 'confirm' | 'primary' | 'reset' | 'text'
       label?: string
-      onClick?: any
-      disabled?: boolean
       className?: string
-      children?: React.ReactChild
       loading?: boolean
-      [key: string]: any
-    },
+    } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
     ref: React.LegacyRef<HTMLButtonElement>
   ) => {
     const btnType = isNativeType(type) ? type : 'button'
