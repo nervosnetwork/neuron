@@ -124,6 +124,10 @@ const SyncStatus = ({
     return <span>{t('navbar.connecting')}</span>
   }
 
+  if (ConnectionStatus.Pause === connectionStatus) {
+    return <span>{t('navbar.pause')}</span>
+  }
+
   if (ConnectionStatus.Offline === connectionStatus) {
     return (
       <span className={styles.redDot}>

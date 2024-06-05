@@ -29,6 +29,9 @@ export default class MultisigConfig {
   @Column()
   lastestBlockNumber: string = ''
 
+  @Column()
+  startBlockNumber?: number
+
   public static fromModel(model: MultisigConfigModel): MultisigConfig {
     const multisigConfig = new MultisigConfig()
 

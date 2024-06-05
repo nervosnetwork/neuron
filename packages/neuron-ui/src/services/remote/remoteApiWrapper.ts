@@ -159,6 +159,7 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  | 'change-multisig-sync-status'
   // spore
   | 'generate-transfer-spore-tx'
   // cell-manage

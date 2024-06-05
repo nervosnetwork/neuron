@@ -15,6 +15,10 @@ import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
+import { NetworkType } from '../models/network'
+import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-db-changed-subject'
+import { LightRPC } from '../utils/ckb-rpc'
+import SyncProgressService from '../services/sync-progress'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -56,6 +60,23 @@ export default class MultisigController {
     }
   }
 
+  async resetMultisigSync(config: MultisigConfig, startBlockNumber: number) {
+    const network = NetworksService.getInstance().getCurrent()
+    const lightRpc = new LightRPC(network.remote)
+    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+    await lightRpc.setScripts(
+      [
+        {
+          script,
+          blockNumber: `0x${startBlockNumber.toString(16)}`,
+          scriptType: 'lock' as CKBRPC.ScriptType,
+        },
+      ],
+      'partial'
+    )
+    SyncProgressService.resetMultisigSync(scriptToHash(script), startBlockNumber)
+  }
+
   async updateConfig(params: {
     id: number
     walletId?: string
@@ -64,8 +85,19 @@ export default class MultisigController {
     n?: number
     addresses?: string[]
     alias?: string
+    startBlockNumber?: number
   }) {
+    const config = await this.#multisigService.getMultisigConfigById(params.id)
     const result = await this.#multisigService.updateMultisigConfig(params)
+    const network = NetworksService.getInstance().getCurrent()
+    if (params.startBlockNumber && network.type === NetworkType.Light) {
+      if (config?.startBlockNumber !== undefined && config.startBlockNumber > params.startBlockNumber) {
+        // if set small than last, reset by set_script
+        this.resetMultisigSync(config, params.startBlockNumber)
+      }
+      // if it's light client, restart queue task
+      MultisigConfigDbChangedSubject.getSubject().next('UpdateStartBlockNumber')
+    }
     return {
       status: ResponseCode.Success,
       result,

@@ -21,6 +21,7 @@
       "special-assets": "Actifs personnalisés",
       "sync-not-start": "Synchronisation pas encore démarrée",
       "connecting": "Connexion",
+      "pause": "Pause synchronisation",
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",

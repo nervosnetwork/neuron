@@ -4,7 +4,6 @@ import { type QueryOptions } from '@ckb-lumos/base'
 import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 import AddressMeta from '../../database/address/meta'
 import { Address } from '../../models/address'
-import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import IndexerCacheService from './indexer-cache-service'
 import logger from '../../utils/logger'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
@@ -12,13 +11,6 @@ import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-ca
 export interface BlockTips {
   cacheTipNumber: number
   indexerTipNumber: number | undefined
-}
-
-export interface AppendScript {
-  walletId: string
-  script: CKBComponents.Script
-  addressType: SyncAddressType
-  scriptType: CKBRPC.ScriptType
 }
 
 export abstract class Synchronizer {
@@ -32,13 +24,10 @@ export abstract class Synchronizer {
   private indexerQueryQueue: QueueObject<QueryOptions> | undefined
   protected _needGenerateAddress: boolean = false
 
-  abstract connect(): Promise<void>
+  abstract connect(syncMultisig?: boolean): Promise<void>
   abstract processTxsInNextBlockNumber(): Promise<void>
   protected abstract upsertTxHashes(): Promise<unknown>
   public abstract notifyCurrentBlockNumberProcessed(blockNumber: string): Promise<void>
-  async appendScript(_scripts: AppendScript[]) {
-    // do nothing
-  }
 
   constructor({ addresses, nodeUrl }: { addresses: Address[]; nodeUrl: string }) {
     this.indexer = new CkbIndexer(nodeUrl)
