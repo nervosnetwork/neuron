@@ -1,6 +1,5 @@
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
-import LiveCell from '../../../src/models/chain/live-cell'
+import LiveCell, { CellWithOutPoint } from '../../../src/models/chain/live-cell'
 
 describe('LiveCell Test', () => {
   const INITIAL_DATA = {
@@ -88,7 +87,7 @@ describe('LiveCell Test', () => {
   })
 
   describe('get cells from lumos cell', () => {
-    const LUMOS_CELL: LumosCell = {
+    const LUMOS_CELL: CellWithOutPoint = {
       blockHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
       outPoint: {
         txHash: INITIAL_DATA.txHash,

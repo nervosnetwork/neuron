@@ -328,7 +328,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.DismissNotification: {
       /**
-       * payload: timstamp
+       * payload: timestamp
        */
       state.app.showTopAlert =
         state.app.notifications.findIndex(message => message.timestamp === action.payload) ===

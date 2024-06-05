@@ -47,7 +47,7 @@ const MigrateCkbDataDialog = ({
     [currentPath, onConfirm]
   )
   const onActionClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
       if (e.currentTarget.dataset.syncType) {
         startSync(e.currentTarget.dataset.syncType)
       }

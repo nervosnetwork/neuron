@@ -268,7 +268,7 @@ const Overview = () => {
             },
           },
           {
-            title: t('overview.amount'),
+            title: t('overview.asset'),
             dataIndex: 'amount',
             align: 'left',
             isBalance: true,

@@ -96,6 +96,15 @@ const AmendSend = () => {
     return ''
   }
 
+  const inputsCapacity = useMemo(() => {
+    if (transaction) {
+      return transaction.inputs.reduce((total, cur) => {
+        return total + BigInt(cur.capacity || '0')
+      }, BigInt(0))
+    }
+    return undefined
+  }, [transaction])
+
   const items: {
     address: string
     amount: string
@@ -103,21 +112,25 @@ const AmendSend = () => {
     isLastOutput: boolean
     output: State.DetailedOutput
   }[] = useMemo(() => {
-    if (transaction && transaction.outputs.length) {
+    if (transaction && transaction.outputs.length && inputsCapacity) {
       const lastOutputAddress = getLastOutputAddress(transaction.outputs)
       return transaction.outputs.map(output => {
         const address = scriptToAddress(output.lock, { isMainnet })
+        const capacity =
+          transaction.outputs.length === 1 && address === lastOutputAddress
+            ? (inputsCapacity - fee).toString()
+            : output.capacity
         return {
-          capacity: output.capacity,
+          capacity,
           address,
           output,
-          amount: shannonToCKBFormatter(output.capacity || '0'),
+          amount: shannonToCKBFormatter(capacity || '0'),
           isLastOutput: address === lastOutputAddress,
         }
       })
     }
     return []
-  }, [transaction?.outputs])
+  }, [transaction?.outputs, inputsCapacity, fee])
 
   const outputsCapacity = useMemo(() => {
     const outputList = items.length === 1 ? items : items.filter(item => !item.isLastOutput)
@@ -129,15 +142,15 @@ const AmendSend = () => {
   const totalAmount = shannonToCKBFormatter(outputsCapacity.toString())
 
   const lastOutputsCapacity = useMemo(() => {
-    if (transaction) {
-      const inputsCapacity = transaction.inputs.reduce((total, cur) => {
-        return total + BigInt(cur.capacity || '0')
-      }, BigInt(0))
+    if (inputsCapacity) {
+      if (items.length === 1) {
+        return BigInt(items[0].capacity || '0')
+      }
 
       return inputsCapacity - outputsCapacity - fee
     }
     return undefined
-  }, [transaction, fee, outputsCapacity])
+  }, [inputsCapacity, fee, outputsCapacity, items])
 
   useEffect(() => {
     if (transaction && lastOutputsCapacity !== undefined) {
@@ -237,7 +250,7 @@ const AmendSend = () => {
                 <span>{t('send.allow-use-sent-cell')}</span>
               </label>
               <div className={styles.actions}>
-                <Button type="submit" disabled={disabled} label={t('send.send')}>
+                <Button type="submit" disabled={!!disabled} label={t('send.send')}>
                   {sending ? <Spinner /> : (t('send.submit-transaction') as string)}
                 </Button>
               </div>

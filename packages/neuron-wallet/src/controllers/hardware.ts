@@ -38,16 +38,6 @@ export default class HardwareController {
     }
   }
 
-  public async getFirmwareVersion(): Promise<Controller.Response<string>> {
-    const device = HardwareWalletService.getInstance().getCurrent()!
-    const version = await device.getFirmwareVersion?.()
-
-    return {
-      status: ResponseCode.Success,
-      result: version,
-    }
-  }
-
   public async getExtendedPublicKey(): Promise<Controller.Response<ExtendedPublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const pubkey = await device.getExtendedPublicKey()

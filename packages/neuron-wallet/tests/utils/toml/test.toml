@@ -17,6 +17,7 @@ log_to_stdout = true
 
 [network]
 network = 127
+listen_addresses = ["/ip4/0.0.0.0/tcp/8115"]
 ### Specify the public and routable network addresses
 # public_addresses = []
 

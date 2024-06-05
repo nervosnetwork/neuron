@@ -140,7 +140,6 @@ export abstract class Hardware {
   public abstract signMessage(path: string, messageHex: string): Promise<string>
   public abstract disconnect(): Promise<void>
   public abstract getAppVersion(): Promise<string>
-  public abstract getFirmwareVersion?(): Promise<string>
   public abstract signTransaction(
     walletID: string,
     tx: Transaction,

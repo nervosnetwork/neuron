@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
+import { getDevices, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
 import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
 import { Error as ErrorIcon } from 'widgets/Icons/icon'
@@ -50,7 +50,6 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
   const [scanning, setScanning] = useState(true)
   const [error, setError] = useState('')
   const [appVersion, setAppVersion] = useState('')
-  const [firmwareVersion, setFirmwareVersion] = useState('')
 
   const findDevice = useCallback(async () => {
     setError('')
@@ -75,10 +74,6 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
         if (!isSuccessResponse(connectionRes)) {
           setScanning(false)
           throw new ConnectFailedException(errorFormatter(connectionRes.message, t))
-        }
-        const firmwareVersionRes = await getDeviceFirmwareVersion(device.descriptor)
-        if (isSuccessResponse(firmwareVersionRes)) {
-          setFirmwareVersion(firmwareVersionRes.result!)
         }
         const ckbVersionRes = await getDeviceCkbAppVersion(device.descriptor)
         if (isSuccessResponse(ckbVersionRes)) {
@@ -117,9 +112,6 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
         <h3 className={styles.model}>{productName}</h3>
         {errorMsg ? <Info isError msg={errorMsg} /> : null}
         {scanning ? <Info isWaiting={scanning} msg={t('import-hardware.waiting')} /> : null}
-        {firmwareVersion && !errorMsg && !scanning ? (
-          <Info msg={t('import-hardware.firmware-version', { version: firmwareVersion })} />
-        ) : null}
         {appVersion ? <Info msg={t('import-hardware.app-version', { version: appVersion })} /> : null}
       </section>
       <footer className={styles.dialogFooter}>
