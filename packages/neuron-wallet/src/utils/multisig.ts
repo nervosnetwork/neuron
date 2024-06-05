@@ -34,8 +34,7 @@ export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signature
 
 export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction => {
   const { multisig_configs, transaction } = tx
-  // @ts-expect-error
-  const txObj = Transaction.fromObject(deepCamelizeKeys(transaction))
+  const txObj = Transaction.fromObject(deepCamelizeKeys(transaction) as any)
   if (multisig_configs && Object.keys(multisig_configs).length) {
     const args = Object.keys(multisig_configs)[0]
     const lock = SystemScriptInfo.generateMultiSignScript(args)

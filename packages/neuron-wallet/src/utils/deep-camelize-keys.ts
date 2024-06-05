@@ -1,4 +1,5 @@
 export const snakeToCamel = (str: string): string => {
+  if (!str) return ''
   return str.replace(/([-_][a-z])/gi, c => c.toUpperCase().replace(/[-_]/g, ''))
 }
 

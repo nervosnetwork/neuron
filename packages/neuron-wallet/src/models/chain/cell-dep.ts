@@ -16,8 +16,7 @@ export default class CellDep {
   }
 
   public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType | 'dep_group' }): CellDep {
-    const _depType = snakeToCamel(depType) as DepType
-    return new CellDep(OutPoint.fromObject(outPoint), _depType)
+    return new CellDep(OutPoint.fromObject(outPoint), snakeToCamel(depType) as DepType)
   }
 
   public toSDK(): CKBComponents.CellDep {
