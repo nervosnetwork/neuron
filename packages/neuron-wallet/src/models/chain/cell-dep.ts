@@ -15,7 +15,7 @@ export default class CellDep {
     this.depType = depType
   }
 
-  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType }): CellDep {
+  public static fromObject({ outPoint, depType }: { outPoint: OutPoint; depType: DepType | 'dep_group' }): CellDep {
     const _depType = snakeToCamel(depType) as DepType
     return new CellDep(OutPoint.fromObject(outPoint), _depType)
   }
