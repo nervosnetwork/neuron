@@ -9,6 +9,7 @@ $noticeHeight: 60px;
   .left {
     flex: 1;
     position: relative;
+    min-width: 480px;
 
     .leftFooter {
       position: absolute;
