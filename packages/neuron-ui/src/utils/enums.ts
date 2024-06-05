@@ -2,6 +2,8 @@ export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',
   Connecting = 'connecting',
+  // pasue by open multisig address with light client
+  Pause = 'pause',
 }
 
 export enum RoutePath {

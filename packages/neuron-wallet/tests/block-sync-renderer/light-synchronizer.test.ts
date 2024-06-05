@@ -126,12 +126,15 @@ describe('test light synchronizer', () => {
       await connect.initSyncProgress()
       expect(getScriptsMock).toBeCalledTimes(0)
     })
-    it('append multisig script', async () => {
+    it('sync multisig config', async () => {
       getScriptsMock.mockResolvedValue([])
       const connect = new LightSynchronizer([], '')
       getOtherTypeSyncBlockNumberMock.mockResolvedValueOnce({})
+      getMultisigConfigForLightMock.mockResolvedValueOnce([
+        { walletId: 'walletId', script, addressType: 1, scriptType: 'lock' },
+      ])
       //@ts-ignore
-      await connect.initSyncProgress([{ walletId: 'walletId', script, addressType: 1, scriptType: 'lock' }])
+      await connect.initMultisigSyncProgress()
       expect(getScriptsMock).toBeCalledTimes(1)
       expect(setScriptsMock).toHaveBeenNthCalledWith(
         1,

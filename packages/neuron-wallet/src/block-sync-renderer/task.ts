@@ -21,7 +21,6 @@ export interface WorkerMessage<T = any> {
     | 'address-created'
     | 'indexer-error'
     | 'check-and-save-wallet-address'
-    | 'append_scripts'
   message: T
 }
 
@@ -32,6 +31,7 @@ export interface StartParams {
   url: SyncQueueParams[0]
   addressMetas: SyncQueueParams[1]
   nodeType: SyncQueueParams[2]
+  syncMultisig: SyncQueueParams[3]
 }
 
 export type QueryIndexerParams = QueryOptions
@@ -62,7 +62,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       try {
         await initConnection(message.genesisHash)
 
-        syncQueue = new SyncQueue(message.url, message.addressMetas, message.nodeType)
+        syncQueue = new SyncQueue(message.url, message.addressMetas, message.nodeType, message.syncMultisig)
         syncQueue.start()
       } catch (err) {
         logger.error(`Block Sync Task:\t`, err)
@@ -89,12 +89,6 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
         res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
       } catch (error) {
         logger.error(`Block Sync Task: queryIndexer:\t`, error)
-      }
-      break
-    }
-    case 'append_scripts': {
-      if (Array.isArray(message)) {
-        await syncQueue?.appendLightScript(message)
       }
       break
     }
