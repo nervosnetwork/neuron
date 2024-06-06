@@ -186,28 +186,36 @@ const getColumns = ({
         const { locked, lockedReason } = item
         return (
           <div className={styles.actions}>
-            <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            <Tooltip tip={t('history.detail')} showTriangle placement="top">
+              <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            </Tooltip>
             {locked ? (
-              <UnLock
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Unlock}
-                data-index={index}
-              />
+              <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
+                <UnLock
+                  data-disabled={!!lockedReason}
+                  onClick={onAction}
+                  data-action={Actions.Unlock}
+                  data-index={index}
+                />
+              </Tooltip>
             ) : (
-              <LockCell
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Lock}
+              <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
+                <LockCell
+                  data-disabled={!!lockedReason}
+                  onClick={onAction}
+                  data-action={Actions.Lock}
+                  data-index={index}
+                />
+              </Tooltip>
+            )}
+            <Tooltip tip={t('cell-manage.consume')} showTriangle placement="top">
+              <Consume
+                data-disabled={!!locked}
+                onClick={locked ? undefined : onAction}
+                data-action={Actions.Consume}
                 data-index={index}
               />
-            )}
-            <Consume
-              data-disabled={!!locked}
-              onClick={locked ? undefined : onAction}
-              data-action={Actions.Consume}
-              data-index={index}
-            />
+            </Tooltip>
           </div>
         )
       },
