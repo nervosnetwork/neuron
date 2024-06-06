@@ -1261,12 +1261,17 @@
         "title": "Consommer la cellule",
         "warn-consume": "La consommation de la cellule ne conservera aucune donnée et utilisera tout le CKB. Veuillez vous assurer qu'aucune donnée importante ne doit être conservée."
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolider",
+        "warn-consume": "Toutes les cellules sélectionnées seront consolidées dans une nouvelle cellule. Assurez-vous que les cellules sélectionnées ne contiennent pas de données importantes."
+      },
       "enter-password": "Entrez le mot de passe",
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer",
-      "verify": "Vérifier"
+      "verify": "Vérifier",
+      "consolidate": "Consolider"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

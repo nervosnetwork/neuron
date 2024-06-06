@@ -1251,12 +1251,17 @@
         "title": "Consumir Cell",
         "warn-consume": "Al consumir la Cell, no se retendrá ningún dato y se utilizará todo el ckb, asegúrese de que no haya datos importantes que necesiten ser retenidos"
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolidar",
+        "warn-consume": "Todas las celdas seleccionadas se consolidarán en una nueva celda, asegúrese de que las celdas seleccionadas no contienen datos importantes."
+      },
       "enter-password": "Ingresar Contraseña",
       "password-placeholder": "Ingrese la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
       "consume": "Consumir",
-      "verify": "Verificar"
+      "verify": "Verificar",
+      "consolidate": "Consolidar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

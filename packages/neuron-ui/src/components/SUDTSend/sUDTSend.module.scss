@@ -27,6 +27,7 @@ $right-min-width: 476px;
 
   .left {
     flex: 1;
+    min-width: 480px;
     position: relative;
     max-width: calc(100% - $right-min-width);
 

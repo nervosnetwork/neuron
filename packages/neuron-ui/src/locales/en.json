@@ -1271,12 +1271,17 @@
         "title": "Consume Cell",
         "warn-consume": "Consume cell will not keep any data and use all of the ckb, please ensure that no important data needs to be retained"
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolidate Cells",
+        "warn-consume": "All selected cells will be consolidated into a new cell, make sure that selected cells do not contain important data."
+      },
       "enter-password": "Enter Password",
       "password-placeholder": "Please input wallet password",
       "lock": "Lock",
       "unlock": "Unlock",
       "consume": "Consume",
-      "verify": "Verify"
+      "verify": "Verify",
+      "consolidate": "Consolidate"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

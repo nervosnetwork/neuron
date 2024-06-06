@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock } from 'widgets/Icons/icon'
+import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock, Consolidate } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
@@ -273,6 +273,7 @@ const CellManagement = () => {
       resetPassword,
       password,
       verifyDeviceStatus,
+      wallet,
     })
   const columns = useMemo(
     () =>
@@ -338,6 +339,10 @@ const CellManagement = () => {
             <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consume}>
               <Consume />
               {t('cell-manage.consume')}
+            </button>
+            <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consolidate}>
+              <Consolidate />
+              {t('cell-manage.consolidate')}
             </button>
           </div>
         ) : null}
@@ -439,6 +444,15 @@ const CellManagement = () => {
         onConfirm={onActionConfirm}
       >
         <span className={styles.consumeNotice}>{t('cell-manage.cell-consume-dialog.warn-consume')}</span>
+      </Dialog>
+      <Dialog
+        show={action === Actions.Consolidate}
+        title={t('cell-manage.cell-consolidate-dialog.title')}
+        onCancel={onActionCancel}
+        onConfirm={onActionConfirm}
+        confirmText={t('cell-manage.consolidate')}
+      >
+        <span className={styles.consumeNotice}>{t('cell-manage.cell-consolidate-dialog.warn-consume')}</span>
       </Dialog>
     </PageContainer>
   )
