@@ -59,7 +59,7 @@ import startMonitor, { stopMonitor } from '../services/monitor'
 import { migrateCkbData } from '../services/ckb-runner'
 import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
-import { resetSyncTaskQueue } from '../block-sync-renderer'
+import { changeMultisigSyncStatus, resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
@@ -836,10 +836,6 @@ export default class ApiController {
       return this.#hardwareController.getCkbAppVersion()
     })
 
-    handle('get-device-firmware-version', async () => {
-      return this.#hardwareController.getFirmwareVersion()
-    })
-
     handle('get-device-extended-public-key', async () => {
       return this.#hardwareController.getExtendedPublicKey()
     })
@@ -915,6 +911,13 @@ export default class ApiController {
 
     handle('load-multisig-tx-json', async (_, fullPayload) => {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
+    })
+
+    handle('change-multisig-sync-status', (_, status: boolean) => {
+      changeMultisigSyncStatus(status)
+      return {
+        status: ResponseCode.Success,
+      }
     })
 
     //migrate

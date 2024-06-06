@@ -81,6 +81,7 @@ export class CKBLightRunner extends NodeRunner {
   protected binaryName: string = 'ckb-light-client'
   protected logStream: Map<string, fs.WriteStream> = new Map()
   protected _port: number = 9000
+  protected listenPort: number = 8118
 
   static getInstance(): CKBLightRunner {
     if (!CKBLightRunner.instance) {
@@ -117,13 +118,22 @@ export class CKBLightRunner extends NodeRunner {
 
   async updateConfig() {
     const usablePort = await getUsablePort(this._port)
+    const listenPort = await getUsablePort(usablePort >= this._port ? this.listenPort + 1 : this.listenPort)
     this._port = usablePort
+    this.listenPort = listenPort
     const storePath = path.join(SettingsService.getInstance().getNodeDataPath(), './store')
     const networkPath = path.join(SettingsService.getInstance().getNodeDataPath(), './network')
     updateToml(this.configFile, {
-      store: `path = "${this.platform() === 'win' ? storePath.replace(/\\/g, '\\\\') : storePath}"`,
-      network: `path = "${this.platform() === 'win' ? networkPath.replace(/\\/g, '\\\\') : networkPath}"`,
-      rpc: `listen_address = "127.0.0.1:${usablePort}"`,
+      store: {
+        path: `"${this.platform() === 'win' ? storePath.replace(/\\/g, '\\\\') : storePath}"`,
+      },
+      network: {
+        path: `"${this.platform() === 'win' ? networkPath.replace(/\\/g, '\\\\') : networkPath}"`,
+        listen_addresses: `["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+      },
+      rpc: {
+        listen_address: `"127.0.0.1:${usablePort}"`,
+      },
     })
   }
 

@@ -115,8 +115,12 @@ export const startCkbNode = async () => {
   listenPort = await getUsablePort(rpcPort >= listenPort ? rpcPort + 1 : listenPort)
 
   updateToml(path.join(SettingsService.getInstance().getNodeDataPath(), 'ckb.toml'), {
-    rpc: `listen_address = "127.0.0.1:${rpcPort}"`,
-    network: `listen_addresses = ["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+    rpc: {
+      listen_address: `"127.0.0.1:${rpcPort}"`,
+    },
+    network: {
+      listen_addresses: `["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+    },
   })
   const options = ['run', '-C', SettingsService.getInstance().getNodeDataPath(), '--indexer']
   const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'pipe', 'pipe']

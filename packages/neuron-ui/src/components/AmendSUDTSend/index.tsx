@@ -198,7 +198,7 @@ const AmendSUDTSend = () => {
             </div>
             <div className={styles.rightFooter}>
               <div className={styles.actions}>
-                <Button type="submit" disabled={disabled} label={t('send.send')}>
+                <Button type="submit" disabled={!!disabled} label={t('send.send')}>
                   {sending ? <Spinner /> : (t('send.submit-transaction') as string)}
                 </Button>
               </div>

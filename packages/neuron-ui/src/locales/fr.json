@@ -21,6 +21,7 @@
       "special-assets": "Actifs personnalisés",
       "sync-not-start": "Synchronisation pas encore démarrée",
       "connecting": "Connexion",
+      "pause": "Pause synchronisation",
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
@@ -1202,7 +1203,8 @@
         "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le noeud externe"
+        "ignore-external-node": "Ignorer le noeud externe",
+        "external-node-is-light": "En raison de différentes hypothèses de sécurité du client léger, Neuron ne prend pas en charge les nœuds clients légers externes. Voulez-vous vous connecter à un \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",

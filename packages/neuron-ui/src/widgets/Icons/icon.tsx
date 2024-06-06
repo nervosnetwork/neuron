@@ -58,6 +58,9 @@ import { ReactComponent as ImportKeystoreSvg } from './SoftWalletImportKeystore.
 import { ReactComponent as ImportHardwareSvg } from './HardWalletImport.svg'
 import { ReactComponent as DepositTimeSortSvg } from './DepositTimeSort.svg'
 import { ReactComponent as QuestionSvg } from './Question.svg'
+import { ReactComponent as DetailsSvg } from './Details.svg'
+import { ReactComponent as ConfirmSvg } from './Confirm.svg'
+import { ReactComponent as UploadSvg } from './Upload.svg'
 
 import styles from './icon.module.scss'
 
@@ -132,3 +135,6 @@ export const ImportKeystore = WrapSvg(ImportKeystoreSvg)
 export const ImportHardware = WrapSvg(ImportHardwareSvg)
 export const DepositTimeSort = WrapSvg(DepositTimeSortSvg)
 export const Question = WrapSvg(QuestionSvg)
+export const Details = WrapSvg(DetailsSvg)
+export const Confirm = WrapSvg(ConfirmSvg)
+export const Upload = WrapSvg(UploadSvg)

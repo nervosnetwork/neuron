@@ -21,6 +21,7 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
+      "pause": "Sync paused",
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
@@ -1212,7 +1213,8 @@
         "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
         "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network",
-        "ignore-external-node": "Ignore external node"
+        "ignore-external-node": "Ignore external node",
+        "external-node-is-light": "Neuron does not support external light client nodes due to different security assumptions for light clients. Would you like to connect to the \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
