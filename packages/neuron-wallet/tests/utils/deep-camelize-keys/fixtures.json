@@ -1,0 +1,101 @@
+{
+  "value": {
+    "version": "0x0",
+    "cell_deps": [
+      {
+        "out_point": {
+          "tx_hash": "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37",
+          "index": "0x1"
+        },
+        "dep_type": "dep_group"
+      }
+    ],
+    "header_deps": [],
+    "inputs": [
+      {
+        "since": "0x0",
+        "previous_output": {
+          "tx_hash": "0x00bc60fd23dd556a9bd139791e4cb95d678550054953793b79c864abcc733eae",
+          "index": "0x1"
+        }
+      },
+      {
+        "previous_output": {
+          "txHash": "0x8b37ded770fe457e1d3969e93722873308aef1e6810757d248f437de4d009d8f",
+          "index": "0x1"
+        },
+        "since": "0x0"
+      }
+    ],
+    "outputs": [
+      {
+        "capacity": "6600000000",
+        "lock": {
+          "args": "0x2d8765d2d0e007aa227e61d9bc1ebd7343360a58",
+          "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+          "hash_type": "type"
+        },
+        "type": null
+      },
+      {
+        "capacity": "10399999375",
+        "lock": {
+          "args": "0x5b34cc4f76644ec6da564c1ace41711ee0f1e071",
+          "code_hash": "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8",
+          "hash_type": "type"
+        },
+        "type": null
+      }
+    ],
+    "outputs_data": ["0x", "0x"],
+    "witnesses": []
+  },
+  "expected": {
+    "version": "0x0",
+    "inputs": [
+      {
+        "since": "0x0",
+        "previousOutput": {
+          "index": "0x1",
+          "txHash": "0x00bc60fd23dd556a9bd139791e4cb95d678550054953793b79c864abcc733eae"
+        }
+      },
+      {
+        "since": "0x0",
+        "previousOutput": {
+          "txHash": "0x8b37ded770fe457e1d3969e93722873308aef1e6810757d248f437de4d009d8f",
+          "index": "0x1"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "capacity": "6600000000",
+        "lock": {
+          "args": "0x2d8765d2d0e007aa227e61d9bc1ebd7343360a58",
+          "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+          "hashType": "type"
+        },
+        "type": null
+      },
+      {
+        "capacity": "10399999375",
+        "lock": {
+          "args": "0x5b34cc4f76644ec6da564c1ace41711ee0f1e071",
+          "codeHash": "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8",
+          "hashType": "type"
+        },
+        "type": null
+      }
+    ],
+    "witnesses": [],
+    "cellDeps": [
+      {
+        "outPoint": { "index": "0x1", "txHash": "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37" },
+        "depType": "dep_group"
+      }
+    ],
+    "headerDeps": [],
+    "outputsData": ["0x", "0x"]
+  }
+}

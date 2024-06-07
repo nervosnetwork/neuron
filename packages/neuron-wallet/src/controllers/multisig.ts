@@ -5,6 +5,7 @@ import { t } from 'i18next'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import { ResponseCode } from '../utils/const'
+import { parseMultisigTxJsonFromCkbCli } from '../utils/multisig'
 import MultisigConfig from '../database/chain/entities/multisig-config'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigService from '../services/multisig'
@@ -246,7 +247,12 @@ export default class MultisigController {
     }
     const tx = result.json
     const lockHash = scriptToHash(addressToScript(fullPayload))
-    if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
+
+    if (tx.transaction) {
+      tx.transaction = parseMultisigTxJsonFromCkbCli(tx)
+    }
+
+    if (tx.transaction.inputs.every(v => v.lockHash && v.lockHash !== lockHash)) {
       ShowGlobalDialogSubject.next({
         type: 'failed',
         title: t('common.error'),
@@ -258,7 +264,7 @@ export default class MultisigController {
     }
     return {
       status: ResponseCode.Success,
-      result: result?.json,
+      result: tx,
     }
   }
 }
