@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "2.2.0",
-    "@nervosnetwork/ckb-types": "0.109.0",
+    "@nervosnetwork/ckb-types": "0.109.1",
     "@types/archiver": "6.0.2",
     "@types/async": "3.2.24",
     "@types/electron-devtools-installer": "2.2.5",

@@ -3401,10 +3401,10 @@
     pump "^3.0.0"
     tar-fs "^2.1.1"
 
-"@nervosnetwork/ckb-types@0.109.0":
-  version "0.109.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.109.0.tgz#efcd1d96f1d3e21b20bb0c9d38e80b83e90ef827"
-  integrity sha512-ZB3zpotHP8KDTex9Jxv7vi3sxVEqWijQjDmNA9laIEk01aoKVMyBZ09ByKuU46/88qgjmDsu3Ob7HqGaoFVtKQ==
+"@nervosnetwork/ckb-types@0.109.1":
+  version "0.109.1"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.109.1.tgz#1e8b0abe0ae0227306d6a3f65cb670bcd4cf276f"
+  integrity sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
