@@ -82,8 +82,8 @@ test("Launch Neuron", async () => {
   await page.screenshot({ path: "./test-results/createWallet.png" });
 });*/
 
-test.describe('OverViewPage tests', () => {
-  /*test("send transaction", async () => {
+test.describe('overview page tests', () => {
+  test("send transaction", async () => {
     await page.waitForTimeout(40000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('总览').click();
@@ -99,19 +99,19 @@ test.describe('OverViewPage tests', () => {
 
 
   test("amend transaction ", async () => {
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交').first()).toBeVisible();
-  });*/
+  });
   test("two cells consumes", async () => {
     await page.waitForTimeout(10000);
     await page.getByTitle('总览').click();
     await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]').click();
     await expect(page.getByTitle('Cell管理')).toBeVisible();
-    //复选框勾选可选的第一个/第二个
+    //复选框勾选可选的第一个/第二个?--todo
     await page.locator('id=0xb37255202fee78163e3933d1e27698d96d00cc279381da376fcefa4e563e4fbb_0').check();
     await page.locator('id=0x1b19b7c4be4e3e38774600adab14cd015b160eb4a612d704aef2ee655a862219_1').check();
 
@@ -127,7 +127,7 @@ test.describe('OverViewPage tests', () => {
 
 
 // 等待同步进度到100%
-/*test("nervos dao deposit", async () => {
+test("nervos dao deposit", async () => {
   await page.waitForTimeout(10000);
   await page.getByTitle('Nervos Dao').click();
   await page.getByRole('button', {name: '存入'}).click();
@@ -148,8 +148,8 @@ test("check transaction history", async () => {
   await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
   await page.getByRole('button', {name: '导出交易历史'}).click();
 
-});*/
-/*test.describe('实验性功能', () => {
+});
+test.describe('实验性功能', () => {
   test("create account in asset accounts", async () => {
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('资产账户').click();
@@ -169,11 +169,15 @@ test("check transaction history", async () => {
   });
 
 
-  /!*test("claim in customized page ", async () => {
+  /*test("claim in customized page ", async () => {
 
 
-  });*!/
+  });*/
 
+
+});
+
+/*test.describe('change to light client node', () => {
 
 });*/
 
