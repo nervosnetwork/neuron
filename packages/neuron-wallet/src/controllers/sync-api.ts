@@ -108,12 +108,10 @@ export default class SyncApiController {
     const rpcService = new RpcService(network.remote, network.type)
     try {
       const syncState = await rpcService.getSyncState()
-      let bestKnownBlockNumber = parseInt(syncState.bestKnownBlockNumber, 16)
-      if (network.chain === 'ckb_dev') {
-        bestKnownBlockNumber = parseInt(await rpcService.getTipBlockNumber(), 16)
-      }
+      const bestKnownBlockNumber =
+        network.chain === 'ckb_dev' ? await rpcService.getTipBlockNumber() : syncState.bestKnownBlockNumber
       return {
-        bestKnownBlockNumber,
+        bestKnownBlockNumber: parseInt(bestKnownBlockNumber, 16),
         bestKnownBlockTimestamp: +syncState.bestKnownBlockTimestamp,
       }
     } catch (error) {
