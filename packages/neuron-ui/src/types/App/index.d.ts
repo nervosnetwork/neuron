@@ -19,6 +19,7 @@ declare namespace State {
       data: string
     }
     assetAccountType?: 'CKB' | 'sUDT' | string
+    daoCapacity?: string
   }
 
   interface DetailedInput {
@@ -41,6 +42,7 @@ declare namespace State {
     outPoint: CKBComponents.OutPoint
     type?: CKBComponents.Script
     data?: string
+    daoData?: string
     isChangeCell?: boolean
   }
   interface DetailedTransaction extends Transaction {
@@ -54,6 +56,7 @@ declare namespace State {
     witnesses: string[]
     size?: number
     isLastChange?: boolean
+    cycles?: string
   }
   interface Output {
     address: string | undefined
@@ -126,6 +129,7 @@ declare namespace State {
     }
     onSuccess?: () => void
     showType?: 'Global' | ''
+    amendHash?: string
   }
 
   interface SUDTAccount {
@@ -174,6 +178,10 @@ declare namespace State {
     loadedTransaction: any
     pageNotice?: PageNotice
     showWaitForFullySynced: boolean
+    lockWindowInfo?: {
+      locked: boolean
+      encryptedPassword?: string
+    }
   }
 
   interface NetworkProperty {
@@ -231,7 +239,7 @@ declare namespace State {
     balance: string
     addresses: Address[]
   }
-  type ConnectionStatus = 'online' | 'offline' | 'connecting'
+  type ConnectionStatus = 'online' | 'offline' | 'connecting' | 'pause'
 
   type SyncState = Readonly<{
     cacheTipBlockNumber: number

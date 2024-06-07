@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SyncStatus as SyncStatusEnum, ConnectionStatus, clsx, localNumberFormatter } from 'utils'
-import { Confirming, NewTab } from 'widgets/Icons/icon'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus, clsx, localNumberFormatter, getSyncLeftTime } from 'utils'
+import { Confirming, NewTab, Question } from 'widgets/Icons/icon'
 import { ReactComponent as UnexpandStatus } from 'widgets/Icons/UnexpandStatus.svg'
 import { ReactComponent as StartBlock } from 'widgets/Icons/StartBlock.svg'
 import Tooltip from 'widgets/Tooltip'
+import { openExternal } from 'services/remote'
 import styles from './syncStatus.module.scss'
 
 const SyncDetail = ({
@@ -14,6 +15,7 @@ const SyncDetail = ({
   isLightClient,
   onOpenSetStartBlock,
   startBlockNumber,
+  estimate,
 }: {
   syncBlockNumbers: string
   isLookingValidTarget: boolean
@@ -21,6 +23,7 @@ const SyncDetail = ({
   isLightClient: boolean
   onOpenSetStartBlock: () => void
   startBlockNumber?: string
+  estimate?: number
 }) => {
   const [t] = useTranslation()
   return (
@@ -45,11 +48,25 @@ const SyncDetail = ({
         </div>
       )}
       {isLightClient && startBlockNumber ? (
-        <div className={styles.startBlockNumber}>
+        <div className={styles.item}>
           <div className={styles.title}>{t('network-status.tooltip.start-block-number')}:</div>
           <div className={styles.number}>{localNumberFormatter(startBlockNumber)}</div>
         </div>
       ) : null}
+      <div className={styles.item}>
+        <div className={styles.title}>
+          {t('network-status.left-time')}:
+          <Tooltip
+            tip={<div className={styles.leftTimeTip}>{t('network-status.left-time-tip')}</div>}
+            className={styles.question}
+            tipClassName={styles.questionTip}
+            placement="right-bottom"
+          >
+            <Question />
+          </Tooltip>
+        </div>
+        <div className={styles.number}>{getSyncLeftTime(estimate)}</div>
+      </div>
       {isLightClient && (
         <div
           role="link"
@@ -79,6 +96,7 @@ const SyncStatus = ({
   isLightClient,
   onOpenSetStartBlock,
   startBlockNumber,
+  estimate,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
@@ -90,6 +108,7 @@ const SyncStatus = ({
   isLightClient: boolean
   onOpenSetStartBlock: () => void
   startBlockNumber?: string
+  estimate?: number
 }>) => {
   const [t] = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
@@ -105,8 +124,39 @@ const SyncStatus = ({
     return <span>{t('navbar.connecting')}</span>
   }
 
+  if (ConnectionStatus.Pause === connectionStatus) {
+    return <span>{t('navbar.pause')}</span>
+  }
+
   if (ConnectionStatus.Offline === connectionStatus) {
-    return <span className={styles.redDot}>{t('sync.sync-failed')}</span>
+    return (
+      <span className={styles.redDot}>
+        {t('sync.sync-failed')}
+        <Tooltip
+          tip={
+            <div className={styles.failedDetail}>
+              {t('sync.sync-failed-detail')}
+              &nbsp;&nbsp;
+              <button
+                type="button"
+                onClick={() => {
+                  openExternal(`https://neuron.magickbase.com/posts/issues/2893`)
+                }}
+                className={styles.openHelper}
+              >
+                {t('sync.learn-more')}
+              </button>
+            </div>
+          }
+          trigger="click"
+          placement="left-bottom"
+          showTriangle
+          tipClassName={styles.helpTip}
+        >
+          <Question />
+        </Tooltip>
+      </span>
+    )
   }
 
   if (SyncStatusEnum.SyncNotStart === syncStatus) {
@@ -127,6 +177,7 @@ const SyncStatus = ({
           isLightClient={isLightClient}
           onOpenSetStartBlock={onOpenSetStartBlock}
           startBlockNumber={startBlockNumber}
+          estimate={estimate}
         />
       }
       trigger="click"

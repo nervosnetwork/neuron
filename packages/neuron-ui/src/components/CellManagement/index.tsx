@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Attention, Consume, Copy, DetailIcon, EyesClose, EyesOpen, LockCell, NewTab, UnLock } from 'widgets/Icons/icon'
+import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock, Consolidate } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
@@ -10,22 +10,24 @@ import {
   shannonToCKBFormatter,
   uniformTimeFormatter,
   usePagination,
-  isMainnet as isMainnetUtil,
-  useCopy,
-  clsx,
   outPointToStr,
   LockScriptCategory,
   getLockTimestamp,
+  isMainnet as isMainnetUtil,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
-import Alert from 'widgets/Alert'
 import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
 import { useSearchParams } from 'react-router-dom'
-import { Actions, useAction, useLiveCells, usePassword, useSelect, useViewCell } from './hooks'
+import CellInfoDialog from 'components/CellInfoDialog'
+import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import Hardware from 'widgets/Icons/Hardware.png'
+import Button from 'widgets/Button'
+import Alert from 'widgets/Alert'
+import { Actions, useAction, useHardWallet, useLiveCells, usePassword, useSelect } from './hooks'
 import styles from './cellManagement.module.scss'
 
 const getColumns = ({
@@ -184,28 +186,36 @@ const getColumns = ({
         const { locked, lockedReason } = item
         return (
           <div className={styles.actions}>
-            <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            <Tooltip tip={t('history.detail')} showTriangle placement="top">
+              <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            </Tooltip>
             {locked ? (
-              <UnLock
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Unlock}
-                data-index={index}
-              />
+              <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
+                <UnLock
+                  data-disabled={!!lockedReason}
+                  onClick={onAction}
+                  data-action={Actions.Unlock}
+                  data-index={index}
+                />
+              </Tooltip>
             ) : (
-              <LockCell
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Lock}
+              <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
+                <LockCell
+                  data-disabled={!!lockedReason}
+                  onClick={onAction}
+                  data-action={Actions.Lock}
+                  data-index={index}
+                />
+              </Tooltip>
+            )}
+            <Tooltip tip={t('cell-manage.consume')} showTriangle placement="top">
+              <Consume
+                data-disabled={!!locked}
+                onClick={locked ? undefined : onAction}
+                data-action={Actions.Consume}
                 data-index={index}
               />
-            )}
-            <Consume
-              data-disabled={!!locked}
-              onClick={locked ? undefined : onAction}
-              data-action={Actions.Consume}
-              data-index={index}
-            />
+            </Tooltip>
           </div>
         )
       },
@@ -216,14 +226,14 @@ const getColumns = ({
 const CellManagement = () => {
   const {
     app: { epoch },
-    wallet: { balance = '' },
+    wallet,
     chain: {
-      networkID,
       syncState: { bestKnownBlockTimestamp },
+      networkID,
     },
     settings: { networks },
   } = useGlobalState()
-  const isMainnet = isMainnetUtil(networks, networkID)
+  const isMainnet = useMemo(() => isMainnetUtil(networks, networkID), [networks, networkID])
   const [t] = useTranslation()
   const [searchParams] = useSearchParams()
   const breadPages = useMemo(() => [{ label: t('cell-manage.title') }], [t])
@@ -241,6 +251,17 @@ const CellManagement = () => {
     return liveCells.slice(pageSize * (pageNo - 1), pageSize * pageNo)
   }, [pageNo, pageSize, liveCells])
   const { onSelect, onSelectAll, isAllSelected, selectedOutPoints, hasSelectLocked, isAllLocked } = useSelect(liveCells)
+  const {
+    isReconnecting,
+    isNotAvailable,
+    reconnect,
+    verifyDeviceStatus,
+    errorMessage: hardwalletError,
+    setError: setHardwalletError,
+  } = useHardWallet({
+    wallet,
+    t,
+  })
   const { password, error, onPasswordChange, setError, resetPassword } = usePassword()
   const { action, operateCells, onActionCancel, onActionConfirm, onOpenActionDialog, onMultiAction, loading } =
     useAction({
@@ -248,9 +269,11 @@ const CellManagement = () => {
       currentPageLiveCells,
       updateLiveCellsLockStatus,
       selectedOutPoints,
-      setError,
+      setError: wallet.device ? setHardwalletError : setError,
       resetPassword,
       password,
+      verifyDeviceStatus,
+      wallet,
     })
   const columns = useMemo(
     () =>
@@ -277,11 +300,6 @@ const CellManagement = () => {
       bestKnownBlockTimestamp,
     ]
   )
-  const { copied, onCopy, copyTimes } = useCopy()
-  const { onViewDetail, rawData, rawLock, rawType, usedCapacity } = useViewCell({
-    viewCell: operateCells[0],
-    isMainnet,
-  })
   const totalCapacity = useMemo(
     () => shannonToCKBFormatter(operateCells.reduce((pre, cur) => pre + BigInt(cur.capacity), BigInt(0)).toString()),
     [operateCells]
@@ -295,7 +313,7 @@ const CellManagement = () => {
             {showBalance ? <EyesOpen onClick={onChangeShowBalance} /> : <EyesClose onClick={onChangeShowBalance} />}
             <span>{t('cell-manage.wallet-balance')}</span>
             &nbsp;&nbsp;
-            {`${showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB`}
+            {`${showBalance ? shannonToCKBFormatter(wallet.balance) : HIDE_BALANCE} CKB`}
           </div>
         </div>
       }
@@ -322,6 +340,10 @@ const CellManagement = () => {
               <Consume />
               {t('cell-manage.consume')}
             </button>
+            <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consolidate}>
+              <Consolidate />
+              {t('cell-manage.consolidate')}
+            </button>
           </div>
         ) : null}
       </div>
@@ -332,89 +354,89 @@ const CellManagement = () => {
         pageNo={pageNo}
         onChange={onPageChange}
       />
-      <Dialog
-        show={action === Actions.View}
-        title={t('cell-manage.cell-detail-dialog.title')}
+      <CellInfoDialog
+        output={
+          action === Actions.View
+            ? { ...operateCells[0]!, lockHash: computeScriptHash(operateCells[0]!.lock) }
+            : undefined
+        }
         onCancel={onActionCancel}
-        showFooter={false}
-        className={styles.cellDetailDialog}
-      >
-        <section className={styles.section}>
-          <h6 className={styles.title}>OutPoint.TxHash</h6>
-          <div className={styles.txHash}>
-            <p>{operateCells[0]?.outPoint.txHash}</p>
-            <div className={styles.cellActions}>
-              <Copy onClick={() => onCopy(operateCells[0]!.outPoint.txHash)} />
-              <NewTab onClick={onViewDetail} data-tx-hash={operateCells[0]?.outPoint.txHash} />
-            </div>
+        isMainnet={isMainnet}
+      />
+      {wallet.device ? (
+        <Dialog
+          show={action === Actions.Lock || action === Actions.Unlock}
+          title={t(`cell-manage.cell-${action}-dialog.title`)}
+          onCancel={onActionCancel}
+          showFooter={false}
+          className={styles.lockCell}
+        >
+          <p className={styles.cellsCapacity}>
+            {t(`cell-manage.cell-${action}-dialog.capacity`, { capacity: totalCapacity })}
+          </p>
+          <div>
+            <img src={Hardware} alt="hard-wallet" className={styles.hardWalletImg} />
           </div>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>Lock Script</h6>
-          <pre>{rawLock}</pre>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>Type Script</h6>
-          <pre>{rawType}</pre>
-        </section>
-        <section className={styles.section}>
-          <h6 className={styles.title}>{t('cell-manage.cell-detail-dialog.data')}</h6>
-          <pre>{rawData}</pre>
-        </section>
-        {copied ? (
-          <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
-            {t('common.copied')}
-          </Alert>
-        ) : null}
-        <section className={styles.section}>
-          <h6 className={clsx(styles.title, styles.capacity)}>
-            {t('cell-manage.cell-detail-dialog.capacity-used')}
-            <div className={styles.capacityDetail}>
-              {t('cell-manage.cell-detail-dialog.total')}
-              &nbsp;{shannonToCKBFormatter(operateCells[0]?.capacity ?? '')} CKB ，
-              {t('cell-manage.cell-detail-dialog.used')}
-              &nbsp;{usedCapacity} CKB
-            </div>
-          </h6>
-          <div className={styles.slider}>
-            <div
-              style={{ width: `${(100 * usedCapacity) / +shannonToCKBFormatter(operateCells[0]?.capacity ?? '')}%` }}
-            />
+          {action === Actions.Lock ? (
+            <span className={styles.canNotUse}>
+              <Attention />
+              {t('cell-manage.cell-lock-dialog.locked-cell-can-not-use')}
+            </span>
+          ) : null}
+          <div className={styles.lockActions}>
+            <Button onClick={onActionCancel} type="cancel">
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={isNotAvailable ? reconnect : onActionConfirm}
+              loading={loading || isReconnecting}
+              type="primary"
+            >
+              {isNotAvailable || isReconnecting
+                ? t('hardware-verify-address.actions.reconnect')
+                : t('cell-manage.verify')}
+            </Button>
           </div>
-        </section>
-      </Dialog>
-      <Dialog
-        show={action === Actions.Lock || action === Actions.Unlock}
-        title={t(`cell-manage.cell-${action}-dialog.title`)}
-        onCancel={onActionCancel}
-        onConfirm={onActionConfirm}
-        className={styles.lockCell}
-        disabled={!password || !!error}
-        isLoading={loading}
-      >
-        <p className={styles.cellsCapacity}>
-          {t(`cell-manage.cell-${action}-dialog.capacity`, { capacity: totalCapacity })}
-        </p>
-        <TextField
-          className={styles.passwordInput}
-          placeholder={t('cell-manage.password-placeholder')}
-          width="100%"
-          label={t('cell-manage.enter-password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('cell-manage.enter-password')}
-          onChange={onPasswordChange}
-          autoFocus
-          error={error}
-        />
-        {action === Actions.Lock ? (
-          <span className={styles.canNotUse}>
-            <Attention />
-            {t('cell-manage.cell-lock-dialog.locked-cell-can-not-use')}
-          </span>
-        ) : null}
-      </Dialog>
+          {hardwalletError ? (
+            <Alert status="error" className={styles.hardwalletErr}>
+              {hardwalletError}
+            </Alert>
+          ) : null}
+        </Dialog>
+      ) : (
+        <Dialog
+          show={action === Actions.Lock || action === Actions.Unlock}
+          title={t(`cell-manage.cell-${action}-dialog.title`)}
+          onCancel={onActionCancel}
+          onConfirm={onActionConfirm}
+          className={styles.lockCell}
+          disabled={!password || !!error}
+          isLoading={loading}
+        >
+          <p className={styles.cellsCapacity}>
+            {t(`cell-manage.cell-${action}-dialog.capacity`, { capacity: totalCapacity })}
+          </p>
+          <TextField
+            className={styles.passwordInput}
+            placeholder={t('cell-manage.password-placeholder')}
+            width="100%"
+            label={t('cell-manage.enter-password')}
+            value={password}
+            field="password"
+            type="password"
+            title={t('cell-manage.enter-password')}
+            onChange={onPasswordChange}
+            autoFocus
+            error={error}
+          />
+          {action === Actions.Lock ? (
+            <span className={styles.canNotUse}>
+              <Attention />
+              {t('cell-manage.cell-lock-dialog.locked-cell-can-not-use')}
+            </span>
+          ) : null}
+        </Dialog>
+      )}
       <Dialog
         show={action === Actions.Consume}
         title={t('cell-manage.cell-consume-dialog.title')}
@@ -422,6 +444,15 @@ const CellManagement = () => {
         onConfirm={onActionConfirm}
       >
         <span className={styles.consumeNotice}>{t('cell-manage.cell-consume-dialog.warn-consume')}</span>
+      </Dialog>
+      <Dialog
+        show={action === Actions.Consolidate}
+        title={t('cell-manage.cell-consolidate-dialog.title')}
+        onCancel={onActionCancel}
+        onConfirm={onActionConfirm}
+        confirmText={t('cell-manage.consolidate')}
+      >
+        <span className={styles.consumeNotice}>{t('cell-manage.cell-consolidate-dialog.warn-consume')}</span>
       </Dialog>
     </PageContainer>
   )

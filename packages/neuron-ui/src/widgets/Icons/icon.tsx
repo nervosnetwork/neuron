@@ -52,10 +52,16 @@ import { ReactComponent as LockSvg } from './Lock.svg'
 import { ReactComponent as LockCellSvg } from './LockCell.svg'
 import { ReactComponent as UnLockSvg } from './Unlock.svg'
 import { ReactComponent as ConsumeSvg } from './Consume.svg'
+import { ReactComponent as ConsolidateSvg } from './Consolidate.svg'
 import { ReactComponent as DetectSvg } from './Detect.svg'
 import { ReactComponent as DeleteSvg } from './Delete.svg'
 import { ReactComponent as ImportKeystoreSvg } from './SoftWalletImportKeystore.svg'
 import { ReactComponent as ImportHardwareSvg } from './HardWalletImport.svg'
+import { ReactComponent as DepositTimeSortSvg } from './DepositTimeSort.svg'
+import { ReactComponent as QuestionSvg } from './Question.svg'
+import { ReactComponent as DetailsSvg } from './Details.svg'
+import { ReactComponent as ConfirmSvg } from './Confirm.svg'
+import { ReactComponent as UploadSvg } from './Upload.svg'
 
 import styles from './icon.module.scss'
 
@@ -124,7 +130,13 @@ export const Lock = WrapSvg(LockSvg, styles.withTheme)
 export const LockCell = WrapSvg(LockCellSvg)
 export const UnLock = WrapSvg(UnLockSvg)
 export const Consume = WrapSvg(ConsumeSvg)
+export const Consolidate = WrapSvg(ConsolidateSvg)
 export const Detect = WrapSvg(DetectSvg)
 export const Delete = WrapSvg(DeleteSvg)
 export const ImportKeystore = WrapSvg(ImportKeystoreSvg)
 export const ImportHardware = WrapSvg(ImportHardwareSvg)
+export const DepositTimeSort = WrapSvg(DepositTimeSortSvg)
+export const Question = WrapSvg(QuestionSvg)
+export const Details = WrapSvg(DetailsSvg)
+export const Confirm = WrapSvg(ConfirmSvg)
+export const Upload = WrapSvg(UploadSvg)

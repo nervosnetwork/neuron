@@ -1,4 +1,6 @@
-import { BrowserWindow, nativeTheme } from 'electron'
+import { BrowserWindow, nativeTheme, safeStorage } from 'electron'
+import fs from 'node:fs'
+import crypto from 'node:crypto'
 import env from '../env'
 import Store from '../models/store'
 import { changeLanguage } from '../locales/i18n'
@@ -14,6 +16,7 @@ export type Locale = (typeof locales)[number]
 const settingKeys = {
   ckbDataPath: 'ckbDataPath',
   nodeDataPath: 'nodeDataPath',
+  lockWindow: 'lockWindow',
 }
 
 export default class SettingsService extends Store {
@@ -52,6 +55,14 @@ export default class SettingsService extends Store {
     this.writeSync('indexerDataPath', dataPath)
   }
 
+  get isFirstSync(): boolean {
+    return this.readSync('isFirstSync')
+  }
+
+  set isFirstSync(isFirstSync: boolean) {
+    this.writeSync('isFirstSync', isFirstSync)
+  }
+
   getNodeDataPath(chain?: string) {
     return this.readSync<string>(
       `${settingKeys.nodeDataPath}_${chain ?? NetworksService.getInstance().getCurrent().chain}`
@@ -71,6 +82,39 @@ export default class SettingsService extends Store {
     this.writeSync('themeSource', theme)
   }
 
+  get lockWindowInfo(): { locked: boolean; encryptedPassword?: string } {
+    return this.readSync(settingKeys.lockWindow) ?? { locked: false }
+  }
+
+  private generateEncryptString(str: string) {
+    if (safeStorage.isEncryptionAvailable()) {
+      return safeStorage.encryptString(str).toString('hex')
+    }
+    const hash = crypto.createHash('sha256')
+    hash.update(str)
+    return hash.digest('hex')
+  }
+
+  updateLockWindowInfo(params: { locked?: boolean; password?: string }) {
+    const oldValue = SettingsService.getInstance().lockWindowInfo
+    const updatedValue = {
+      locked: params.locked ?? oldValue.locked,
+      encryptedPassword: oldValue.encryptedPassword,
+    }
+    if (params.password) {
+      updatedValue.encryptedPassword = this.generateEncryptString(params.password)
+    }
+    this.writeSync(settingKeys.lockWindow, updatedValue)
+  }
+
+  verifyLockWindowPassword(password: string) {
+    if (safeStorage.isEncryptionAvailable()) {
+      return safeStorage.decryptString(Buffer.from(this.lockWindowInfo.encryptedPassword!, 'hex')) === password
+    }
+    const encryptedPassword = this.generateEncryptString(password)
+    return SettingsService.getInstance().lockWindowInfo.encryptedPassword === encryptedPassword
+  }
+
   constructor() {
     super(
       '',
@@ -78,16 +122,23 @@ export default class SettingsService extends Store {
       JSON.stringify({
         locale: app.getLocale(),
         ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet'),
+        isFirstSync: true,
+        [settingKeys.lockWindow]: {
+          locked: false,
+        },
       })
     )
     if (!this.getNodeDataPath(LIGHT_CLIENT_MAINNET) || !this.getNodeDataPath('ckb')) {
       this.migrateDataPath()
     }
+    if (this.isFirstSync === undefined) {
+      this.isFirstSync = !fs.existsSync(path.join(this.getNodeDataPath(), 'ckb.toml'))
+    }
   }
 
   private onLocaleChanged = (lng: Locale) => {
     BrowserWindow.getAllWindows().forEach(bw => bw.webContents.send('set-locale', lng))
-    updateApplicationMenu(null)
+    updateApplicationMenu(BrowserWindow.getFocusedWindow())
   }
 
   migrateDataPath() {

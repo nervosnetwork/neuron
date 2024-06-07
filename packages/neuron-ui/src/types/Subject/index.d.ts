@@ -16,6 +16,7 @@ declare namespace Command {
     | 'migrate-acp'
     | 'sign-verify'
     | 'multisig-address'
+    | 'lock-window'
   type Payload = string | null
 }
 

@@ -9,6 +9,7 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
+import { scheduler } from 'timers/promises'
 
 const [alice, bob, charlie] = keyInfos
 
@@ -30,6 +31,7 @@ jest.mock('../../src/services/networks', () => ({
     getCurrent: () => ({
       type: NetworkType.Normal,
     }),
+    isMainnet: jest.fn(),
   }),
 }))
 
@@ -45,6 +47,7 @@ describe('multisig service', () => {
   )
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
   defaultMultisigConfig.lastestBlockNumber = '0x0'
+  defaultMultisigConfig.startBlockNumber = 0
   const lock = {
     args: Multisig.hash(
       multisigConfigModel.blake160s,
@@ -70,7 +73,7 @@ describe('multisig service', () => {
   const multisigOutput = MultisigOutput.fromIndexer(defaultOutput)
 
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
   })
 
   afterAll(async () => {
@@ -97,6 +100,7 @@ describe('multisig service', () => {
     it('save success', async () => {
       const anotherConfig = MultisigConfig.fromModel(multisigConfigModel)
       anotherConfig.lastestBlockNumber = '0x0'
+      anotherConfig.startBlockNumber = 0
       anotherConfig.r = 2
       const res = await multisigService.saveMultisigConfig(anotherConfig)
       const count = await getConnection()
@@ -132,6 +136,26 @@ describe('multisig service', () => {
         })
         .getOne()
       expect(config?.alias).toBe('newalisa')
+    })
+    it('only update startBlockNumber and original data should not be change', async () => {
+      await multisigService.updateMultisigConfig({
+        id: multisigConfigModel.id!,
+        startBlockNumber: 256,
+      })
+      await scheduler.wait(2_000)
+      const config = await getConnection()
+        .getRepository(MultisigConfig)
+        .createQueryBuilder()
+        .where({
+          id: multisigConfigModel.id,
+        })
+        .getOne()
+      expect(config?.alias).toBe('alias')
+      expect(config?.startBlockNumber).toBe(256)
+      expect(config?.walletId).toBe(multisigConfigModel.walletId)
+      expect(config?.blake160s).toStrictEqual(multisigConfigModel.blake160s)
+      expect(config?.r).toBe(multisigConfigModel.r)
+      expect(config?.m).toBe(multisigConfigModel.m)
     })
   })
 

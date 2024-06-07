@@ -145,7 +145,7 @@ describe('ckb runner', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath, 'ckb')),
             ['run', '-C', ckbDataPath, '--indexer'],
-            { stdio: ['ignore', 'ignore', 'pipe'] }
+            { stdio: ['ignore', 'pipe', 'pipe'] }
           )
         })
       })
@@ -179,7 +179,7 @@ describe('ckb runner', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath, 'ckb')),
               ['run', '-C', ckbDataPath, '--indexer'],
-              { stdio: ['ignore', 'ignore', 'pipe'] }
+              { stdio: ['ignore', 'pipe', 'pipe'] }
             )
           })
         })
@@ -255,8 +255,12 @@ describe('ckb runner', () => {
         expect(getNodeUrl()).toBe('http://127.0.0.1:8114')
         expect(getUsablePortMock).toHaveBeenLastCalledWith(8115)
         expect(updateTomlMock).toBeCalledWith(path.join('/chains/mainnet', 'ckb.toml'), {
-          rpc: `listen_address = "127.0.0.1:8114"`,
-          network: `listen_addresses = ["/ip4/0.0.0.0/tcp/8115"]`,
+          rpc: {
+            listen_address: `"127.0.0.1:8114"`,
+          },
+          network: {
+            listen_addresses: `["/ip4/0.0.0.0/tcp/8115"]`,
+          },
         })
         const promise = stopCkbNode()
         stubbedCkb.emit('close')
@@ -270,8 +274,12 @@ describe('ckb runner', () => {
         expect(getNodeUrl()).toBe('http://127.0.0.1:8115')
         expect(getUsablePortMock).toHaveBeenLastCalledWith(8116)
         expect(updateTomlMock).toBeCalledWith(path.join('/chains/mainnet', 'ckb.toml'), {
-          rpc: `listen_address = "127.0.0.1:8115"`,
-          network: `listen_addresses = ["/ip4/0.0.0.0/tcp/8116"]`,
+          rpc: {
+            listen_address: `"127.0.0.1:8115"`,
+          },
+          network: {
+            listen_addresses: `["/ip4/0.0.0.0/tcp/8116"]`,
+          },
         })
         let promise = stopCkbNode()
         stubbedCkb.emit('close')

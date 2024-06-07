@@ -109,8 +109,12 @@ const Send = () => {
     if (searchParams.get('isSendMax')) {
       updateIsSendMax(true)
     }
+    const toAddress = searchParams.get('toAddress')
+    if (toAddress) {
+      updateTransactionOutput('address')(0)(toAddress)
+    }
     // only when router change init send max
-  }, [searchParams, updateIsSendMax])
+  }, [searchParams, updateIsSendMax, updateTransactionOutput])
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 

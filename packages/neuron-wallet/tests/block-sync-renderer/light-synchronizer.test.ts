@@ -5,13 +5,14 @@ import AddressMeta from '../../src/database/address/meta'
 const getSyncStatusMock = jest.fn()
 const getCurrentWalletMinSyncedBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()
-const resetSyncProgressMock = jest.fn()
+const initSyncProgressMock = jest.fn()
 const updateSyncStatusMock = jest.fn()
 const updateSyncProgressFlagMock = jest.fn()
 const getWalletMinLocalSavedBlockNumberMock = jest.fn()
 const removeByHashesAndAddressType = jest.fn()
 const getOtherTypeSyncProgressMock = jest.fn()
 const getOtherTypeSyncBlockNumberMock = jest.fn()
+const getExistingSyncArgsesMock = jest.fn()
 
 const setScriptsMock = jest.fn()
 const getScriptsMock = jest.fn()
@@ -23,12 +24,13 @@ const schedulerWaitMock = jest.fn()
 const getMultisigConfigForLightMock = jest.fn()
 const walletGetCurrentMock = jest.fn()
 const walletGetAllMock = jest.fn()
+const updateBlockStartNumberMock = jest.fn()
 
 function mockReset() {
   getSyncStatusMock.mockReset()
   getCurrentWalletMinSyncedBlockNumberMock.mockReset()
   getAllSyncStatusToMapMock.mockReset()
-  resetSyncProgressMock.mockReset()
+  initSyncProgressMock.mockReset()
   updateSyncStatusMock.mockReset()
   getWalletMinLocalSavedBlockNumberMock.mockReset()
   getOtherTypeSyncProgressMock.mockReset()
@@ -45,6 +47,8 @@ function mockReset() {
   removeByHashesAndAddressType.mockReset()
   walletGetCurrentMock.mockReset()
   walletGetAllMock.mockReset()
+
+  updateBlockStartNumberMock.mockReset()
 }
 
 jest.mock('../../src/services/sync-progress', () => {
@@ -52,7 +56,7 @@ jest.mock('../../src/services/sync-progress', () => {
     static getSyncStatus: any = () => getSyncStatusMock()
     static getCurrentWalletMinSyncedBlockNumber: any = () => getCurrentWalletMinSyncedBlockNumberMock()
     static getAllSyncStatusToMap: any = () => getAllSyncStatusToMapMock()
-    static resetSyncProgress: any = (arg: any) => resetSyncProgressMock(arg)
+    static initSyncProgress: any = (arg: any) => initSyncProgressMock(arg)
     static updateSyncStatus: any = (hash: string, update: any) => updateSyncStatusMock(hash, update)
     static updateSyncProgressFlag: any = (walletIds: string[]) => updateSyncProgressFlagMock(walletIds)
     static getWalletMinLocalSavedBlockNumber: any = () => getWalletMinLocalSavedBlockNumberMock()
@@ -61,6 +65,7 @@ jest.mock('../../src/services/sync-progress', () => {
 
     static getOtherTypeSyncProgress: any = () => getOtherTypeSyncProgressMock()
     static getOtherTypeSyncBlockNumber: any = () => getOtherTypeSyncBlockNumberMock()
+    static getExistingSyncArgses: any = () => getExistingSyncArgsesMock()
   }
 })
 
@@ -121,12 +126,15 @@ describe('test light synchronizer', () => {
       await connect.initSyncProgress()
       expect(getScriptsMock).toBeCalledTimes(0)
     })
-    it('append multisig script', async () => {
+    it('sync multisig config', async () => {
       getScriptsMock.mockResolvedValue([])
       const connect = new LightSynchronizer([], '')
       getOtherTypeSyncBlockNumberMock.mockResolvedValueOnce({})
+      getMultisigConfigForLightMock.mockResolvedValueOnce([
+        { walletId: 'walletId', script, addressType: 1, scriptType: 'lock' },
+      ])
       //@ts-ignore
-      await connect.initSyncProgress([{ walletId: 'walletId', script, addressType: 1, scriptType: 'lock' }])
+      await connect.initMultisigSyncProgress()
       expect(getScriptsMock).toBeCalledTimes(1)
       expect(setScriptsMock).toHaveBeenNthCalledWith(
         1,
@@ -134,8 +142,10 @@ describe('test light synchronizer', () => {
         'partial'
       )
     })
-    it('there is not exist sync scripts with light client', async () => {
+    it('when syncing script in the local DB', async () => {
       getScriptsMock.mockResolvedValue([{ script, blockNumber: '0xaa' }])
+      walletGetAllMock.mockReturnValue([{ id: 'walletId' }])
+      getExistingSyncArgsesMock.mockResolvedValue(new Set([script.args]))
       const addressMeta = AddressMeta.fromObject({
         walletId: 'walletId',
         address,
@@ -166,7 +176,69 @@ describe('test light synchronizer', () => {
         'partial'
       )
       expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
-      expect(resetSyncProgressMock).toBeCalledWith([
+      expect(initSyncProgressMock).toBeCalledWith([
+        {
+          script: addressMeta.generateACPLockScript().toSDK(),
+          scriptType: 'lock',
+          walletId: 'walletId',
+          blockNumber: '0x0',
+        },
+        {
+          script: addressMeta.generateLegacyACPLockScript().toSDK(),
+          scriptType: 'lock',
+          walletId: 'walletId',
+          blockNumber: '0x0',
+        },
+      ])
+      expect(updateSyncProgressFlagMock).toBeCalledWith(['walletId'])
+    })
+    it('when syncing script not in the local DB', async () => {
+      getScriptsMock.mockResolvedValue([{ script, blockNumber: '0xaa' }])
+      walletGetAllMock.mockReturnValue([{ id: 'walletId' }])
+      getExistingSyncArgsesMock.mockResolvedValue(new Set())
+      const addressMeta = AddressMeta.fromObject({
+        walletId: 'walletId',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script.args,
+      })
+      const connect = new LightSynchronizer([addressMeta], '')
+      //@ts-ignore
+      await connect.initSyncProgress()
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateDefaultLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0x0',
+          },
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0x0',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0x0',
+          },
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
+      expect(initSyncProgressMock).toBeCalledWith([
+        {
+          script: addressMeta.generateDefaultLockScript().toSDK(),
+          scriptType: 'lock',
+          walletId: 'walletId',
+          blockNumber: '0x0',
+        },
         {
           script: addressMeta.generateACPLockScript().toSDK(),
           scriptType: 'lock',
@@ -192,6 +264,7 @@ describe('test light synchronizer', () => {
         addressType: 0,
         blake160: script.args,
       })
+      walletGetAllMock.mockReturnValue([{ id: 'walletId' }])
       getWalletMinLocalSavedBlockNumberMock.mockResolvedValue({ walletId: 170 })
       const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
@@ -262,6 +335,193 @@ describe('test light synchronizer', () => {
       )
       expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
     })
+    it('when set the wallet start block number is bigger than current synced block number', async () => {
+      getScriptsMock.mockResolvedValue([{ script, blockNumber: '0xaa' }])
+      const addressMeta = AddressMeta.fromObject({
+        walletId: 'walletId',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script.args,
+      })
+      getWalletMinLocalSavedBlockNumberMock.mockResolvedValue({})
+      walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumber: '0xffff' }])
+      const connect = new LightSynchronizer([addressMeta], '')
+      //@ts-ignore
+      await connect.initSyncProgress()
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateDefaultLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xffff',
+          },
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
+    })
+    it('when other wallet min synced block number near the current wallet', async () => {
+      walletGetCurrentMock.mockReturnValue({ id: 'walletId1' })
+      walletGetAllMock.mockReturnValue([
+        { id: 'walletId1', startBlockNumber: '0xaa' },
+        { id: 'walletId2', startBlockNumber: '0xab' },
+      ])
+      const addressMeta1 = AddressMeta.fromObject({
+        walletId: 'walletId1',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script.args,
+      })
+      const script2: Script = {
+        args: '0x403f0d4e833b2a8d372772a63facaa310dfeef93',
+        codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+        hashType: 'type',
+      }
+      const getScriptsResult = [{ script: script2, blockNumber: '0xaa', scriptType: 'lock' }]
+      getScriptsMock.mockResolvedValue(getScriptsResult)
+      getExistingSyncArgsesMock.mockResolvedValue(new Set([script2.args]))
+      const addressMeta2 = AddressMeta.fromObject({
+        walletId: 'walletId2',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script2.args,
+      })
+      const connect = new LightSynchronizer([addressMeta1, addressMeta2], '')
+      //@ts-ignore
+      await connect.initSyncProgress()
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          ...[
+            addressMeta1.generateDefaultLockScript().toSDK(),
+            addressMeta1.generateACPLockScript().toSDK(),
+            addressMeta1.generateLegacyACPLockScript().toSDK(),
+          ].map(script => ({
+            script,
+            scriptType: 'lock',
+            walletId: addressMeta1.walletId,
+            blockNumber: '0xaa',
+          })),
+          ...[
+            addressMeta2.generateDefaultLockScript().toSDK(),
+            addressMeta2.generateACPLockScript().toSDK(),
+            addressMeta2.generateLegacyACPLockScript().toSDK(),
+          ].map(script => ({
+            script,
+            scriptType: 'lock',
+            walletId: addressMeta2.walletId,
+            blockNumber: '0xab',
+          })),
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
+      expect(initSyncProgressMock).toBeCalledWith([
+        ...[
+          addressMeta1.generateDefaultLockScript().toSDK(),
+          addressMeta1.generateACPLockScript().toSDK(),
+          addressMeta1.generateLegacyACPLockScript().toSDK(),
+        ].map(script => ({
+          script,
+          scriptType: 'lock',
+          walletId: addressMeta1.walletId,
+          blockNumber: '0xaa',
+        })),
+        ...[
+          addressMeta2.generateDefaultLockScript().toSDK(),
+          addressMeta2.generateACPLockScript().toSDK(),
+          addressMeta2.generateLegacyACPLockScript().toSDK(),
+        ].map(script => ({
+          script,
+          scriptType: 'lock',
+          walletId: addressMeta2.walletId,
+          blockNumber: '0xab',
+        })),
+      ])
+      expect(updateSyncProgressFlagMock).toBeCalledWith(['walletId1', 'walletId2'])
+    })
+    it('when other wallet min synced block number bigger than the current wallet', async () => {
+      walletGetCurrentMock.mockReturnValue({ id: 'walletId1' })
+      walletGetAllMock.mockReturnValue([
+        { id: 'walletId1', startBlockNumber: '0xaaaa0' },
+        { id: 'walletId2', startBlockNumber: '0xab' },
+      ])
+      const addressMeta1 = AddressMeta.fromObject({
+        walletId: 'walletId1',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script.args,
+      })
+      const script2: Script = {
+        args: '0x403f0d4e833b2a8d372772a63facaa310dfeef93',
+        codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+        hashType: 'type',
+      }
+      const getScriptsResult = [{ script: script2, blockNumber: '0xab', scriptType: 'lock' }]
+      getScriptsMock.mockResolvedValue(getScriptsResult)
+      getExistingSyncArgsesMock.mockResolvedValue(new Set([script2.args]))
+      const addressMeta2 = AddressMeta.fromObject({
+        walletId: 'walletId2',
+        address,
+        path: '',
+        addressIndex: 10,
+        addressType: 0,
+        blake160: script2.args,
+      })
+      const connect = new LightSynchronizer([addressMeta1, addressMeta2], '')
+      //@ts-ignore
+      await connect.initSyncProgress()
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          addressMeta1.generateDefaultLockScript().toSDK(),
+          addressMeta1.generateACPLockScript().toSDK(),
+          addressMeta1.generateLegacyACPLockScript().toSDK(),
+        ].map(script => ({
+          script,
+          scriptType: 'lock',
+          walletId: addressMeta1.walletId,
+          blockNumber: '0xaaaa0',
+        })),
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith(getScriptsResult, 'delete')
+      expect(initSyncProgressMock).toBeCalledWith(
+        [
+          addressMeta1.generateDefaultLockScript().toSDK(),
+          addressMeta1.generateACPLockScript().toSDK(),
+          addressMeta1.generateLegacyACPLockScript().toSDK(),
+        ].map(script => ({
+          script,
+          scriptType: 'lock',
+          walletId: addressMeta1.walletId,
+          blockNumber: '0xaaaa0',
+        }))
+      )
+      expect(updateSyncProgressFlagMock).toBeCalledWith(['walletId1', 'walletId2'])
+    })
   })
 
   describe('test initSync', () => {
@@ -323,16 +583,10 @@ describe('test light synchronizer', () => {
   })
 
   describe('#notifyCurrentBlockNumberProcessed', () => {
-    const synchronizer = new LightSynchronizer([], '')
-    const updateBlockStartNumberMock = jest.fn()
-    beforeAll(() => {
+    it('last process block number finish', async () => {
+      const synchronizer = new LightSynchronizer([], '')
       // @ts-ignore private property
       synchronizer.updateBlockStartNumber = updateBlockStartNumberMock
-    })
-    beforeEach(() => {
-      updateBlockStartNumberMock.mockReset()
-    })
-    it('last process block number finish', async () => {
       // @ts-ignore private property
       synchronizer.processingBlockNumber = '0xaa'
       getCurrentWalletMinSyncedBlockNumberMock.mockResolvedValueOnce(100)
@@ -342,6 +596,9 @@ describe('test light synchronizer', () => {
       expect(updateBlockStartNumberMock).toBeCalledWith(100)
     })
     it('not last process block number finish', async () => {
+      const synchronizer = new LightSynchronizer([], '')
+      // @ts-ignore private property
+      synchronizer.updateBlockStartNumber = updateBlockStartNumberMock
       // @ts-ignore private property
       synchronizer.processingBlockNumber = undefined
       await synchronizer.notifyCurrentBlockNumberProcessed('0xaa')

@@ -69,6 +69,8 @@ export enum AppActions {
 
   // Cell manage
   UpdateConsumeCells = 'UpdateConsumeCells',
+  // lock window
+  SetLockWindowInfo = 'SetLockWindowInfo',
 }
 
 export type StateAction =
@@ -121,6 +123,7 @@ export type StateAction =
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
   | { type: AppActions.SignVerify; payload: string }
   | { type: AppActions.UpdateConsumeCells; payload?: { outPoint: OutPoint; capacity: string }[] }
+  | { type: AppActions.SetLockWindowInfo; payload: Required<State.App>['lockWindowInfo'] }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -325,7 +328,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.DismissNotification: {
       /**
-       * payload: timstamp
+       * payload: timestamp
        */
       state.app.showTopAlert =
         state.app.notifications.findIndex(message => message.timestamp === action.payload) ===
@@ -417,6 +420,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
 
     case AppActions.UpdateConsumeCells: {
       state.consumeCells = action.payload
+      break
+    }
+
+    case AppActions.SetLockWindowInfo: {
+      state.app.lockWindowInfo = { ...(state.app.lockWindowInfo ?? {}), ...action.payload }
       break
     }
 

@@ -2,7 +2,7 @@
   "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.112.0",
+  "version": "0.116.2",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -36,7 +36,7 @@
     "lint": "lerna run --stream lint",
     "postinstall": "husky install",
     "db:chain": "node ./node_modules/.bin/typeorm",
-    "update:valid-target": "node ./scripts/update-valid-target.js",
+    "update:wallet-env": "node ./scripts/update-wallet-env.js",
     "update:neuron-compatible": "node ./scripts/add-neuron-version-in-compatibility-table.js",
     "update:client-versions": "node ./scripts/update-ckb-client-versions.js"
   },
@@ -64,7 +64,9 @@
   "dependencies": {},
   "resolutions": {
     "@types/react": "18.2.45",
-    "react-i18next": ">=11.16.4"
+    "react-i18next": ">=11.16.4",
+    "react-refresh": "0.14.0",
+    "node-fetch": "2.6.13"
   },
   "volta": {
     "node": "20.10.0"

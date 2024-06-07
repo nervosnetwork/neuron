@@ -11,7 +11,7 @@ export const getSUDTAmount = ({
   let amountToCopy = amount
   if (tokenInfo) {
     amount = `${sudtValueToAmount(amount, tokenInfo.decimal)} ${tokenInfo.symbol}`
-    amountToCopy = sudtValueToAmount(amountToCopy, tokenInfo.decimal, false, '')
+    amountToCopy = sudtValueToAmount(amountToCopy, tokenInfo.decimal, false, false)
   }
   return {
     amount,

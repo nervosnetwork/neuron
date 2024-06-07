@@ -85,6 +85,8 @@ export default ({
     switch (offlineSignJSON?.type) {
       case OfflineSignType.CreateSUDTAccount:
         return 'create-sudt-account'
+      case OfflineSignType.SendAcpSUDTToNewCell:
+        return 'send-acp-sudt-to-new-cell'
       case OfflineSignType.SendSUDT:
         return 'send-sudt'
       case OfflineSignType.UnlockDAO:
@@ -229,7 +231,8 @@ export default ({
         case 'send-nft':
         case 'destroy-asset-account':
         case 'send-cheque':
-        case 'claim-cheque': {
+        case 'claim-cheque':
+        case 'withdraw-cheque': {
           if (isSending) {
             break
           }
@@ -278,7 +281,8 @@ export default ({
         case 'send-ckb-asset':
         case 'send-acp-sudt-to-new-cell':
         case 'send-acp-ckb-to-new-cell':
-        case 'send-sudt': {
+        case 'send-sudt':
+        case 'transfer-to-sudt': {
           let skipLastInputs = true
           if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
             skipLastInputs = false

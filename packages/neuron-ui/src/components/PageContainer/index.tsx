@@ -6,9 +6,10 @@ import {
   isMainnet as isMainnetUtil,
   localNumberFormatter,
   getNetworkLabelI18nkey,
+  RoutePath,
 } from 'utils'
 import Alert from 'widgets/Alert'
-import { Attention, Close, NewTab } from 'widgets/Icons/icon'
+import { Close } from 'widgets/Icons/icon'
 import { ReactComponent as Sun } from 'widgets/Icons/Sun.svg'
 import { ReactComponent as Moon } from 'widgets/Icons/Moon.svg'
 import SyncStatusComponent from 'components/SyncStatus'
@@ -16,8 +17,7 @@ import { AppActions, useDispatch, useState as useGlobalState } from 'states'
 import { openExternal } from 'services/remote'
 import Tooltip from 'widgets/Tooltip'
 import { NetworkType } from 'utils/const'
-import Dialog from 'widgets/Dialog'
-import TextField from 'widgets/TextField'
+import SetStartBlockNumberDialog from 'components/SetStartBlockNumberDialog'
 
 import { useMigrate, useSetBlockNumber, useTheme } from './hooks'
 import styles from './pageContainer.module.scss'
@@ -41,7 +41,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   const {
     app: { showWaitForFullySynced },
     chain: {
-      syncState: { bestKnownBlockNumber, cacheTipBlockNumber, syncStatus, isLookingValidTarget, validTarget },
+      syncState: { bestKnownBlockNumber, cacheTipBlockNumber, syncStatus, isLookingValidTarget, validTarget, estimate },
       connectionStatus,
       networkID,
     },
@@ -84,28 +84,13 @@ const PageContainer: React.FC<ComponentProps> = props => {
     [isMainnet, validTarget]
   )
   const isMigrate = useMigrate()
-  const {
-    isSetStartBlockShown,
-    openDialog,
-    closeDialog,
-    onChangeStartBlockNumber,
-    startBlockNumber,
-    onOpenAddressInExplorer,
-    onViewBlock,
-    onConfirm,
-    countdown,
-    isSetLessThanBefore,
-    blockNumberErr,
-  } = useSetBlockNumber({
-    firstAddress: addresses[0]?.address,
-    isMainnet,
+  const { isSetStartBlockShown, openDialog, closeDialog, onConfirm } = useSetBlockNumber({
     isLightClient,
     walletID: id,
     isHomePage,
     initStartBlockNumber: walletStartBlockNumber ? Number(walletStartBlockNumber) : undefined,
-    headerTipNumber: bestKnownBlockNumber,
-    t,
   })
+  const isOpenMultisigWithLight = isLightClient && window.location.href.includes(RoutePath.MultisigAddress)
   return (
     <div className={`${styles.page} ${className || ''}`}>
       <div className={styles.head}>
@@ -132,7 +117,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
           <div className={styles.syncStatus}>
             <SyncStatusComponent
               syncStatus={syncStatus}
-              connectionStatus={connectionStatus}
+              connectionStatus={isOpenMultisigWithLight ? 'pause' : connectionStatus}
               syncPercents={syncPercents}
               syncBlockNumbers={syncBlockNumbers}
               isLookingValidTarget={isLookingValidTarget}
@@ -141,6 +126,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
               isLightClient={isLightClient}
               onOpenSetStartBlock={openDialog}
               startBlockNumber={walletStartBlockNumber}
+              estimate={estimate}
             />
           </div>
         </div>
@@ -153,48 +139,15 @@ const PageContainer: React.FC<ComponentProps> = props => {
         </Alert>
       )}
       <div className={styles.body}>{children}</div>
-      <Dialog
-        title={t('set-start-block-number.title')}
-        confirmText={countdown ? `${t('common.confirm')}(${countdown})` : t('common.confirm')}
+      <SetStartBlockNumberDialog
         show={isSetStartBlockShown}
+        headerTipNumber={bestKnownBlockNumber}
+        initStartBlockNumber={walletStartBlockNumber ? Number(walletStartBlockNumber) : undefined}
+        isMainnet={isMainnet}
+        address={addresses[0]?.address}
+        onUpdateStartBlockNumber={onConfirm}
         onCancel={closeDialog}
-        onConfirm={onConfirm}
-        disabled={!startBlockNumber || !!countdown}
-        contentClassName={styles.setBlockContent}
-      >
-        <div className={styles.setBlockWarn}>
-          <Attention />
-          {t('set-start-block-number.warn')}
-        </div>
-        <div className={styles.content}>
-          <p className={styles.startBlockTip}>{t('set-start-block-number.tip')}</p>
-          <TextField
-            field="startBlockNumber"
-            onChange={onChangeStartBlockNumber}
-            placeholder={t('set-start-block-number.input-place-holder')}
-            value={localNumberFormatter(startBlockNumber)}
-            error={blockNumberErr}
-            suffix={
-              startBlockNumber ? (
-                <button type="button" className={styles.viewAction} onClick={onViewBlock}>
-                  {t('set-start-block-number.view-block')}
-                  <NewTab />
-                </button>
-              ) : (
-                <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
-                  {t('set-start-block-number.locate-first-tx')}
-                  <NewTab />
-                </button>
-              )
-            }
-          />
-          {isSetLessThanBefore ? (
-            <Alert status="error" className={styles.errorMessage} withIcon={false}>
-              {t('set-start-block-number.set-less-than-before')}
-            </Alert>
-          ) : null}
-        </div>
-      </Dialog>
+      />
     </div>
   )
 }

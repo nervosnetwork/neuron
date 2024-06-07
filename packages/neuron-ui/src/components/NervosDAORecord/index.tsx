@@ -18,7 +18,7 @@ import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 import { Clock } from 'widgets/Icons/icon'
 import { Link } from 'react-router-dom'
 import { HIDE_BALANCE } from 'utils/const'
-
+import Spinner from 'widgets/Spinner'
 import Tooltip from 'widgets/Tooltip'
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
@@ -38,7 +38,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
   depositEpoch: string // deposit epoch string
   currentEpoch: string // current epoch string
   withdrawCapacity: string | null // capacity that is available for withdraw
-  connectionStatus: 'online' | 'offline' | 'connecting' // connection status
+  connectionStatus: State.ConnectionStatus // connection status
   onClick: React.EventHandler<React.MouseEvent> // on action button click
   tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
@@ -92,7 +92,14 @@ export const DAORecord = ({
   )
 
   const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
-  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
+
+  let leftHours = ''
+  let leftDays = ''
+  if (leftEpochs < EPOCHS_PER_DAY) {
+    leftHours = (parseInt(`${leftEpochs * (24 / EPOCHS_PER_DAY)}`, 10) || 1).toString()
+  } else {
+    leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
+  }
 
   const compensation = BigInt(withdrawCapacity || capacity) - BigInt(capacity)
 
@@ -106,15 +113,18 @@ export const DAORecord = ({
   })
 
   let message = ''
+  let showLoading = false
 
   if (ConnectionStatus.Online === connectionStatus) {
     switch (cellStatus) {
       case CellStatus.Unlocking: {
         message = t('nervos-dao.compensation-period.stage-messages.unlocking')
+        showLoading = true
         break
       }
       case CellStatus.Withdrawing: {
         message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
+        showLoading = true
         break
       }
       case CellStatus.Unlockable: {
@@ -122,17 +132,32 @@ export const DAORecord = ({
         break
       }
       case CellStatus.Depositing: {
-        message = t('nervos-dao.compensation-period.stage-messages.pending')
+        message = t('nervos-dao.compensation-period.stage-messages.deposit-in-progress')
+        showLoading = true
         break
       }
       case CellStatus.Deposited: {
-        message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
+        if (leftHours) {
+          message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle-hours', {
+            hours: leftHours || '--',
+          })
+        } else {
+          message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', {
+            days: leftDays || '--',
+          })
+        }
         break
       }
       case CellStatus.Locked: {
-        message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
-          days: leftDays || '--',
-        })
+        if (leftHours) {
+          message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end-hours', {
+            hours: leftHours || '--',
+          })
+        } else {
+          message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
+            days: leftDays || '--',
+          })
+        }
         break
       }
       default: {
@@ -149,7 +174,7 @@ export const DAORecord = ({
   const isWithdrawnDisabled = CellStatus.Deposited === cellStatus && !hasCkbBalance
   const isActionAvailable =
     connectionStatus === 'online' &&
-    [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus) &&
+    [CellStatus.Deposited, CellStatus.Unlockable, CellStatus.Depositing].includes(cellStatus) &&
     !isWithdrawnDisabled
 
   const depositOutPointKey = depositOutPoint
@@ -220,7 +245,7 @@ export const DAORecord = ({
         ) : (
           <CopyZone
             className={clsx(styles.amount, styles.withCopy)}
-            content={shannonToCKBFormatter(capacity, false, '')}
+            content={shannonToCKBFormatter(capacity, false, false)}
           >
             {`${shannonToCKBFormatter(capacity)} CKB`}
           </CopyZone>
@@ -279,10 +304,20 @@ export const DAORecord = ({
                 />
               )}
             </div>
-            <span className={styles.message}>{message}</span>
+            {showLoading ? (
+              <p className={styles.depositingMsg}>
+                {message}
+                <Spinner className={styles.spinner} />
+              </p>
+            ) : (
+              <span className={styles.message}>{message}</span>
+            )}
           </div>
 
           <div className={styles.action}>
+            {cellStatus === CellStatus.Locked ? (
+              <div className={styles.lockWarn}>{t('nervos-dao.deposit-record.lock-warn')}</div>
+            ) : null}
             {isWithdrawnDisabled ? (
               <Tooltip
                 tip={<div>{t('nervos-dao.deposit-record.insufficient-balance-to-unlock')}</div>}
@@ -305,7 +340,11 @@ export const DAORecord = ({
                 data-index={index}
                 onClick={onClick}
                 disabled={!isActionAvailable}
-                label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
+                label={
+                  cellStatus === CellStatus.Depositing
+                    ? t('nervos-dao.deposit-record.view-tx-detail')
+                    : t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)
+                }
               />
             )}
           </div>

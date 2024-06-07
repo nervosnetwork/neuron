@@ -21,6 +21,7 @@
       "special-assets": "Actifs personnalisés",
       "sync-not-start": "Synchronisation pas encore démarrée",
       "connecting": "Connexion",
+      "pause": "Pause synchronisation",
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
@@ -35,7 +36,9 @@
         "start-block-number": "bloc de départ",
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
-      "migrating": "migration en cours..."
+      "migrating": "migration en cours...",
+      "left-time": "Temps restant",
+      "left-time-tip": "Le temps restant est une estimation et est lié au réseau actuel et à d'autres facteurs, et est fourni à titre indicatif seulement."
     },
     "import-hardware": {
       "title": {
@@ -140,7 +143,7 @@
       "activity": "Activité",
       "datetime": "Date et heure",
       "status": "Statut",
-      "amount": "Montant",
+      "asset": "actifs",
       "address": "Adresse",
       "sent": "Envoyé",
       "sending": "Envoi",
@@ -156,7 +159,9 @@
       "send": "Envoyer",
       "receive": "Recevoir",
       "locked": "Montant verrouillé",
-      "locked-balance": "Solde verrouillé"
+      "locked-balance": "Solde verrouillé",
+      "first-sync-notice": "La synchronisation initiale nécessite au moins {{size}} Go d'espace disque, la taille des données augmentera avec le temps. Il est recommandé de choisir un espace disque plus important pour stocker les données.",
+      "start-sync": "Démarrer la synchronisation"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenue sur Neuron",
@@ -249,7 +254,10 @@
       "release-on": "Libération le",
       "locktime-warning": "Veuillez vous assurer que le Wallet du destinataire peut prendre en charge le déverrouillage par expiration. (Remarque : 1. Les échanges ne prennent généralement pas en charge le déverrouillage par expiration {{extraNote}})",
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
-      "submit-transaction": "Soumettre la transaction"
+      "submit-transaction": "Soumettre la transaction",
+      "transaction-confirmed": "Transaction confirmée",
+      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée.",
+      "amend-pending-transaction": "Modifier une transaction en cours"
     },
     "receive": {
       "title": "Recevoir",
@@ -304,7 +312,8 @@
       "table": {
         "name": "Nom du Wallet",
         "type": "Type",
-        "amount": "Montant",
+        "balance": "Solde",
+        "asset": "actifs",
         "timestamp": "Heure",
         "status": "Statut",
         "operation": "Opération"
@@ -318,12 +327,14 @@
       "view-in-explorer-button-title": "Voir sur l'explorateur",
       "view-detail": "Détail",
       "view-detail-button-title": "Voir les détails",
+      "amend": "Modifier",
       "opening": "Ouverture",
       "copy-tx-hash": "Copier le hash de la transaction",
       "copy-balance": "Copier le solde",
       "copy-address": "Copier l'adresse",
       "create": "Créer le compte d'actif {{name}}",
-      "destroy": "Détruire le compte d'actif {{name}}"
+      "destroy": "Détruire le compte d'actif {{name}}",
+      "fee": "Frais de transaction"
     },
     "transaction": {
       "window-title": "Transaction : {{hash}}",
@@ -340,7 +351,15 @@
       "cell-from-cellbase": "De cellbase",
       "lock-script": "Script de verrouillage",
       "lock-script-title": "Informations sur l'adresse",
-      "deprecated-address-format": "Adresse au format obsolète"
+      "deprecated-address-format": "Adresse au format obsolète",
+      "type": "Type",
+      "fee": "Frais de transaction",
+      "assets": "Actifs",
+      "balance": "Solde",
+      "status": "Statut",
+      "size": "taille",
+      "cycles": "Cycles",
+      "cell-detail": "Détail de la cellule"
     },
     "addresses": {
       "title": "Carnet d'adresses",
@@ -377,7 +396,22 @@
         "version": "Version",
         "language": "Langue",
         "select-language": "Sélectionner la langue",
-        "apply": "Appliquer"
+        "apply": "Appliquer",
+        "keep-awake": "Maintenir l'écran allumé pendant la synchronisation",
+        "lock-password": "Mot de passe de verrouillage de l'écran",
+        "set-lock-password": "Configurer le mot de passe de verrouillage de l'écran",
+        "change-lock-password": "Modifier le mot de passe de verrouillage de l'écran",
+        "lock-window": {
+          "set-password": "Créer un mot de passe",
+          "confirm-password": "Confirmer le mot de passe",
+          "enter-current-password": "Entrer le mot de passe actuel",
+          "enter-new-password": "Entrer le nouveau mot de passe",
+          "password-error": "Mot de passe incorrect",
+          "different-password": "Les deux mots de passe entrés ne correspondent pas",
+          "set-password-success": "Mot de passe défini avec succès",
+          "change-password-success": "Mot de passe modifié avec succès",
+          "reset": "Réinitialiser"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -416,8 +450,8 @@
         "switch-network-type": "Basculer vers {{type}}"
       },
       "locale": {
-        "en": "Anglais",
-        "en-US": "Anglais (États-Unis)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
         "fr": "Français",
@@ -540,7 +574,8 @@
       "verification-failure": "Échec de la vérification",
       "back": "Retour",
       "switch-to-light": "Passer en mode clair",
-      "switch-to-dark": "Passer en mode sombre"
+      "switch-to-dark": "Passer en mode sombre",
+      "ckb-node-data-path": "CKB Chemin des données du nœud"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -645,7 +680,9 @@
       "block-number": "numéro de bloc",
       "syncing-balance": "La balance est en cours de mise à jour",
       "slow": "La synchronisation est lente",
-      "sync-failed": "Échec de la synchronisation, veuillez vérifier le réseau",
+      "sync-failed": "échec de la synchronisation",
+      "sync-failed-detail": "En raison de nœuds réseau ou d'autres problèmes, la synchronisation a échoué.",
+      "learn-more": "En savoir plus",
       "sync-not-start": "La synchronisation n'a pas encore commencé, veuillez essayer de redémarrer le Wallet Neuron",
       "connecting": "Connexion en cours"
     },
@@ -682,7 +719,12 @@
       "compensation-accumulated": "{{blockNumber}} blocs de compensation accumulée",
       "withdraw-alert": "Astuce : il ne reste que {{epochs}} époques (~{{hours}} heures) jusqu'à la fin de votre période de verrouillage actuelle. Si vous souhaitez retirer pendant cette période de verrouillage, veuillez envoyer une demande de retrait à temps. Il reste {{nextLeftEpochs}} époques (~{{days}} jours) jusqu'à la fin de votre prochaine période de verrouillage.",
       "balance-not-reserved": "Ne pas réserver de CKBytes pour les futures opérations DAO (non recommandé)",
+      "estimated-rewards": "Récompenses estimées de {{days}} jours",
+      "estimated-apc": "Estimation de APC",
+      "estimated-apc-tooltip": "Estimation de Compensation Annuel",
       "deposit-amount": "Montant du dépôt (CKB)",
+      "attention": "Attention : Une fois déposés dans la DAO Nervos, vos dépôts seront bloqués pendant au moins 180 époques (environ 30 jours).",
+      "deposit-submitted": "Dépôt de garantie",
       "deposit-record": {
         "deposited-at": "Déposé",
         "completed-at": "Terminé",
@@ -699,7 +741,8 @@
         "days-hours": "{{days}} jours {{hours}} heures",
         "no-deposit": "Aucun dépôt",
         "no-completed": "Aucun terminé",
-        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO."
+        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO.",
+        "lock-warn": "Verrouillage à la fin du cycle de compensation en cours"
       },
       "compensation-period": {
         "tooltip": {
@@ -712,12 +755,14 @@
           "withdrawn": "Retiré"
         },
         "stage-messages": {
-          "pending": "En attente...",
+          "deposit-in-progress": "En attente...",
           "immature-for-withdraw": "Les CKB ne peuvent pas être retirés pendant les {{ hours }} prochaines heures",
           "immature-for-unlock": "Les CKB ne peuvent pas être déverrouillés pendant les {{ hours }} prochaines heures",
           "next-compensation-cycle": "Le prochain cycle de compensation commencera dans environ {{days}} jours",
+          "next-compensation-cycle-hours": "Le prochain cycle de compensation commencera dans environ {{hours}} heures",
           "withdrawing": "Retrait en cours...",
           "compensation-cycle-will-end": "La période de compensation se termine dans environ {{days}} jours",
+          "compensation-cycle-will-end-hours": "La période de compensation se termine dans environ {{hours}} heures",
           "compensation-cycle-has-ended": "Le cycle est terminé, les CKB sont prêts à être déverrouillés",
           "unlocking": "Déverrouillage en cours..."
         }
@@ -739,6 +784,16 @@
       "cell-from-cellbase": "De cellbase",
       "cancel": "Annuler",
       "next": "Suivant"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Dépôt minimum",
+      "single-compensation-cycle": "Cycle de compensation unique",
+      "single-compensation-cycle-description": "180 Époque (environ 30 jours)",
+      "withdraw": "Retirer",
+      "withdraw-description": "A tout moment",
+      "unlock": "Déverrouiller",
+      "unlock-description": "Après le cycle de compensation en cours",
+      "get": "Obtenir"
     },
     "lock-info-dialog": {
       "address-info": "Informations sur l'adresse",
@@ -1148,7 +1203,13 @@
         "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le noeud externe"
+        "ignore-external-node": "Ignorer le noeud externe",
+        "external-node-is-light": "En raison de différentes hypothèses de sécurité du client léger, Neuron ne prend pas en charge les nœuds clients légers externes. Voulez-vous vous connecter à un \"Light Client\" ?"
+      },
+      "no-disk-space-dialog": {
+        "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
+        "continue-sync": "Continuer la synchronisation",
+        "migrate-data": "Migration des données"
       }
     },
     "cell-manage": {
@@ -1169,10 +1230,16 @@
       },
       "cell-detail-dialog": {
         "title": "Détail de la cellule",
+        "transaction-hash": "Hash de transaction",
         "capacity-used": "Capacité utilisée",
         "data": "Données",
         "total": "Total",
-        "used": "Utilisé"
+        "used": "Utilisé",
+        "view-raw-data": "Données",
+        "UTF8": "UTF-8",
+        "address": "Adresse",
+        "number": "Numéro",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "La cellule est verrouillée dans le temps et vous ne pouvez pas l'utiliser avant {{time}}.",
@@ -1194,11 +1261,17 @@
         "title": "Consommer la cellule",
         "warn-consume": "La consommation de la cellule ne conservera aucune donnée et utilisera tout le CKB. Veuillez vous assurer qu'aucune donnée importante ne doit être conservée."
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolider",
+        "warn-consume": "Toutes les cellules sélectionnées seront consolidées dans une nouvelle cellule. Assurez-vous que les cellules sélectionnées ne contiennent pas de données importantes."
+      },
       "enter-password": "Entrez le mot de passe",
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
-      "consume": "Consommer"
+      "consume": "Consommer",
+      "verify": "Vérifier",
+      "consolidate": "Consolider"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",
@@ -1211,6 +1284,12 @@
         "size": "taille",
         "lock-time": "Période de verrouillage"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "a fenêtre de Neuron est verrouillée",
+      "enter-lock-password": "Entrer le mot de passe de verrouillage d'écran",
+      "lock-password-error": "Mot de passe de verrouillage d'écran incorrect",
+      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}"
     }
   }
 }

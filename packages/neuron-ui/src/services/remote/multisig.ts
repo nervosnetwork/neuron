@@ -21,6 +21,7 @@ export type MultisigEntity = MultisigParams & {
   id?: number
   walletId: string
   alias?: string
+  startBlockNumber?: number
 }
 
 export type MultisigConfig = MultisigEntity & {
@@ -52,3 +53,4 @@ export const loadMultisigTxJson = remoteApi<string, OfflineSignJSON>('load-multi
 export const getMultisigSyncProgress = remoteApi<string[], { hash: string; localSavedBlockNumber: number }[]>(
   'get-sync-progress-by-addresses'
 )
+export const changeMultisigSyncStatus = remoteApi<boolean, void>('change-multisig-sync-status')

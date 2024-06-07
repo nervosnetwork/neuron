@@ -17,12 +17,16 @@ export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerP
 export const handleViewError = remoteApi<string>('handle-view-error')
 export const setLocale = remoteApi<(typeof LOCALES)[number]>('set-locale')
 export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-path')
-export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean }, string>(
+export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean; onlySetPath?: boolean }, string>(
   'set-ckb-node-data-path'
 )
 export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 export const startNodeIgnoreExternal = remoteApi<void, boolean>('start-node-ignore-external')
+export const getFirstSyncInfo = remoteApi<void, { isFirstSync: boolean; needSize: number; ckbNodeDataPath: string }>(
+  'get-first-sync-info'
+)
+export const startSync = remoteApi<void, void>('start-sync')
 
 export type VerifyExternalCkbNodeRes =
   | {
@@ -43,3 +47,9 @@ export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-display
 export const invokeShowMessageBox = remoteApi<MessageBoxOptions, MessageBoxReturnValue>('show-message-box')
 export const isDark = remoteApi<void, boolean>('is-dark')
 export const setTheme = remoteApi<'light' | 'dark', void>('set-theme')
+export const getLockWindowInfo = remoteApi<void, State.App['lockWindowInfo']>('get-lock-window-info')
+export const updateLockWindowInfo = remoteApi<{ locked?: boolean; password?: string }, State.App['lockWindowInfo']>(
+  'update-lock-window-info'
+)
+export const verifyLockWindowPassword = remoteApi<string, boolean>('verify-lock-window-password')
+export const unlockWindow = remoteApi<string, boolean>('unlock-window')

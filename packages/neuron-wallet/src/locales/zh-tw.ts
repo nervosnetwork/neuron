@@ -45,6 +45,7 @@ export default {
         label: '視窗',
         minimize: '最小化',
         close: '關閉視窗',
+        lock: '鎖定窗口',
       },
       help: {
         label: '幫助',

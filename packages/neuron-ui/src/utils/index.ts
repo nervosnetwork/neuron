@@ -26,7 +26,10 @@ export * from './baseActions'
 export * from './getSUDTAmount'
 export * from './multisig'
 export * from './getNetworkLabel'
+export * from './getMultisigSignStatus'
 export * from './calculateUsedCapacity'
 export * from './outPointTransform'
+export * from './scriptAndAddress'
+export * from './wakeScreen'
 
 export { CONSTANTS }

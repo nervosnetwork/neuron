@@ -5,7 +5,7 @@ import WalletService from './wallets'
 import { getConnection } from '../database/chain/connection'
 
 export default class SyncProgressService {
-  static async resetSyncProgress(
+  static async initSyncProgress(
     params: {
       script: CKBComponents.Script
       scriptType: CKBRPC.ScriptType
@@ -14,13 +14,15 @@ export default class SyncProgressService {
       blockNumber: string
     }[]
   ) {
-    await getConnection()
+    const syncProgresses = params.map(v => SyncProgress.fromObject(v))
+    const existProgresses = await getConnection()
       .getRepository(SyncProgress)
-      .createQueryBuilder()
-      .insert()
-      .orIgnore()
-      .values(params.map(v => SyncProgress.fromObject(v)))
-      .execute()
+      .find({
+        select: ['hash'],
+      })
+    const existHashes = new Set(existProgresses.map(v => v.hash))
+    const newSyncProgreses = syncProgresses.filter(v => !existHashes.has(v.hash))
+    await getConnection().manager.save(newSyncProgreses, { chunk: 100 })
   }
 
   static async updateSyncProgressFlag(existWalletIds: string[]) {
@@ -66,6 +68,11 @@ export default class SyncProgressService {
     return res
   }
 
+  static async getExistingSyncArgses() {
+    const syncProgresses = await getConnection().getRepository(SyncProgress).createQueryBuilder().getMany()
+    return new Set(syncProgresses.map(v => v.args))
+  }
+
   static async getAllSyncStatusToMap() {
     const result: Map<CKBComponents.Hash, SyncProgress> = new Map()
     const syncProgresses = await getConnection()
@@ -79,15 +86,15 @@ export default class SyncProgressService {
     return result
   }
 
-  static async getCurrentWalletMinSyncedBlockNumber() {
+  static async getCurrentWalletMinSyncedBlockNumber(addressType: SyncAddressType = SyncAddressType.Default) {
     const currentWallet = WalletService.getInstance().getCurrent()
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
       .where({
         delete: false,
-        addressType: SyncAddressType.Default,
-        ...(currentWallet ? { walletId: currentWallet.id } : {}),
+        addressType,
+        ...(currentWallet && addressType === SyncAddressType.Default ? { walletId: currentWallet.id } : {}),
       })
       .orderBy('syncedBlockNumber', 'ASC')
       .getOne()
@@ -109,7 +116,7 @@ export default class SyncProgressService {
   }
 
   static async getOtherTypeSyncBlockNumber() {
-    const items = await getConnection().getRepository(SyncProgress).find({
+    const items = await getConnection().getRepository(SyncProgress).findBy({
       addressType: SyncAddressType.Multisig,
     })
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.localSavedBlockNumber }), {})
@@ -128,6 +135,26 @@ export default class SyncProgressService {
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ localSavedBlockNumber: 0, syncedBlockNumber: 0 })
+      .execute()
+  }
+
+  static async deleteWalletSyncProgress(walletId: string) {
+    await getConnection().getRepository(SyncProgress).delete({
+      walletId,
+      addressType: SyncAddressType.Default,
+    })
+  }
+
+  static async resetMultisigSync(hash: string, startBlockNumber: number) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({
+        localSavedBlockNumber: startBlockNumber,
+        lightStartBlockNumber: startBlockNumber,
+        syncedBlockNumber: startBlockNumber,
+      })
+      .where({ hash })
       .execute()
   }
 }

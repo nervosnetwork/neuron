@@ -31,6 +31,7 @@ export const generateDaoDepositAllTx = remoteApi<Controller.GenerateDepositAllTr
 )
 export const generateDaoWithdrawTx = remoteApi<Controller.WithdrawParams>('start-withdraw-from-dao')
 export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-from-dao')
+export const calculateUnlockDaoMaximumWithdraw = remoteApi<string, string>('calculate-unlock-dao-maximum-withdraw')
 
 // Sign and Verify
 export const signMessage = remoteApi<Controller.SignMessageParams>('sign-message')

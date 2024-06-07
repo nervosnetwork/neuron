@@ -17,17 +17,16 @@ import IndexerCacheService from './indexer-cache-service'
 import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import { ShouldInChildProcess } from '../../exceptions'
-import { AppendScript, BlockTips, Synchronizer } from './synchronizer'
+import { BlockTips, Synchronizer } from './synchronizer'
 import LightSynchronizer from './light-synchronizer'
 import { generateRPC } from '../../utils/ckb-rpc'
-import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 import { NetworkType } from '../../models/network'
+import WalletService from '../../services/wallets'
 
 export default class Queue {
   #lockHashes: string[]
   #url: string // ckb node
   #nodeType: NetworkType
-  #indexerUrl: string
   #addresses: AddressInterface[]
   #rpcService: RpcService
   #indexerConnector: Synchronizer | undefined
@@ -37,15 +36,16 @@ export default class Queue {
   #multiSignBlake160s: string[]
   #anyoneCanPayLockHashes: string[]
   #assetAccountInfo: AssetAccountInfo
+  #syncMultisig: boolean
 
-  constructor(url: string, addresses: AddressInterface[], indexerUrl: string, nodeType: NetworkType) {
+  constructor(url: string, addresses: AddressInterface[], nodeType: NetworkType, syncMultisig: boolean) {
     this.#url = url
-    this.#indexerUrl = indexerUrl
     this.#addresses = addresses
     this.#rpcService = new RpcService(url, nodeType)
     this.#nodeType = nodeType
     this.#assetAccountInfo = new AssetAccountInfo()
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
+    this.#syncMultisig = syncMultisig
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
     this.#lockArgsSet = new Set(
@@ -66,12 +66,12 @@ export default class Queue {
   start = async () => {
     logger.info('Queue:\tstart')
     try {
-      if (this.#url === BUNDLED_LIGHT_CKB_URL) {
+      if (this.#nodeType === NetworkType.Light) {
         this.#indexerConnector = new LightSynchronizer(this.#addresses, this.#url)
       } else {
-        this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#indexerUrl, this.#nodeType)
+        this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#nodeType)
       }
-      await this.#indexerConnector!.connect()
+      await this.#indexerConnector!.connect(this.#syncMultisig)
     } catch (error) {
       logger.error('Restarting child process due to error', error.message)
       if (process.send) {
@@ -119,10 +119,6 @@ export default class Queue {
     if (this.#checkAndSaveQueue) {
       this.#checkAndSaveQueue.idle() ? true : await this.#checkAndSaveQueue.drain()
     }
-  }
-
-  async appendLightScript(scripts: AppendScript[]) {
-    await this.#indexerConnector?.appendScript(scripts)
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
@@ -254,6 +250,9 @@ export default class Queue {
         .map(addr => addr.walletId)
     )
     if (process.send) {
+      this.#indexerConnector!.needGenerateAddress = await WalletService.getInstance().checkNeedGenerateAddress([
+        ...walletIds,
+      ])
       process.send({ channel: 'check-and-save-wallet-address', message: [...walletIds] })
     } else {
       throw new ShouldInChildProcess()
@@ -268,6 +267,7 @@ export default class Queue {
           indexerTipNumber: tip.indexerTipNumber,
           cacheTipNumber: tip.cacheTipNumber,
           timestamp: Date.now(),
+          syncMultisig: this.#syncMultisig,
         },
       })
     } else {

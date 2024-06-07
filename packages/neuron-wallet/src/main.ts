@@ -16,9 +16,11 @@ if (singleInstanceLock) {
     appController.start()
   })
 
-  app.on('before-quit', async () => {
+  app.on('before-quit', async e => {
     logger.info('App:\tNeuron will exit')
+    e.preventDefault()
     await appController.end()
+    app.exit()
   })
 
   app.on('activate', appController.openWindow)

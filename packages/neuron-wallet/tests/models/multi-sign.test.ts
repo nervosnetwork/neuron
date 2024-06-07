@@ -15,13 +15,13 @@ describe('MultiSign Test', () => {
   const serialized = '0x0000010136c329ed630d6ce750712a477543672adab57f4c'
 
   it('since', () => {
-    const since = new Multisig().since(minutes, headerEpoch)
+    const since = Multisig.since(minutes, headerEpoch)
     expect(since).toEqual(expectedSince)
   })
 
   it('since, minutes < 0', () => {
     expect(() => {
-      new Multisig().since(-1, headerEpoch)
+      Multisig.since(-1, headerEpoch)
     }).toThrowError()
   })
 
@@ -47,7 +47,7 @@ describe('MultiSign Test', () => {
   })
 
   it('args', () => {
-    const args = new Multisig().args(bob.blake160, minutes, headerEpoch)
+    const args = Multisig.args(bob.blake160, minutes, headerEpoch)
     expect(args).toEqual(expectedArgs)
   })
 })

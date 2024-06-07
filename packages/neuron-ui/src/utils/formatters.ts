@@ -1,5 +1,6 @@
 import { molecule } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
+import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
 import { TFunction } from 'i18next'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
@@ -103,40 +104,16 @@ export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit =
   }
 }
 
-export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolean, delimiter: string = ',') => {
+export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolean, showCommaSeparator = true) => {
   if (Number.isNaN(+shannon)) {
-    console.warn(`Shannon is not a valid number`)
+    console.warn(`Invalid shannon value: ${shannon}`)
     return shannon
   }
-  if (shannon === null) {
-    return '0'
-  }
-  let sign = ''
-  if (shannon.startsWith('-')) {
-    sign = '-'
-  } else if (showPositiveSign) {
-    sign = '+'
-  }
-  const unsignedShannon = shannon.replace(/^-?0*/, '')
-  let unsignedCKB = ''
-  if (unsignedShannon.length <= 8) {
-    unsignedCKB = `0.${unsignedShannon.padStart(8, '0')}`.replace(/\.?0+$/, '')
-  } else {
-    const decimal = `.${unsignedShannon.slice(-8)}`.replace(/\.?0+$/, '')
-    const int = unsignedShannon.slice(0, -8).replace(/\^0+/, '')
-    unsignedCKB = `${(
-      int
-        .split('')
-        .reverse()
-        .join('')
-        .match(/\d{1,3}/g) || ['0']
-    )
-      .join(delimiter)
-      .split('')
-      .reverse()
-      .join('')}${decimal}`
-  }
-  return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
+  return new Intl.NumberFormat('en-US', {
+    useGrouping: showCommaSeparator,
+    signDisplay: showPositiveSign && +shannon > 0 ? 'always' : 'auto',
+    maximumFractionDigits: ckbDecimals,
+  }).format(formatUnit(BigInt(shannon ?? '0'), 'ckb') as any)
 }
 
 export const localNumberFormatter = (num: string | number | bigint = 0) => {
@@ -236,45 +213,19 @@ export const sudtValueToAmount = (
   value: string | null = '0',
   decimal: string = '0',
   showPositiveSign = false,
-  separator = ','
+  showCommaSeparator = true
 ) => {
-  if (value === null) {
-    return showPositiveSign ? '+0' : '0'
+  if (Number.isNaN(Number(value))) {
+    console.warn(`Invalid sudt value: ${value}`)
   }
-  if (Number.isNaN(+value)) {
-    console.warn(`sUDT value is not a valid number`)
-    return showPositiveSign ? '+0' : '0'
-  }
-  let sign = ''
-  if (value.startsWith('-')) {
-    sign = '-'
-  } else if (showPositiveSign) {
-    sign = '+'
-  }
-  const unsignedValue = value.replace(/^-?0*/, '')
-  const dec = +decimal
-  if (dec === 0) {
-    return +unsignedValue ? `${sign}${unsignedValue}` : '0'
-  }
-  let unsignedSUDTValue = ''
-  if (unsignedValue.length <= dec) {
-    unsignedSUDTValue = `0.${unsignedValue.padStart(dec, '0')}`.replace(/\.?0+$/, '')
-  } else {
-    const decimalFraction = `.${unsignedValue.slice(-dec)}`.replace(/\.?0+$/, '')
-    const int = unsignedValue.slice(0, -dec).replace(/\^0+/, '')
-    unsignedSUDTValue = `${(
-      int
-        .split('')
-        .reverse()
-        .join('')
-        .match(/\d{1,3}/g) || ['0']
-    )
-      .join(separator)
-      .split('')
-      .reverse()
-      .join('')}${decimalFraction}`
-  }
-  return `${sign}${+unsignedSUDTValue === 0 ? '0' : unsignedSUDTValue}`
+  const val = value === null || Number.isNaN(+value) ? '0' : value
+  const [int, dec = ''] = formatUnit(val, +decimal).split('.')
+  const fmt = new Intl.NumberFormat('en-US', {
+    useGrouping: showCommaSeparator,
+    signDisplay: showPositiveSign ? 'always' : 'auto',
+  })
+  // use any type to avoid TS errors since string is not listed in the args IntlFormatter.prototype.format definition but it works
+  return `${fmt.format(int as any)}${dec ? `.${dec}` : ''}`
 }
 
 export const sUDTAmountFormatter = (amount: string) => {

@@ -1,0 +1,202 @@
+@import '../../styles/mixin.scss';
+$bottomHeight: 24px;
+$headerHeight: 72px;
+$noticeHeight: 60px;
+
+.layout {
+  display: flex;
+
+  .left {
+    flex: 1;
+    position: relative;
+    min-width: 480px;
+
+    .addressCell {
+      margin-bottom: 10px;
+      .label {
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--secondary-text-color);
+        margin-bottom: 8px;
+      }
+      .content {
+        font-family: 'JetBrains Mono';
+        display: flex;
+        align-items: center;
+        color: var(--main-text-color);
+        border: 1px solid var(--divide-line-color);
+        background-color: var(--input-disabled-color);
+        border-radius: 8px;
+        padding: 10px 16px;
+        word-break: break-word;
+        white-space: break-spaces;
+      }
+    }
+
+    .inputCell {
+      background: var(--secondary-background-color);
+      padding: 20px 16px 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      .addresstField {
+        font-family: 'JetBrains Mono';
+      }
+      .textFieldClass {
+        margin-bottom: 10px;
+      }
+    }
+
+    .leftFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .addButton {
+        min-width: 216px;
+        padding: 20px;
+        box-shadow: 0 0 10px var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &_icon {
+          margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color);
+          }
+        }
+      }
+    }
+  }
+
+  &.withFullySynced {
+    .right {
+      height: calc(100vh - $headerHeight - $bottomHeight - $noticeHeight);
+    }
+  }
+
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+    height: calc(100vh - $headerHeight - $bottomHeight);
+    $actionHeight: 108px;
+
+    .content {
+      $contentPadding: 16px;
+      padding: 16px;
+      /**
+        These styles are for showing the full tips, because of content needs to scroll on the y-axis.
+        Then the overflow property that is set as scroll will truncate the tips overflow of the content.
+        So I need to expand the content's left to show the full tips.
+      */
+      position: relative;
+      left: -48px;
+      padding-left: 64px;
+      width: calc(100% - 32px);
+      overflow-y: scroll;
+      height: calc(100% - $actionHeight - 2 * $contentPadding);
+    }
+
+    .totalAmountField {
+      padding-bottom: 34px;
+      p {
+        margin: 0;
+      }
+      .title {
+        color: var(--secondary-text-color);
+        font-size: 14px;
+      }
+      .value {
+        margin-top: 22px;
+        color: var(--main-text-color);
+        font-size: 32px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        font-family: 'D-DIN-PRO';
+      }
+      .errorMessage {
+        margin-top: 8px;
+        color: var(--error-color);
+      }
+    }
+
+    .rightFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 16px;
+      left: 0;
+      text-align: center;
+      .actions {
+        display: flex;
+        justify-content: center;
+
+        button {
+          width: 216px;
+          &:last-child {
+            margin-left: 12px;
+          }
+        }
+      }
+      .allowUseSent {
+        display: inline-block;
+        margin-bottom: 16px;
+        color: var(--secondary-text-color);
+        input[type='checkbox'] {
+          display: none;
+          margin-right: 8px;
+        }
+        input[type='checkbox'] + span {
+          display: inline-block;
+          padding-left: 26px;
+          background: url('../../widgets/Icons/Radio.svg') no-repeat left top;
+          user-select: none;
+        }
+        input[type='checkbox']:checked + span {
+          background: url('../../widgets/Icons/RadioSelected.svg') no-repeat left top;
+        }
+      }
+    }
+  }
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+
+  .goBack {
+    margin-right: 8px;
+    cursor: pointer;
+    g,
+    path {
+      stroke: var(--main-text-color);
+    }
+  }
+  .btn {
+    margin-left: 12px;
+    min-width: 30px;
+    height: 16px;
+    padding: 0 8px;
+    border-radius: 0;
+    border-left: 1px solid var(--button-cancel-color);
+    svg {
+      g,
+      path {
+        fill: var(--main-text-color);
+      }
+    }
+  }
+
+  .balance {
+    font-size: 14px;
+  }
+}

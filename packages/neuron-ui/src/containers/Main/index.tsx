@@ -1,22 +1,27 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
 import RadioGroup from 'widgets/RadioGroup'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import { AddSimple } from 'widgets/Icons/icon'
+import DataPathDialog from 'widgets/DataPathDialog'
+import NoDiskSpaceWarn from 'widgets/Icons/Attention.png'
+import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
+import { keepScreenAwake } from 'services/localCache'
+import LockWindowDialog from 'components/GeneralSetting/LockWindowDialog'
 import styles from './main.module.scss'
-import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode } from './hooks'
+import { useSubscription, useSyncChainData, useOnCurrentWalletChange, useCheckNode, useNoDiskSpace } from './hooks'
 
 const MainContent = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const {
-    app: { isAllowedToFetchList = true, globalAlertDialog },
+    app: { isAllowedToFetchList = true, globalAlertDialog, lockWindowInfo },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
@@ -31,6 +36,8 @@ const MainContent = () => {
     () => networks.filter(v => v.remote === network?.remote && !v.readonly),
     [network, networks]
   )
+
+  const isLightClientNetwork = network?.type === 2
 
   useSyncChainData({
     chainURL: network?.remote ?? '',
@@ -48,6 +55,7 @@ const MainContent = () => {
     onOpenEditorDialog,
   } = useCheckNode(sameUrlNetworks, networkID)
 
+  const [isLockDialogShow, setIsLockDialogShow] = useState(false)
   useSubscription({
     walletID,
     chain,
@@ -56,6 +64,8 @@ const MainContent = () => {
     dispatch,
     location,
     showSwitchNetwork,
+    lockWindowInfo,
+    setIsLockDialogShow,
   })
 
   useOnCurrentWalletChange({
@@ -70,6 +80,67 @@ const MainContent = () => {
     dismissGlobalAlertDialog()(dispatch)
   }, [dispatch])
   const { isMigrateDialogShow, onCancel, onBackUp, onConfirm } = useMigrate()
+  const {
+    isNoDiskSpaceDialogShow,
+    oldCkbDataPath,
+    newCkbDataPath,
+    setNewCkbDataPath,
+    onCancel: onCloseNoDiskDialog,
+    onConfirm: onContinueSync,
+    isMigrateDataDialogShow,
+    onMigrate,
+    onCloseMigrateDialog,
+    onConfirmMigrate,
+  } = useNoDiskSpace(navigate)
+  const needConfirm = newCkbDataPath && newCkbDataPath !== oldCkbDataPath
+
+  useEffect(() => {
+    if (keepScreenAwake.get()) {
+      wakeScreen()
+    }
+  }, [])
+
+  const dialogProps = (function getDialogProps() {
+    if (isLightClientNetwork) {
+      return {
+        onConfirm: onCloseSwitchNetwork,
+        children: t('main.external-node-detected-dialog.external-node-is-light'),
+      }
+    }
+    if (sameUrlNetworks.length) {
+      return {
+        onConfirm: onSwitchNetwork,
+        children: (
+          <>
+            <span className={styles.chooseNetworkTip}>
+              {t('main.external-node-detected-dialog.body-tips-with-network')}
+            </span>
+            <div className={styles.networks}>
+              <RadioGroup
+                onChange={onChangeSelected}
+                options={sameUrlNetworks.map(v => ({
+                  value: v.id,
+                  label: `${v.name} (${v.remote})`,
+                }))}
+                inputIdPrefix="main-switch"
+              />
+            </div>
+            <div className={styles.addNetwork}>
+              <Button type="text" onClick={onOpenEditorDialog}>
+                <AddSimple />
+                {t('main.external-node-detected-dialog.add-network')}
+              </Button>
+            </div>
+          </>
+        ),
+      }
+    }
+    return {
+      onConfirm: onOpenEditorDialog,
+      confirmText: t('main.external-node-detected-dialog.add-network'),
+      children: t('main.external-node-detected-dialog.body-tips-without-network'),
+    }
+  })()
 
   return (
     <div onContextMenu={onContextMenu}>
@@ -97,39 +168,13 @@ const MainContent = () => {
       <Dialog
         show={isSwitchNetworkShow}
         onCancel={onCloseSwitchNetwork}
-        onConfirm={sameUrlNetworks.length ? onSwitchNetwork : onOpenEditorDialog}
-        confirmText={sameUrlNetworks.length ? undefined : t('main.external-node-detected-dialog.add-network')}
+        onConfirm={dialogProps.onConfirm}
+        confirmText={dialogProps.confirmText}
         cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
         title={t('main.external-node-detected-dialog.title')}
         className={styles.networkDialog}
       >
-        {sameUrlNetworks.length ? (
-          <span className={styles.chooseNetworkTip}>
-            {t('main.external-node-detected-dialog.body-tips-with-network')}
-          </span>
-        ) : (
-          t('main.external-node-detected-dialog.body-tips-without-network')
-        )}
-        {sameUrlNetworks.length ? (
-          <>
-            <div className={styles.networks}>
-              <RadioGroup
-                onChange={onChangeSelected}
-                options={sameUrlNetworks.map(v => ({
-                  value: v.id,
-                  label: `${v.name} (${v.remote})`,
-                }))}
-                inputIdPrefix="main-switch"
-              />
-            </div>
-            <div className={styles.addNetwork}>
-              <Button type="text" onClick={onOpenEditorDialog}>
-                <AddSimple />
-                {t('main.external-node-detected-dialog.add-network')}
-              </Button>
-            </div>
-          </>
-        ) : null}
+        {dialogProps.children}
       </Dialog>
       {showEditorDialog ? (
         <NetworkEditorDialog
@@ -139,6 +184,32 @@ const MainContent = () => {
           id="new"
         />
       ) : null}
+      <DataPathDialog
+        show={isNoDiskSpaceDialogShow}
+        icon={<img className={styles.noDiskSpace} src={NoDiskSpaceWarn} alt="No disk space" />}
+        confirmText={
+          needConfirm ? t('main.no-disk-space-dialog.migrate-data') : t('main.no-disk-space-dialog.continue-sync')
+        }
+        dataPath={newCkbDataPath || oldCkbDataPath}
+        text={<Trans i18nKey="main.no-disk-space-dialog.tip" />}
+        onCancel={onCloseNoDiskDialog}
+        onConfirm={needConfirm ? onMigrate : onContinueSync}
+        onChangeDataPath={setNewCkbDataPath}
+      />
+      <MigrateCkbDataDialog
+        show={isMigrateDataDialogShow}
+        prevPath={oldCkbDataPath}
+        currentPath={newCkbDataPath}
+        onCancel={onCloseMigrateDialog}
+        onConfirm={onConfirmMigrate}
+      />
+      <LockWindowDialog
+        show={isLockDialogShow}
+        encryptedPassword={lockWindowInfo?.encryptedPassword}
+        onCancel={() => {
+          setIsLockDialogShow(false)
+        }}
+      />
     </div>
   )
 }

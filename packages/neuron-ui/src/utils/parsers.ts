@@ -1,4 +1,5 @@
-import { toUint64Le, parseEpoch } from 'services/chain'
+import { since } from '@ckb-lumos/base'
+import { number, bytes } from '@ckb-lumos/codec'
 import { MILLISECONDS, PAGE_SIZE } from './const'
 
 export const listParams = (search: string) => {
@@ -9,13 +10,15 @@ export const listParams = (search: string) => {
     pageNo: +(query.get('pageNo') || 1),
     pageSize: +(query.get('pageSize') || PAGE_SIZE),
     keywords,
+    sort: query.get('sort') || '',
+    direction: query.get('direction') || '',
   }
   return params
 }
 
 export const epochParser = (epoch: string) => {
   const e = epoch.startsWith('0x') ? epoch : `0x${BigInt(epoch).toString(16)}`
-  const parsed = parseEpoch(e)
+  const parsed = since.parseEpoch(e)
 
   const res = {
     length: BigInt(parsed.length),
@@ -42,7 +45,7 @@ export const toUint128Le = (hexString: string) => {
     s = s.slice(0, 34)
   }
 
-  return `${toUint64Le(`0x${s.substr(18, 16)}`)}${toUint64Le(s.substr(0, 18)).slice(2)}`
+  return bytes.hexify(number.Uint128LE.pack(s))
 }
 
 export const getLockTimestamp = ({
@@ -54,7 +57,7 @@ export const getLockTimestamp = ({
   epoch: string
   bestKnownBlockTimestamp: number
 }) => {
-  const targetEpochInfo = epochParser(toUint64Le(`0x${lockArgs.slice(-16)}`))
+  const targetEpochInfo = epochParser(bytes.hexify(number.Uint64LE.pack(`0x${lockArgs.slice(-16)}`)))
   const currentEpochInfo = epochParser(epoch)
   const targetEpochFraction =
     Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1

@@ -8,9 +8,17 @@ import {
   updateAddressListAndBalance,
   initAppState,
   showGlobalAlertDialog,
+  updateLockWindowInfo,
 } from 'states/stateProvider/actionCreators'
 
-import { getCurrentWallet, getWinID, setCurrentNetwork, startNodeIgnoreExternal } from 'services/remote'
+import {
+  getCkbNodeDataPath,
+  getCurrentWallet,
+  getWinID,
+  setCurrentNetwork,
+  startNodeIgnoreExternal,
+  startSync,
+} from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
@@ -19,8 +27,9 @@ import {
   SyncState as SyncStateSubject,
   Command as CommandSubject,
   ShowGlobalDialog as ShowGlobalDialogSubject,
+  NoDiskSpace,
 } from 'services/subjects'
-import { ckbCore, getTipHeader } from 'services/chain'
+import { rpc, getTipHeader } from 'services/chain'
 import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
@@ -69,13 +78,13 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
     }
     clearInterval(timer!)
     if (chainURL) {
-      ckbCore.setNode(chainURL)
+      rpc.setNode({ url: chainURL })
       syncBlockchainInfo()
       timer = setInterval(() => {
         syncBlockchainInfo()
       }, SYNC_INTERVAL_TIME)
     } else {
-      ckbCore.setNode('')
+      rpc.setNode({ url: '' })
     }
     return () => {
       clearInterval(timer)
@@ -106,6 +115,8 @@ export const useSubscription = ({
   dispatch,
   location,
   showSwitchNetwork,
+  lockWindowInfo,
+  setIsLockDialogShow,
 }: {
   walletID: string
   chain: State.Chain
@@ -114,6 +125,8 @@ export const useSubscription = ({
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
   showSwitchNetwork: () => void
+  lockWindowInfo: State.App['lockWindowInfo']
+  setIsLockDialogShow: (v: boolean) => void
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
 
@@ -296,6 +309,15 @@ export const useSubscription = ({
           case 'multisig-address':
             navigateToolsRouter(type)
             break
+          case 'lock-window':
+            if (lockWindowInfo?.encryptedPassword) {
+              if (!lockWindowInfo.locked) {
+                updateLockWindowInfo({ locked: true })(dispatch)
+              }
+            } else {
+              setIsLockDialogShow(true)
+            }
+            break
           default: {
             break
           }
@@ -324,7 +346,61 @@ export const useSubscription = ({
     dispatch,
     location.pathname,
     showSwitchNetwork,
+    lockWindowInfo,
+    setIsLockDialogShow,
   ])
+}
+
+export const useNoDiskSpace = (navigate: NavigateFunction) => {
+  const [isNoDiskSpaceDialogShow, setIsNoDiskSpaceDialogShow] = useState(false)
+  const [isMigrateDataDialogShow, setIsMigrateDataDialogShow] = useState(false)
+  const [oldCkbDataPath, setOldCkbDataPath] = useState('')
+  const [newCkbDataPath, setNewCkbDataPath] = useState('')
+  useEffect(() => {
+    const noDiskSpaceSubject = NoDiskSpace.subscribe(params => {
+      navigate(RoutePath.Overview)
+      setIsNoDiskSpaceDialogShow(params)
+      getCkbNodeDataPath().then(res => {
+        if (isSuccessResponse(res)) {
+          setOldCkbDataPath(res.result!)
+        }
+      })
+    })
+    return () => {
+      noDiskSpaceSubject.unsubscribe()
+    }
+  }, [navigate])
+  const onConfirm = useCallback(() => {
+    startSync().then(res => {
+      if (isSuccessResponse(res)) {
+        setIsNoDiskSpaceDialogShow(false)
+      }
+    })
+  }, [])
+  const onMigrate = useCallback(() => {
+    setIsMigrateDataDialogShow(true)
+  }, [])
+  const onConfirmMigrate = useCallback((dataPath: string) => {
+    setIsMigrateDataDialogShow(false)
+    setIsNoDiskSpaceDialogShow(false)
+    setOldCkbDataPath(dataPath)
+  }, [])
+  return {
+    isNoDiskSpaceDialogShow,
+    setNewCkbDataPath,
+    oldCkbDataPath,
+    newCkbDataPath,
+    onCancel: useCallback(() => {
+      setIsNoDiskSpaceDialogShow(false)
+    }, []),
+    onConfirm,
+    isMigrateDataDialogShow,
+    onMigrate,
+    onCloseMigrateDialog: useCallback(() => {
+      setIsMigrateDataDialogShow(false)
+    }, []),
+    onConfirmMigrate,
+  }
 }
 
 export const useCheckNode = (networks: State.Network[], networkID: string) => {

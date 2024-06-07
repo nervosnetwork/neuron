@@ -11,6 +11,7 @@ import { resetSyncTaskQueue } from '../block-sync-renderer'
 import { getUsablePort } from '../utils/get-usable-port'
 import { updateToml } from '../utils/toml'
 import { BUNDLED_URL_PREFIX } from '../utils/const'
+import NoDiskSpaceSubject from '../models/subjects/no-disk-space'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -23,6 +24,11 @@ const platform = (): string => {
     default:
       return ''
   }
+}
+
+enum NeedMigrateMsg {
+  Wants = 'CKB wants to migrate the data into new format',
+  Recommends = 'CKB recommends migrating your data into a new format',
 }
 
 const { app } = env
@@ -109,14 +115,17 @@ export const startCkbNode = async () => {
   listenPort = await getUsablePort(rpcPort >= listenPort ? rpcPort + 1 : listenPort)
 
   updateToml(path.join(SettingsService.getInstance().getNodeDataPath(), 'ckb.toml'), {
-    rpc: `listen_address = "127.0.0.1:${rpcPort}"`,
-    network: `listen_addresses = ["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+    rpc: {
+      listen_address: `"127.0.0.1:${rpcPort}"`,
+    },
+    network: {
+      listen_addresses: `["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+    },
   })
   const options = ['run', '-C', SettingsService.getInstance().getNodeDataPath(), '--indexer']
-  const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'ignore', 'pipe']
+  const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'pipe', 'pipe']
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
-    stdio[1] = 'pipe'
   }
   logger.info(`CKB:\tckb full node will with rpc port ${rpcPort}, listen port ${listenPort}, with options`, options)
   const currentProcess = spawn(ckbBinary(), options, { stdio })
@@ -124,12 +133,17 @@ export const startCkbNode = async () => {
   currentProcess.stderr?.on('data', data => {
     const dataString: string = data.toString()
     logger.error('CKB:\trun fail:', dataString)
-    if (dataString.includes('CKB wants to migrate the data into new format')) {
+    if (dataString.includes(NeedMigrateMsg.Wants) || dataString.includes(NeedMigrateMsg.Recommends)) {
       MigrateSubject.next({ type: 'need-migrate' })
     }
   })
   currentProcess.stdout?.on('data', data => {
     const dataString: string = data.toString()
+    if (/No space left/.test(dataString)) {
+      NoDiskSpaceSubject.next(true)
+      logger.error('CKB:\trun fail:', dataString)
+      return
+    }
     if (
       dataString.includes(
         `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
@@ -150,8 +164,8 @@ export const startCkbNode = async () => {
     }
   })
 
-  currentProcess.on('close', () => {
-    logger.info('CKB:\tprocess closed')
+  currentProcess.on('close', code => {
+    logger.info(`CKB:\tprocess closed with code ${code}`)
     isLookingValidTarget = false
     if (Object.is(ckb, currentProcess)) {
       ckb = null

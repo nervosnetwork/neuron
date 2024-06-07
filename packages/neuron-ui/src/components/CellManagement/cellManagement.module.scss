@@ -51,13 +51,14 @@
 }
 
 .actions {
+  display: flex;
+  gap: 16px;
   & > svg {
     cursor: pointer;
     &[data-disabled='true'] {
       cursor: not-allowed;
       opacity: 50%;
     }
-    margin-right: 16px;
   }
 }
 
@@ -163,9 +164,9 @@
   @include checkbox;
 
   .multiActions {
-    position: absolute;
+    position: fixed;
     bottom: 24px;
-    left: 50%;
+    left: calc(50% + 80px);
     transform: translateX(-50%);
     padding: 12px 40px 12px 40px;
     border-radius: 40px;
@@ -234,5 +235,23 @@
     & > svg {
       margin-right: 4px;
     }
+  }
+
+  .hardWalletImg {
+    width: 88px;
+    height: 88px;
+    margin: 16px 0 24px 0;
+  }
+
+  .lockActions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hardwalletErr {
+    justify-content: center;
+    margin-top: 12px;
   }
 }

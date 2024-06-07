@@ -1,5 +1,6 @@
 import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
+import LockWindow from 'containers/LockWindow'
 import Main from 'containers/Main'
 import Navbar from 'containers/Navbar'
 import { RoutePath } from 'utils'
@@ -9,6 +10,8 @@ import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
 import History from 'components/History'
 import HistoryDetailPage from 'components/HistoryDetailPage'
+import AmendSend from 'components/AmendSend'
+import AmendSUDTSend from 'components/AmendSUDTSend'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
@@ -48,11 +51,11 @@ const mainRouterConfig: RouteObject[] = [
   {
     path: '/',
     element: (
-      <>
+      <LockWindow>
         <Navbar />
         <Main />
         <PasswordRequest />
-      </>
+      </LockWindow>
     ),
     children: [
       {
@@ -137,6 +140,26 @@ const mainRouterConfig: RouteObject[] = [
             element: (
               <>
                 <History />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: 'amend/:hash',
+            element: (
+              <>
+                <AmendSend />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: 'amendSUDTSend/:hash',
+            element: (
+              <>
+                <AmendSUDTSend />
                 <Outlet />
               </>
             ),

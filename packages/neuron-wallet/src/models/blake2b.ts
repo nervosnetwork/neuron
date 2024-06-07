@@ -1,6 +1,8 @@
 import { CKBHasher } from '@ckb-lumos/base/lib/utils'
 import { bytes } from '@ckb-lumos/codec'
 
+export const BLAKE160_HEX_LENGTH = 42
+
 export default class Blake2b {
   private blake2b: CKBHasher
 

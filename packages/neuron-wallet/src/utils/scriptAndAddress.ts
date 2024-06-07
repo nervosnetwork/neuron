@@ -1,6 +1,26 @@
-import { Script } from '@ckb-lumos/base'
+import { key } from '@ckb-lumos/hd'
+import { type Script } from '@ckb-lumos/base'
 import { predefined } from '@ckb-lumos/config-manager'
 import { encodeToAddress, parseAddress } from '@ckb-lumos/helpers'
+import { systemScripts } from './systemScripts'
+
+export enum DefaultAddressNumber {
+  Change = 10,
+  Receiving = 20,
+}
+
+export const prefixWith0x = (hex: string) => (hex.startsWith('0x') ? hex : `0x${hex}`)
+
+export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
+  return scriptToAddress(
+    {
+      codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+      hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
+      args: key.publicKeyToBlake160(prefixWith0x(publicKey)),
+    },
+    isMainnet
+  )
+}
 
 export const scriptToAddress = (script: CKBComponents.Script, isMainnet = true): string => {
   const lumosConfig = !isMainnet ? predefined.AGGRON4 : predefined.LINA

@@ -11,7 +11,7 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import OutPoint from '../../src/models/chain/out-point'
 import { when } from 'jest-when'
 import SystemScriptInfo from '../../src/models/system-script-info'
@@ -132,7 +132,7 @@ describe('AssetAccountService', () => {
   const AssetAccountService = require('../../src/services/asset-account-service').default
 
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
   })
 
   afterAll(async () => {

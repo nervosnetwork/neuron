@@ -33,7 +33,6 @@ import NetworksController from '../controllers/networks'
 import UpdateController from '../controllers/update'
 import MultisigController from '../controllers/multisig'
 import Transaction from '../models/chain/transaction'
-import OutPoint from '../models/chain/out-point'
 import SignMessageController from '../controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from '../models/system-script-info'
@@ -60,13 +59,14 @@ import startMonitor, { stopMonitor } from '../services/monitor'
 import { migrateCkbData } from '../services/ckb-runner'
 import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
-import { resetSyncTaskQueue } from '../block-sync-renderer'
+import { changeMultisigSyncStatus, resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
+import { OutPoint } from '@ckb-lumos/base'
 
-export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
+export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
   #walletsController = new WalletsController()
@@ -112,10 +112,6 @@ export default class ApiController {
       case 'backup-wallet': {
         // delete/backup wallet with wallet id
         this.#walletsController.requestPassword(params, command)
-        break
-      }
-      case 'migrate-acp': {
-        this.#assetAccountController.showACPMigrationDialog(false)
         break
       }
       default: {
@@ -306,6 +302,42 @@ export default class ApiController {
       }
     })
 
+    handle('unlock-window', async (_, password: string) => {
+      if (!SettingsService.getInstance().verifyLockWindowPassword(password)) {
+        return {
+          status: ResponseCode.Fail,
+        }
+      }
+      SettingsService.getInstance().updateLockWindowInfo({ locked: false })
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('update-lock-window-info', async (_, params: { locked?: boolean; password?: string }) => {
+      SettingsService.getInstance().updateLockWindowInfo(params)
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().lockWindowInfo,
+      }
+    })
+
+    handle('get-lock-window-info', async () => {
+      return {
+        result: SettingsService.getInstance().lockWindowInfo,
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle('verify-lock-window-password', async (_, password: string) => {
+      return {
+        status: SettingsService.getInstance().verifyLockWindowPassword(password)
+          ? ResponseCode.Success
+          : ResponseCode.Fail,
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -341,12 +373,12 @@ export default class ApiController {
           startBlockNumber: string
         }
       ) => {
-        const res = this.#walletsController.update(params)
         const network = NetworksService.getInstance().getCurrent()
         if (network.type !== NetworkType.Light) {
           throw new Error('Only Light client can set start block number')
         }
         const lastSetStartBlockNumber = WalletsService.getInstance().getCurrent()?.toJSON().startBlockNumber
+        const res = this.#walletsController.update(params)
         if (lastSetStartBlockNumber && +params.startBlockNumber < +lastSetStartBlockNumber) {
           await CKBLightRunner.getInstance().clearNodeCache()
         } else {
@@ -416,6 +448,8 @@ export default class ApiController {
           password: string
           description?: string
           multisigConfig?: MultisigConfigModel
+          amendHash?: string
+          skipLastInputs?: boolean
         }
       ) => {
         return this.#walletsController.sendTx({
@@ -434,7 +468,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints?: CKBComponents.OutPoint[]
+          consumeOutPoints?: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -451,7 +485,7 @@ export default class ApiController {
           items: { address: string; capacity: string }[]
           fee: string
           feeRate: string
-          consumeOutPoints: CKBComponents.OutPoint[]
+          consumeOutPoints: OutPoint[]
           enableUseSentCell?: boolean
         }
       ) => {
@@ -551,6 +585,10 @@ export default class ApiController {
       }
     )
 
+    handle('calculate-unlock-dao-maximum-withdraw', async (_, unlockHash: string) => {
+      return this.#daoController.calculateUnlockDaoMaximumWithdraw(unlockHash)
+    })
+
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
       return this.#customizedAssetsController.getCustomizedAssetCells(params)
@@ -632,6 +670,26 @@ export default class ApiController {
       return { status: ResponseCode.Success, result: true }
     })
 
+    handle('get-first-sync-info', () => {
+      const currentNetwork = NetworksService.getInstance().getCurrent()
+      return {
+        status: ResponseCode.Success,
+        result: {
+          isFirstSync: SettingsService.getInstance().isFirstSync && currentNetwork.type === NetworkType.Default,
+          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+          ckbNodeDataPath: SettingsService.getInstance().getNodeDataPath(),
+        },
+      }
+    })
+
+    handle('start-sync', () => {
+      SettingsService.getInstance().isFirstSync = false
+      this.#networksController.activate(this.#networksController.currentID().result)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
@@ -639,21 +697,34 @@ export default class ApiController {
       }
     })
 
-    handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
-      if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+    handle(
+      'set-ckb-node-data-path',
+      async (
+        _,
+        { dataPath, clearCache, onlySetPath }: { dataPath: string; clearCache: boolean; onlySetPath?: boolean }
+      ) => {
+        if (onlySetPath) {
+          SettingsService.getInstance().setNodeDataPath(dataPath)
+          return {
+            status: ResponseCode.Success,
+            result: SettingsService.getInstance().getNodeDataPath(),
+          }
+        }
+        if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+          return {
+            status: ResponseCode.Fail,
+            message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          }
+        }
+        await cleanChain()
+        SettingsService.getInstance().setNodeDataPath(dataPath)
+        await startMonitor('ckb', true)
         return {
-          status: ResponseCode.Fail,
-          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          status: ResponseCode.Success,
+          result: SettingsService.getInstance().getNodeDataPath(),
         }
       }
-      await cleanChain()
-      SettingsService.getInstance().setNodeDataPath(dataPath)
-      await startMonitor('ckb', true)
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().getNodeDataPath(),
-      }
-    })
+    )
 
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
@@ -706,11 +777,6 @@ export default class ApiController {
 
     handle('get-asset-account', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.getAccount(params)
-    })
-
-    handle('check-migrate-acp', async () => {
-      const allowMultipleOpen = true
-      return this.#assetAccountController.showACPMigrationDialog(allowMultipleOpen)
     })
 
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
@@ -768,10 +834,6 @@ export default class ApiController {
 
     handle('get-device-ckb-app-version', async () => {
       return this.#hardwareController.getCkbAppVersion()
-    })
-
-    handle('get-device-firmware-version', async () => {
-      return this.#hardwareController.getFirmwareVersion()
     })
 
     handle('get-device-extended-public-key', async () => {
@@ -851,6 +913,13 @@ export default class ApiController {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
     })
 
+    handle('change-multisig-sync-status', (_, status: boolean) => {
+      changeMultisigSyncStatus(status)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     //migrate
     handle('start-migrate', async () => {
       migrateCkbData()
@@ -887,9 +956,9 @@ export default class ApiController {
       async (
         _,
         params: {
-          outPoints: CKBComponents.OutPoint[]
+          outPoints: OutPoint[]
           locked: boolean
-          password: string
+          password?: string
           lockScripts: CKBComponents.Script[]
         }
       ) => {

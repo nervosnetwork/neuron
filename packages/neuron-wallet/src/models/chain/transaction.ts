@@ -61,6 +61,7 @@ export default class Transaction {
   public value?: string
   public fee?: string
   public size?: number
+  public cycles?: string | null
   public interest?: string
 
   public type?: string
@@ -80,6 +81,8 @@ export default class Transaction {
 
   public signatures: Signatures = {}
   public assetAccountType?: AssetAccountType
+
+  public daoCapacity?: string
 
   constructor(
     version: string,
@@ -105,7 +108,8 @@ export default class Transaction {
     sudtInfo?: SudtInfo,
     nftType?: NFTInfo,
     signatures: Signatures = {},
-    assetAccountType?: AssetAccountType
+    assetAccountType?: AssetAccountType,
+    daoCapacity?: string
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -119,7 +123,7 @@ export default class Transaction {
     this.description = description
     this.nervosDao = nervosDao
     this.assetAccountType = assetAccountType
-    this.version = BigInt(version).toString()
+    this.version = BigInt(version || '0x0').toString()
     this.value = value ? BigInt(value).toString() : value
     this.fee = fee ? BigInt(fee).toString() : fee
     this.interest = interest ? BigInt(interest).toString() : interest
@@ -132,6 +136,7 @@ export default class Transaction {
     this.sudtInfo = sudtInfo
     this.nftInfo = nftType
     this.signatures = signatures
+    this.daoCapacity = daoCapacity
     TypeCheckerUtils.hashChecker(...this.headerDeps, this.blockHash)
     TypeCheckerUtils.numberChecker(
       this.version,
@@ -170,6 +175,7 @@ export default class Transaction {
     nftInfo,
     signatures = {},
     assetAccountType,
+    daoCapacity,
   }: {
     version: string
     cellDeps?: CellDep[]
@@ -195,6 +201,7 @@ export default class Transaction {
     nftInfo?: NFTInfo
     signatures?: Signatures
     assetAccountType?: AssetAccountType
+    daoCapacity?: string
   }): Transaction {
     return new Transaction(
       version,
@@ -225,7 +232,8 @@ export default class Transaction {
       sudtInfo,
       nftInfo,
       signatures,
-      assetAccountType
+      assetAccountType,
+      daoCapacity
     )
   }
 

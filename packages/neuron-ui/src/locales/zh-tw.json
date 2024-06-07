@@ -21,6 +21,7 @@
       "special-assets": "自定義資產",
       "sync-not-start": "同步尚未開始",
       "connecting": "正在連接節點",
+      "pause": "同步暫停",
       "experimental-functions": "實驗性功能",
       "s-udt": "資產賬戶",
       "update-neuron-with-ckb": "CKB 節點版本與 Neuron (v{{ version }}) 不匹配，可能導致兼容性問題。請更新到最新版 Neuron。",
@@ -35,7 +36,9 @@
         "start-block-number": "起始區塊",
         "set-start-block-number": "設置同步起始區塊"
       },
-      "migrating": "正在數據遷移..."
+      "migrating": "正在數據遷移...",
+      "left-time": "剩余時間",
+      "left-time-tip": "剩余時間僅為估計值，與當前網絡和其他因素有關，僅供參考。"
     },
     "import-hardware": {
       "title": {
@@ -134,7 +137,7 @@
       "activity": "收支活動",
       "datetime": "時間",
       "status": "狀態",
-      "amount": "金額",
+      "asset": "資產",
       "address": "地址",
       "sent": "已發送",
       "sending": "正在發送",
@@ -150,7 +153,9 @@
       "send": "轉賬",
       "receive": "收款",
       "locked": "已鎖定餘額",
-      "locked-balance": "已鎖定余額"
+      "locked-balance": "已鎖定余額",
+      "first-sync-notice": "首次同步數據至少需要 {{size}} GB的磁盤空間，<br />並且數據大小會隨著時間增長，建議選擇較大磁盤空間來存儲數據。",
+      "start-sync": "開始同步"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -244,7 +249,10 @@
       "release-on": "鎖定至",
       "locktime-warning": "請確保對方錢包支持到期解鎖功能。（註：1.交易所壹般不支持到期解鎖功能 {{extraNote}}）",
       "allow-use-sent-cell": "允許使用待確認的 Outputs 構建交易",
-      "submit-transaction": "發起交易"
+      "submit-transaction": "發起交易",
+      "transaction-confirmed": "交易已確認",
+      "transaction-cannot-amend": "目前交易已確認，無法修改。",
+      "amend-pending-transaction": "修改待處理交易"
     },
     "receive": {
       "title": "收款",
@@ -300,7 +308,8 @@
       "table": {
         "name": "錢包名稱",
         "type": "類型",
-        "amount": "金額",
+        "balance": "余額",
+        "asset": "資產",
         "timestamp": "時間",
         "status": "狀態",
         "operation": "操作"
@@ -312,6 +321,7 @@
       "no-txs": "沒有交易記錄",
       "view-in-explorer": "瀏覽器打開",
       "view-in-explorer-button-title": "瀏覽器中查看詳情",
+      "amend": "修改",
       "view-detail": "詳情",
       "view-detail-button-title": "查看詳情",
       "opening": "正在打開",
@@ -319,7 +329,8 @@
       "copy-balance": "複製餘額",
       "copy-address": "複製地址",
       "create": "創建 {{name}} 資產賬戶",
-      "destroy": "銷毀 {{name}} 資產賬戶"
+      "destroy": "銷毀 {{name}} 資產賬戶",
+      "fee": "交易費用"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
@@ -336,7 +347,15 @@
       "cell-from-cellbase": "來自 Cellbase",
       "lock-script": "腳本鎖定",
       "lock-script-title": "地址資訊",
-      "deprecated-address-format": "已棄用格式的地址"
+      "deprecated-address-format": "已棄用格式的地址",
+      "type": "類型",
+      "fee": "交易費用",
+      "assets": "資產",
+      "balance": "余額",
+      "status": "狀態",
+      "size": "大小",
+      "cycles": "周期",
+      "cell-detail": "Cell詳情"
     },
     "addresses": {
       "title": "地址簿",
@@ -373,7 +392,22 @@
         "version": "版本",
         "language": "語言",
         "select-language": "選擇語言",
-        "apply": "應用"
+        "apply": "應用",
+        "keep-awake": "同步期間保持屏幕喚醒",
+        "lock-password": "鎖屏密碼",
+        "set-lock-password": "設置鎖屏密碼",
+        "change-lock-password": "修改鎖屏密碼",
+        "lock-window": {
+          "set-password": "設置密碼",
+          "confirm-password": "確認密碼",
+          "enter-current-password": "輸入當前密碼",
+          "enter-new-password": "輸入新密碼",
+          "password-error": "密碼錯誤",
+          "different-password": "兩次輸入密碼不壹致",
+          "set-password-success": "密碼設置成功",
+          "change-password-success": "密碼修改成功",
+          "reset": "重新設置"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -544,7 +578,8 @@
       "verification-failure": "驗證失敗",
       "back": "上一步",
       "switch-to-light": "開啟日間模式",
-      "switch-to-dark": "開啟夜間模式"
+      "switch-to-dark": "開啟夜間模式",
+      "ckb-node-data-path": "CKB 節點數據路徑"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -649,7 +684,9 @@
       "block-number": "區塊高度",
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",
-      "sync-failed": "連接失敗, 請檢查網絡",
+      "sync-failed": "同步失敗",
+      "sync-failed-detail": "由於網絡節點或其他問題，同步失敗。",
+      "learn-more": "了解更多",
       "sync-not-start": "同步尚未開始, 請嘗試重啟",
       "connecting": "正在連接節點"
     },
@@ -686,6 +723,12 @@
       "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
       "balance-not-reserved": "（不建議）不預留未來操作手續費",
+      "estimated-rewards": "{{days}}天預計獎勵",
+      "estimated-apc": "預計年化鎖定補貼率",
+      "estimated-apc-tooltip": "預計年化鎖定補貼率",
+      "deposit-amount": "存入金額 (CKB)",
+      "attention": "請注意： 一旦存入 Nervos DAO，您的存款將被鎖定至少 180 個 Epochs（約 30 天）。",
+      "deposit-submitted": "存入已提交",
       "deposit-record": {
         "deposited-at": "存入於",
         "completed-at": "已取出",
@@ -702,7 +745,8 @@
         "days-hours": "{{days}} 天 {{hours}} 小時",
         "no-deposit": "沒有存入記錄",
         "no-completed": "沒有解鎖記錄",
-        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款"
+        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款",
+        "lock-warn": "鎖定至當前補償週期結束"
       },
       "compensation-period": {
         "tooltip": {
@@ -715,16 +759,49 @@
           "withdrawn": "已提取"
         },
         "stage-messages": {
-          "pending": "正在存入...",
+          "deposit-in-progress": "正在存入...",
           "immature-for-withdraw": "{{hours}} 小時內無法提取 CKB",
           "immature-for-unlock": "{{hours}} 小時內無法解鎖 CKB",
           "next-compensation-cycle": "下一補償週期約在 {{days}} 天后開始",
+          "next-compensation-cycle-hours": "下一補償週期約在 {{hours}} 小時后開始",
           "withdrawing": "正在提取...",
           "compensation-cycle-will-end": "補償週期約在 {{days}} 天后結束",
+          "compensation-cycle-will-end-hours": "補償週期約在 {{hours}} 小時后結束",
           "compensation-cycle-has-ended": "補償週期已結束, 可以解鎖 CKB",
           "unlocking": "解鎖中..."
         }
       }
+    },
+    "nervos-dao-detail": {
+      "tx-detail": "交易詳情",
+      "deposited": "存入",
+      "withdrawn": "發起提取",
+      "unlocked": "解鎖",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "區塊高度",
+      "datetime": "時間",
+      "income": "收入",
+      "index": "序號",
+      "address": "地址",
+      "amount": "數量",
+      "cell-from-cellbase": "來自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "最低存入額",
+      "single-compensation-cycle": "單一補償週期",
+      "single-compensation-cycle-description": "180 個 Epochs（約 30 天）",
+      "withdraw": "提取",
+      "withdraw-description": "任意時間",
+      "unlock": "解鎖",
+      "unlock-description": "目前補償週期結束後",
+      "get": "好的"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已棄用格式的地址"
     },
     "updates": {
       "check-updates": "檢查更新",
@@ -1017,7 +1094,7 @@
         "address": "簽名者地址",
         "alias": "别名",
         "type": "類型",
-        "balance": "余额",
+        "balance": "余額",
         "copy-address": "復製地址",
         "action": "操作",
         "more": "更多",
@@ -1129,7 +1206,13 @@
         "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
         "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡",
-        "ignore-external-node": "忽略外部節點"
+        "ignore-external-node": "忽略外部節點",
+        "external-node-is-light": "由於輕客戶端的安全假設不同，Neuron 不支持外部輕客戶端節點。您想連接到 \"Light Client\" 嗎？"
+      },
+      "no-disk-space-dialog": {
+        "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
+        "continue-sync": "繼續同步",
+        "migrate-data": "遷移數據"
       }
     },
     "cell-manage": {
@@ -1150,10 +1233,12 @@
       },
       "cell-detail-dialog": {
         "title": "Cell詳情",
+        "transaction-hash": "交易哈希",
         "capacity-used": "容量使用",
         "data": "數據",
         "total": "總量",
-        "used": "已用"
+        "used": "已用",
+        "view-raw-data": "原始數據"
       },
       "locked-reason": {
         "multi-locktime": "這是壹個有時間鎖的 cell, 只能在 {{time}} 之後使用。",
@@ -1175,11 +1260,17 @@
         "title": "消耗 Cell",
         "warn-consume": "消耗Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
       },
+      "cell-consolidate-dialog": {
+        "title": "合並",
+        "warn-consume": "所有選中的Cell都將合並到一個新Cell中，請確保沒有重要數據需要保留。"
+      },
       "enter-password": "輸入密碼",
       "password-placeholder": "請輸入錢包密碼",
       "lock": "鎖定",
       "unlock": "解鎖",
-      "consume": "消耗"
+      "consume": "消耗",
+      "verify": "驗證",
+      "consolidate": "合並"
     },
     "send-tx-detail": {
       "page-title": "交易詳情",
@@ -1192,6 +1283,12 @@
         "size": "大小",
         "lock-time": "鎖定時間"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "Neuron 窗口已鎖定",
+      "enter-lock-password": "輸入鎖屏密碼",
+      "lock-password-error": "鎖屏密碼錯誤",
+      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試"
     }
   }
 }

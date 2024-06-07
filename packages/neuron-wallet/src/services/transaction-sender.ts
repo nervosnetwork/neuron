@@ -4,12 +4,10 @@ import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
 import RpcService from '../services/rpc-service'
-import { PathAndPrivateKey } from '../models/keys/key'
 import { Address } from '../models/address'
 import FeeMode from '../models/fee-mode'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import Keychain from '../models/keys/keychain'
 import Input from '../models/chain/input'
 import OutPoint from '../models/chain/out-point'
 import Output from '../models/chain/output'
@@ -20,7 +18,7 @@ import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import { signWitnesses } from '../utils/signWitnesses'
-import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
+import { bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -37,12 +35,13 @@ import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
 import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
+import AmendTransactionService from './amend-transaction'
 import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
-import hd from '@ckb-lumos/hd'
+import { key, Keychain } from '@ckb-lumos/hd'
 import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/common-scripts'
@@ -52,6 +51,11 @@ interface SignInfo {
   lockHash: string
   witness: string
   lockArgs: string
+}
+
+interface PathAndPrivateKey {
+  path: string
+  privateKey: string
 }
 
 export default class TransactionSender {
@@ -68,13 +72,14 @@ export default class TransactionSender {
     transaction: Transaction,
     password: string = '',
     skipLastInputs: boolean = true,
-    skipSign = false
+    skipSign = false,
+    amendHash = ''
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
       : await this.sign(walletID, transaction, password, skipLastInputs)
 
-    return this.broadcastTx(walletID, tx)
+    return this.broadcastTx(walletID, tx, amendHash)
   }
 
   public async sendMultisigTx(
@@ -91,7 +96,7 @@ export default class TransactionSender {
     return this.broadcastTx(walletID, tx)
   }
 
-  public async broadcastTx(walletID: string = '', tx: Transaction) {
+  public async broadcastTx(walletID: string = '', tx: Transaction, amendHash = '') {
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -99,6 +104,9 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
     await MultisigService.saveSentMultisigOutput(tx)
+    if (amendHash) {
+      await AmendTransactionService.save(txHash, amendHash)
+    }
 
     if (walletID) {
       const wallet = WalletService.getInstance().get(walletID)
@@ -406,7 +414,7 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
+    const serializedEmptyWitnessSize = bytes.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
     blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
@@ -414,7 +422,7 @@ export default class TransactionSender {
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
-      const byteLength = byteUtils.bytify(wit).byteLength
+      const byteLength = bytes.bytify(wit).byteLength
       blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
@@ -424,7 +432,7 @@ export default class TransactionSender {
     if (!wallet.isHardware()) {
       // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
-      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
+      emptyWitness.lock = key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]
@@ -669,8 +677,8 @@ export default class TransactionSender {
 
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
-    const depositeOutput = await CellsService.getLiveCell(outPoint)
-    if (!depositeOutput) {
+    const depositOutput = await CellsService.getLiveCell(outPoint)
+    if (!depositOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -685,7 +693,7 @@ export default class TransactionSender {
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
       outPoint,
-      depositeOutput,
+      depositOutput,
       depositBlockHeader!.number,
       depositBlockHeader!.hash,
       changeAddress!.address,
@@ -731,13 +739,13 @@ export default class TransactionSender {
     if (!withdrawOutput.depositOutPoint) {
       throw new Error('DAO has not finish step first withdraw')
     }
-    const depositeTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
-    if (!depositeTx?.txStatus.blockHash) {
-      throw new Error(`Get deposite block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
+    const depositTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
+    if (!depositTx?.txStatus.blockHash) {
+      throw new Error(`Get deposit block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
     }
-    const depositBlockHeader = await rpcService.getHeader(depositeTx.txStatus.blockHash)
+    const depositBlockHeader = await rpcService.getHeader(depositTx.txStatus.blockHash)
     if (!depositBlockHeader) {
-      throw new Error(`Get Header failed with blockHash ${depositeTx.txStatus.blockHash}`)
+      throw new Error(`Get Header failed with blockHash ${depositTx.txStatus.blockHash}`)
     }
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
     const depositCapacity: bigint = BigInt(withdrawOutput.capacity)
@@ -923,14 +931,14 @@ export default class TransactionSender {
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
-      Buffer.from(masterPrivateKey.privateKey, 'hex'),
-      Buffer.from(masterPrivateKey.chainCode, 'hex')
+      Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
+      Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )
 
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+      privateKey: bytes.hexify(masterKeychain.derivePath(path).privateKey),
     }))
   }
 }

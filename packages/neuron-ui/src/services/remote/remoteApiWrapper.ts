@@ -50,6 +50,12 @@ type Action =
   | 'set-theme'
   | 'verify-external-ckb-node'
   | 'start-node-ignore-external'
+  | 'get-first-sync-info'
+  | 'start-sync'
+  | 'get-lock-window-info'
+  | 'update-lock-window-info'
+  | 'verify-lock-window-password'
+  | 'unlock-window'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -83,6 +89,7 @@ type Action =
   | 'generate-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
   | 'withdraw-from-dao'
+  | 'calculate-unlock-dao-maximum-withdraw'
   // Special Assets
   | 'get-customized-asset-cells'
   | 'generate-withdraw-customized-cell-tx'
@@ -113,7 +120,6 @@ type Action =
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
   | 'migrate-acp'
-  | 'check-migrate-acp'
   | 'get-sudt-token-info'
   | 'generate-destroy-asset-account-tx'
   | 'get-sudt-type-script-hash'
@@ -126,7 +132,6 @@ type Action =
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'
-  | 'get-device-firmware-version'
   | 'get-device-public-key'
   | 'get-device-extended-public-key'
   | 'connect-device'
@@ -154,6 +159,7 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  | 'change-multisig-sync-status'
   // spore
   | 'generate-transfer-spore-tx'
   // cell-manage

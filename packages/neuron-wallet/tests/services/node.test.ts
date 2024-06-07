@@ -30,6 +30,7 @@ describe('NodeService', () => {
   const getLocalNodeInfoMock = jest.fn()
   const pathJoinMock = jest.fn()
   const redistCheckMock = jest.fn()
+  const isFirstSyncMock = jest.fn()
 
   const fakeHTTPUrl = 'http://fakeurl'
 
@@ -57,6 +58,7 @@ describe('NodeService', () => {
     stubbedStopLightNode.mockReset()
     pathJoinMock.mockReset()
     redistCheckMock.mockReset()
+    isFirstSyncMock.mockReset()
   }
 
   beforeEach(() => {
@@ -181,6 +183,16 @@ describe('NodeService', () => {
     }))
 
     jest.doMock('utils/redist-check', () => redistCheckMock)
+
+    jest.doMock('services/settings', () => ({
+      getInstance() {
+        return {
+          get isFirstSync() {
+            return isFirstSyncMock()
+          },
+        }
+      },
+    }))
 
     stubbedRxjsDebounceTime.mockReturnValue((x: any) => x)
     getChainMock.mockRejectedValue('no chain')
@@ -554,6 +566,27 @@ describe('NodeService', () => {
           full: ['0.108'],
         },
       })
+    })
+  })
+  describe('test start default node', () => {
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: true, type: 0 })
+      getLocalNodeInfoMock.mockRejectedValue('not start')
+      nodeService = new NodeService()
+    })
+    it('is first sync', async () => {
+      isFirstSyncMock.mockReturnValue(true)
+      await nodeService.tryStartNodeOnDefaultURI()
+      expect(stubbedLoggerInfo).toBeCalledWith(`CKB:\tThis is the first sync, please wait for the user's confirmation`)
+    })
+    it('is not first sync', async () => {
+      isFirstSyncMock.mockReturnValue(false)
+      redistCheckMock.mockResolvedValue(true)
+      await nodeService.tryStartNodeOnDefaultURI()
+      expect(stubbedLoggerInfo).toBeCalledWith(
+        `CKB:\texternal RPC on default uri not detected, starting bundled CKB node.`
+      )
     })
   })
 })

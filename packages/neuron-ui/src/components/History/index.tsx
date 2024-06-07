@@ -10,7 +10,7 @@ import { Download, Search, ArrowNext, Clean } from 'widgets/Icons/icon'
 
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
-import FormattedTokenAmount from 'components/FormattedTokenAmount'
+import FormattedTokenAmount, { FormattedCKBBalanceChange } from 'components/FormattedTokenAmount'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { exportTransactions } from 'services/remote'
 
@@ -30,7 +30,7 @@ import styles from './history.module.scss'
 const History = () => {
   const {
     app: { pageNotice },
-    wallet: { id, name: walletName },
+    wallet: { id, name: walletName, isWatchOnly },
     chain: {
       networkID,
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber },
@@ -45,8 +45,11 @@ const History = () => {
   const [isExporting, setIsExporting] = useState(false)
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
-  const onSearch = useCallback(() => navigate(`${RoutePath.History}?keywords=${keywords}`), [navigate, keywords])
+  const { keywords, onKeywordsChange, sortInfo } = useSearch(search, id, dispatch)
+  const onSearch = useCallback(
+    () => navigate(`${RoutePath.History}?keywords=${keywords}&sort=${sortInfo.sort}&direction=${sortInfo.direction}`),
+    [navigate, keywords]
+  )
   const onClean = useCallback(() => onKeywordsChange(undefined, ''), [onKeywordsChange])
   const onExport = useCallback(() => {
     setIsExporting(true)
@@ -109,7 +112,7 @@ const History = () => {
       title: t('history.table.type'),
       dataIndex: 'type',
       align: 'left',
-      minWidth: '120px',
+      minWidth: '100px',
       render: (_, __, item) => {
         return (
           <TransactionType
@@ -120,16 +123,28 @@ const History = () => {
           />
         )
       },
+      sortable: true,
     },
     {
-      title: t('history.table.amount'),
+      title: t('history.table.asset'),
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
-      minWidth: '200px',
+      minWidth: '140px',
       render(_, __, item, show) {
         return <FormattedTokenAmount item={item} show={show} symbolClassName={styles.symbol} />
       },
+    },
+    {
+      title: t('history.table.balance'),
+      dataIndex: 'value',
+      align: 'left',
+      isBalance: true,
+      minWidth: '140px',
+      render(_, __, item, show) {
+        return <FormattedCKBBalanceChange item={item} show={show} symbolClassName={styles.symbol} />
+      },
+      sortable: true,
     },
     {
       title: t('history.table.timestamp'),
@@ -137,6 +152,7 @@ const History = () => {
       align: 'left',
       minWidth: '150px',
       render: (_, __, item) => uniformTimeFormatter(item.timestamp),
+      sortable: true,
     },
     {
       title: t('history.table.status'),
@@ -212,10 +228,14 @@ const History = () => {
             isMainnet={isMainnet}
             id={id}
             bestBlockNumber={bestBlockNumber}
+            isWatchOnly={isWatchOnly}
           />
         )}
         expandedRow={expandedRow}
         onRowClick={(_, __, idx) => handleExpandClick(idx)}
+        onSorted={(key, type) => {
+          navigate(`${RoutePath.History}?pageNo=${pageNo}&keywords=${keywords}&sort=${key}&direction=${type}`)
+        }}
       />
 
       <div className={styles.container}>
@@ -225,7 +245,9 @@ const History = () => {
             pageSize={pageSize}
             pageNo={pageNo}
             onChange={(no: number) => {
-              navigate(`${RoutePath.History}?pageNo=${no}&keywords=${keywords}`)
+              navigate(
+                `${RoutePath.History}?pageNo=${no}&keywords=${keywords}&sort=${sortInfo.sort}&direction=${sortInfo.direction}`
+              )
             }}
           />
         </div>

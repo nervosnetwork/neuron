@@ -2,7 +2,7 @@ import '../../src/types/ckbComponents.d.ts'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Address, AddressVersion } from '../../src/models/address'
 import Queue from '../../src/block-sync-renderer/sync/queue'
@@ -179,6 +179,15 @@ describe('queue', () => {
                 exec: stubbedRPCCreateBatchRequestExecFn,
               }
             },
+          }
+        },
+      }
+    })
+    jest.doMock('../../src/services/wallets', () => {
+      return {
+        getInstance() {
+          return {
+            checkNeedGenerateAddress: jest.fn(),
           }
         },
       }

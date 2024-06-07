@@ -21,6 +21,7 @@
       "special-assets": "Activos personalizados",
       "sync-not-start": "Sincronización no iniciada aún",
       "connecting": "Conectando",
+      "pause": "Pausar sincronización",
       "experimental-functions": "Experimental",
       "s-udt": "Cuentas de activos",
       "update-neuron-with-ckb": "La versión del nodo de CKB no coincide con Neuron (v{{ version }}), lo que puede causar problemas de compatibilidad. Por favor actualice a la última versión de Neuron.",
@@ -34,7 +35,9 @@
         "looking-valid-target": "Buscando objetivo válido asumido",
         "set-start-block-number": "Establecer el número de bloque inicial"
       },
-      "migrating": "migrando..."
+      "migrating": "migrando...",
+      "left-time": "Tiempo restante",
+      "left-time-tip": "El tiempo restante es una estimación y está relacionado con la red actual y otros factores, y es solo para referencia."
     },
     "import-hardware": {
       "title": {
@@ -133,7 +136,7 @@
       "activity": "Actividad",
       "datetime": "Fecha y Hora",
       "status": "Estado",
-      "amount": "Cantidad",
+      "asset": "Activos",
       "address": "Dirección",
       "sent": "Enviado",
       "sending": "Enviando",
@@ -149,7 +152,9 @@
       "send": "Enviar",
       "receive": "Recibir",
       "locked": "Cantidad bloqueada",
-      "locked-balance": "Saldo bloqueado"
+      "locked-balance": "Saldo bloqueado",
+      "first-sync-notice": "La sincronización inicial requiere al menos {{size}} GB de espacio en disco, <br />Además, el tamaño de los datos aumentará con el tiempo, se recomienda seleccionar un espacio en disco más grande para almacenar los datos.",
+      "start-sync": "Iniciar sincronización"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenido a Neuron",
@@ -242,7 +247,10 @@
       "release-on": "Liberar en",
       "locktime-warning": "Asegúrese de que la billetera del receptor pueda soportar el desbloqueo por vencimiento. (Nota: 1. Generalmente, las casas de cambio no admiten el desbloqueo por vencimiento {{extraNote}})",
       "allow-use-sent-cell": "Se permite el uso de salidas no confirmadas en esta transacción.",
-      "submit-transaction": "Enviar la transacción"
+      "submit-transaction": "Enviar la transacción",
+      "transaction-confirmed": "Transacción confirmada",
+      "transaction-cannot-amend": "La transacción actual está confirmada y no puede modificarse.",
+      "amend-pending-transaction": "Modificar transacción pendiente"
     },
     "receive": {
       "title": "Recibir",
@@ -297,7 +305,8 @@
       "table": {
         "name": "Nombre de la Billetera",
         "type": "Tipo",
-        "amount": "Cantidad",
+        "balance": "Saldo",
+        "asset": "activos",
         "timestamp": "Tiempo",
         "status": "Estado",
         "operation": "Operación"
@@ -311,12 +320,14 @@
       "view-in-explorer-button-title": "Ver en el explorador",
       "view-detail": "Detalle",
       "view-detail-button-title": "Ver Detalle",
+      "amend": "Enmendar",
       "opening": "Abriendo",
       "copy-tx-hash": "Copiar Hash de Transacción",
       "copy-balance": "Copiar Saldo",
       "copy-address": "Copiar Dirección",
       "create": "Crear Cuenta de Activos {{name}}",
-      "destroy": "Destruir Cuenta de Activos {{name}}"
+      "destroy": "Destruir Cuenta de Activos {{name}}",
+      "fee": "Tarifa de transacción"
     },
     "transaction": {
       "window-title": "Transacción: {{hash}}",
@@ -333,7 +344,15 @@
       "cell-from-cellbase": "Desde cellbase",
       "lock-script": "Script de Bloqueo",
       "lock-script-title": "Información de Dirección",
-      "deprecated-address-format": "Dirección en formato obsoleto"
+      "deprecated-address-format": "Dirección en formato obsoleto",
+      "type": "Tipo",
+      "fee": "Tarifa de transacción",
+      "assets": "Activos",
+      "balance": "Saldo",
+      "status": "Estado",
+      "size": "Tamaño",
+      "cycles": "Ciclos",
+      "cell-detail": "Detalles de la Cell"
     },
     "addresses": {
       "title": "Libro de Direcciones",
@@ -370,7 +389,22 @@
         "version": "Versión",
         "language": "Idioma",
         "select-language": "Seleccionar Idioma",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "keep-awake": "Mantener la pantalla encendida durante la sincronización",
+        "lock-password": "Contraseña de bloqueo de pantalla",
+        "set-lock-password": "Establecer contraseña de bloqueo de pantalla",
+        "change-lock-password": "Modificar contraseña de bloqueo de pantalla",
+        "lock-window": {
+          "set-password": "Establecer contraseña",
+          "confirm-password": "Confirmar contraseña",
+          "enter-current-password": "Ingresar contraseña actual",
+          "enter-new-password": "Ingresar nueva contraseña",
+          "password-error": "Contraseña incorrecta",
+          "different-password": "Las contraseñas ingresadas no coinciden",
+          "set-password-success": "Contraseña establecida exitosamente",
+          "change-password-success": "Contraseña modificada exitosamente",
+          "reset": "Reestablecer"
+        }
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -409,11 +443,11 @@
         "switch-network-type": "Cambiar a {{type}}"
       },
       "locale": {
-        "en": "Inglés",
-        "en-US": "Inglés(Estados Unidos)",
+        "en": "English",
+        "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Francés",
+        "fr": "Français",
         "es": "Español"
       },
       "data": {
@@ -501,93 +535,94 @@
         "title": "Enviar CKB desde dirección multifirma"
       },
       "xpub-notice": "Para billetera de solo lectura, sólo es posible exportar transacciones"
+    },
+    "qrcode": {
+      "copy": "Copiar imagen",
+      "save": "Guardar imagen"
+    },
+    "common": {
+      "or": "o",
+      "ok": "Ok",
+      "dismiss": "Descartar",
+      "confirm": "Confirmar",
+      "open": "Abrir",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "toggle": {
+        "on": "Encendido",
+        "off": "Apagado"
       },
-      "qrcode": {
-        "copy": "Copiar imagen",
-        "save": "Guardar imagen"
+      "copy-tx-hash": "Copiar Hash de Transacción",
+      "copy-address": "Copiar Dirección",
+      "select": "Seleccionar",
+      "backup": "Respaldar",
+      "edit": "Editar",
+      "delete": "Borrar",
+      "click-to-edit": "Hacer clic para editar",
+      "notice": "Nota",
+      "experimental": "Experimental",
+      "close": "Cerrar",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "verification-failure": "Falló la Verificación",
+      "back": "Atrás",
+      "switch-to-light": "Cambiar a modo claro",
+      "switch-to-dark": "Cambiar a modo oscuro",
+      "ckb-node-data-path": "CKB Ruta de los datos del nodo"
+    },
+    "notification-panel": {
+      "title": "Notificaciones"
+    },
+    "message-types": {
+      "warning": "advertencia",
+      "alert": "alerta",
+      "success": "éxito"
+    },
+    "messages": {
+      "error": "Error",
+      "unknown-error": "Error desconocido",
+      "update-wallet-successfully": "La billetera fue actualizada",
+      "delete-wallet-successfully": "La billetera fue eliminada",
+      "create-network-successfully": "La red fue creada",
+      "update-network-successfully": "La red fue actualizada",
+      "clear-cache-successfully": "El caché fue borrado",
+      "addr-copied": "La dirección ha sido copiada en el portapapeles",
+      "qrcode-copied": "El Código QR ha sido copiado en el portapapeles",
+      "view-the-run-node-doc": "Ver la guía en el navegador",
+      "remain-ckb-for-withdraw": "Es recomendable reservar algunos CKBytes para operaciones de retiro",
+      "no-valid-addresses-found": "No se encontraron direcciones válidas",
+      "decimal-range": "El decimal debe ser un número entero de {{range}}(incluido)",
+      "experimental-message-hardware": "Esta es una función experimental. Preste atención al riesgo y use con precaución.",
+      "experimental-message": "Esta es una función experimental, puede cambiar en cualquier momento. Por favor, use con precaución.",
+      "rebuild-sync": "Para una mejor experiencia de usuario, Neuron ha adoptado un nuevo almacenamiento, lo que requiere una migración de datos (estimado de 20 a 60 minutos).\nLo sentimos por la inconveniencia.",
+      "migrate-warning": "Advertencia: el proceso de migración puede fallar por razones desconocidas, lo que resulta en resincronización, ¡haga una copia de seguridad manualmente y comience la migración!",
+      "migrate-ckb-data": "Migrar",
+      "migrate": "Migrar",
+      "secp256k1/blake160-address-required": "Se requiere la dirección Secp256k1/Blake160",
+      "light-client-locktime-warning": "2. El modo de cliente ligero no admite mostrar CKBytes en tiempo de bloqueo.",
+      "light-client-cheque-warning": "Advertencia: el modo de cliente ligero no admite mostrar activos de Cheque.",
+      "fields": {
+        "wallet": "Billetera",
+        "name": "Nombre",
+        "password": "Contraseña",
+        "remote": "URL de RPC",
+        "network": "Red",
+        "address": "Dirección",
+        "amount": "Cantidad",
+        "transaction": "Transacción",
+        "default-address": "Dirección predeterminada",
+        "mnemonic": "Mnemónico",
+        "keystore-path": "Archivo Keystore",
+        "keystore-name": "Nombre de la billetera",
+        "keystore-password": "Contraseña",
+        "deposit": "Depósito",
+        "account-name": "Nombre de la cuenta",
+        "token-name": "Nombre del token",
+        "token-id": "ID del token",
+        "symbol": "Símbolo",
+        "decimal": "Decimal"
       },
-      "common": {
-        "or": "o",
-        "ok": "Ok",
-        "dismiss": "Descartar",
-        "confirm": "Confirmar",
-        "open": "Abrir",
-        "cancel": "Cancelar",
-        "save": "Guardar",
-        "toggle": {
-          "on": "Encendido",
-          "off": "Apagado"
-        },
-        "copy-tx-hash": "Copiar Hash de Transacción",
-        "copy-address": "Copiar Dirección",
-        "select": "Seleccionar",
-        "backup": "Respaldar",
-        "edit": "Editar",
-        "delete": "Borrar",
-        "click-to-edit": "Hacer clic para editar",
-        "notice": "Nota",
-        "experimental": "Experimental",
-        "close": "Cerrar",
-        "copy": "Copiar",
-        "copied": "Copiado",
-        "verification-failure": "Falló la Verificación",
-        "back": "Atrás",
-        "switch-to-light": "Cambiar a modo claro",
-        "switch-to-dark": "Cambiar a modo oscuro"
-      },
-      "notification-panel": {
-        "title": "Notificaciones"
-      },
-      "message-types": {
-        "warning": "advertencia",
-        "alert": "alerta",
-        "success": "éxito"
-      },
-      "messages": {
-        "error": "Error",
-        "unknown-error": "Error desconocido",
-        "update-wallet-successfully": "La billetera fue actualizada",
-        "delete-wallet-successfully": "La billetera fue eliminada",
-        "create-network-successfully": "La red fue creada",
-        "update-network-successfully": "La red fue actualizada",
-        "clear-cache-successfully": "El caché fue borrado",
-        "addr-copied": "La dirección ha sido copiada en el portapapeles",
-        "qrcode-copied": "El Código QR ha sido copiado en el portapapeles",
-        "view-the-run-node-doc": "Ver la guía en el navegador",
-        "remain-ckb-for-withdraw": "Es recomendable reservar algunos CKBytes para operaciones de retiro",
-        "no-valid-addresses-found": "No se encontraron direcciones válidas",
-        "decimal-range": "El decimal debe ser un número entero de {{range}}(incluido)",
-        "experimental-message-hardware": "Esta es una función experimental. Preste atención al riesgo y use con precaución.",
-        "experimental-message": "Esta es una función experimental, puede cambiar en cualquier momento. Por favor, use con precaución.",
-        "rebuild-sync": "Para una mejor experiencia de usuario, Neuron ha adoptado un nuevo almacenamiento, lo que requiere una migración de datos (estimado de 20 a 60 minutos).\nLo sentimos por la inconveniencia.",
-        "migrate-warning": "Advertencia: el proceso de migración puede fallar por razones desconocidas, lo que resulta en resincronización, ¡haga una copia de seguridad manualmente y comience la migración!",
-        "migrate-ckb-data": "Migrar",
-        "migrate": "Migrar",
-        "secp256k1/blake160-address-required": "Se requiere la dirección Secp256k1/Blake160",
-        "light-client-locktime-warning": "2. El modo de cliente ligero no admite mostrar CKBytes en tiempo de bloqueo.",
-        "light-client-cheque-warning": "Advertencia: el modo de cliente ligero no admite mostrar activos de Cheque.",
-        "fields": {
-          "wallet": "Billetera",
-          "name": "Nombre",
-          "password": "Contraseña",
-          "remote": "URL de RPC",
-          "network": "Red",
-          "address": "Dirección",
-          "amount": "Cantidad",
-          "transaction": "Transacción",
-          "default-address": "Dirección predeterminada",
-          "mnemonic": "Mnemónico",
-          "keystore-path": "Archivo Keystore",
-          "keystore-name": "Nombre de la billetera",
-          "keystore-password": "Contraseña",
-          "deposit": "Depósito",
-          "account-name": "Nombre de la cuenta",
-          "token-name": "Nombre del token",
-          "token-id": "ID del token",
-          "symbol": "Símbolo",
-          "decimal": "Decimal"
-        },
-        "codes": {
+      "codes": {
         "-3": "",
         "100": "La cantidad no es suficiente.",
         "101": "La cantidad {{amount}} CKB es demasiado pequeña, por favor ingrese una cantidad no menor a {{required}} CKB.",
@@ -638,7 +673,9 @@
       "block-number": "número de bloque",
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
-      "sync-failed": "Error de sincronización, por favor compruebe la red",
+      "sync-failed": "sincronización fallida",
+      "sync-failed-detail": "Debido a nodos de red u otros problemas, la sincronización ha fallado.",
+      "learn-more": "Saber más",
       "sync-not-start": "La sincronización no se ha iniciado todavía, por favor intente reiniciar Neuron Wallet",
       "connecting": "Conectando"
     },
@@ -675,7 +712,12 @@
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
       "balance-not-reserved": "No reservar ningún CKBytes para futuras operaciones de DAO (no se recomienda)",
+      "estimated-rewards": "Recompensas estimadas de {{días}} días",
+      "estimated-apc": "Estimación APC",
+      "estimated-apc-tooltip": "Estimación de Compensación Anual",
       "deposit-amount": "Cantidad a Depositar (CKB)",
+      "attention": "Atención: Una vez depositado en el DAO de Nervos, sus depósitos estarán bloqueados durante al menos 180 épocas (unos 30 días).",
+      "deposit-submitted": "Depósito presentado",
       "deposit-record": {
         "deposited-at": "Depositado",
         "completed-at": "Completado",
@@ -691,25 +733,29 @@
         "compensated-period": "Período de Compensación",
         "days-hours": "{{days}} días {{hours}} horas",
         "no-deposit": "Sin Depósito",
-        "no-completed": "Sin Completar"
-    },
-    "compensation-period": {
-      "tooltip": {
-        "compensated-period": "Período de Compensación",
-        "days-hours": "{{days}} días {{hours}} horas",
-        "immature-for-withdraw": "Se tarda al menos 16 horas (4epochs) para realizar la siguiente acción",
-        "normal": "La cantidad de compensación es baja, no se recomienda la acción de retiro",
-        "suggested": "Período de retiro sugerido para una compensación maximizada",
-        "ending": "Es posible que el retiro solicitado se posponga y se bloquee durante un ciclo adicional de 30 días",
-        "withdrawn": "Retirado"
+        "no-completed": "Sin Completar",
+        "insufficient-balance-to-unlock": "El saldo no es suficiente para que la comisión de transacción desbloquee el depósito",
+        "lock-warn": "Bloqueo al final del ciclo de compensación actual"
       },
-      "stage-messages": {
-          "pending": "Pendiente...",
-          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ horas }} horas",
-          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ horas }} horas",
-          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{días}} días",
+      "compensation-period": {
+        "tooltip": {
+          "compensated-period": "Período de Compensación",
+          "days-hours": "{{days}} días {{hours}} horas",
+          "immature-for-withdraw": "Se tarda al menos 16 horas (4epochs) para realizar la siguiente acción",
+          "normal": "La cantidad de compensación es baja, no se recomienda la acción de retiro",
+          "suggested": "Período de retiro sugerido para una compensación maximizada",
+          "ending": "Es posible que el retiro solicitado se posponga y se bloquee durante un ciclo adicional de 30 días",
+          "withdrawn": "Retirado"
+        },
+        "stage-messages": {
+          "deposit-in-progress": "Depósito en curso...",
+          "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ hours }} horas",
+          "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ hours }} horas",
+          "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{days}} días",
+          "next-compensation-cycle-hours": "El siguiente ciclo de compensación comenzará en aproximadamente {{hours}} horas",
           "withdrawing": "Retirando...",
-          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{días}} días",
+          "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{days}} días",
+          "compensation-cycle-will-end-hours": "El ciclo de compensación termina en aproximadamente {{hours}} horas",
           "compensation-cycle-has-ended": "El ciclo ha terminado, CKB está listo para ser desbloqueado",
           "unlocking": "Desbloqueando..."
         }
@@ -731,6 +777,16 @@
       "cell-from-cellbase": "Desde cellbase",
       "cancel": "Cancelar",
       "next": "Siguiente"
+    },
+    "deposit-rules": {
+      "minimum-deposit": "Depósito mínimo",
+      "single-compensation-cycle": "Ciclo de compensación único",
+      "single-compensation-cycle-description": "180 Época (unos 30 días)",
+      "withdraw": "Retirar",
+      "withdraw-description": "En cualquier momento",
+      "unlock": "Desbloquear",
+      "unlock-description": "Después del ciclo de compensación actual",
+      "get": "Visite"
     },
     "lock-info-dialog": {
       "address-info": "Información de dirección",
@@ -1137,7 +1193,13 @@
         "body-tips-without-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, agregue una nueva opción de red para el nodo externo.",
         "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
         "add-network": "Agregar red",
-        "ignore-external-node": "Ignorar nodo externo"
+        "ignore-external-node": "Ignorar nodo externo",
+        "external-node-is-light": "Debido a las diferentes suposiciones de seguridad del cliente ligero, Neuron no admite nodos de cliente ligero externos. ¿Desea conectarse a un \"Light Client\" ?"
+      },
+      "no-disk-space-dialog": {
+        "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",
+        "continue-sync": "Continuar sincronización",
+        "migrate-data": "Migrar datos"
       }
     },
     "cell-manage": {
@@ -1158,10 +1220,16 @@
       },
       "cell-detail-dialog": {
         "title": "Detalles de la Cell",
+        "transaction-hash": "Hash de Transacción",
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
-        "used": "Usado"
+        "used": "Usado",
+        "view-raw-data": "Datos sin procesar",
+        "UTF8": "UTF-8",
+        "address": "Dirección",
+        "number": "Número",
+        "bigEndian": "Big-Endian"
       },
       "locked-reason": {
         "multi-locktime": "La Cell tiene un bloqueo de tiempo y no se puede usar hasta {{time}}.",
@@ -1183,11 +1251,17 @@
         "title": "Consumir Cell",
         "warn-consume": "Al consumir la Cell, no se retendrá ningún dato y se utilizará todo el ckb, asegúrese de que no haya datos importantes que necesiten ser retenidos"
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolidar",
+        "warn-consume": "Todas las celdas seleccionadas se consolidarán en una nueva celda, asegúrese de que las celdas seleccionadas no contienen datos importantes."
+      },
       "enter-password": "Ingresar Contraseña",
       "password-placeholder": "Ingrese la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
-      "consume": "Consumir"
+      "consume": "Consumir",
+      "verify": "Verificar",
+      "consolidate": "Consolidar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",
@@ -1200,6 +1274,12 @@
         "size": "tamaño",
         "lock-time": "Período de Bloqueo"
       }
+    },
+    "lock-window": {
+      "neuron-is-locked": "La ventana de Neuron está bloqueada",
+      "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
     }
   }
 }

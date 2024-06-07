@@ -1,3 +1,196 @@
+# 0.116.2 (2024-05-29)
+
+### CKB Node & Light Client
+
+- [CKB@v0.116.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.116.1) was released on May. 11st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6dd077b407d019a0bce0cbad8c34e69a524ae4b2599b9feda2c7491f3559d32c`(at height `13,007,704`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3157)
+
+---
+
+## Bug fixes
+
+- 3179: Remove the display of the ledger firmware version because it causes the Nervos app to crash on the ledger device.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.116.1...v0.116.2
+
+# 0.116.1 (2024-05-28)
+
+### CKB Node & Light Client
+
+- [CKB@v0.116.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.116.1) was released on May. 11st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6dd077b407d019a0bce0cbad8c34e69a524ae4b2599b9feda2c7491f3559d32c`(at height `13,007,704`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3157)
+
+---
+
+## Bug fixes
+
+- 3173: Fix importing an account from a hardware wallet.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.116.0...v0.116.1
+
+# 0.116.0 (2024-05-24)
+
+### CKB Node & Light Client
+
+- [CKB@v0.116.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.116.1) was released on May. 11st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6dd077b407d019a0bce0cbad8c34e69a524ae4b2599b9feda2c7491f3559d32c`(at height `13,007,704`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3157)
+
+---
+
+[![Neuron@v0.116.0](https://github.com/Magickbase/neuron-public-issues/assets/7271329/ec10aa01-47fe-47a3-9636-3d4e86fc6c9b)](https://youtu.be/QXv8by2C8zU)
+
+YouTube: https://youtu.be/QXv8by2C8zU
+
+---
+
+## New features
+
+- 3134: Support 'replace-by-fee' nervos dao transactions and sudt transactions.(@devchenyan)
+- 3144: Reduce size of light client log in debug information and reveal start-block-number in log.(@yanguoyu)
+- 3064: Support locking window by pin code.(@yanguoyu)
+- 3131: Add detailed result for nervos dao transaction.(@devchenyan)
+
+## Bug fixes
+
+- 3121: Locate the first transaction on Explorer directly when users want to set the start-block-number for light client.(@yanguoyu)
+- 3101: Show migration instruction properly.(@devchenyan)
+- 3062: Migrate legacy ACP to active ACP account(@yanguoyu)
+- 3141: Fix some issues about light client synchronizaiton.(@yanguoyu)
+- 3120: Remove all sync data when start-block-number is set less than before.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.3...v0.116.0
+
+# 0.114.3 (2024-04-16)
+
+### CKB Node & Light Client
+
+- [CKB@v0.115.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.115.0) was released on Apr. 1st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x9443ad8da9172d484367bc5467988cba7a0c46028398309edfdda7d2d79be897`(at height `12,703,957`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3123)
+
+---
+
+## New features
+
+- #3054: Displaying DAO rewards.(@devchenyan)
+- #3066: Support keeping screen awake.(@yanguoyu)
+
+## Bug fixes
+
+- #3055: Fix sending sudt to a new acp cell with extra 142 CKB by offline sign.(@yanguoyu)
+- #3103: Handle MacOS crash properly on quitting.(@devchenyan)
+
+## New Contributors
+
+- @twhy made their first contribution in https://github.com/nervosnetwork/neuron/pull/3110
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.2...v0.114.3
+
+# 0.114.2 (2024-03-15)
+
+### CKB Node & Light Client
+
+- [CKB@v0.114.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.114.0) was released on Feb. 29st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.6](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.6) was released on Feb. 8th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x397d7d41167051cab2bf1610e334ad3aa5cf612e2cd442f71b91422e0361141e`(at height `12,450,084`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3077)
+
+---
+
+Good day, good Neuron, packed with exciting new features and enhancements to elevate your transaction experience!
+
+With support for Cell Management, Chained Transactions, and detailed viewing options, managing your transactions has never been easier.
+
+We're also thrilled to announce multilingual support, with French and Spanish interfaces now available, thanks to the contributions of our dedicated community members.
+
+Plus, enjoy enhanced guidance features like remaining time estimation and the ability to amend pending transactions for added flexibility.
+
+With optimizations to settings and transaction overviews, Neuron continues to prioritize efficiency and user satisfaction.
+
+Upgrade now and experience seamless transaction management with Neuron.
+
+[![Neuron@v0.114.2](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/df29-EUZG0Y)
+
+---
+
+## Bug fixes
+
+- #3081: fix start-sync confirmation in light client mode.(@yanguoyu)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.0...v0.114.2
+
+# 0.114.0 (2024-03-15)
+
+### CKB Node & Light Client
+
+- [CKB@v0.114.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.114.0) was released on Feb. 29st, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.6](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.6) was released on Feb. 8th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x397d7d41167051cab2bf1610e334ad3aa5cf612e2cd442f71b91422e0361141e`(at height `12,450,084`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3077)
+
+---
+
+Good day, good Neuron, packed with exciting new features and enhancements to elevate your transaction experience!
+
+With support for Cell Management, Chained Transactions, and detailed viewing options, managing your transactions has never been easier.
+
+We're also thrilled to announce multilingual support, with French and Spanish interfaces now available, thanks to the contributions of our dedicated community members.
+
+Plus, enjoy enhanced guidance features like remaining time estimation and the ability to amend pending transactions for added flexibility.
+
+With optimizations to settings and transaction overviews, Neuron continues to prioritize efficiency and user satisfaction.
+
+Upgrade now and experience seamless transaction management with Neuron.
+
+[![Neuron@v0.114.0](https://github.com/nervosnetwork/neuron/assets/7271329/883aba6e-ceb0-402d-9de0-d46609c528b7)](https://youtu.be/df29-EUZG0Y)
+
+---
+
+## New features
+
+- #2859: Support Cell Management.(@yanguoyu)
+- #2963: Support chained transactions.(@yanguoyu)
+- #2986: Support viewing chained transaction detail.(@yanguoyu)
+- #3012: Support French in User Interface.(Special thanks to @Natixe)
+- #3024: Support Spanish in User Interface.(Special thanks to @Natixe)
+- #3014: Support remaining time estimation.(@yanguoyu)
+- #3045: Support "amend a pending transaction".(@devchenyan)
+- #3005: Show tip for first sync and show warning when disk is not enough for full-node mode.(@yanguoyu)
+- #2994: Optimize setting of light client.(@yanguoyu)
+- #3040: Optimize transaction overview.(@yanguoyu)
+
+## Bug fixes
+
+- #2951: Fix error on creating multisig address.(@devchenyan)
+- #2992: Fix transaction lost in light client mode.(@yanguoyu)
+- #3010: Fix storage of multisig configuration.(@yanguoyu)
+- #3020: Disable nervos dao unlock button when balance is not enough as transaction fee.(@yanguoyu)
+
+## New Contributors
+
+- @Natixe made their first contribution in https://github.com/nervosnetwork/neuron/pull/3012
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.112.0...v0.114.0
+
 # 0.112.0 (2023-12-07)
 
 ### CKB Node & Light Client
@@ -25,9 +218,7 @@ Block before `0x1d46fe5bb62d19a004eadd7ba40564c45620905ab260d8a546a9e4b9d7cc0f85
 - #2944: Fix requests jam when a synced transaction includes cellbase cells.(@yanguoyu)
 - #2965: Fix transaction type recognition on light client mode.(@yanguoyu)
 
-
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.111.1...v0.112.0
-
 
 # 0.111.1 (2023-11-08)
 
@@ -57,9 +248,7 @@ Block before `0x79cecdd6f41361e2474290224751284312a018528d1d92f4e18dd6d542feddfe
 - #2913: Use KeyLocker to sign Neuron for Windows, conforming to the new industry standards effective since June 1, 2023.(@keith-cy)
 - #2921: Add network option of "Light Client(Mainnet)", and reserve "Internal Node" for built-in CKB Node only.(@yanguoyu)
 
-
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.111.0...v0.111.1
-
 
 # 0.111.0 (2023-10-19)
 
@@ -84,9 +273,7 @@ Block before `0xd5e25ad24400f237aa5f72f3738a9ae77fe082a89937e75143fcc8ef5b009383
 - #2870: Fix width of navbar.(@yanguoyu)
 - #2873: Fix fallback font on Linux.(@yanguoyu)
 
-
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.3...v0.111.0
-
 
 # 0.110.3 (2023-10-11)
 
@@ -138,7 +325,6 @@ Curious to see the magic of the new Neuron in action? Checkout our demo video on
 
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.2...v0.110.3
 
-
 # 0.110.2 (2023-07-07)
 
 ### CKB Node & Light Client
@@ -161,9 +347,7 @@ Block before `0xc0c532e10c708852d9586be46a5ed8317b2aa0835c721aa691abffb9bf4a26cd
 
 - #2760: Avoid generating deposit DAO when the dialog is not visible.(@yanguoyu)
 
-
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.1...v0.110.2
-
 
 # 0.110.1 (2023-05-31)
 

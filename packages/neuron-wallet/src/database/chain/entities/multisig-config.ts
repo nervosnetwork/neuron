@@ -24,10 +24,13 @@ export default class MultisigConfig {
   blake160s!: string[]
 
   @Column()
-  alias!: string
+  alias: string = ''
 
   @Column()
-  lastestBlockNumber!: string
+  lastestBlockNumber: string = ''
+
+  @Column()
+  startBlockNumber?: number
 
   public static fromModel(model: MultisigConfigModel): MultisigConfig {
     const multisigConfig = new MultisigConfig()

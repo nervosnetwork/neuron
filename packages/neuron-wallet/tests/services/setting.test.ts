@@ -3,6 +3,7 @@ import SettingsService from '../../src/services/settings'
 const readSyncMock = jest.fn()
 const writeSyncMock = jest.fn()
 const resolveMock = jest.fn()
+const joinMock = jest.fn()
 const getLocaleMock = jest.fn()
 const getPathMock = jest.fn()
 const updateApplicationMenuMock = jest.fn()
@@ -11,6 +12,7 @@ function resetMock() {
   readSyncMock.mockReset()
   writeSyncMock.mockReset()
   resolveMock.mockReset()
+  joinMock.mockReset()
   getLocaleMock.mockReset()
   getPathMock.mockReset()
   updateApplicationMenuMock.mockReset()
@@ -40,11 +42,13 @@ jest.mock('../../src/services/networks', () => {
 jest.mock('electron', () => ({
   BrowserWindow: {
     getAllWindows: jest.fn().mockReturnValue([]),
+    getFocusedWindow: jest.fn().mockReturnValue(null),
   },
 }))
 
 jest.mock('path', () => ({
   resolve: () => resolveMock(),
+  join: () => joinMock(),
 }))
 
 jest.mock('env', () => ({

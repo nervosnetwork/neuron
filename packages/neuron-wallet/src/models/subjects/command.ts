@@ -10,9 +10,9 @@ const CommandSubject = new Subject<{
     | 'import-xpubkey'
     | 'import-hardware'
     | 'load-transaction-json'
-    | 'migrate-acp'
     | 'sign-verify'
     | 'multisig-address'
+    | 'lock-window'
   payload: string | null
   dispatchToUI: boolean
 }>()

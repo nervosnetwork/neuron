@@ -1,5 +1,5 @@
-import { AccountExtendedPublicKey, DefaultAddressNumber } from '../models/keys/key'
-import Address, { AddressType, publicKeyToAddress } from '../models/keys/address'
+import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { publicKeyToAddress, DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import NetworksService from '../services/networks'
@@ -95,19 +95,16 @@ export default class AddressService {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
-    const unusedReceivingCount = unusedReceivingAddresses.length
-    const unusedChangeCount = unusedChangeAddresses.length
-    if (unusedReceivingCount > this.minUnusedAddressCount && unusedChangeCount > this.minUnusedAddressCount) {
-      return undefined
-    }
+    const [receivingCount, changeCount] = await this.getAddressCountsToFillGapLimit(
+      walletId,
+      receivingAddressCount,
+      changeAddressCount
+    )
+    if (!receivingCount && !changeCount) return undefined
     const maxReceivingAddressIndex = await this.maxAddressIndex(walletId, AddressType.Receiving)
     const maxChangeAddressIndex = await this.maxAddressIndex(walletId, AddressType.Change)
     const nextReceivingIndex = maxReceivingAddressIndex === undefined ? 0 : maxReceivingAddressIndex + 1
     const nextChangeIndex = maxChangeAddressIndex === undefined ? 0 : maxChangeAddressIndex + 1
-
-    const receivingCount: number = unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount
-    const changeCount: number = unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount
 
     const currentGeneratedAddresses = await this.generateAndSave(
       walletId,
@@ -138,6 +135,20 @@ export default class AddressService {
     })
 
     return allGeneratedAddresses
+  }
+
+  public static async getAddressCountsToFillGapLimit(
+    walletId: string,
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
+  ) {
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
+    const unusedReceivingCount = unusedReceivingAddresses.length
+    const unusedChangeCount = unusedChangeAddresses.length
+    return [
+      unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount,
+      unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount,
+    ]
   }
 
   public static async generateAndSaveForExtendedKey({
@@ -249,25 +260,21 @@ export default class AddressService {
   }
 
   private static toAddress = (addressMetaInfo: AddressMetaInfo): AddressInterface => {
-    const path: string = Address.pathFor(addressMetaInfo.addressType, addressMetaInfo.addressIndex)
-    const address: string = addressMetaInfo.accountExtendedPublicKey.address(
+    const info = addressMetaInfo.accountExtendedPublicKey.publicKeyInfo(
       addressMetaInfo.addressType,
-      addressMetaInfo.addressIndex,
-      NetworksService.getInstance().isMainnet()
-    ).address
+      addressMetaInfo.addressIndex
+    )
 
-    const blake160: string = AddressParser.toBlake160(address)
-
-    const addressInfo: AddressInterface = {
+    const address: AddressInterface = {
       walletId: addressMetaInfo.walletId,
-      address,
-      path,
+      address: publicKeyToAddress(info.publicKey, NetworksService.getInstance().isMainnet()),
+      path: info.path,
       addressType: addressMetaInfo.addressType,
       addressIndex: addressMetaInfo.addressIndex,
-      blake160,
+      blake160: info.blake160,
     }
 
-    return addressInfo
+    return address
   }
 
   private static async maxAddressIndex(walletId: string, addressType: AddressType): Promise<number | undefined> {

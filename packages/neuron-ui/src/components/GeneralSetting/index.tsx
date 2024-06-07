@@ -8,10 +8,13 @@ import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { ReactComponent as Update } from 'widgets/Icons/Update.svg'
 import { cancelCheckUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
-import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
-import { LanguageSelect } from 'widgets/Icons/icon'
+import { uniformTimeFormatter, bytesFormatter, clsx, wakeScreen, releaseWakeLock } from 'utils'
+import Switch from 'widgets/Switch'
+import { keepScreenAwake } from 'services/localCache'
+import { LanguageSelect, UnLock } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 import { useCheckUpdate, useUpdateDownloadStatus } from './hooks'
+import LockWindowDialog from './LockWindowDialog'
 
 interface UpdateDownloadStatusProps {
   show: boolean
@@ -134,11 +137,13 @@ const UpdateDownloadStatus = ({
 
 interface GeneralSettingProps {
   updater: State.AppUpdater
+  app: State.App
 }
 
-const GeneralSetting = ({ updater }: GeneralSettingProps) => {
+const GeneralSetting = ({ updater, app }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
   const [showLangDialog, setShowLangDialog] = useState(false)
+  const [isLockDialogShow, setIsLockDialogShow] = useState(false)
   const [searchParams] = useSearchParams()
   const [errorMsg, setErrorMsg] = useState('')
   const { showCheckDialog, setShowCheckDialog, onCancelCheckUpdates } = useCheckUpdate()
@@ -173,13 +178,29 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
     }
   }, [updater.errorMsg, setErrorMsg])
 
+  const [isScreenKeepAwake, setIsScreenKeepAwake] = useState(keepScreenAwake.get())
+  const onChangeScreenKeepAwake = useCallback((v: boolean) => {
+    keepScreenAwake.save(v)
+    setIsScreenKeepAwake(v)
+    if (v) {
+      wakeScreen()
+    } else {
+      releaseWakeLock()
+    }
+  }, [])
+
   return (
     <div className={styles.container}>
       <div className={clsx(styles.content, `${newVersion ? styles.showVersion : ''}`)} data-new-version-tip="New">
         <p>
           {t('settings.general.version')} v{newVersion || currentVersion}
         </p>
-        <button type="button" onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate} data-method="check">
+        <button
+          type="button"
+          data-button-type="text"
+          onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate}
+          data-method="check"
+        >
           <Update />
           {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
@@ -189,12 +210,33 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         <p>{t('settings.general.language')}</p>
         <button
           type="button"
+          data-button-type="text"
           onClick={() => {
             setShowLangDialog(true)
           }}
         >
           <LanguageSelect />
           {t(`settings.locale.${i18n.language}`)}
+        </button>
+      </div>
+      <div className={clsx(styles.content, styles.lockWindow)}>
+        <p>{t('settings.general.keep-awake')}</p>
+        <Switch checked={isScreenKeepAwake} onChange={onChangeScreenKeepAwake} />
+      </div>
+
+      <div className={clsx(styles.content, styles.lockWindow)}>
+        <p>{t('settings.general.lock-password')}</p>
+        <button
+          type="button"
+          data-button-type="text"
+          onClick={() => {
+            setIsLockDialogShow(true)
+          }}
+        >
+          <UnLock />
+          {t(
+            `settings.general.${app.lockWindowInfo?.encryptedPassword ? 'change-lock-password' : 'set-lock-password'}`
+          )}
         </button>
       </div>
 
@@ -235,6 +277,14 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         show={showLangDialog}
         close={() => {
           setShowLangDialog(false)
+        }}
+      />
+
+      <LockWindowDialog
+        show={isLockDialogShow}
+        encryptedPassword={app.lockWindowInfo?.encryptedPassword}
+        onCancel={() => {
+          setIsLockDialogShow(false)
         }}
       />
     </div>

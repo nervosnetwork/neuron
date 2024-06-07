@@ -41,6 +41,7 @@ export default class MultisigService {
     n?: number
     blake160s?: string[]
     alias?: string
+    startBlockNumber?: number
   }) {
     const result = await getConnection()
       .getRepository(MultisigConfig)
@@ -52,19 +53,15 @@ export default class MultisigService {
     if (!result) {
       throw new MultisigConfigNotExistError()
     }
-    await getConnection()
-      .createQueryBuilder()
-      .update(MultisigConfig)
-      .set({
-        alias: params.alias ?? result.alias,
-        walletId: params.walletId ?? result.walletId,
-        r: params.r ?? result.r,
-        m: params.m ?? result.m,
-        n: params.n ?? result.n,
-        blake160s: params.blake160s ?? result.blake160s,
-      })
-      .where('id = :id', { id: params.id })
-      .execute()
+    await getConnection().getRepository(MultisigConfig).update(params.id, {
+      alias: params.alias,
+      walletId: params.walletId,
+      r: params.r,
+      m: params.m,
+      n: params.n,
+      blake160s: params.blake160s,
+      startBlockNumber: params.startBlockNumber,
+    })
     return { ...result, ...params }
   }
 
@@ -75,6 +72,16 @@ export default class MultisigService {
       .orderBy('id', 'DESC')
       .getMany()
     return result
+  }
+
+  async getMultisigConfigById(id: number) {
+    return getConnection()
+      .getRepository(MultisigConfig)
+      .createQueryBuilder()
+      .where({
+        id,
+      })
+      .getOne()
   }
 
   async deleteConfig(id: number) {
@@ -342,6 +349,7 @@ export default class MultisigService {
       script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),
       addressType: SyncAddressType.Multisig,
       scriptType: 'lock' as CKBRPC.ScriptType,
+      startBlockNumber: v.startBlockNumber,
     }))
   }
 }
