@@ -54,7 +54,7 @@
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.22",
     "@spore-sdk/core": "0.1.0",
-    "archiver": "6.0.1",
+    "archiver": "6.0.2",
     "async": "3.2.5",
     "bn.js": "4.12.0",
     "chalk": "3.0.0",
