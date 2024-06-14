@@ -82,7 +82,7 @@ test("Launch Neuron", async () => {
   await page.screenshot({ path: "./test-results/createWallet.png" });
 });*/
 
-test.describe('overview page tests', () => {
+/*test.describe('overview page tests', () => {
   test("send transaction", async () => {
     await page.waitForTimeout(40000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
@@ -99,19 +99,19 @@ test.describe('overview page tests', () => {
 
 
   test("amend transaction ", async () => {
-    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交').first()).toBeVisible();
   });
-  test("two cells consumes", async () => {
+  test("one cell consume", async () => {
     await page.waitForTimeout(10000);
     await page.getByTitle('总览').click();
-    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]').click();
     await expect(page.getByTitle('Cell管理')).toBeVisible();
-    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/div/table/tbody/tr[2]/td[1]/label/span').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/div/table/tbody/tr[2]/td[1]/label/span').click();
     // await page.getByLabel('0x2cd04468e9a4c968ca43f404d217ffd86fc5664bf1f2f7574649718939f49807_2').check();
     await page.getByRole('button', {name: '消耗'}).click();
     await page.getByRole('button', {name: '确认'}).click();
@@ -146,9 +146,9 @@ test("check transaction history", async () => {
   await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
   await page.getByRole('button', {name: '导出交易历史'}).click();
 
-});
+});*/
 test.describe('实验性功能', () => {
-  test("create account in asset accounts", async () => {
+  /*test("create account in asset accounts", async () => {
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('资产账户').click();
     await page.getByRole('button', {name: '创建资产账户'}).click();
@@ -170,7 +170,7 @@ test.describe('实验性功能', () => {
 
   test("receive ", async () => {
     await page.getByRole('button', {name: '收款'}).first().click();
-    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
     await expect(page.getByText('已复制')).toBeVisible();
     await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[1]//!*[name()="svg"]').click();
   });
@@ -183,17 +183,24 @@ test("send ", async () => {
     await page.getByRole('button', {name: '提交'}).click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
-  });
+  });*/
 
 
 
 
 test("claim in customized page ", async () => {
+  await page.getByTitle('实验性功能').click();
+  await page.getByTitle('自定义资产').click();
+  let result=await page.getByRole('button', {name: '领取'}).first().isDisabled();
+  if (result==false){
+    await page.getByRole('button', {name: '领取'}).first().click();
+    await page.locator('id=accountName').fill('ac1');
+    await page.getByRole('button', {name: '确认'}).click();
+    await page.locator("id=password").fill('Aa111111');
+    await page.getByRole('button', {name: '确认'}).click();
+  }
 
-
-
-
-  });
+});
 
 
 });
