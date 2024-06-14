@@ -111,10 +111,8 @@ test.describe('overview page tests', () => {
     await page.getByTitle('总览').click();
     await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]').click();
     await expect(page.getByTitle('Cell管理')).toBeVisible();
-    //复选框勾选可选的第一个/第二个?--todo
-    await page.locator('id=0xb37255202fee78163e3933d1e27698d96d00cc279381da376fcefa4e563e4fbb_0').check();
-    await page.locator('id=0x1b19b7c4be4e3e38774600adab14cd015b160eb4a612d704aef2ee655a862219_1').check();
-
+    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/div/table/tbody/tr[2]/td[1]/label/span').click();
+    // await page.getByLabel('0x2cd04468e9a4c968ca43f404d217ffd86fc5664bf1f2f7574649718939f49807_2').check();
     await page.getByRole('button', {name: '消耗'}).click();
     await page.getByRole('button', {name: '确认'}).click();
     await page.locator("id=address").fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqt6q3xq73zw456d5me5d3gxpjyqu6wtvvsrvay5z');
@@ -155,6 +153,7 @@ test.describe('实验性功能', () => {
     await page.getByTitle('资产账户').click();
     await page.getByRole('button', {name: '创建资产账户'}).click();
     const tp: number = Date.parse(new Date().toString());
+    console.log('时间戳是:'+tp);
     await page.locator("id=accountName").fill("te" + tp);
     await page.getByRole('button', {name: '下一步'}).click();
     await page.locator("id=tokenId").fill("0xb1718e7c0175d8a6428a6ddca708b765803e3131d07c8e0046a94be310f1722b");
@@ -164,22 +163,48 @@ test.describe('实验性功能', () => {
     await page.getByRole('button', {name: '下一步'}).click();
     await page.locator("id=password").fill("Aa111111");
     await page.getByRole('button', {name: '确认'}).click();
-    await page.waitForTimeout(40000);
+    await page.waitForTimeout(20000);
     await expect(page.getByText('te' + tp, {exact: true})).toBeVisible();
   });
 
 
-  /*test("claim in customized page ", async () => {
+  test("receive ", async () => {
+    await page.getByRole('button', {name: '收款'}).first().click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
+    await expect(page.getByText('已复制')).toBeVisible();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[1]//!*[name()="svg"]').click();
+  });
 
 
-  });*/
+test("send ", async () => {
+  await page.getByRole('button', {name: '转账'}).first().click();
+    await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqggcska5fafwdlfw9g0cttk5uzdcvuqj4qqz5d7q");
+    await page.locator("id=amount").fill("0.001");
+    await page.getByRole('button', {name: '提交'}).click();
+    await page.locator("id=password").fill('Aa111111');
+    await page.getByRole('button', {name: '确认'}).click();
+  });
+
+
+
+
+test("claim in customized page ", async () => {
+
+
+
+
+  });
 
 
 });
 
-/*test.describe('change to light client node', () => {
 
-});*/
+/*  test("change  to light node ", async () => {
+    await page.getByTitle('设置').click();
+    await page.locator('[value="light_client_testnet"]').check();
+  });*/
+
+
 
 
 
