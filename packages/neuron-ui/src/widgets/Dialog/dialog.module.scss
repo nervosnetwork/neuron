@@ -50,6 +50,7 @@
   position: relative;
   max-height: calc(100vh - 260px);
   overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 .footerWrap {
