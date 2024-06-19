@@ -1226,8 +1226,8 @@
           "description": "备注",
           "action": "操作"
         },
-        "locked": "锁定",
-        "unlocked": "解锁",
+        "locked": "已锁定",
+        "unlocked": "已解锁",
         "default-description": "无"
       },
       "cell-detail-dialog": {
@@ -1260,8 +1260,8 @@
         "capacity": "解锁所选 Cell {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "消耗 Cell",
-        "warn-consume": "消耗Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
+        "title": "花费 Cell",
+        "warn-consume": "花费Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
       },
       "cell-consolidate-dialog": {
         "title": "合并 Cells",
@@ -1271,7 +1271,7 @@
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
-      "consume": "消耗",
+      "consume": "花费",
       "verify": "验证",
       "consolidate": "合并"
     },

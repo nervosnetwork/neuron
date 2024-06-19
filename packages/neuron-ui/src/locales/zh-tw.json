@@ -1227,8 +1227,8 @@
           "description": "備註",
           "action": "操作"
         },
-        "locked": "鎖定",
-        "unlocked": "解鎖",
+        "locked": "已鎖定",
+        "unlocked": "已解鎖",
         "default-description": "無"
       },
       "cell-detail-dialog": {
@@ -1257,8 +1257,8 @@
         "capacity": "解鎖所選 Cell {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "消耗 Cell",
-        "warn-consume": "消耗Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
+        "title": "花費 Cell",
+        "warn-consume": "花費Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
       },
       "cell-consolidate-dialog": {
         "title": "合並",
@@ -1268,7 +1268,7 @@
       "password-placeholder": "請輸入錢包密碼",
       "lock": "鎖定",
       "unlock": "解鎖",
-      "consume": "消耗",
+      "consume": "花費",
       "verify": "驗證",
       "consolidate": "合並"
     },
