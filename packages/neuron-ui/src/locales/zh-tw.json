@@ -196,6 +196,8 @@
     "import-keystore": {
       "title": "導入 Keystore 文件",
       "select-file": "選擇文件",
+      "import-failure": "導入失敗",
+      "import-failure-msg": "由於不同的Keystore文件衍生規則，Neuron不支持導入ckb-cli的Keystore文件。",
       "label": {
         "path": "Keystore 檔案",
         "name": "錢包名稱",

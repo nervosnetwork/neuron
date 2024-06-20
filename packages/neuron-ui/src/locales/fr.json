@@ -201,6 +201,8 @@
     "import-keystore": {
       "title": "Importer le fichier Keystore",
       "select-file": "Choisir le fichier",
+      "import-failure": "Échec de l'importation",
+      "import-failure-msg": "Neuron ne prend pas en charge l'importation du fichier Keystore en raison de différentes règles de dérivation du fichier Keystore.",
       "label": {
         "path": "Fichier Keystore",
         "name": "Nom du Wallet",

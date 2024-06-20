@@ -85,6 +85,13 @@ export class DuplicateImportWallet extends Error {
   }
 }
 
+export class UnsupportedCkbCliKeystore extends Error {
+  public code = 119
+  constructor() {
+    super(t('messages.unsupported-ckb-cli-keystore'))
+  }
+}
+
 export default {
   WalletNotFound,
   CurrentWalletNotSet,
@@ -96,4 +103,5 @@ export default {
   CapacityNotEnoughForChange,
   InvalidKeystore,
   DuplicateImportWallet,
+  UnsupportedCkbCliKeystore,
 }

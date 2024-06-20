@@ -202,6 +202,8 @@
     "import-keystore": {
       "title": "Import Keystore File",
       "select-file": "Choose File",
+      "import-failure": "Import Failure",
+      "import-failure-msg": "Neuron does not support importing ckb-cli's keystore file due to different keystore file derivation rules.",
       "label": {
         "path": "Keystore File",
         "name": "Wallet Name",

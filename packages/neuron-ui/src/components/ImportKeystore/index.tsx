@@ -19,6 +19,7 @@ import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'compone
 import { FinishCreateLoading, CreateFirstWalletNav } from 'components/WalletWizard'
 import TextField from 'widgets/TextField'
 import { importedWalletDialogShown } from 'services/localCache'
+import ImportFailureDialog from '../ImportFailureDialog'
 import styles from './importKeystore.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
@@ -49,6 +50,7 @@ const ImportKeystore = () => {
   const navigate = useNavigate()
   const [fields, setFields] = useState(defaultFields)
   const [openingFile, setOpeningFile] = useState(false)
+  const [isImportFailureDialogShow, setIsImportFailureDialogShow] = useState(false)
   const { onImportingExitingWalletError, dialogProps } = useReplaceDuplicateWallet()
   const goBack = useGoBack()
 
@@ -122,6 +124,11 @@ const ImportKeystore = () => {
             return
           }
 
+          if (res.status === ErrorCode.UnsupportedCkbCliKeystore) {
+            setIsImportFailureDialogShow(true)
+            return
+          }
+
           if (res.message) {
             const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
             if (msg) {
@@ -140,7 +147,18 @@ const ImportKeystore = () => {
           closeDialog()
         })
     },
-    [fields.name, fields.password, fields.path, navigate, openDialog, closeDialog, disabled, setFields, t]
+    [
+      fields.name,
+      fields.password,
+      fields.path,
+      navigate,
+      openDialog,
+      closeDialog,
+      disabled,
+      setFields,
+      t,
+      setIsImportFailureDialogShow,
+    ]
   )
 
   const handleChange = useCallback(
@@ -199,6 +217,10 @@ const ImportKeystore = () => {
     [setFields, wallets, t]
   )
 
+  const onCloseImportFailureDialog = useCallback(() => {
+    setIsImportFailureDialogShow(false)
+  }, [setIsImportFailureDialogShow])
+
   return (
     <>
       <form className={styles.container} onSubmit={handleSubmit}>
@@ -248,6 +270,8 @@ const ImportKeystore = () => {
       </form>
 
       <ReplaceDuplicateWalletDialog {...dialogProps} />
+
+      <ImportFailureDialog show={isImportFailureDialogShow} onClose={onCloseImportFailureDialog} />
     </>
   )
 }
