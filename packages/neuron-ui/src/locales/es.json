@@ -1066,6 +1066,8 @@
     },
     "multisig-address": {
       "window-title": "Direcciones de Multifirma",
+      "guide-tip": "Para los usuarios nuevos, pueden consultar la documentación para obtener <0>más información</0>.",
+      "learn-more": "más información",
       "search": {
         "placeholder": "buscar por dirección de multifirma, alias"
       },

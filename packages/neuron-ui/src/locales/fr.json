@@ -1073,6 +1073,8 @@
     },
     "multisig-address": {
       "window-title": "Adresses Multisig",
+      "guide-tip": "Pour les nouveaux utilisateurs, vous pouvez consulter la documentation pour <0>en savoir plus</0>.",
+      "learn-more": "en savoir plus",
       "search": {
         "placeholder": "recherche par adresse multisig, alias"
       },
