@@ -1280,8 +1280,10 @@
     "lock-window": {
       "neuron-is-locked": "La ventana de Neuron está bloqueada",
       "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "forget-password": "Olvidé mi contraseña?",
       "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
-      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}",
+      "verify-wallet": "Verificar"
     }
   }
 }

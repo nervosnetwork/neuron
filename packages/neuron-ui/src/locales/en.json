@@ -1300,8 +1300,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron's window has been locked",
       "enter-lock-password": "Enter lock password",
+      "forget-password": "Forget password?",
       "lock-password-error": "Lock windows password error",
-      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}"
+      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}",
+      "verify-wallet": "Verify"
     }
   }
 }

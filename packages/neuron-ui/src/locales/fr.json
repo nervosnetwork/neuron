@@ -1290,8 +1290,10 @@
     "lock-window": {
       "neuron-is-locked": "a fenêtre de Neuron est verrouillée",
       "enter-lock-password": "Entrer le mot de passe de verrouillage d'écran",
+      "forget-password": "Mot de passe oublié?",
       "lock-password-error": "Mot de passe de verrouillage d'écran incorrect",
-      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}"
+      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}",
+      "verify-wallet": "Vérifier"
     }
   }
 }
