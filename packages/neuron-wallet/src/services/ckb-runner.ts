@@ -91,10 +91,6 @@ const initCkb = async () => {
   })
 }
 
-let isLookingValidTarget: boolean = false
-let lastLogTime: number
-export const getLookingValidTargetStatus = () => isLookingValidTarget
-
 export const getNodeUrl = () => `${BUNDLED_URL_PREFIX}${rpcPort}`
 
 const removeOldIndexerIfRunSuccess = () => {
@@ -144,21 +140,10 @@ export const startCkbNode = async () => {
       logger.error('CKB:\trun fail:', dataString)
       return
     }
-    if (
-      dataString.includes(
-        `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
-      )
-    ) {
-      isLookingValidTarget = true
-      lastLogTime = Date.now()
-    } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
-      isLookingValidTarget = false
-    }
   })
 
   currentProcess.on('error', error => {
     logger.error('CKB:\trun fail:', error)
-    isLookingValidTarget = false
     if (Object.is(ckb, currentProcess)) {
       ckb = null
     }
@@ -166,7 +151,6 @@ export const startCkbNode = async () => {
 
   currentProcess.on('close', code => {
     logger.info(`CKB:\tprocess closed with code ${code}`)
-    isLookingValidTarget = false
     if (Object.is(ckb, currentProcess)) {
       ckb = null
     }
