@@ -1,9 +1,9 @@
 import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
+import ClickSystemMenu from './common/utils';
+
 
 let electronApp: ElectronApplication;
-const {exec} = require('child_process');
-const path = require('path');
 
 
 test.beforeAll(async () => {
@@ -215,22 +215,11 @@ test("claim in customized page ", async () => {
 });
 
 
-test.describe('menu', () => {
+test.describe('menu-tool', () => {
   test("单签", async () => {
 // AppleScript 文件的路径
-    const scriptPath = path.resolve('/Users/chllp/Desktop/','singleSign.scpt');
+    ClickSystemMenu.clickMenu( '/Users/chllp/Desktop/','singleSign.scpt');
 
-    exec(`osascript ${scriptPath}`, (error:any, stdout:any, stderr:any) => {
-      if (error) {
-        console.error(`执行错误: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
-    });
     await expect(page.getByText('签名/验签信息')).toBeVisible();
     await page.getByPlaceholder('请输入信息').fill('just a test');
     await page.getByPlaceholder('请输入或选择地址').click();
@@ -284,24 +273,11 @@ test.describe('menu', () => {
   });*/
 });
 
-test.describe('hard wallet', () => {
+test.describe('menu-hard wallet', () => {
   test("创建硬件钱包", async () => {
     let createHardwallet = await page.getByText('LN-test').isVisible();
     if (!createHardwallet) {
-      const scriptPath = path.resolve('/Users/chllp/Desktop/', 'hardWallet.scpt');
-
-// 执行 AppleScript
-      exec(`osascript ${scriptPath}`, (error:any, stdout:any, stderr:any) => {
-        if (error) {
-          console.error(`执行错误: ${error.message}`);
-          return;
-        }
-        if (stderr) {
-          console.error(`stderr: ${stderr}`);
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-      });
+      ClickSystemMenu.clickMenu( '/Users/chllp/Desktop/','hardWallet.scpt');
       await page.getByRole('button', {name: '其他型号'}).click();
       await page.getByRole('button', {name: '下一步'}).click();
       await page.locator('.button_button__wmqYv').click();
@@ -335,7 +311,7 @@ test.describe('hard wallet', () => {
 });
 
 
-/*  test("change  to light node ", async () => {
+  /*test("change  to light node ", async () => {
     await page.getByTitle('设置').click();
     await page.locator('[value="light_client_testnet"]').check();
   });*/
