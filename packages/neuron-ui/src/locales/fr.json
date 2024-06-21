@@ -808,7 +808,8 @@
       "updates-found-do-you-want-to-update": "Une mise à jour ({{version}}) est disponible",
       "install-update": "Mise à jour immédiate",
       "updates-downloaded-about-to-quit-and-install": "Mise à jour téléchargée. Prêt à installer et relancer.",
-      "quit-and-install": "Installer et relancer"
+      "quit-and-install-restart": "Installer et relancer",
+      "quit-and-install": "Immédiate Installer"
     },
     "datetime": {
       "mon": {
