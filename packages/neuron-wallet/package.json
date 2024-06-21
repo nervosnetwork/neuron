@@ -29,6 +29,19 @@
     "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
+  "build": {
+    "appId": "com.example.neuron",
+    "productName": "Neuron",
+    "files": [
+      "main.js",
+      "index.html",
+      "package.json"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities"
+    }
+  },
   "lint-staged": {
     "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
       "prettier --ignore-path ../../.prettierignore --write",
