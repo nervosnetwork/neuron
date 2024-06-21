@@ -177,6 +177,8 @@ export default class WalletsController {
     } catch (error) {
       if (error.message === 'Incorrect password!') {
         throw new IncorrectPassword()
+      } else {
+        throw error
       }
     }
 

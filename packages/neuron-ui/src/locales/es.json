@@ -195,7 +195,7 @@
       "title": "Importar Keystore",
       "select-file": "Seleccionar Archivo",
       "import-failure": "Error de importación",
-      "import-failure-msg": "Neuron no soporta la importación del archivo Keystore debido a diferentes reglas de derivación del archivo Keystore.",
+      "import-failure-msg": "Neuron no soporta la importación del archivo keystore de ckb-cli debido a diferentes reglas de derivación del archivo keystore.",
       "label": {
         "path": "Archivo de Claves",
         "name": "Nombre de la Billetera",
