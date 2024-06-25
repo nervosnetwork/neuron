@@ -1083,6 +1083,8 @@
     },
     "multisig-address": {
       "window-title": "Multisig Addresses",
+      "guide-tip": "Refer to the Multisig documentation to <0>learn more</0>.",
+      "learn-more": "learn more",
       "search": {
         "placeholder": "search by multisig address,alias"
       },

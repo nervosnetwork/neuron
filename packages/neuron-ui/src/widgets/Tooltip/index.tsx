@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react'
+import React, { useCallback, useState, useRef, type CSSProperties } from 'react'
 import { useDidMount } from 'utils'
 import styles from './tooltip.module.scss'
 
@@ -8,6 +8,7 @@ interface TooltipProps {
   tip: React.ReactNode
   className?: string
   tipClassName?: string
+  tipStyles?: CSSProperties
   placement?: Placement
   center?: boolean
   trigger?: 'hover' | 'click'
@@ -21,6 +22,7 @@ const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({
   tip,
   className = '',
   tipClassName = '',
+  tipStyles,
   placement = 'bottom',
   center = true,
   trigger = 'hover',
@@ -88,7 +90,7 @@ const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({
       data-has-trigger={showTriangle}
       data-trigger-next-to-child={isTriggerNextToChild}
     >
-      <div className={`${styles.tip} ${tipClassName}`}>
+      <div className={`${styles.tip} ${tipClassName}`} style={tipStyles}>
         {tip}
         {showTriangle && <div className={styles.triangle} />}
       </div>

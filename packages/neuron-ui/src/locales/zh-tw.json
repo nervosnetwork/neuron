@@ -1076,6 +1076,8 @@
     },
     "multisig-address": {
       "window-title": "多簽地址",
+      "guide-tip": "對於首次使用您可以查看文檔以 <0>了解更多</0>。",
+      "learn-more": "了解更多",
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },
