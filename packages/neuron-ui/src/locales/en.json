@@ -1137,6 +1137,8 @@
         "export": "Export Tx"
       },
       "multi-details": "Multisig address details",
+      "synchronization-abort": "Synchronization Abort",
+      "synchronization-abort-msg": "Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.",
       "create-dialog": {
         "title": "Create multisig address",
         "preview-title": "Multisig address has been generated",

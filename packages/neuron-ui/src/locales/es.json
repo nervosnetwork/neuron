@@ -1120,6 +1120,8 @@
         "export": "Exportar Tx"
       },
       "multi-details": "Detalles de la dirección multifirma",
+      "synchronization-abort": "Abortar sincronización",
+      "synchronization-abort-msg": "Salir de la ventana actual provocará que se aborte la sincronización de multisig, por favor confirme si desea salir.",
       "create-dialog": {
         "title": "Crear dirección multifirma",
         "preview-title": "La dirección multifirma se ha generado",

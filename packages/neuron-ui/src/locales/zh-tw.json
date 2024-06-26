@@ -1130,6 +1130,8 @@
         "export": "導出交易"
       },
       "multi-details": "多簽地址詳情",
+      "synchronization-abort": "同步中止",
+      "synchronization-abort-msg": "離開當前窗口將導致多簽同步中止，請確認是否離開。",
       "create-dialog": {
         "title": "創建多重簽名地址",
         "preview-title": "簽名地址已生成",
