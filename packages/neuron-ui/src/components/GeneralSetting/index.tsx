@@ -97,6 +97,7 @@ const UpdateDownloadStatus = ({
   }
 
   if (downloaded) {
+    const isWin = process.platform === 'win32'
     return (
       <Dialog
         show={show}
@@ -104,7 +105,7 @@ const UpdateDownloadStatus = ({
         showCancel={false}
         onConfirm={handleConfirm}
         disabled={!downloaded}
-        confirmText={t('updates.quit-and-install')}
+        confirmText={t(`updates.${isWin ? 'quit-and-install' : 'quit-and-install-restart'}`)}
         title={t('updates.update-available')}
         confirmProps={{
           'data-method': 'install',

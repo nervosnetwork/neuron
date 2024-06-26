@@ -818,7 +818,8 @@
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
       "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
-      "quit-and-install": "Install and relaunch"
+      "quit-and-install-restart": "Install and relaunch",
+      "quit-and-install": "Immediate Install"
     },
     "datetime": {
       "mon": {
