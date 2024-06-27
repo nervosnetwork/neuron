@@ -1,6 +1,6 @@
 name: Package Neuron for Test
 
-on: 
+on:
   issue_comment:
     types: [created]
   push:
@@ -278,3 +278,82 @@ jobs:
           comment-id: ${{ github.event.comment.id }}
           body: Packageing failed in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
           edit-mode: append
+
+  sync-test:
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package -test')) || github.event_name == 'push' }}
+    needs: [packaging]
+    strategy:
+      matrix:
+        node:
+          - 18.12.0
+        os:
+          - macos-latest
+          - ubuntu-20.04
+          - windows-2019
+
+    runs-on: ${{ matrix.os }}
+
+    name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+
+      - name: Install libudev
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev
+      - name: Download Neuron App Zip(x64)
+        if: matrix.os == 'macos-latest'
+        uses: actions/download-artifact@v4
+        with:
+          name: Neuron-Mac-x64
+          path: packages/sync-test
+
+      - name: Download Neuron Win
+        if: matrix.os == 'windows-2019'
+        uses: actions/download-artifact@v4
+        with:
+          name: Neuron-Win
+          path: packages/sync-test
+
+      - name: Download Neuron Linux
+        if: matrix.os == 'ubuntu-20.04'
+        uses: actions/download-artifact@v4
+        with:
+          name: Neuron-Linux
+          path: packages/sync-test
+
+      - name: macos run
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd packages/sync-test
+          yarn
+          bash scripts/prepare_neuron_macos.sh
+          yarn sync-test
+      - name:  Windows run
+        if: matrix.os == 'windows-2019'
+        run: |
+          cd packages\sync-test
+          yarn
+          .\scripts\prepare_neuron_windows.bat
+          yarn sync-test
+      - name: ubuntu run
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          cd  packages/sync-test
+          yarn
+          bash scripts/prepare_neuron_linux.sh
+          xvfb-run --auto-servernum yarn sync-test
+      - name: tar result
+        if: always()
+        run: |
+          tar -zcvf tmp.${{ matrix.os  }}.tar.gz packages/sync-test/tmp
+      - name: Publish reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jfoa-build-reports-${{ runner.os }}
+          path: tmp.${{ matrix.os  }}.tar.gz
