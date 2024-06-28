@@ -1,9 +1,7 @@
 import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
-import ClickSystemMenu from './common/utils';
+import ClickSystemMenu from '../common/utils';
 
-const {exec} = require('child_process');
-const path = require('path');
 
 
 let electronApp: ElectronApplication;
@@ -30,10 +28,6 @@ test.afterAll(async () => {
 });
 */
 
-test.beforeEach(async () => {
-  test.setTimeout(60000);
-});
-
 
 let page: Page;
 
@@ -57,7 +51,7 @@ test("Launch Neuron", async () => {
   await page.waitForSelector('text="总览"');
 });
 
-/*test("Create Wallet", async () => {
+test("Create Wallet", async () => {
   let createWallet = await page.getByText('钱包 1').isVisible();
   if (!createWallet) {
     await page.getByLabel("导入助记词").click();
@@ -109,16 +103,19 @@ test.describe('overview page tests', () => {
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交')).toBeVisible();
     await page.waitForTimeout(5000);
+    console.log('发送交易成功！');
   });
 
 
   test("amend transaction ", async () => {
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交').first()).toBeVisible();
+    console.log('amend交易成功！');
+
   });
   test("one cell consume", async () => {
     await page.waitForTimeout(10000);
@@ -133,6 +130,8 @@ test.describe('overview page tests', () => {
     await page.getByRole('button', {name: '发送'}).click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
+    console.log('消费cell成功！');
+
   });
 
 });
@@ -149,6 +148,7 @@ test("nervos dao deposit", async () => {
   await page.getByRole('button',{name: '确认'}).click();
   await page.waitForTimeout(10000);
   await expect(page.getByText('正在存入...', { exact: true })).toBeVisible();
+  console.log('nervos dao deposit 成功！');
 });
 
 
@@ -159,6 +159,7 @@ test("check transaction history", async () => {
   page.keyboard.press(EnterKey);
   await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
   await page.getByRole('button', {name: '导出交易历史'}).click();
+  console.log('查历史记录成功！');
 
 });
 test.describe('实验性功能', () => {
@@ -215,11 +216,11 @@ test("claim in customized page ", async () => {
 });
 
 
-});*/
+});
 
 
 test.describe('menu-tool', () => {
-  /* test("单签", async () => {
+   test("单签", async () => {
  // AppleScript 文件的路径
      ClickSystemMenu.clickMenu( '/Users/chllp/Desktop/','singleSign.scpt');
 
@@ -235,9 +236,8 @@ test.describe('menu-tool', () => {
      await expect(page.locator('.toast_content__U4vEI')).toHaveText('验证成功');
 
    });
- */
 
-  /*test("多签", async () => {
+  test("多签", async () => {
     ClickSystemMenu.clickMenu( './__tests__/script/','multisigSign.scpt');
     //删除已创建的数据
     await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
@@ -264,37 +264,48 @@ test.describe('menu-tool', () => {
     await page.getByRole('button', {name: '导出交易'}).click();
     await page.waitForTimeout(30000);
     ClickSystemMenu.clickMenu( './__tests__/script/','dialogClick.scpt');
-  });*/
+  });
+   test("导出交易", async () => {
+     await page.getByTitle('总览').click();
+     await page.getByRole('button', {name: '转账'}).click();
+     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
+     await page.locator("id=amount").fill("103");
+     await page.getByRole('button', {name: '发送'}).click();
+     await page.getByPlaceholder("输入钱包密码").fill('Aa111111');
+     await page.locator('//*[@id="root"]/dialog/div[2]/div/div[3]/button[1]').click();
+     await page.waitForTimeout(10000);
+     ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+     await page.getByRole('button', {name: '确认'}).click();
+   });
 
-  /*test("离线签", async () => {
-    ClickSystemMenu.clickMenu('./__tests__/script/', 'offlineSign.scpt');
-//弹窗中选择特定文件
+   test("离线签", async () => {
+     ClickSystemMenu.clickMenu('./__tests__/script/', 'offlineSign.scpt');
+     ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+     await page.locator('//!*[@id="root"]/div/dialog[1]/div[3]/form/button[2]').click();
+     await page.locator('id=password').fill('Aa111111');
+     await page.getByRole('button', {name: '确认'}).click();
+   });
 
-    ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
-    await page.getByRole('button', {name: '签名并导出'}).click();
-    await page.getByPlaceholder("输入密码").fill('Aa111111');
-    await page.getByRole('button', {name: '确认'}).click();
-  });*/
-
-  test("广播交易", async () => {
-    ClickSystemMenu.clickMenu('./__tests__/script/', 'broadcastTransaction.scpt');
-    //已签名文件只能使用一次
+  test("签名并导出", async () => {
     await page.getByTitle('总览').click();
     await page.getByRole('button', {name: '转账'}).click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103");
-    await page.getByPlaceholder("输入密码").fill('Aa111111');
     await page.getByRole('button', {name: '发送'}).click();
+    await page.getByPlaceholder("输入钱包密码").fill('Aa111111');
     await page.getByRole('button', {name: '签名并导出交易'}).click();
     ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
     await page.getByRole('button', {name: '确认'}).click();
-    await page.getByRole('button', {name: '广播交易'}).click();
 
+  });
 
+  test("广播交易", async () => {
+    ClickSystemMenu.clickMenu('./__tests__/script/', 'broadcastTransaction.scpt');
+    ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
   });
 });
 
-/*test.describe('menu-hard wallet', () => {
+test.describe('menu-hard wallet', () => {
   test("创建硬件钱包", async () => {
     let createHardwallet = await page.getByText('LN-test').isVisible();
     if (!createHardwallet) {
@@ -324,27 +335,15 @@ test.describe('menu-tool', () => {
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqw539axnad36dwf45je32w7su70pqp8g6qh7r60q");
     await page.locator("id=amount").fill("106");
     await page.getByRole('button', {name: '发送'}).click();
-    await page.locator('//!*[@id="root"]/dialog/div[3]/form/button[2]').click();
+    await page.locator('//*[@id="root"]/dialog/div[3]/form/button[2]').click();
     await expect(page.getByText('已连接，等待确认...')).toBeVisible();
   });
 
 
-});*/
+});
 
 
 /*test("change  to light node ", async () => {
   await page.getByTitle('设置').click();
   await page.locator('[value="light_client_testnet"]').check();
 });*/
-
-
-
-
-
-
-
-
-
-
-
-
