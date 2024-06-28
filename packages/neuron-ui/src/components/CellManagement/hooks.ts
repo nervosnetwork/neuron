@@ -202,6 +202,7 @@ export enum Actions {
   Lock = 'lock',
   Unlock = 'unlock',
   Consume = 'consume',
+  Consolidate = 'consolidate',
 }
 
 export const useAction = ({
@@ -213,6 +214,7 @@ export const useAction = ({
   setError,
   password,
   verifyDeviceStatus,
+  wallet,
 }: {
   liveCells: State.LiveCellWithLocalInfo[]
   currentPageLiveCells: State.LiveCellWithLocalInfo[]
@@ -222,6 +224,7 @@ export const useAction = ({
   setError: (error: string) => void
   password: string
   verifyDeviceStatus: () => Promise<boolean>
+  wallet: State.Wallet
 }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -253,10 +256,21 @@ export const useAction = ({
     },
     [liveCells, selectedOutPoints, setOperateCells, dispatch, navigate]
   )
+
+  const getConsolidateAddress = useCallback(() => {
+    const { addresses } = wallet
+    if (addresses.length === 1) {
+      return addresses[0].address
+    }
+    const unusedReceiveAddress = addresses.find(a => a.type === 0 && a.txCount === 0)?.address ?? ''
+
+    return unusedReceiveAddress
+  }, [wallet])
+
   const onActionConfirm = useCallback(async () => {
     switch (action) {
-      case 'lock':
-      case 'unlock':
+      case Actions.Lock:
+      case Actions.Unlock:
         if (!(await verifyDeviceStatus())) return
         setLoading(true)
         updateLiveCellsLockStatus({
@@ -276,17 +290,24 @@ export const useAction = ({
             setLoading(false)
           })
         break
-      case 'consume':
+      case Actions.Consume:
         dispatch({
           type: AppActions.UpdateConsumeCells,
           payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
         })
         navigate(`${RoutePath.Send}?isSendMax=true`)
         break
+      case Actions.Consolidate:
+        dispatch({
+          type: AppActions.UpdateConsumeCells,
+          payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
+        })
+        navigate(`${RoutePath.Send}?isSendMax=true&toAddress=${getConsolidateAddress()}`)
+        break
       default:
         break
     }
-  }, [action, operateCells, dispatch, navigate, password])
+  }, [action, operateCells, dispatch, navigate, password, getConsolidateAddress])
   const onActionCancel = useCallback(() => {
     setAction(undefined)
     setOperateCells([])

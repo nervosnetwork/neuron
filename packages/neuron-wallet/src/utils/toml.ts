@@ -1,7 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 
-export function updateToml(filePath: string, updateValue: Record<string, string>, newFilePath?: string) {
+export function updateToml(
+  filePath: string,
+  updateValue: Record<string, Record<string, string>>,
+  newFilePath?: string
+) {
   const values = fs.readFileSync(filePath).toString().split('\n')
   let field: string | undefined = undefined
   const newValues = values.map(v => {
@@ -14,9 +18,15 @@ export function updateToml(filePath: string, updateValue: Record<string, string>
       return v
     }
     if (field && updateValue[field]) {
-      const newLine = updateValue[field]
-      field = undefined
-      return newLine
+      const equalIndex = v.indexOf('=')
+      if (equalIndex !== -1) {
+        const stringBeforeEqual = v.slice(0, equalIndex)
+        const key = stringBeforeEqual.trim()
+        if (updateValue[field][key]) {
+          const newLine = `${stringBeforeEqual}= ${updateValue[field][key]}`
+          return newLine
+        }
+      }
     }
     return v
   })

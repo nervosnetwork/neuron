@@ -8,7 +8,9 @@ export class RemoveAddressesMultisigConfig1651820157100 implements MigrationInte
     public async up(queryRunner: QueryRunner): Promise<any> {
       await queryRunner.renameColumn('multisig_config', 'addresses', 'blake160s')
       await queryRunner.dropColumn('multisig_config', 'fullpayload')
-      const configList = await queryRunner.manager.find(MultisigConfig)
+      // after add a column for multisig_config here will throw exception if use `queryRunner.manager.find(MultisigConfig)`
+      // so it's better to use query to find the items
+      const configList: MultisigConfig[] = await queryRunner.manager.query('select * from multisig_config')
       const updated = configList.map(v => {
         v.blake160s = v.blake160s.map(v => addressToScript(v).args)
         return v

@@ -21,6 +21,7 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
+      "pause": "Sync paused",
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
@@ -36,7 +37,8 @@
         "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating...",
-      "left-time": "Left Time"
+      "left-time": "Time Remaining",
+      "left-time-tip": "The time remaining is an estimate and is related to the current network and other factors, and is for reference only."
     },
     "import-hardware": {
       "title": {
@@ -141,7 +143,7 @@
       "activity": "Activity",
       "datetime": "Date & Time",
       "status": "Status",
-      "amount": "Amount",
+      "asset": "Asset",
       "address": "Address",
       "sent": "Sent",
       "sending": "Sending",
@@ -255,7 +257,8 @@
       "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
       "submit-transaction": "Submit the transaction",
       "transaction-confirmed": "Transaction Confirmed",
-      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended."
+      "transaction-cannot-amend": "The current transaction is confirmed and cannot be amended.",
+      "amend-pending-transaction": "Amend Pending Transaction"
     },
     "receive": {
       "title": "Receive",
@@ -311,7 +314,7 @@
         "name": "Wallet Name",
         "type": "Type",
         "balance": "Balance",
-        "amount": "Amount",
+        "asset": "Asset",
         "timestamp": "Time",
         "status": "Status",
         "operation": "Operation"
@@ -687,7 +690,9 @@
       "block-number": "block number",
       "syncing-balance": "Balance is updating",
       "slow": "Sync is slow",
-      "sync-failed": "Sync failed, please check network",
+      "sync-failed": "Synchronization failed",
+      "sync-failed-detail": "Synchronization failed due to network node or other problems.",
+      "learn-more": "Learn More",
       "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet",
       "connecting": "Connecting"
     },
@@ -813,7 +818,8 @@
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
       "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
-      "quit-and-install": "Install and relaunch"
+      "quit-and-install-restart": "Install and relaunch",
+      "quit-and-install": "Immediate Install"
     },
     "datetime": {
       "mon": {
@@ -1078,6 +1084,8 @@
     },
     "multisig-address": {
       "window-title": "Multisig Addresses",
+      "guide-tip": "Refer to the Multisig documentation to <0>learn more</0>.",
+      "learn-more": "learn more",
       "search": {
         "placeholder": "search by multisig address,alias"
       },
@@ -1208,7 +1216,8 @@
         "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
         "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network",
-        "ignore-external-node": "Ignore external node"
+        "ignore-external-node": "Ignore external node",
+        "external-node-is-light": "Neuron does not support external light client nodes due to different security assumptions for light clients. Would you like to connect to the \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
@@ -1265,12 +1274,17 @@
         "title": "Consume Cell",
         "warn-consume": "Consume cell will not keep any data and use all of the ckb, please ensure that no important data needs to be retained"
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolidate Cells",
+        "warn-consume": "All selected cells will be consolidated into a new cell, make sure that selected cells do not contain important data."
+      },
       "enter-password": "Enter Password",
       "password-placeholder": "Please input wallet password",
       "lock": "Lock",
       "unlock": "Unlock",
       "consume": "Consume",
-      "verify": "Verify"
+      "verify": "Verify",
+      "consolidate": "Consolidate"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

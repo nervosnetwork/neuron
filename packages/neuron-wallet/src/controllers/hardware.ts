@@ -2,7 +2,7 @@ import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/c
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
 import { connectDeviceFailed } from '../exceptions'
-import { AccountExtendedPublicKey } from '../models/keys/key'
+import { AccountExtendedPublicKey } from '@ckb-lumos/hd'
 
 export default class HardwareController {
   public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
@@ -31,16 +31,6 @@ export default class HardwareController {
   public async getCkbAppVersion(): Promise<Controller.Response<string>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const version = await device.getAppVersion()
-
-    return {
-      status: ResponseCode.Success,
-      result: version,
-    }
-  }
-
-  public async getFirmwareVersion(): Promise<Controller.Response<string>> {
-    const device = HardwareWalletService.getInstance().getCurrent()!
-    const version = await device.getFirmwareVersion?.()
 
     return {
       status: ResponseCode.Success,

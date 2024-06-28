@@ -1,21 +1,18 @@
-import {MigrationInterface, QueryRunner, TableColumn} from "typeorm";
+import {MigrationInterface, QueryRunner} from "typeorm";
 
 export class RenameSyncProgress1702781527414 implements MigrationInterface {
     name = 'RenameSyncProgress1702781527414'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.renameColumn('sync_progress', 'blockStartNumber', 'localSavedBlockNumber')
-        await queryRunner.renameColumn('sync_progress', 'blockEndNumber', 'syncedBlockNumber')
-        await queryRunner.addColumn('sync_progress', new TableColumn({
-          name: 'lightStartBlockNumber',
-          type: 'integer',
-          default: 0
-        }))
+        // the typeorm renameColumn will throw an exception about drop indexer when rename or add column
+        await queryRunner.query('ALTER TABLE "sync_progress" RENAME "blockStartNumber" to "localSavedBlockNumber"') 
+        await queryRunner.query('ALTER TABLE "sync_progress" RENAME "blockEndNumber" to "syncedBlockNumber"')
+        await queryRunner.query(`ALTER TABLE "sync_progress" ADD COLUMN "lightStartBlockNumber" integer DEFAULT 0;`)
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.renameColumn('sync_progress', 'localSavedBlockNumber', 'blockStartNumber')
-        await queryRunner.renameColumn('sync_progress', 'syncedBlockNumber', 'blockEndNumber')
-    }
+        await queryRunner.query('ALTER TABLE "sync_progress" RENAME "localSavedBlockNumber" to "blockStartNumber"') 
+        await queryRunner.query('ALTER TABLE "sync_progress" RENAME "syncedBlockNumber" to "blockEndNumber"') 
+      }
 
 }

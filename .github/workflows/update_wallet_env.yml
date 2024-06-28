@@ -19,7 +19,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           branch: 'chore-update-wallet-env/${{github.ref_name}}'
-          sha: '${{ github.event.create.head.sha }}'
+          sha: '${{ github.sha }}'
 
       - name: Checkout
         uses: actions/checkout@v4

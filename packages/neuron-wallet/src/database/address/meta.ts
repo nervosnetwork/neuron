@@ -1,6 +1,6 @@
 import { bytes } from '@ckb-lumos/codec'
 import { Address, AddressVersion } from '../../models/address'
-import { AddressType } from '../../models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import Script from '../../models/chain/script'
 import SystemScriptInfo from '../../models/system-script-info'
 import AssetAccountInfo from '../../models/asset-account-info'

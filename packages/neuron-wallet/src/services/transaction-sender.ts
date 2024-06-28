@@ -4,12 +4,10 @@ import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
 import RpcService from '../services/rpc-service'
-import { PathAndPrivateKey } from '../models/keys/key'
 import { Address } from '../models/address'
 import FeeMode from '../models/fee-mode'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import Keychain from '../models/keys/keychain'
 import Input from '../models/chain/input'
 import OutPoint from '../models/chain/out-point'
 import Output from '../models/chain/output'
@@ -20,7 +18,7 @@ import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import { signWitnesses } from '../utils/signWitnesses'
-import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
+import { bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -43,7 +41,7 @@ import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
-import hd from '@ckb-lumos/hd'
+import { key, Keychain } from '@ckb-lumos/hd'
 import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/common-scripts'
@@ -53,6 +51,11 @@ interface SignInfo {
   lockHash: string
   witness: string
   lockArgs: string
+}
+
+interface PathAndPrivateKey {
+  path: string
+  privateKey: string
 }
 
 export default class TransactionSender {
@@ -411,7 +414,7 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
+    const serializedEmptyWitnessSize = bytes.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
     blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
@@ -419,7 +422,7 @@ export default class TransactionSender {
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
-      const byteLength = byteUtils.bytify(wit).byteLength
+      const byteLength = bytes.bytify(wit).byteLength
       blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
@@ -429,7 +432,7 @@ export default class TransactionSender {
     if (!wallet.isHardware()) {
       // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
-      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
+      emptyWitness.lock = key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]
@@ -928,14 +931,14 @@ export default class TransactionSender {
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
-      Buffer.from(masterPrivateKey.privateKey, 'hex'),
-      Buffer.from(masterPrivateKey.chainCode, 'hex')
+      Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
+      Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )
 
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+      privateKey: bytes.hexify(masterKeychain.derivePath(path).privateKey),
     }))
   }
 }

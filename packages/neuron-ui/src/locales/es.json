@@ -21,6 +21,7 @@
       "special-assets": "Activos personalizados",
       "sync-not-start": "Sincronización no iniciada aún",
       "connecting": "Conectando",
+      "pause": "Pausar sincronización",
       "experimental-functions": "Experimental",
       "s-udt": "Cuentas de activos",
       "update-neuron-with-ckb": "La versión del nodo de CKB no coincide con Neuron (v{{ version }}), lo que puede causar problemas de compatibilidad. Por favor actualice a la última versión de Neuron.",
@@ -35,7 +36,8 @@
         "set-start-block-number": "Establecer el número de bloque inicial"
       },
       "migrating": "migrando...",
-      "left-time": "Tiempo restante"
+      "left-time": "Tiempo restante",
+      "left-time-tip": "El tiempo restante es una estimación y está relacionado con la red actual y otros factores, y es solo para referencia."
     },
     "import-hardware": {
       "title": {
@@ -134,7 +136,7 @@
       "activity": "Actividad",
       "datetime": "Fecha y Hora",
       "status": "Estado",
-      "amount": "Cantidad",
+      "asset": "Activos",
       "address": "Dirección",
       "sent": "Enviado",
       "sending": "Enviando",
@@ -247,7 +249,8 @@
       "allow-use-sent-cell": "Se permite el uso de salidas no confirmadas en esta transacción.",
       "submit-transaction": "Enviar la transacción",
       "transaction-confirmed": "Transacción confirmada",
-      "transaction-cannot-amend": "La transacción actual está confirmada y no puede modificarse."
+      "transaction-cannot-amend": "La transacción actual está confirmada y no puede modificarse.",
+      "amend-pending-transaction": "Modificar transacción pendiente"
     },
     "receive": {
       "title": "Recibir",
@@ -303,7 +306,7 @@
         "name": "Nombre de la Billetera",
         "type": "Tipo",
         "balance": "Saldo",
-        "amount": "Cantidad",
+        "asset": "activos",
         "timestamp": "Tiempo",
         "status": "Estado",
         "operation": "Operación"
@@ -670,7 +673,9 @@
       "block-number": "número de bloque",
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
-      "sync-failed": "Error de sincronización, por favor compruebe la red",
+      "sync-failed": "sincronización fallida",
+      "sync-failed-detail": "Debido a nodos de red u otros problemas, la sincronización ha fallado.",
+      "learn-more": "Saber más",
       "sync-not-start": "La sincronización no se ha iniciado todavía, por favor intente reiniciar Neuron Wallet",
       "connecting": "Conectando"
     },
@@ -796,7 +801,8 @@
       "updates-found-do-you-want-to-update": "Hay una actualización ({{versión}}) disponible",
       "install-update": "Actualización inmediata",
       "updates-downloaded-about-to-quit-and-install": "Actualización descargada. Listo para instalar y reiniciar.",
-      "quit-and-install": "Instalar y reiniciar"
+      "quit-and-install-restart": "Instalar y reiniciar",
+      "quit-and-install": "Inmediata Instalar"
     },
     "datetime": {
       "mon": {
@@ -1061,6 +1067,8 @@
     },
     "multisig-address": {
       "window-title": "Direcciones de Multifirma",
+      "guide-tip": "Para los usuarios nuevos, pueden consultar la documentación para obtener <0>más información</0>.",
+      "learn-more": "más información",
       "search": {
         "placeholder": "buscar por dirección de multifirma, alias"
       },
@@ -1188,7 +1196,8 @@
         "body-tips-without-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, agregue una nueva opción de red para el nodo externo.",
         "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
         "add-network": "Agregar red",
-        "ignore-external-node": "Ignorar nodo externo"
+        "ignore-external-node": "Ignorar nodo externo",
+        "external-node-is-light": "Debido a las diferentes suposiciones de seguridad del cliente ligero, Neuron no admite nodos de cliente ligero externos. ¿Desea conectarse a un \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",
@@ -1245,12 +1254,17 @@
         "title": "Consumir Cell",
         "warn-consume": "Al consumir la Cell, no se retendrá ningún dato y se utilizará todo el ckb, asegúrese de que no haya datos importantes que necesiten ser retenidos"
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolidar",
+        "warn-consume": "Todas las celdas seleccionadas se consolidarán en una nueva celda, asegúrese de que las celdas seleccionadas no contienen datos importantes."
+      },
       "enter-password": "Ingresar Contraseña",
       "password-placeholder": "Ingrese la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
       "consume": "Consumir",
-      "verify": "Verificar"
+      "verify": "Verificar",
+      "consolidate": "Consolidar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

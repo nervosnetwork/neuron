@@ -1,12 +1,12 @@
 import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
-import Keychain from '../models/keys/keychain'
 import Blake2b from '../models/blake2b'
-import hd from '@ckb-lumos/hd'
+import { key, Keychain } from '@ckb-lumos/hd'
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
+import { bytes } from '@ckb-lumos/codec'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -40,7 +40,7 @@ export default class SignMessage {
 
   private static signByPrivateKey(privateKey: string, message: string): string {
     const digest = SignMessage.signatureHash(message)
-    const signature = hd.key.signRecoverable(digest, privateKey)
+    const signature = key.signRecoverable(digest, privateKey)
     return signature
   }
 
@@ -92,8 +92,8 @@ export default class SignMessage {
   private static getPrivateKey(wallet: Wallet, path: string, password: string): string {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
-      Buffer.from(masterPrivateKey.privateKey, 'hex'),
-      Buffer.from(masterPrivateKey.chainCode, 'hex')
+      Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
+      Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )
 
     return `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`

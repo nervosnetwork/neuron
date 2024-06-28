@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
 import { bytes } from '@ckb-lumos/codec'
+import { since } from '@ckb-lumos/base'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
@@ -27,7 +28,7 @@ import {
   SudtAcpHaveDataError,
   TargetOutputNotFoundError,
 } from '../../../src/exceptions'
-import LiveCell from '../../../src/models/chain/live-cell'
+import LiveCell, { CellWithOutPoint } from '../../../src/models/chain/live-cell'
 import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 
 const randomHex = (length: number = 64): string => {
@@ -85,7 +86,6 @@ import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-
 import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
 import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
 
 describe('TransactionGenerator', () => {
@@ -470,13 +470,11 @@ describe('TransactionGenerator', () => {
           const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH)
           expect(multiSignOutput).toBeDefined()
 
-          const multiSign = new Multisig()
-          const epoch = multiSign.parseSince(multiSignOutput!.lock.args)
-          // @ts-ignore: Private method
-          const parsedEpoch = multiSign.parseEpoch(epoch)
-          expect(parsedEpoch.number).toEqual(BigInt(5))
-          expect(parsedEpoch.length).toEqual(BigInt(240))
-          expect(parsedEpoch.index).toEqual(BigInt(43))
+          const epoch = Multisig.parseSince(multiSignOutput!.lock.args)
+          const parsedEpoch = since.parseEpoch(epoch)
+          expect(parsedEpoch.number).toEqual(5)
+          expect(parsedEpoch.length).toEqual(240)
+          expect(parsedEpoch.index).toEqual(43)
         })
       })
     })
@@ -733,13 +731,11 @@ describe('TransactionGenerator', () => {
 
         expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
 
-        const multiSign = new Multisig()
-        const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
-        // @ts-ignore: Private method
-        const parsedEpoch = multiSign.parseEpoch(epoch)
-        expect(parsedEpoch.number).toEqual(BigInt(5))
-        expect(parsedEpoch.length).toEqual(BigInt(240))
-        expect(parsedEpoch.index).toEqual(BigInt(43))
+        const epoch = Multisig.parseSince(tx.outputs[0].lock.args)
+        const parsedEpoch = since.parseEpoch(epoch)
+        expect(parsedEpoch.number).toEqual(5)
+        expect(parsedEpoch.length).toEqual(240)
+        expect(parsedEpoch.index).toEqual(43)
       })
     })
 
@@ -1045,7 +1041,7 @@ describe('TransactionGenerator', () => {
   describe('generateWithdrawMultiSignTx', () => {
     const prevOutput = Output.fromObject({
       capacity: toShannon('1000'),
-      lock: SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.lockScript.args, 100, '0x7080018000001')),
+      lock: SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.lockScript.args, 100, '0x7080018000001')),
     })
     const outPoint = OutPoint.fromObject({
       txHash: '0x' + '0'.repeat(64),
@@ -1100,8 +1096,8 @@ describe('TransactionGenerator', () => {
       tokenID: string | undefined = undefined,
       lockScript: Script = bobAnyoneCanPayLockScript,
       customData: string = '0x'
-    ): LumosCell => {
-      const liveCell: LumosCell = {
+    ): CellWithOutPoint => {
+      const liveCell: CellWithOutPoint = {
         blockHash: randomHex(),
         outPoint: {
           txHash: randomHex(),
@@ -1112,18 +1108,17 @@ describe('TransactionGenerator', () => {
           lock: {
             codeHash: lockScript.codeHash,
             args: lockScript.args,
-            hashType: lockScript.hashType.toString(),
+            hashType: lockScript.hashType,
           },
         },
         data: '0x',
       }
       if (tokenID) {
         const typeScript = assetAccountInfo.generateSudtScript(tokenID)
-        // @ts-ignore
         liveCell.cellOutput.type = {
           codeHash: typeScript.codeHash,
           args: typeScript.args,
-          hashType: typeScript.hashType.toString(),
+          hashType: typeScript.hashType,
         }
       }
       liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
