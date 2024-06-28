@@ -132,7 +132,6 @@ type Action =
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'
-  | 'get-device-firmware-version'
   | 'get-device-public-key'
   | 'get-device-extended-public-key'
   | 'connect-device'
@@ -142,7 +141,6 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'broadcast-signed-transaction'
-  | 'get-transaction-size'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft
@@ -161,6 +159,7 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  | 'change-multisig-sync-status'
   // spore
   | 'generate-transfer-spore-tx'
   // cell-manage

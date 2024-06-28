@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.114.3",
+  "version": "0.116.2",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -66,8 +66,8 @@
     "@ckb-lumos/rpc": "0.21.1",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.22",
-    "@spore-sdk/core": "0.1.0-beta.14",
-    "archiver": "6.0.1",
+    "@spore-sdk/core": "0.1.0",
+    "archiver": "6.0.2",
     "async": "3.2.5",
     "bn.js": "4.12.0",
     "chalk": "3.0.0",
@@ -75,7 +75,7 @@
     "electron-log": "4.4.8",
     "electron-updater": "4.6.5",
     "electron-window-state": "5.0.3",
-    "elliptic": "6.5.4",
+    "elliptic": "6.5.5",
     "hw-app-ckb": "0.1.2",
     "i18next": "21.10.0",
     "leveldown": "6.1.1",
@@ -85,14 +85,14 @@
     "sha3": "2.1.4",
     "sqlite3": "5.1.6",
     "subleveldown": "4.1.4",
-    "tslib": "2.6.2",
+    "tslib": "2.6.3",
     "typeorm": "0.3.17",
     "undici": "5.28.4",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@electron/notarize": "2.2.0",
-    "@nervosnetwork/ckb-types": "0.109.0",
+    "@electron/notarize": "2.3.2",
+    "@nervosnetwork/ckb-types": "0.109.1",
     "@types/archiver": "6.0.2",
     "@types/async": "3.2.24",
     "@types/electron-devtools-installer": "2.2.5",
@@ -110,7 +110,7 @@
     "electron-builder": "24.9.1",
     "electron-devtools-installer": "3.2.0",
     "jest-when": "3.6.0",
-    "neuron-ui": "0.114.3",
+    "neuron-ui": "0.116.2",
     "typescript": "5.3.3"
   }
 }

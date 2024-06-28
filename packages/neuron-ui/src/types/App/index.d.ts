@@ -19,6 +19,7 @@ declare namespace State {
       data: string
     }
     assetAccountType?: 'CKB' | 'sUDT' | string
+    daoCapacity?: string
   }
 
   interface DetailedInput {
@@ -41,6 +42,7 @@ declare namespace State {
     outPoint: CKBComponents.OutPoint
     type?: CKBComponents.Script
     data?: string
+    daoData?: string
     isChangeCell?: boolean
   }
   interface DetailedTransaction extends Transaction {
@@ -237,7 +239,7 @@ declare namespace State {
     balance: string
     addresses: Address[]
   }
-  type ConnectionStatus = 'online' | 'offline' | 'connecting'
+  type ConnectionStatus = 'online' | 'offline' | 'connecting' | 'pause'
 
   type SyncState = Readonly<{
     cacheTipBlockNumber: number

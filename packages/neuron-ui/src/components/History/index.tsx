@@ -30,7 +30,7 @@ import styles from './history.module.scss'
 const History = () => {
   const {
     app: { pageNotice },
-    wallet: { id, name: walletName },
+    wallet: { id, name: walletName, isWatchOnly },
     chain: {
       networkID,
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber },
@@ -126,7 +126,7 @@ const History = () => {
       sortable: true,
     },
     {
-      title: t('history.table.amount'),
+      title: t('history.table.asset'),
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
@@ -228,6 +228,7 @@ const History = () => {
             isMainnet={isMainnet}
             id={id}
             bestBlockNumber={bestBlockNumber}
+            isWatchOnly={isWatchOnly}
           />
         )}
         expandedRow={expandedRow}

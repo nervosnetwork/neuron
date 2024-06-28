@@ -99,6 +99,37 @@
     .title {
       font-size: 12px;
       font-weight: 400;
+      display: flex;
+      align-items: center;
+
+      .question {
+        height: 14px;
+        flex: 1 1 auto;
+        svg {
+          margin-left: 4px;
+          cursor: pointer;
+          path {
+            stroke: var(--secondary-text-color);
+          }
+          &:hover {
+            path {
+              stroke: var(--primary-color);
+            }
+          }
+        }
+      }
+
+      .questionTip {
+        top: calc(100% + 28px);
+        right: -36px;
+        width: 200px;
+        left: inherit;
+      }
+
+      .leftTimeTip {
+        white-space: normal;
+        width: 200px;
+      }
     }
     .number {
       color: var(--third-text-color);
@@ -110,8 +141,20 @@
 
 .redDot {
   position: relative;
-  color: '#FF1E1E';
+  color: var(--error-color);
   padding-left: 14px;
+  display: flex;
+  align-items: center;
+
+  & > div {
+    height: 14px;
+  }
+
+  svg {
+    margin-left: 4px;
+    cursor: pointer;
+  }
+
   &::before {
     content: '';
     height: 6px;
@@ -121,5 +164,28 @@
     left: 0;
     top: calc(50% - 3px);
     background: var(--error-color);
+  }
+
+  .helpTip {
+    margin-top: 20px;
+    right: -10px !important;
+
+    & > div:nth-last-child(1) {
+      right: 12px;
+    }
+  }
+
+  .failedDetail {
+    white-space: normal;
+    min-width: 250px;
+  }
+  .openHelper {
+    font-weight: 500;
+    background: inherit;
+    color: var(--primary-color);
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
   }
 }

@@ -1,5 +1,5 @@
 import { Address, AddressVersion } from '../../../src/models/address'
-import { AddressType } from '../../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import AddressMeta from '../../../src/database/address/meta'
 import Multisig from '../../../src/models/multisig'
 import AssetAccountInfo from '../../../src/models/asset-account-info'

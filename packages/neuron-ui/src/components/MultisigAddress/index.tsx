@@ -1,34 +1,52 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   useOnLocaleChange,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
   useExitOnWalletChange,
   useGoBack,
+  useOnWindowResize,
 } from 'utils'
 import { useState as useGlobalState } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
-import { MultisigConfig } from 'services/remote'
+import { MultisigConfig, changeMultisigSyncStatus, openExternal } from 'services/remote'
 import ApproveMultisigTxDialog from 'components/ApproveMultisigTxDialog'
 import Dialog from 'widgets/Dialog'
 import Table from 'widgets/Table'
 import Tooltip from 'widgets/Tooltip'
 import AlertDialog from 'widgets/AlertDialog'
-import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
-import { ReactComponent as Details } from 'widgets/Icons/Details.svg'
-import { ReactComponent as Delete } from 'widgets/Icons/Delete.svg'
-import { ReactComponent as Confirm } from 'widgets/Icons/Confirm.svg'
-import { ReactComponent as Transfer } from 'widgets/Icons/Transfer.svg'
-import { ReactComponent as Upload } from 'widgets/Icons/Upload.svg'
-import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
-import { Download, Search } from 'widgets/Icons/icon'
+import {
+  Download,
+  Search,
+  AddSimple,
+  Details,
+  Delete,
+  Confirm,
+  Transfer,
+  Upload,
+  Edit,
+  Confirming,
+  Question,
+} from 'widgets/Icons/icon'
+import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
 import getMultisigSignStatus from 'utils/getMultisigSignStatus'
-import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
+import Button from 'widgets/Button'
+import SetStartBlockNumberDialog from 'components/SetStartBlockNumberDialog'
+import { type TFunction } from 'i18next'
+import {
+  useSearch,
+  useConfigManage,
+  useExportConfig,
+  useActions,
+  useSubscription,
+  useCancelWithLightClient,
+  useSetStartBlockNumber,
+} from './hooks'
 
 import styles from './multisigAddress.module.scss'
 
@@ -52,13 +70,30 @@ const tableActions = [
   },
 ]
 
+const LearnMore = React.memo(({ t }: { t: TFunction }) => (
+  <button
+    type="button"
+    onClick={() => {
+      openExternal(`https://neuron.magickbase.com/posts/issues/3193`)
+    }}
+    aria-label={t('multisig-address.learn-more')}
+    title={t('multisig-address.learn-more')}
+  >
+    {t('multisig-address.learn-more')}
+  </button>
+))
+
 const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   const {
     wallet: { id: walletId, addresses },
-    chain: { networkID },
+    chain: {
+      syncState: { bestKnownBlockNumber },
+      networkID,
+      connectionStatus,
+    },
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
@@ -67,11 +102,19 @@ const MultisigAddress = () => {
     [networks, networkID]
   )
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig, configs, onFilterConfig } =
-    useConfigManage({
-      walletId,
-      isMainnet,
-    })
+  const {
+    allConfigs,
+    saveConfig,
+    onUpdateConfig,
+    onUpdateConfigAlias,
+    deleteConfigById,
+    onImportConfig,
+    configs,
+    onFilterConfig,
+  } = useConfigManage({
+    walletId,
+    isMainnet,
+  })
   const { multisigBanlances, multisigSyncProgress } = useSubscription({
     walletId,
     isMainnet,
@@ -141,10 +184,68 @@ const MultisigAddress = () => {
   }, [multisigBanlances, sendAction.sendFromMultisig])
 
   const onBack = useGoBack()
+  const {
+    onCancel: onCancelWithLight,
+    isCloseWarningDialogShow,
+    onCancelCloseMultisigDialog,
+  } = useCancelWithLightClient()
+  const {
+    isSetStartBlockShown,
+    openDialog: openSetStartBlockNumber,
+    lastStartBlockNumber,
+    address,
+    onConfirm,
+    onCancel,
+  } = useSetStartBlockNumber({ onUpdateConfig })
+
+  useEffect(() => {
+    if (isLightClient) {
+      changeMultisigSyncStatus(true)
+    }
+    return () => {
+      if (isLightClient) {
+        changeMultisigSyncStatus(false)
+      }
+    }
+  }, [isLightClient])
+  const titleRef = useRef<HTMLDivElement | null>(null)
+  const [tipPosition, setTipPosition] = useState<{ left?: number; top?: number }>({})
+  const updateTipPosition = useCallback(() => {
+    if (titleRef.current) {
+      const boundingClientRect = titleRef.current.getBoundingClientRect()
+      setTipPosition({
+        left: boundingClientRect.left - 18,
+        top: boundingClientRect.top - boundingClientRect.height,
+      })
+    }
+  }, [titleRef.current, setTipPosition])
+  useEffect(() => {
+    updateTipPosition()
+  }, [updateTipPosition])
+  useOnWindowResize(updateTipPosition)
 
   return (
     <div>
-      <Dialog show={showMainDialog} title={t('multisig-address.window-title')} onCancel={onBack} showFooter={false}>
+      <Dialog
+        show={showMainDialog}
+        title={
+          <div ref={titleRef} className={styles.title}>
+            {t('multisig-address.window-title')}
+            <Tooltip
+              className={styles.multiGuideTip}
+              tip={<Trans i18nKey="multisig-address.guide-tip" components={[<LearnMore t={t} />]} />}
+              placement="top"
+              showTriangle
+              tipClassName={styles.multiGuide}
+              tipStyles={tipPosition}
+            >
+              <Question />
+            </Tooltip>
+          </div>
+        }
+        onCancel={isLightClient ? onCancelWithLight : onBack}
+        showFooter={false}
+      >
         <div className={styles.container}>
           <div className={styles.head}>
             <div className={styles.searchBox}>
@@ -221,8 +322,8 @@ const MultisigAddress = () => {
                               <textarea
                                 className={styles.descInput}
                                 value={item.alias || ''}
-                                onChange={updateConfig(item.id)}
-                                onKeyDown={updateConfig(item.id)}
+                                onChange={onUpdateConfigAlias(item.id)}
+                                onKeyDown={onUpdateConfigAlias(item.id)}
                               />
                               <Edit />
                             </div>
@@ -261,7 +362,21 @@ const MultisigAddress = () => {
                   align: 'left',
                   hidden: !isLightClient,
                   render(_, __, item) {
-                    return <div>{multisigSyncProgress?.[item.fullPayload] ?? 0}</div>
+                    return (
+                      <div className={styles.syncBlock}>
+                        {connectionStatus === 'online' ? <Confirming className={styles.syncing} /> : null}
+                        {multisigSyncProgress?.[item.fullPayload] ?? 0}
+                        <Button
+                          type="text"
+                          onClick={openSetStartBlockNumber}
+                          data-id={item.id}
+                          data-address={item.fullPayload}
+                          data-start-block-number={item.startBlockNumber}
+                        >
+                          <Edit />
+                        </Button>
+                      </div>
+                    )
                   },
                 },
                 {
@@ -366,6 +481,23 @@ const MultisigAddress = () => {
         }}
       />
 
+      <Dialog
+        title={t('multisig-address.multi-details')}
+        show={isCloseWarningDialogShow}
+        onConfirm={onBack}
+        onCancel={onCancelCloseMultisigDialog}
+        confirmText={t('multisig-address.ok')}
+        contentClassName={styles.closeMutisigContent}
+        className={styles.closeMultisigDialog}
+        confirmProps={{ type: 'cancel', className: styles.confirmBtn }}
+      >
+        <img src={AttentionCloseDialog} alt="Synchronization Abort" />
+        <h4>Synchronization Abort</h4>
+        <p>
+          Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.
+        </p>
+      </Dialog>
+
       {sendAction.sendFromMultisig && sendAction.isDialogOpen ? (
         <SendFromMultisigDialog
           closeDialog={sendAction.closeDialog}
@@ -380,6 +512,17 @@ const MultisigAddress = () => {
           multisigConfig={approveAction.multisigConfig}
           offlineSignJson={approveAction.offlineSignJson}
           isMainnet={isMainnet}
+        />
+      ) : null}
+      {address ? (
+        <SetStartBlockNumberDialog
+          show={isSetStartBlockShown}
+          headerTipNumber={bestKnownBlockNumber}
+          initStartBlockNumber={lastStartBlockNumber}
+          isMainnet={isMainnet}
+          address={address}
+          onUpdateStartBlockNumber={onConfirm}
+          onCancel={onCancel}
         />
       ) : null}
     </div>

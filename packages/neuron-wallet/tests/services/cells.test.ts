@@ -1676,7 +1676,7 @@ describe('CellsService', () => {
         '61',
         OutputStatus.Sent,
         false,
-        SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049'))
+        SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049'))
       )
       await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
@@ -1718,7 +1718,7 @@ describe('CellsService', () => {
     it('MULTI_LOCK_TIME', () => {
       const output = Output.fromObject({
         capacity: '1000',
-        lock: SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049')),
+        lock: SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049')),
       })
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTI_LOCK_TIME)
     })

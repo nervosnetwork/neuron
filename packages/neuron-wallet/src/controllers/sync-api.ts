@@ -1,15 +1,17 @@
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
+import env from '../env'
 import RpcService from '../services/rpc-service'
 import SyncedBlockNumber from '../models/synced-block-number'
 import SyncStateSubject from '../models/subjects/sync-state-subject'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import MultisigService from '../services/multisig'
-import { getLookingValidTargetStatus } from '../services/ckb-runner'
 import NetworksService from '../services/networks'
+import { NetworkType } from '../models/network'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
+const { app } = env
 
 export enum SyncStatus {
   SyncNotStart,
@@ -108,8 +110,10 @@ export default class SyncApiController {
     const rpcService = new RpcService(network.remote, network.type)
     try {
       const syncState = await rpcService.getSyncState()
+      const bestKnownBlockNumber =
+        network.chain === 'ckb_dev' ? await rpcService.getTipBlockNumber() : syncState.bestKnownBlockNumber
       return {
-        bestKnownBlockNumber: parseInt(syncState.bestKnownBlockNumber, 16),
+        bestKnownBlockNumber: parseInt(bestKnownBlockNumber, 16),
         bestKnownBlockTimestamp: +syncState.bestKnownBlockTimestamp,
       }
     } catch (error) {
@@ -135,6 +139,16 @@ export default class SyncApiController {
 
     const remainingBlocksToCache = bestKnownBlockNumber - cacheTipNumber
     const remainingBlocksToIndex = bestKnownBlockNumber - indexerTipNumber
+    const setAssumeValidTargetBlockNumber =
+      app.isPackaged &&
+      process.env.CKB_NODE_ASSUME_VALID_TARGET &&
+      process.env.CKB_NODE_ASSUME_VALID_TARGET_BLOCK_NUMBER
+        ? +process.env.CKB_NODE_ASSUME_VALID_TARGET_BLOCK_NUMBER
+        : undefined
+    const isLookingValidTarget =
+      network.type === NetworkType.Default &&
+      !!setAssumeValidTargetBlockNumber &&
+      bestKnownBlockNumber < setAssumeValidTargetBlockNumber
 
     const newSyncState: SyncState = {
       nodeUrl: network.remote,
@@ -147,7 +161,7 @@ export default class SyncApiController {
       cacheRate: undefined,
       estimate: undefined,
       status: SyncStatus.Syncing,
-      isLookingValidTarget: getLookingValidTargetStatus(),
+      isLookingValidTarget,
       validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET,
     }
 

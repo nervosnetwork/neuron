@@ -86,15 +86,15 @@ export default class SyncProgressService {
     return result
   }
 
-  static async getCurrentWalletMinSyncedBlockNumber() {
+  static async getCurrentWalletMinSyncedBlockNumber(addressType: SyncAddressType = SyncAddressType.Default) {
     const currentWallet = WalletService.getInstance().getCurrent()
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
       .where({
         delete: false,
-        addressType: SyncAddressType.Default,
-        ...(currentWallet ? { walletId: currentWallet.id } : {}),
+        addressType,
+        ...(currentWallet && addressType === SyncAddressType.Default ? { walletId: currentWallet.id } : {}),
       })
       .orderBy('syncedBlockNumber', 'ASC')
       .getOne()
@@ -143,5 +143,18 @@ export default class SyncProgressService {
       walletId,
       addressType: SyncAddressType.Default,
     })
+  }
+
+  static async resetMultisigSync(hash: string, startBlockNumber: number) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({
+        localSavedBlockNumber: startBlockNumber,
+        lightStartBlockNumber: startBlockNumber,
+        syncedBlockNumber: startBlockNumber,
+      })
+      .where({ hash })
+      .execute()
   }
 }

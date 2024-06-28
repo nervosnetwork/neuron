@@ -12,7 +12,7 @@ type FormattedTokenAmountProps = { item: State.Transaction; show: boolean; symbo
 type AmountProps = Omit<FormattedTokenAmountProps, 'isNeedCopy'> & {
   sudtAmount?: string
   isReceive: boolean
-  amount: string
+  amount?: string
   symbolClassName?: string
 }
 
@@ -30,18 +30,18 @@ const Amount = ({ sudtAmount, show, item, isReceive, amount, symbolClassName, sy
     </div>
   ) : (
     <div>
-      <span className={show ? styles.amount : ''} data-direction={isReceive ? 'receive' : 'send'}>
-        {amount}
+      <span className={show ? styles.amount : ''} data-direction={amount && (isReceive ? 'receive' : 'send')}>
+        {amount ?? '--'}
       </span>
-      &nbsp;{symbol}
+      &nbsp;{amount ? symbol : ''}
     </div>
   )
 }
 
 export const FormattedTokenAmount = ({ item, show, symbolClassName }: FormattedTokenAmountProps) => {
-  let amount = '--'
+  let amount: string | undefined
   let sudtAmount = ''
-  let copyText = amount
+  let copyText: string | undefined = amount
   let isReceive = false
   let symbol = ''
 
@@ -61,16 +61,22 @@ export const FormattedTokenAmount = ({ item, show, symbolClassName }: FormattedT
         isReceive = !sudtAmount.includes('-')
       }
     } else {
-      amount = show ? `${shannonToCKBFormatter(item.value, true)}` : `${HIDE_BALANCE}`
-      isReceive = !amount.includes('-')
+      amount = show
+        ? `${shannonToCKBFormatter(item.nervosDao ? item.daoCapacity ?? '--' : item.value, true)}`
+        : `${HIDE_BALANCE}`
+      isReceive = !amount?.includes('-')
       copyText = `${amount} CKB`
       symbol = 'CKB'
+      if (item.nervosDao && item.daoCapacity === undefined) {
+        amount = undefined
+        copyText = undefined
+      }
     }
   }
 
   const props = { sudtAmount, show, item, isReceive, amount, symbolClassName, symbol }
 
-  return show ? (
+  return show && copyText ? (
     <CopyZone content={copyText}>
       <Amount {...props} />
     </CopyZone>

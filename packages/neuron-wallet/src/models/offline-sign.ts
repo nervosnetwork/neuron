@@ -44,6 +44,7 @@ export interface OfflineSignJSON {
   description?: string
   asset_account?: AssetAccount
   multisig_configs?: MultisigConfigs
+  signatures?: Signatures
 }
 
 export default class OfflineSign implements OfflineSignProps {

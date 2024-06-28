@@ -21,6 +21,7 @@
       "special-assets": "Actifs personnalisés",
       "sync-not-start": "Synchronisation pas encore démarrée",
       "connecting": "Connexion",
+      "pause": "Pause synchronisation",
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
@@ -36,7 +37,8 @@
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
       "migrating": "migration en cours...",
-      "left-time": "Temps restant"
+      "left-time": "Temps restant",
+      "left-time-tip": "Le temps restant est une estimation et est lié au réseau actuel et à d'autres facteurs, et est fourni à titre indicatif seulement."
     },
     "import-hardware": {
       "title": {
@@ -141,7 +143,7 @@
       "activity": "Activité",
       "datetime": "Date et heure",
       "status": "Statut",
-      "amount": "Montant",
+      "asset": "actifs",
       "address": "Adresse",
       "sent": "Envoyé",
       "sending": "Envoi",
@@ -254,7 +256,8 @@
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
       "submit-transaction": "Soumettre la transaction",
       "transaction-confirmed": "Transaction confirmée",
-      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée."
+      "transaction-cannot-amend": "La transaction en cours est confirmée et ne peut être modifiée.",
+      "amend-pending-transaction": "Modifier une transaction en cours"
     },
     "receive": {
       "title": "Recevoir",
@@ -310,7 +313,7 @@
         "name": "Nom du Wallet",
         "type": "Type",
         "balance": "Solde",
-        "amount": "Montant",
+        "asset": "actifs",
         "timestamp": "Heure",
         "status": "Statut",
         "operation": "Opération"
@@ -677,7 +680,9 @@
       "block-number": "numéro de bloc",
       "syncing-balance": "La balance est en cours de mise à jour",
       "slow": "La synchronisation est lente",
-      "sync-failed": "Échec de la synchronisation, veuillez vérifier le réseau",
+      "sync-failed": "échec de la synchronisation",
+      "sync-failed-detail": "En raison de nœuds réseau ou d'autres problèmes, la synchronisation a échoué.",
+      "learn-more": "En savoir plus",
       "sync-not-start": "La synchronisation n'a pas encore commencé, veuillez essayer de redémarrer le Wallet Neuron",
       "connecting": "Connexion en cours"
     },
@@ -803,7 +808,8 @@
       "updates-found-do-you-want-to-update": "Une mise à jour ({{version}}) est disponible",
       "install-update": "Mise à jour immédiate",
       "updates-downloaded-about-to-quit-and-install": "Mise à jour téléchargée. Prêt à installer et relancer.",
-      "quit-and-install": "Installer et relancer"
+      "quit-and-install-restart": "Installer et relancer",
+      "quit-and-install": "Immédiate Installer"
     },
     "datetime": {
       "mon": {
@@ -1068,6 +1074,8 @@
     },
     "multisig-address": {
       "window-title": "Adresses Multisig",
+      "guide-tip": "Pour les nouveaux utilisateurs, vous pouvez consulter la documentation pour <0>en savoir plus</0>.",
+      "learn-more": "en savoir plus",
       "search": {
         "placeholder": "recherche par adresse multisig, alias"
       },
@@ -1198,7 +1206,8 @@
         "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le noeud externe"
+        "ignore-external-node": "Ignorer le noeud externe",
+        "external-node-is-light": "En raison de différentes hypothèses de sécurité du client léger, Neuron ne prend pas en charge les nœuds clients légers externes. Voulez-vous vous connecter à un \"Light Client\" ?"
       },
       "no-disk-space-dialog": {
         "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
@@ -1255,12 +1264,17 @@
         "title": "Consommer la cellule",
         "warn-consume": "La consommation de la cellule ne conservera aucune donnée et utilisera tout le CKB. Veuillez vous assurer qu'aucune donnée importante ne doit être conservée."
       },
+      "cell-consolidate-dialog": {
+        "title": "Consolider",
+        "warn-consume": "Toutes les cellules sélectionnées seront consolidées dans une nouvelle cellule. Assurez-vous que les cellules sélectionnées ne contiennent pas de données importantes."
+      },
       "enter-password": "Entrez le mot de passe",
       "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer",
-      "verify": "Vérifier"
+      "verify": "Vérifier",
+      "consolidate": "Consolider"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

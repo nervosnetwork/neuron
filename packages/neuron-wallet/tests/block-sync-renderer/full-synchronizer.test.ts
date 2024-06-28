@@ -1,6 +1,6 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { when } from 'jest-when'
-import { AddressType } from '../../src/models/keys/address'
+import { AddressType } from '@ckb-lumos/hd'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import FullSynchronizer from '../../src/block-sync-renderer/sync/full-synchronizer'
@@ -87,14 +87,12 @@ describe('unit tests for IndexerConnector', () => {
   })
 
   describe('#constructor', () => {
-    const STUB_URI = 'stub_uri'
-
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
-        new stubbedFullSynchronizer([], nodeUrl, STUB_URI)
+        new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits lumos indexer with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
       })
     })
     describe('when init without indexer folder path', () => {
@@ -102,7 +100,7 @@ describe('unit tests for IndexerConnector', () => {
         new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits mercury indexer with a node url and a default port', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
       })
     })
   })

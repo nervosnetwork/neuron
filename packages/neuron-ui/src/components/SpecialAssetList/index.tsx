@@ -493,7 +493,7 @@ const SpecialAssetList = () => {
                           label={t(`special-assets.${status}`)}
                           className={styles.actionBtn}
                           onClick={handleAction}
-                          disabled={btnDisabled}
+                          disabled={!!btnDisabled}
                         />
                       </Tooltip>
                     ) : (
@@ -505,7 +505,7 @@ const SpecialAssetList = () => {
                         label={t(`special-assets.${status}`)}
                         className={styles.actionBtn}
                         onClick={handleAction}
-                        disabled={btnDisabled}
+                        disabled={!!btnDisabled}
                       />
                     )}
                     <Button

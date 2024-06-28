@@ -21,6 +21,7 @@
       "special-assets": "自定義資產",
       "sync-not-start": "同步尚未開始",
       "connecting": "正在連接節點",
+      "pause": "同步暫停",
       "experimental-functions": "實驗性功能",
       "s-udt": "資產賬戶",
       "update-neuron-with-ckb": "CKB 節點版本與 Neuron (v{{ version }}) 不匹配，可能導致兼容性問題。請更新到最新版 Neuron。",
@@ -36,7 +37,8 @@
         "set-start-block-number": "設置同步起始區塊"
       },
       "migrating": "正在數據遷移...",
-      "left-time": "剩余時間"
+      "left-time": "剩余時間",
+      "left-time-tip": "剩余時間僅為估計值，與當前網絡和其他因素有關，僅供參考。"
     },
     "import-hardware": {
       "title": {
@@ -135,7 +137,7 @@
       "activity": "收支活動",
       "datetime": "時間",
       "status": "狀態",
-      "amount": "金額",
+      "asset": "資產",
       "address": "地址",
       "sent": "已發送",
       "sending": "正在發送",
@@ -249,7 +251,8 @@
       "allow-use-sent-cell": "允許使用待確認的 Outputs 構建交易",
       "submit-transaction": "發起交易",
       "transaction-confirmed": "交易已確認",
-      "transaction-cannot-amend": "目前交易已確認，無法修改。"
+      "transaction-cannot-amend": "目前交易已確認，無法修改。",
+      "amend-pending-transaction": "修改待處理交易"
     },
     "receive": {
       "title": "收款",
@@ -306,7 +309,7 @@
         "name": "錢包名稱",
         "type": "類型",
         "balance": "余額",
-        "amount": "金額",
+        "asset": "資產",
         "timestamp": "時間",
         "status": "狀態",
         "operation": "操作"
@@ -681,7 +684,9 @@
       "block-number": "區塊高度",
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",
-      "sync-failed": "連接失敗, 請檢查網絡",
+      "sync-failed": "同步失敗",
+      "sync-failed-detail": "由於網絡節點或其他問題，同步失敗。",
+      "learn-more": "了解更多",
       "sync-not-start": "同步尚未開始, 請嘗試重啟",
       "connecting": "正在連接節點"
     },
@@ -807,7 +812,8 @@
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載",
       "install-update": "立即更新",
       "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
-      "quit-and-install": "安裝並重啓應用"
+      "quit-and-install-restart": "安裝並重啓應用",
+      "quit-and-install": "立即安裝"
     },
     "datetime": {
       "mon": {
@@ -1071,6 +1077,8 @@
     },
     "multisig-address": {
       "window-title": "多簽地址",
+      "guide-tip": "對於首次使用您可以查看文檔以 <0>了解更多</0>。",
+      "learn-more": "了解更多",
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },
@@ -1201,7 +1209,8 @@
         "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
         "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡",
-        "ignore-external-node": "忽略外部節點"
+        "ignore-external-node": "忽略外部節點",
+        "external-node-is-light": "由於輕客戶端的安全假設不同，Neuron 不支持外部輕客戶端節點。您想連接到 \"Light Client\" 嗎？"
       },
       "no-disk-space-dialog": {
         "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
@@ -1221,8 +1230,8 @@
           "description": "備註",
           "action": "操作"
         },
-        "locked": "鎖定",
-        "unlocked": "解鎖",
+        "locked": "已鎖定",
+        "unlocked": "已解鎖",
         "default-description": "無"
       },
       "cell-detail-dialog": {
@@ -1251,15 +1260,20 @@
         "capacity": "解鎖所選 Cell {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "消耗 Cell",
-        "warn-consume": "消耗Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
+        "title": "花費 Cell",
+        "warn-consume": "花費Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
+      },
+      "cell-consolidate-dialog": {
+        "title": "合並",
+        "warn-consume": "所有選中的Cell都將合並到一個新Cell中，請確保沒有重要數據需要保留。"
       },
       "enter-password": "輸入密碼",
       "password-placeholder": "請輸入錢包密碼",
       "lock": "鎖定",
       "unlock": "解鎖",
-      "consume": "消耗",
-      "verify": "驗證"
+      "consume": "花費",
+      "verify": "驗證",
+      "consolidate": "合並"
     },
     "send-tx-detail": {
       "page-title": "交易詳情",

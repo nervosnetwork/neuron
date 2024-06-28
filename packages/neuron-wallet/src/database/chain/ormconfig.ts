@@ -68,6 +68,7 @@ import MultisigConfigSubscribe from './subscriber/multisig-config-subscriber'
 import TxDescriptionSubscribe from './subscriber/tx-description-subscriber'
 import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
 import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
+import { AddStartBlockNumber1716539079505 } from './migrations/1716539079505-AddStartBlockNumber'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 export type ConnectionName = 'light' | 'full'
@@ -184,6 +185,7 @@ const getConnectionOptions = (genesisBlockHash: string, connectionName: Connecti
       RenameSyncProgress1702781527414,
       RemoveAddressInIndexerCache1704357651876,
       AmendTransaction1709008125088,
+      AddStartBlockNumber1716539079505,
     ],
     subscribers: [
       AddressSubscribe,

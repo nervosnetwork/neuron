@@ -212,7 +212,7 @@ export class TransactionGenerator {
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
-        const script = SystemScriptInfo.generateMultiSignScript(new Multisig().args(blake160, +minutes, tipHeaderEpoch))
+        const script = SystemScriptInfo.generateMultiSignScript(Multisig.args(blake160, +minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
@@ -333,7 +333,7 @@ export class TransactionGenerator {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script: Script = SystemScriptInfo.generateMultiSignScript(
-          new Multisig().args(blake160, minutes, tipHeaderEpoch)
+          Multisig.args(blake160, minutes, tipHeaderEpoch)
         )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
@@ -378,6 +378,7 @@ export class TransactionGenerator {
     tx.outputs[outputs.length - 1].setCapacity((totalCapacity - capacitiesExceptLast - finalFee).toString())
     tx.fee = finalFee.toString()
     tx.size = txSize
+    tx.hash = tx.computeHash()
 
     // check
     if (
@@ -624,7 +625,7 @@ export class TransactionGenerator {
       lock: lockScript,
     })
 
-    const since = new Multisig().parseSince(prevOutput.lock.args)
+    const since = Multisig.parseSince(prevOutput.lock.args)
 
     const input = new Input(outPoint, since.toString(), prevOutput.capacity, prevOutput.lock)
     const tx = Transaction.fromObject({

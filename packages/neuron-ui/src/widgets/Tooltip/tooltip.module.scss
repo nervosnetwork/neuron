@@ -251,25 +251,25 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 .tipWithNode {
   position: relative;
 
-  .tip {
+  > .tip {
     @include tip;
   }
 
   &[data-type='always-dark'] {
-    .tip {
+    > .tip {
       background: #000000;
       color: #ffffff;
     }
   }
 
   &[data-trigger='click'] {
-    &[data-tip-show='true'] .tip {
+    &[data-tip-show='true'] > .tip {
       display: block;
     }
   }
 
   @each $placement in $placements {
-    @include tip-placement($placement, ' .tip');
+    @include tip-placement($placement, '> .tip');
   }
 
   &[data-trigger='hover'] {
@@ -286,14 +286,14 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
   &[data-has-trigger='true'] {
     &[data-placement='bottom'] {
       &:not([data-trigger-next-to-child='true']) {
-        & .tip {
+        & > .tip {
           top: calc(100% + 20px);
         }
       }
     }
     &[data-placement='top'] {
       &[data-trigger-next-to-child='true'] {
-        & .tip {
+        & > .tip {
           margin-bottom: 2px;
         }
       }
