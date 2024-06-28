@@ -2,8 +2,6 @@ import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
 import ClickSystemMenu from '../common/utils';
 
-
-
 let electronApp: ElectronApplication;
 
 
@@ -223,7 +221,6 @@ test.describe('menu-tool', () => {
    test("单签", async () => {
  // AppleScript 文件的路径
      ClickSystemMenu.clickMenu( '/Users/chllp/Desktop/','singleSign.scpt');
-
      await expect(page.getByText('签名/验签信息')).toBeVisible();
      await page.getByPlaceholder('请输入信息').fill('just a test');
      await page.getByPlaceholder('请输入或选择地址').click();
@@ -238,32 +235,32 @@ test.describe('menu-tool', () => {
    });
 
   test("多签", async () => {
-    ClickSystemMenu.clickMenu( './__tests__/script/','multisigSign.scpt');
-    //删除已创建的数据
-    await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
-    await page.getByRole('button', {name: '删除'}).click()
-    await page.getByRole('button', {name: '确认'}).click();
-    await page.getByTitle('多签地址').isVisible();
-    await page.getByRole('button', {name: '创建'}).click();
-    await page.getByPlaceholder('输入m的数值(1-255)').fill('1');
-    await page.getByPlaceholder('输入n的数值(1-255)').fill('2');
-    await page.locator('id=0_address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdujss6wxctltkx6ep027q8p7em04yghysmy4rlq');
-    await page.locator('id=1_address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqws75yet4agaph4ry44hh3lr80e6fz3rtqmcf2td');
-    await page.getByRole('button', {name: '生成地址'}).click();
-    await page.getByRole('button', {name: '确认'}).click();
-    await page.waitForSelector('div.multisigAddress_hoverBtn__Ra5xG');
-    await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
-    await page.getByRole('button', {name: '详情'}).click();
-    await page.getByTitle('多签地址详情').isVisible();
-    await page.getByRole('button', {name: '确定'}).click();
-    await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
-    await page.getByRole('dialog').getByRole('button', {name: '转账'}).click();
-    await page.getByTitle('多签地址转账').isVisible();
-    await page.locator('id=address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqd54pah0drq8tpe0w6lkqry8x03ss8ac9gxp7edv');
-    await page.locator('id=amount').fill('102');
-    await page.getByRole('button', {name: '导出交易'}).click();
-    await page.waitForTimeout(30000);
-    ClickSystemMenu.clickMenu( './__tests__/script/','dialogClick.scpt');
+      ClickSystemMenu.clickMenu( './__tests__/script/','multisigSign.scpt');
+      //删除已创建的数据
+      await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
+      await page.getByRole('button', {name: '删除'}).click()
+      await page.getByRole('button', {name: '确认'}).click();
+      await page.getByTitle('多签地址').isVisible();
+      await page.getByRole('button', {name: '创建'}).click();
+      await page.getByPlaceholder('输入m的数值(1-255)').fill('1');
+      await page.getByPlaceholder('输入n的数值(1-255)').fill('2');
+      await page.locator('id=0_address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdujss6wxctltkx6ep027q8p7em04yghysmy4rlq');
+      await page.locator('id=1_address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqws75yet4agaph4ry44hh3lr80e6fz3rtqmcf2td');
+      await page.getByRole('button', {name: '生成地址'}).click();
+      await page.getByRole('button', {name: '确认'}).click();
+      await page.waitForSelector('div.multisigAddress_hoverBtn__Ra5xG');
+      await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
+      await page.getByRole('button', {name: '详情'}).click();
+      await page.getByTitle('多签地址详情').isVisible();
+      await page.getByRole('button', {name: '确定'}).click();
+      await page.locator('div.multisigAddress_hoverBtn__Ra5xG').click();
+      await page.getByRole('dialog').getByRole('button', {name: '转账'}).click();
+      await page.getByTitle('多签地址转账').isVisible();
+      await page.locator('id=address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqd54pah0drq8tpe0w6lkqry8x03ss8ac9gxp7edv');
+      await page.locator('id=amount').fill('102');
+      await page.getByRole('button', {name: '导出交易'}).click();
+      await page.waitForTimeout(30000);
+      ClickSystemMenu.clickMenu( './__tests__/script/','dialogClick.scpt');
   });
    test("导出交易", async () => {
      await page.getByTitle('总览').click();
@@ -343,7 +340,19 @@ test.describe('menu-hard wallet', () => {
 });
 
 
-/*test("change  to light node ", async () => {
-  await page.getByTitle('设置').click();
-  await page.locator('[value="light_client_testnet"]').check();
-});*/
+  /*test("change  to light node ", async () => {
+    await page.getByTitle('设置').click();
+    await page.locator('[value="light_client_testnet"]').check();
+  });*/
+
+
+
+
+
+
+
+
+
+
+
+
