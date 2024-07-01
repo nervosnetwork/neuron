@@ -121,6 +121,8 @@ export default {
       'connect-device-failed': 'No se puede conectar el dispositivo, por favor, verifica tu conexión.',
       'unsupported-manufacturer': 'Los dispositivos de {{manufacturer}} aún no son compatibles.',
       'wallet-not-supported-function': 'Esta billetera no admite la función {name}.',
+      'unsupported-ckb-cli-keystore':
+        'Neuron no soporta la importación del archivo de almacenamiento de claves de ckb-cli.',
       'invalid-transaction-file': 'Archivo de transacción no válido.',
       'offline-sign-failed': 'Firma fallida, por favor, verifica si estás firmando con la billetera correcta.',
       'multisig-script-prefix-error': 'Error en la configuración multifirma',

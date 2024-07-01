@@ -124,6 +124,8 @@ export default {
       'connect-device-failed': "L'appareil ne peut pas être connecté, veuillez vérifier votre connexion.",
       'unsupported-manufacturer': 'Les appareils de {{manufacturer}} ne sont pas encore pris en charge.',
       'wallet-not-supported-function': 'Ce Wallet ne prend pas en charge la fonction {name}.',
+      'unsupported-ckb-cli-keystore':
+        "Neuron ne prend pas en charge l'importation du fichier de stockage de clés de ckb-cli.",
       'invalid-transaction-file': 'Fichier de transaction non valide.',
       'offline-sign-failed': 'Échec de la signature, veuillez vérifier si vous signez avec le bon Wallet.',
       'multisig-script-prefix-error': 'La configuration multisig est erronée',

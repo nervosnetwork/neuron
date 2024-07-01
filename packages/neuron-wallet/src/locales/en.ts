@@ -122,6 +122,7 @@ export default {
       'connect-device-failed': 'The device cannot be connected, please check your connection.',
       'unsupported-manufacturer': 'Devices from {{manufacturer}} are not yet supported.',
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
+      'unsupported-ckb-cli-keystore': "Neuron does not support importing ckb-cli's keystore file.",
       'invalid-transaction-file': 'Invalid transaction file.',
       'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
       'multisig-script-prefix-error': 'The multisig config is error',

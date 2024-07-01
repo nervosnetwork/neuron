@@ -195,6 +195,8 @@
     "import-keystore": {
       "title": "导入 Keystore 文件",
       "select-file": "选择文件",
+      "import-failure": "导入失败",
+      "import-failure-msg": "由于不同的 Keystore 文件派生规则，Neuron 不支持导入 ckb-cli 的 Keystore 文件。",
       "label": {
         "path": "Keystore 文件",
         "name": "钱包名称",
