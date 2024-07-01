@@ -1290,8 +1290,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron 窗口已鎖定",
       "enter-lock-password": "輸入鎖屏密碼",
+      "forget-password": "忘記密碼？",
       "lock-password-error": "鎖屏密碼錯誤",
-      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試"
+      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試",
+      "verify-wallet": "驗證"
     }
   }
 }

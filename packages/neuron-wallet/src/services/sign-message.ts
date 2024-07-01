@@ -13,10 +13,20 @@ export default class SignMessage {
   private static ec = new EC('secp256k1')
   private static magicString = 'Nervos Message:'
 
-  public static async sign(walletID: string, address: string, password: string, message: string): Promise<string> {
+  public static async sign({
+    walletID,
+    password,
+    message,
+    address,
+  }: {
+    walletID: string
+    password: string
+    message: string
+    address?: string
+  }): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
     const addresses = await AddressService.getAddressesByWalletId(walletID)
-    let addr = addresses.find(addr => addr.address === address)
+    let addr = address ? addresses.find(addr => addr.address === address) : addresses[0]
     if (!addr) {
       throw new AddressNotFound()
     }

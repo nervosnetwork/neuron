@@ -167,7 +167,7 @@ declare namespace Controller {
 
   interface SignMessageParams {
     walletID: string
-    address: string
+    address?: string
     password: string
     message: string
   }

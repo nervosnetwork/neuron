@@ -71,7 +71,7 @@ export const useRepeatPassword = ({
   password: string
   t: TFunction
   encryptedPassword?: string
-  onCancel: () => void
+  onCancel: (success: boolean) => void
 }) => {
   const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
@@ -89,7 +89,7 @@ export const useRepeatPassword = ({
           updateLockWindowInfo(
             encryptedPassword ? { password: updatedRepeatPassword } : { password: updatedRepeatPassword, locked: true }
           )(dispatch)
-          onCancel()
+          onCancel(true)
         }
       } else {
         setErrMsg('')
