@@ -1129,6 +1129,8 @@
         "export": "Exporter Tx"
       },
       "multi-details": "Détails de l'adresse multisig",
+      "synchronization-abort": "Abandon de la synchronisation",
+      "synchronization-abort-msg": "Quitter la fenêtre actuelle entraînera l'abandon de la synchronisation multisig, veuillez confirmer si vous souhaitez quitter.",
       "create-dialog": {
         "title": "Créer une adresse multisig",
         "preview-title": "L'adresse multisig a été générée",
