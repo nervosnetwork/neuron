@@ -24,7 +24,7 @@ const resetMocks = () => {
 }
 
 stubbedRPCServiceConstructor.mockImplementation(() => ({
-  getTransaction: stubbedGetTransactionFn,
+  getTransactionIncludeRejected: stubbedGetTransactionFn,
   getHeader: stubbedGetHeaderFn,
 }))
 
