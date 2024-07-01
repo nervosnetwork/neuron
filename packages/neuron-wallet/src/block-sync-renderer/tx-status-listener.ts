@@ -77,7 +77,7 @@ const trackingStatus = async () => {
 
   const failedTxs = txs.filter(
     (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Failed; isRejected: boolean } =>
-      tx?.status === TransactionStatus.Failed && !tx?.isRejected
+      tx?.status === TransactionStatus.Failed
   )
   const successTxs = txs.filter(
     (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Success; isRejected: boolean } =>
@@ -85,7 +85,7 @@ const trackingStatus = async () => {
   )
   const rejectedTxs = txs.filter(
     (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Failed; isRejected: boolean } =>
-      tx?.status === TransactionStatus.Failed && !!tx?.isRejected
+      !!tx?.isRejected
   )
 
   if (failedTxs.length) {

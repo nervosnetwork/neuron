@@ -37,7 +37,7 @@ export default class RpcService {
     if (result?.transaction) {
       return TransactionWithStatus.fromSDK(result)
     }
-    if (result?.txStatus && result.txStatus.status === TxStatusType.Rejected) {
+    if (result.txStatus.status === TxStatusType.Rejected) {
       logger.warn(`Transaction[${hash}] was rejected`)
       return {
         transaction: null,
@@ -59,7 +59,7 @@ export default class RpcService {
     if (result?.transaction) {
       return TransactionWithStatus.fromSDK(result)
     }
-    if (result?.txStatus && result.txStatus.status === TxStatusType.Rejected) {
+    if (result.txStatus.status === TxStatusType.Rejected) {
       logger.warn(`Transaction[${hash}] was rejected`)
     }
     return undefined
