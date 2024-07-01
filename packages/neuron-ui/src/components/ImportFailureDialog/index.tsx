@@ -14,7 +14,13 @@ const ImportFailureDialog = ({ show, onClose }: { show: boolean; onClose: () => 
   }, [])
 
   return (
-    <Dialog show={show} title={t('import-keystore.import-failure')} onConfirm={onClose} showCancel={false}>
+    <Dialog
+      show={show}
+      title={t('import-keystore.import-failure')}
+      onCancel={onClose}
+      onConfirm={onClose}
+      showCancel={false}
+    >
       <div className={styles.container}>
         <p className={styles.content}>
           {t('import-keystore.import-failure-msg')}
