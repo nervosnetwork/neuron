@@ -7,6 +7,17 @@ export const useInputWords = () => {
       const idx = Number(e.target.dataset.idx)
       if (Number.isNaN(idx)) return
       const { value } = e.target
+      if (Number(idx) === 0) {
+        const list = value
+          .trim()
+          .replace(/[^0-9a-z]+/g, ' ')
+          .split(' ')
+        if (list.length === 12) {
+          setInputsWords(list)
+          return
+        }
+      }
+
       setInputsWords(v => {
         const newWords = [...v]
         newWords[idx] = value
