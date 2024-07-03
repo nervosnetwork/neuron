@@ -5,6 +5,7 @@ import ClickSystemMenu from '../common/utils';
 let electronApp: ElectronApplication;
 
 
+
 test.beforeAll(async () => {
   electronApp = await electron.launch({args: ["../../packages/neuron-wallet/dist/main.js"]});
   electronApp.on("window", async (page) => {
@@ -45,8 +46,8 @@ test("Launch Neuron", async () => {
   const title = await page.title();
   expect(title).toBe("Neuron");
 
-
   await page.waitForSelector('text="总览"');
+  await page.waitForTimeout(20000);
 });
 
 test("Create Wallet", async () => {
@@ -91,7 +92,7 @@ test("Create Wallet", async () => {
 });
 
 test.describe('overview page tests', () => {
-  /*test("send transaction", async () => {
+  test("send transaction", async () => {
     await page.waitForTimeout(10000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('总览').click();
@@ -108,16 +109,17 @@ test.describe('overview page tests', () => {
 
 
   test("amend transaction ", async () => {
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交').first()).toBeVisible();
     console.log('amend交易成功！');
-  });*/
-  //suggestion:this case is run whenwallet balance is large,or you need to increase balance after this case
- /* test("one cell consume", async () => {
+    //程序amend提交成功，交易记录为失败并弹窗提示RBFRejected(\"Tx's current fee is 5515, expect it to >= 6432 to replace old txs\")"} Error: {"code":-1111,"message":"PoolRejectedRBF: RBF rejected: Tx's current fee is 5515, expect it to >= 6432 to replace old txs","data":"RBFRejected(\"Tx's current fee is 5515, expect it to >= 6432 to replace old txs\")"}
+  });
+//suggestion:this case is run whenwallet balance is large,or you need to increase balance after this case
+  test("one cell consume", async () => {
     await page.getByTitle('总览',{exact:true}).click();
     console.log('已点击总览！');
     // await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]//!*[name()="svg"]').click();
@@ -164,10 +166,13 @@ test("check transaction history", async () => {
   await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
   await page.getByRole('button', {name: '导出交易历史'}).click();
   await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+  await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
+  await page.getByRole('button', {name: '确认'}).click();
   console.log('查历史记录成功！');
+});
 
-});*/
-/*test.describe('实验性功能', () => {
+//所有交易完成才能执行以下操作
+test.describe('实验性功能', () => {
   test("create account in asset accounts", async () => {
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('资产账户').click();
@@ -193,11 +198,11 @@ test("check transaction history", async () => {
   test("receive ", async () => {
     await page.getByRole('button', {name: '收款'}).first().click();
     console.log('点击收款成功！');
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
     console.log('点击地址成功！');
     await expect(page.getByText('已复制')).toBeVisible();
 //关闭窗口
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[1]/!*[name()="svg"]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[1]/*[name()="svg"]').click();
     console.log('sudt账号复制成功！');
     await page.waitForTimeout(10000);
   });
@@ -211,25 +216,21 @@ test("check transaction history", async () => {
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     console.log('sudt账号发送交易成功！');
+  });
 
-  });*/
 
-
-  /*test("claim in customized page ", async () => {
+  test("claim in customized page ", async () => {
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('自定义资产').click();
-    let result = await page.getByRole('button', {name: '领取'}).first().isDisabled();
-    if (!result) {
+     await page.getByRole('button', {name: '领取'}).first().isEnabled();
       await page.getByRole('button', {name: '领取'}).first().click();
-      await page.locator('id=accountName').fill('ac1');
-      await page.getByRole('button', {name: '确认'}).click();
       await page.locator("id=password").fill('Aa111111');
       await page.getByRole('button', {name: '确认'}).click();
       console.log('领取自定义资产成功！');
 
-    }
 
-  });*/
+
+  });
 
 
 });
@@ -249,6 +250,9 @@ test.describe('menu-tool', () => {
     await page.getByRole('button', {name: '确认'}).click();
     await page.getByRole('button', {name: '验证'}).click();
     await expect(page.locator('.toast_content__U4vEI')).toHaveText('验证成功');
+    //关闭弹窗
+    await page.locator('//*[@id="root"]/div/div[2]/dialog/div[1]/!*[name()="svg"]').click();
+
     console.log('单签成功！');
 
 
@@ -279,8 +283,11 @@ test.describe('menu-tool', () => {
     await page.locator('id=address').fill('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqd54pah0drq8tpe0w6lkqry8x03ss8ac9gxp7edv');
     await page.locator('id=amount').fill('102');
     await page.getByRole('button', {name: '导出交易'}).click();
-    await page.waitForTimeout(30000);
-    ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+    await page.waitForTimeout(10000);
+    await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+    //关闭窗口
+    await page.locator('//!*[@id="root"]/div/div[2]/dialog[3]/div[1]/!*[name()="svg"]').click();
+    await page.locator('//!*[@id="root"]/div/div[2]/dialog[1]/div[1]/!*[name()="svg"]').click();
     console.log('多签成功！');
 
   });
@@ -290,10 +297,12 @@ test.describe('menu-tool', () => {
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103");
     await page.getByRole('button', {name: '发送'}).click();
-    await page.getByPlaceholder("输入钱包密码").fill('Aa111111');
-    await page.locator('//*[@id="root"]/dialog/div[2]/div/div[3]/button[1]').click();
-    await page.waitForTimeout(10000);
+    await page.locator('//*[@id="root"]/dialog/div[2]/div/div[3]/button[1]/!*[name()="svg"]').click();
+    // await page.locator('//!*[@id="root"]/dialog/div[2]/div/div[3]/button[1]').click();
+    console.log('点击导出交易按钮成功！');
     await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+    // await page.waitForTimeout(10000);
+    await page.getByText('交易导出至').isVisible();
     await page.getByRole('button', {name: '确认'}).click();
     console.log('导出交易成功！');
 
@@ -301,10 +310,13 @@ test.describe('menu-tool', () => {
 
   test("离线签", async () => {
     await ClickSystemMenu.clickMenu('./__tests__/script/', 'offlineSign.scpt');
+    //点击打开按钮不稳定,时间过长时手动点击click
     await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
-    await page.locator('//!*[@id="root"]/div/dialog[1]/div[3]/form/button[2]').click();
+    await page.getByRole('button', {name: '签名并导出'}).click();
     await page.locator('id=password').fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
+    await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
+    await page.locator('dialog').filter({hasText: '交易已被导出至'}).getByLabel('确认').click();
     console.log('离线签成功！');
 
   });
@@ -332,8 +344,9 @@ test.describe('menu-tool', () => {
   });
 });
 
-test.describe('menu-hard wallet', () => {
+/*test.describe('menu-hard wallet', () => {
   test("创建硬件钱包", async () => {
+    await page.waitForTimeout(10000);
     let createHardwallet = await page.getByText('LN-test').isVisible();
     if (!createHardwallet) {
       ClickSystemMenu.clickMenu('/Users/chllp/Desktop/', 'hardWallet.scpt');
@@ -366,14 +379,14 @@ test.describe('menu-hard wallet', () => {
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqw539axnad36dwf45je32w7su70pqp8g6qh7r60q");
     await page.locator("id=amount").fill("106");
     await page.getByRole('button', {name: '发送'}).click();
-    await page.locator('//*[@id="root"]/dialog/div[3]/form/button[2]').click();
+    await page.locator('//!*[@id="root"]/dialog/div[3]/form/button[2]').click();
     await expect(page.getByText('已连接，等待确认...')).toBeVisible();
     console.log('硬件钱包转账成功！');
 
   });
 
 
-});
+});*/
 
 
 /*test("change  to light node ", async () => {
