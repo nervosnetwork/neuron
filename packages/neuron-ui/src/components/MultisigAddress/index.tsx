@@ -492,10 +492,8 @@ const MultisigAddress = () => {
         confirmProps={{ type: 'cancel', className: styles.confirmBtn }}
       >
         <img src={AttentionCloseDialog} alt="Synchronization Abort" />
-        <h4>Synchronization Abort</h4>
-        <p>
-          Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.
-        </p>
+        <h4>{t('multisig-address.synchronization-abort')}</h4>
+        <p>{t('multisig-address.synchronization-abort-msg')}</p>
       </Dialog>
 
       {sendAction.sendFromMultisig && sendAction.isDialogOpen ? (
