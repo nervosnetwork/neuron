@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -28,7 +28,7 @@ const MainContent = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { networkID } = chain
-  const [t, i18n] = useTranslation()
+  const [t] = useTranslation()
 
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
 
@@ -74,7 +74,6 @@ const MainContent = () => {
     navigate,
     dispatch,
   })
-  useOnLocaleChange(i18n)
   const onContextMenu = useOnDefaultContextMenu(t)
   const onCancelGlobalDialog = useCallback(() => {
     dismissGlobalAlertDialog()(dispatch)
