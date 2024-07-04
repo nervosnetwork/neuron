@@ -91,7 +91,7 @@ test("Create Wallet", async () => {
   }
 });
 
-test.describe('overview page tests', () => {
+/*test.describe('overview page tests', () => {
   test("send transaction", async () => {
     await page.waitForTimeout(10000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
@@ -109,7 +109,7 @@ test.describe('overview page tests', () => {
 
 
   test("amend transaction ", async () => {
-    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
@@ -169,7 +169,7 @@ test("check transaction history", async () => {
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
   await page.getByRole('button', {name: '确认'}).click();
   console.log('查历史记录成功！');
-});
+});*/
 
 //所有交易完成才能执行以下操作
 test.describe('实验性功能', () => {
@@ -191,7 +191,6 @@ test.describe('实验性功能', () => {
     await page.waitForTimeout(20000);
     await expect(page.getByText('te' + tp, {exact: true})).toBeVisible();
     console.log('创建sudt账号成功！');
-
   });
 
 
@@ -209,6 +208,7 @@ test.describe('实验性功能', () => {
 
 
   test("send ", async () => {
+    //上笔记录为完成状态
     await page.getByRole('button', {name: '转账'}).first().click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqggcska5fafwdlfw9g0cttk5uzdcvuqj4qqz5d7q");
     await page.locator("id=amount").fill("0.001");

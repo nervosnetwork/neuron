@@ -3,7 +3,7 @@
 2.Install dependencies--yarn install 
 3.Run the package:e2e command 
 4.Run start to complete 100% synchronization
-5.Run the test:e2e  command
+5.Run the test:e2e  command (You can click neuron icon manually if Launch Neuron is slow)
 
 *Regression use cases are divided into ordinary wallets and hardware wallets, and the two chunks need to be operated separately, especially hardware wallets, which involve manually synchronizing the operation of hardware wallets.
 【ordinary wallets】的test cases
@@ -42,7 +42,7 @@ testcases：
 2.Comment out  create ordinary wallet to  case
 3.ledger open the ckb application
 
-*When the neuron program is throw exception like (database lock/output dead/network abnormal)
-/ Garbage data generated when the program is abnormal, etc.), the automation will automatically exit.
+*When the neuron program is throw exception like (database lock/output dead/network abnormal/garbage data generated when the program is abnormal, etc.), the automation will automatically exit.
+![img.png](img.png)
 
 
