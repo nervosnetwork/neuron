@@ -5,7 +5,6 @@ import ClickSystemMenu from '../common/utils';
 let electronApp: ElectronApplication;
 
 
-
 test.beforeAll(async () => {
   electronApp = await electron.launch({args: ["../../packages/neuron-wallet/dist/main.js"]});
   electronApp.on("window", async (page) => {
@@ -91,7 +90,7 @@ test("Create Wallet", async () => {
   }
 });
 
-/*test.describe('overview page tests', () => {
+test.describe('overview page tests', () => {
   test("send transaction", async () => {
     await page.waitForTimeout(10000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
@@ -109,14 +108,13 @@ test("Create Wallet", async () => {
 
 
   test("amend transaction ", async () => {
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
     await page.getByRole('button', {name: '修改'}).click();
     await page.getByTitle('发送').click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: '确认'}).click();
     await expect(page.getByText('已提交').first()).toBeVisible();
     console.log('amend交易成功！');
-    //程序amend提交成功，交易记录为失败并弹窗提示RBFRejected(\"Tx's current fee is 5515, expect it to >= 6432 to replace old txs\")"} Error: {"code":-1111,"message":"PoolRejectedRBF: RBF rejected: Tx's current fee is 5515, expect it to >= 6432 to replace old txs","data":"RBFRejected(\"Tx's current fee is 5515, expect it to >= 6432 to replace old txs\")"}
   });
 //suggestion:this case is run whenwallet balance is large,or you need to increase balance after this case
   test("one cell consume", async () => {
@@ -169,7 +167,8 @@ test("check transaction history", async () => {
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
   await page.getByRole('button', {name: '确认'}).click();
   console.log('查历史记录成功！');
-});*/
+
+});
 
 //所有交易完成才能执行以下操作
 test.describe('实验性功能', () => {
@@ -201,7 +200,7 @@ test.describe('实验性功能', () => {
     console.log('点击地址成功！');
     await expect(page.getByText('已复制')).toBeVisible();
 //关闭窗口
-    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[1]/*[name()="svg"]').click();
+    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[1]/!*[name()="svg"]').click();
     console.log('sudt账号复制成功！');
     await page.waitForTimeout(10000);
   });
@@ -222,12 +221,11 @@ test.describe('实验性功能', () => {
   test("claim in customized page ", async () => {
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('自定义资产').click();
-     await page.getByRole('button', {name: '领取'}).first().isEnabled();
-      await page.getByRole('button', {name: '领取'}).first().click();
-      await page.locator("id=password").fill('Aa111111');
-      await page.getByRole('button', {name: '确认'}).click();
-      console.log('领取自定义资产成功！');
-
+    await page.getByRole('button', {name: '领取'}).first().isEnabled();
+    await page.getByRole('button', {name: '领取'}).first().click();
+    await page.locator("id=password").fill('Aa111111');
+    await page.getByRole('button', {name: '确认'}).click();
+    console.log('领取自定义资产成功！');
 
 
   });
