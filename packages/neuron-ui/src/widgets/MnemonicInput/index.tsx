@@ -13,7 +13,17 @@ const MnemonicInput = ({
   disabled?: boolean
   words: string
   inputsWords: string[]
-  onChangeInputWord: React.ChangeEventHandler<HTMLInputElement>
+  onChangeInputWord: (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | {
+          target: {
+            dataset: { idx: string }
+            value: string
+          }
+        }
+  ) => void
+
   blankIndexes?: number[]
 }) => {
   const wordList = useMemo(() => Object.assign(new Array(12).fill(''), words?.split(' ')), [words])
@@ -23,10 +33,9 @@ const MnemonicInput = ({
 
   const onDropdownClick = useCallback((e: React.SyntheticEvent<HTMLButtonElement>) => {
     const {
-      dataset: { idx, value },
+      dataset: { idx = '', value },
     } = e.target as HTMLButtonElement
     onChangeInputWord({
-      // @ts-expect-error
       target: {
         dataset: { idx },
         value: value || '',

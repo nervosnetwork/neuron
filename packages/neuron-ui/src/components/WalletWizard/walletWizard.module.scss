@@ -176,6 +176,12 @@ $line-gap: 15px;
   }
 }
 
+.tips {
+  font-size: 14px;
+  color: var(--secondary-text-color);
+  margin-top: 12px;
+}
+
 .steps {
   display: flex;
   flex-direction: row;

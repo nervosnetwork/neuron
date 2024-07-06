@@ -311,17 +311,16 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         </div>
       ) : null}
       {type === MnemonicAction.Verify ? <div className={styles.hint}>{t('wizard.input-seed-verify')}</div> : null}
+      <MnemonicInput
+        disabled={isCreate}
+        words={generated}
+        inputsWords={inputsWords}
+        onChangeInputWord={onChangeInput}
+        blankIndexes={MnemonicAction.Import ? undefined : blankIndexes}
+      />
       {type === MnemonicAction.Import ? (
-        <MnemonicInput words={generated} inputsWords={inputsWords} onChangeInputWord={onChangeInput} />
-      ) : (
-        <MnemonicInput
-          disabled={isCreate}
-          words={generated}
-          inputsWords={inputsWords}
-          onChangeInputWord={onChangeInput}
-          blankIndexes={blankIndexes}
-        />
-      )}
+        <div className={styles.tips}>{t('wizard.input-seed-first-empty-space')}</div>
+      ) : null}
       <div className={styles.actions}>
         <Button type="submit" label={t('wizard.next')} onClick={onNext} disabled={disableNext} />
         <Button type="text" label={t('wizard.back')} onClick={onBack} />

@@ -194,6 +194,7 @@
       "complex-password": "Le mot de passe doit contenir entre 8 et 50 caractères, comprenant au moins trois catégories parmi les suivantes : lettres majuscules, lettres minuscules, chiffres et symboles spéciaux.",
       "same-password": "Le mot de passe et la confirmation du mot de passe doivent correspondre",
       "input-seed-verify": "Veuillez entrer la graine correcte du portefeuille ou cliquez sur retour pour recréer le portefeuille",
+      "input-seed-first-empty-space": "Vous pouvez coller l'intégralité de la graine du portefeuille dans le premier espace vide",
       "no-wallet": "Pas de Wallet ?",
       "create-wallet": "Créer un Wallet",
       "repeat-password": "Répéter le mot de passe",

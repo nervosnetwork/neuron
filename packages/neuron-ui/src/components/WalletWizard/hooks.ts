@@ -3,7 +3,16 @@ import { useState, useCallback } from 'react'
 export const useInputWords = () => {
   const [inputsWords, setInputsWords] = useState<string[]>(new Array(12).fill(''))
   const onChangeInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (
+      e:
+        | React.ChangeEvent<HTMLInputElement>
+        | {
+            target: {
+              dataset: { idx: string }
+              value: string
+            }
+          }
+    ) => {
       const idx = Number(e.target.dataset.idx)
       if (Number.isNaN(idx)) return
       const { value } = e.target
