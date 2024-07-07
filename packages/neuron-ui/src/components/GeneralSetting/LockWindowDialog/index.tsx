@@ -13,7 +13,7 @@ const LockWindowDialog = ({
   encryptedPassword,
 }: {
   show: boolean
-  onCancel: () => void
+  onCancel: (success?: boolean) => void
   encryptedPassword?: string
 }) => {
   const [t] = useTranslation()

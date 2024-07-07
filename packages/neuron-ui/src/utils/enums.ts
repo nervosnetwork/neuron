@@ -112,6 +112,7 @@ export enum ErrorCode {
   // active warning
   WaitForFullySynced = 600,
   DuplicateImportWallet = 118,
+  UnsupportedCkbCliKeystore = 119,
 }
 
 export enum SyncStatus {

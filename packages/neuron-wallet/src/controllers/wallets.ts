@@ -22,6 +22,7 @@ import {
   UsedName,
   MainnetAddressRequired,
   TestnetAddressRequired,
+  UnsupportedCkbCliKeystore,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import TransactionSender from '../services/transaction-sender'
@@ -166,6 +167,21 @@ export default class WalletsController {
       throw new InvalidJSON()
     }
     const keystoreObject = Keystore.fromJson(keystore)
+
+    if (keystoreObject.isFromCkbCli()) {
+      throw new UnsupportedCkbCliKeystore()
+    }
+
+    try {
+      keystoreObject.extendedPrivateKey(password)
+    } catch (error) {
+      if (error.message === 'Incorrect password!') {
+        throw new IncorrectPassword()
+      } else {
+        throw error
+      }
+    }
+
     const masterPrivateKey = keystoreObject.extendedPrivateKey(password)
     const masterKeychain = new Keychain(
       Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),

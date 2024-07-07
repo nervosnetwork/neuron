@@ -65,6 +65,7 @@ import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
 import { OutPoint } from '@ckb-lumos/base'
+import { updateApplicationMenu } from './app/menu'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
@@ -317,6 +318,7 @@ export default class ApiController {
 
     handle('update-lock-window-info', async (_, params: { locked?: boolean; password?: string }) => {
       SettingsService.getInstance().updateLockWindowInfo(params)
+      updateApplicationMenu(BrowserWindow.getFocusedWindow())
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().lockWindowInfo,

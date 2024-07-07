@@ -196,6 +196,8 @@
     "import-keystore": {
       "title": "導入 Keystore 文件",
       "select-file": "選擇文件",
+      "import-failure": "導入失敗",
+      "import-failure-msg": "由於不同的 Keystore 文件衍生規則，Neuron 不支持導入 ckb-cli 的 Keystore 文件。",
       "label": {
         "path": "Keystore 檔案",
         "name": "錢包名稱",
@@ -1130,6 +1132,8 @@
         "export": "導出交易"
       },
       "multi-details": "多簽地址詳情",
+      "synchronization-abort": "同步中止",
+      "synchronization-abort-msg": "離開當前窗口將導致多簽同步中止，請確認是否離開。",
       "create-dialog": {
         "title": "創建多重簽名地址",
         "preview-title": "簽名地址已生成",
@@ -1290,8 +1294,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron 窗口已鎖定",
       "enter-lock-password": "輸入鎖屏密碼",
+      "forget-password": "忘記密碼？",
       "lock-password-error": "鎖屏密碼錯誤",
-      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試"
+      "failed-times": "失敗超過 {{frequency}} 次, 請在 {{time}} 後重試",
+      "verify-wallet": "驗證"
     }
   }
 }

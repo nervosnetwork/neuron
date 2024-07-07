@@ -202,6 +202,8 @@
     "import-keystore": {
       "title": "Import Keystore File",
       "select-file": "Choose File",
+      "import-failure": "Import Failure",
+      "import-failure-msg": "Neuron does not support importing ckb-cli's keystore file due to different keystore file derivation rules.",
       "label": {
         "path": "Keystore File",
         "name": "Wallet Name",
@@ -1137,6 +1139,8 @@
         "export": "Export Tx"
       },
       "multi-details": "Multisig address details",
+      "synchronization-abort": "Synchronization Abort",
+      "synchronization-abort-msg": "Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.",
       "create-dialog": {
         "title": "Create multisig address",
         "preview-title": "Multisig address has been generated",
@@ -1301,8 +1305,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron's window has been locked",
       "enter-lock-password": "Enter lock password",
+      "forget-password": "Forget password?",
       "lock-password-error": "Lock windows password error",
-      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}"
+      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}",
+      "verify-wallet": "Verify"
     }
   }
 }

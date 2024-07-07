@@ -69,7 +69,12 @@ export default class CellManagement {
     const addresses = new Set((await AddressService.getAddressesByWalletId(currentWallet.id)).map(v => v.address))
     const isMainnet = NetworksService.getInstance().isMainnet()
     if (!lockScripts.every(v => addresses.has(scriptToAddress(v, isMainnet)))) throw new AddressNotFound()
-    await SignMessage.sign(currentWallet.id, scriptToAddress(lockScripts[0], isMainnet), password, 'verify cell owner')
+    await SignMessage.sign({
+      walletID: currentWallet.id,
+      password,
+      message: 'verify cell owner',
+      address: scriptToAddress(lockScripts[0], isMainnet),
+    })
     return CellLocalInfoService.updateLiveCellLockStatus(outPoints, locked)
   }
 

@@ -398,7 +398,7 @@ export const usePassword = () => {
 }
 
 export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: TFunction }) => {
-  const isWin32 = useMemo(() => {
+  const isWin32 = useMemo<boolean>(() => {
     return getPlatform() === 'win32'
   }, [])
   const [error, setError] = useState<ErrorCode | string | undefined>()
