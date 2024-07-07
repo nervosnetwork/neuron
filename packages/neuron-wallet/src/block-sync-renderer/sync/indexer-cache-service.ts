@@ -194,7 +194,7 @@ export default class IndexerCacheService {
     const txsWithStatus: TransactionWithStatus[] = []
     const fetchBlockDetailsQueue = queue(async (hash: string) => {
       const txWithStatus = await this.rpcService.getTransaction(hash)
-      if (!txWithStatus) {
+      if (!txWithStatus?.transaction) {
         return
       }
       const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
