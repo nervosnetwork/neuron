@@ -1,6 +1,6 @@
-import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/lumos'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import OutputEntity from '../../src/database/chain/entities/output'
 import InputEntity from '../../src/database/chain/entities/input'
 import { OutputStatus } from '../../src/models/chain/output'

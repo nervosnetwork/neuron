@@ -1,6 +1,8 @@
 import { DeviceInfo } from '../../src/services/hardware/common'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import type { Subscriber } from 'rxjs'
+
+const { AddressType } = hd
 
 enum Manufacturer {
   Ledger = 'Ledger',

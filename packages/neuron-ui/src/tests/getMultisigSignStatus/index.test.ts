@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals'
 import { MultisigConfig } from 'services/remote'
 import { addressToScript, getMultisigSignStatus } from 'utils'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 
 const addresses = [
   'ckt1qyqwh5hmt8j59njztrfz6z0s9wug3nv5qysqrnfm2h',

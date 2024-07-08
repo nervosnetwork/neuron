@@ -100,6 +100,8 @@ declare namespace RPC {
         }
     time_added_to_pool: Uint64 | null
     cycles: Uint64 | null
+    fee: Uint64
+    min_replace_fee: Uint64
   }
   export interface TransactionPoint {
     block_number: BlockNumber

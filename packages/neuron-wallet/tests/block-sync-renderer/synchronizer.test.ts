@@ -1,6 +1,6 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
-import { QueryOptions, type Cell } from '@ckb-lumos/base'
+import { hd, type Cell } from '@ckb-lumos/lumos'
+import { QueryOptions } from '@ckb-lumos/base'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Synchronizer } from '../../src/block-sync-renderer/sync/synchronizer'
@@ -40,7 +40,7 @@ const addressObj1: Address = {
   blake160: '0x',
   walletId: walletId1,
   path: '',
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
   txCount: 0,
   liveBalance: '',
@@ -54,7 +54,7 @@ const addressObj2: Address = {
   blake160: '0x',
   walletId: walletId2,
   path: '',
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
   txCount: 0,
   liveBalance: '',
@@ -74,7 +74,7 @@ const resetMocks = () => {
   stubbedCellCellectFn.mockReset()
 }
 
-jest.mock('@ckb-lumos/ckb-indexer', () => {
+jest.mock('@ckb-lumos/lumos', () => {
   return {
     Indexer: class {
       constructor(...params: unknown[]) {

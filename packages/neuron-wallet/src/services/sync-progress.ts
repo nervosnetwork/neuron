@@ -1,5 +1,5 @@
 import { In, LessThan, Not } from 'typeorm'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
 import { getConnection } from '../database/chain/connection'

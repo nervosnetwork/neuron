@@ -1,11 +1,15 @@
 import { v4 as uuid } from 'uuid'
 import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
-import { Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
 import { DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
+
+const { Keystore, AccountExtendedPublicKey } = hd
+type Keystore = hd.Keystore
+type AccountExtendedPublicKey = hd.AccountExtendedPublicKey
 
 import FileService from './file'
 import AddressService from './addresses'

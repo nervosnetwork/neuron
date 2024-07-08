@@ -4,9 +4,8 @@ import { prefixWith0x } from '../utils/scriptAndAddress'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
 import NetworksService from '../services/networks'
-import { bytes } from '@ckb-lumos/codec'
-import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
-import { generateMnemonic, validateMnemonic, mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
+import { bytes } from '@ckb-lumos/lumos/codec'
+import { hd } from '@ckb-lumos/lumos'
 import CommandSubject from '../models/subjects/command'
 import { ResponseCode } from '../utils/const'
 import {
@@ -33,6 +32,9 @@ import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import AddressParser from '../models/address-parser'
 import MultisigConfigModel from '../models/multisig-config'
 import { generateRPC } from '../utils/ckb-rpc'
+
+const { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey, mnemonic } = hd
+const { generateMnemonic, validateMnemonic, mnemonicToSeedSync } = mnemonic
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {

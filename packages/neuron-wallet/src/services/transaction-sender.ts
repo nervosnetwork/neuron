@@ -18,7 +18,7 @@ import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import { signWitnesses } from '../utils/signWitnesses'
-import { bytes, number } from '@ckb-lumos/codec'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -41,10 +41,12 @@ import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
-import { key, Keychain } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
-import { dao } from '@ckb-lumos/common-scripts'
+import { dao } from '@ckb-lumos/lumos/common-scripts'
+
+const { key, Keychain } = hd
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -417,13 +419,13 @@ export default class TransactionSender {
     const serializedEmptyWitnessSize = bytes.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
+    blake2b.update(bytes.hexify(Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
       const byteLength = bytes.bytify(wit).byteLength
-      blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
+      blake2b.update(bytes.hexify(Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
 

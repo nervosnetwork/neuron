@@ -3,12 +3,12 @@ import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
 import { NavigateFunction } from 'react-router-dom'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
 import { rpc, getHeader } from 'services/chain'
 import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
-import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/common-scripts/lib/dao'
+import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/lumos/common-scripts/dao'
 
 const { MILLISECONDS_IN_YEAR, MEDIUM_FEE_RATE } = CONSTANTS
 

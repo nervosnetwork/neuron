@@ -7,8 +7,10 @@ import Multisig from '../../models/multisig'
 import WalletService from '../../services/wallets'
 import DeviceSignIndexSubject from '../../models/subjects/device-sign-index-subject'
 import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
-import { AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import AssetAccountInfo from '../../models/asset-account-info'
+
+const { AccountExtendedPublicKey } = hd
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo

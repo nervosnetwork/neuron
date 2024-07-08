@@ -1,8 +1,10 @@
 import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 import { systemScripts } from '../../../src/utils/systemScripts'
 import { NetworkType } from '../../../src/models/network'
+
+const { AddressType } = hd
 
 const stubbedIsMainnet = jest.fn()
 

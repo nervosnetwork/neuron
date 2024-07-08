@@ -1,7 +1,7 @@
 import Script from './script'
 import OutPoint from './out-point'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
-import { BI } from '@ckb-lumos/bi'
+import { bytes as byteUtils } from '@ckb-lumos/lumos/codec'
+import { BI } from '@ckb-lumos/lumos'
 import TypeChecker from '../../utils/type-checker'
 
 // sent: pending transaction's output

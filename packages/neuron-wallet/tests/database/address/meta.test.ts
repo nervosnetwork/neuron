@@ -1,8 +1,10 @@
 import { Address, AddressVersion } from '../../../src/models/address'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import AddressMeta from '../../../src/database/address/meta'
 import Multisig from '../../../src/models/multisig'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
+
+const { AddressType } = hd
 
 describe('Address Dao tests', () => {
   const address: Address = {

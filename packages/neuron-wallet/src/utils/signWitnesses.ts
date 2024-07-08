@@ -1,7 +1,9 @@
-import { bytes, number } from '@ckb-lumos/codec'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
 import { serializeWitnessArgs } from './serialization'
-import { CKBHasher } from '@ckb-lumos/base/lib/utils'
-import { key } from '@ckb-lumos/hd'
+import { CKBHasher } from '@ckb-lumos/lumos/utils'
+import { hd } from '@ckb-lumos/lumos'
+
+const { key } = hd
 
 type StructuredWitness = CKBComponents.WitnessArgs | CKBComponents.Witness
 
@@ -31,12 +33,12 @@ export const signWitnesses = ({
 
   const hasher = new CKBHasher()
   hasher.update(transactionHash)
-  hasher.update(number.Uint64LE.pack(serializedEmptyWitnessSize))
+  hasher.update(Uint64LE.pack(serializedEmptyWitnessSize))
   hasher.update(serializedEmptyWitnessBytes)
 
   witnesses.slice(1).forEach(witness => {
     const witnessBytes = bytes.bytify(typeof witness === 'string' ? witness : serializeWitnessArgs(witness))
-    hasher.update(number.Uint64LE.pack(witnessBytes.byteLength))
+    hasher.update(Uint64LE.pack(witnessBytes.byteLength))
     hasher.update(witnessBytes)
   })
   const message = hasher.digestHex()

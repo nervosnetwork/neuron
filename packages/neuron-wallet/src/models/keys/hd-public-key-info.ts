@@ -1,7 +1,10 @@
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
+
+const { AccountExtendedPublicKey } = hd
+type AddressType = hd.AddressType
 
 export default class HdPublicKeyInfoModel {
   public walletId: string

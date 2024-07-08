@@ -1,9 +1,10 @@
 import WalletService from '../../src/services/wallets'
-import { bytes } from '@ckb-lumos/codec'
-import { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } from '@ckb-lumos/hd'
-import { mnemonicToSeedSync } from '@ckb-lumos/hd/lib/mnemonic'
+import { bytes } from '@ckb-lumos/lumos/codec'
+import { hd } from '@ckb-lumos/lumos'
 import TransactionSender from '../../src/services/transaction-sender'
 import { signWitnesses } from '../../src/utils/signWitnesses'
+
+const { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } = hd
 
 describe('sign witness', () => {
   const witness = {
@@ -41,7 +42,7 @@ describe('get keys with paths', () => {
   })
 
   it('get keys', () => {
-    const seed = mnemonicToSeedSync(mnemonic)
+    const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)
     const masterKeychain = Keychain.fromSeed(seed)
     const extendedKey = new ExtendedPrivateKey(
       bytes.hexify(masterKeychain.privateKey),

@@ -1,12 +1,14 @@
 import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
 import Blake2b from '../models/blake2b'
-import { key, Keychain } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
+
+const { key, Keychain } = hd
 
 export default class SignMessage {
   static GENERATE_COUNT = 100

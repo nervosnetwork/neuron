@@ -7,10 +7,12 @@ import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from '../../models/chain/transaction'
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import logger from '../../utils/logger'
 import NetworksService from '../../services/networks'
 import { generateRPC } from '../../utils/ckb-rpc'
+
+const { AddressType, AccountExtendedPublicKey } = hd
 
 const UNCOMPRESSED_KEY_LENGTH = 130
 const compressPublicKey = (key: string) => {

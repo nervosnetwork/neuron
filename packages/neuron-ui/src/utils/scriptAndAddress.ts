@@ -1,8 +1,7 @@
-import { type Script } from '@ckb-lumos/base'
-import { predefined } from '@ckb-lumos/config-manager'
-import { encodeToAddress, parseAddress, generateAddress } from '@ckb-lumos/helpers'
-
-const { LINA: MAINNET, AGGRON4: TESTNET } = predefined
+import { type Script } from '@ckb-lumos/lumos'
+import { MAINNET, TESTNET } from '@ckb-lumos/lumos/config'
+import { encodeToAddress, parseAddress } from '@ckb-lumos/lumos/helpers'
+import { generateAddress } from '@ckb-lumos/helpers'
 
 const CONFIGS = {
   [MAINNET.PREFIX]: MAINNET,

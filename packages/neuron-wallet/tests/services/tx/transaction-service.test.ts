@@ -32,7 +32,7 @@ jest.mock('../../../src/services/rpc-service', () => {
 })
 
 const ckbRpcExecMock = jest.fn()
-jest.mock('@ckb-lumos/rpc', () => {
+jest.mock('@ckb-lumos/lumos', () => {
   return {
     CKBRPC: class CKBRPC {
       url: string

@@ -11,13 +11,15 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import OutPoint from '../../src/models/chain/out-point'
 import { when } from 'jest-when'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import Script from '../../src/models/chain/script'
 import Input from '../../src/models/chain/input'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
+
+const { AddressType } = hd
 
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()

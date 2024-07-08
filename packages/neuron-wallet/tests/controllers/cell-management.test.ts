@@ -1,4 +1,4 @@
-import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/lumos'
 import CellManagement from '../../src/controllers/cell-management'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
 import { AddressNotFound, CurrentWalletNotSet } from '../../src/exceptions'

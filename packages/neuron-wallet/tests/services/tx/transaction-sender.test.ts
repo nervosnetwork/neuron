@@ -1,4 +1,5 @@
-import { bytes } from '@ckb-lumos/codec'
+import { CKBComponents } from '@ckb-lumos/lumos/rpc'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import 'dotenv/config'
 
 const stubbedRPCServiceConstructor = jest.fn()
@@ -145,7 +146,7 @@ jest.doMock('services/hardware', () => ({
   }),
 }))
 
-jest.doMock('@ckb-lumos/rpc', () => {
+jest.doMock('@ckb-lumos/lumos', () => {
   return {
     CKBRPC: class CKBRPC {
       url: string
@@ -158,7 +159,7 @@ jest.doMock('@ckb-lumos/rpc', () => {
   }
 })
 
-jest.doMock('@ckb-lumos/common-scripts', () => {
+jest.doMock('@ckb-lumos/lumos/common-scripts', () => {
   return {
     dao: {
       calculateMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
@@ -187,7 +188,7 @@ import OutPoint from '../../../src/models/chain/out-point'
 import Input from '../../../src/models/chain/input'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Output from '../../../src/models/chain/output'
-import { AddressType, Keystore } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
@@ -203,6 +204,8 @@ import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
 import { addressToScript } from '../../../src/utils/scriptAndAddress'
 import { serializeWitnessArgs } from '../../../src/utils/serialization'
+
+const { AddressType, Keystore } = hd
 
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',

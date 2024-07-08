@@ -1,6 +1,6 @@
 import OutPoint from './out-point'
 import Script from './script'
-import { BI } from '@ckb-lumos/bi'
+import { BI } from '@ckb-lumos/lumos'
 import TypeChecker from '../../utils/type-checker'
 import { OutputStatus } from './output'
 

@@ -1,8 +1,10 @@
 import { when } from 'jest-when'
 import { WalletFunctionNotSupported, DuplicateImportWallet } from '../../src/exceptions/wallet'
-import { AddressType, Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { Manufacturer } from '../../src/services/hardware/common'
 import { prefixWith0x } from '../../src/utils/scriptAndAddress'
+
+const { AddressType, Keystore, AccountExtendedPublicKey } = hd
 
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyQueue = jest.fn()

@@ -1,4 +1,4 @@
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { publicKeyToAddress, DefaultAddressNumber } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
@@ -14,6 +14,10 @@ import AddressDescription from '../database/chain/entities/address-description'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressMeta from '../database/address/meta'
 import queueWrapper from '../utils/queue'
+
+const { AddressType } = hd
+type AccountExtendedPublicKey = hd.AccountExtendedPublicKey
+type AddressType = hd.AddressType
 
 const MAX_ADDRESS_COUNT = 100
 
