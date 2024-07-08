@@ -77,7 +77,13 @@ const Dialog = ({
     <dialog
       ref={dialogRef}
       className={`${styles.dialogWrap} ${className}`}
-      onKeyDown={e => (e.key === 'Escape' && enableCloseWithEsc ? onCancel : undefined)}
+      onKeyDown={e => {
+        if (e.key === 'Escape' && enableCloseWithEsc) {
+          onCancel?.()
+        } else if (e.key === 'Enter' && showFooter && showConfirm) {
+          handleConfirm(e)
+        }
+      }}
       role="none"
     >
       {showHeader ? (

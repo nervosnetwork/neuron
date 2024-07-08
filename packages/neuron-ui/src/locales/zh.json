@@ -195,6 +195,8 @@
     "import-keystore": {
       "title": "导入 Keystore 文件",
       "select-file": "选择文件",
+      "import-failure": "导入失败",
+      "import-failure-msg": "由于不同的 Keystore 文件派生规则，Neuron 不支持导入 ckb-cli 的 Keystore 文件。",
       "label": {
         "path": "Keystore 文件",
         "name": "钱包名称",
@@ -811,7 +813,8 @@
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
       "install-update": "立即更新",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
-      "quit-and-install": "安装并重启应用"
+      "quit-and-install-restart": "安装并重启应用",
+      "quit-and-install": "立即安装"
     },
     "datetime": {
       "mon": {
@@ -1128,6 +1131,8 @@
         "export": "导出交易"
       },
       "multi-details": "多签地址详情",
+      "synchronization-abort": "同步中止",
+      "synchronization-abort-msg": "离开当前窗口将导致多签同步中止，请确认是否离开。",
       "create-dialog": {
         "title": "创建多重签名地址",
         "preview-title": "多签地址已生成",
@@ -1292,8 +1297,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron 窗口已锁定",
       "enter-lock-password": "输入锁屏密码",
+      "forget-password": "忘记密码？",
       "lock-password-error": "锁屏密码错误",
-      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试"
+      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试",
+      "verify-wallet": "验证"
     }
   }
 }

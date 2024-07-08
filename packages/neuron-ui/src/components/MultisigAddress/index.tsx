@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  useOnLocaleChange,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
   useExitOnWalletChange,
@@ -84,8 +83,7 @@ const LearnMore = React.memo(({ t }: { t: TFunction }) => (
 ))
 
 const MultisigAddress = () => {
-  const [t, i18n] = useTranslation()
-  useOnLocaleChange(i18n)
+  const [t] = useTranslation()
   useExitOnWalletChange()
   const {
     wallet: { id: walletId, addresses },
@@ -492,10 +490,8 @@ const MultisigAddress = () => {
         confirmProps={{ type: 'cancel', className: styles.confirmBtn }}
       >
         <img src={AttentionCloseDialog} alt="Synchronization Abort" />
-        <h4>Synchronization Abort</h4>
-        <p>
-          Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.
-        </p>
+        <h4>{t('multisig-address.synchronization-abort')}</h4>
+        <p>{t('multisig-address.synchronization-abort-msg')}</p>
       </Dialog>
 
       {sendAction.sendFromMultisig && sendAction.isDialogOpen ? (

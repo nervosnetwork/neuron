@@ -20,6 +20,13 @@
     &[data-has-err='true'] {
       color: var(--error-color);
     }
+
+    & > button {
+      border: none;
+      color: var(--primary-color);
+      background-color: transparent;
+      cursor: pointer;
+    }
   }
 
   .passwordContainer {
@@ -51,5 +58,14 @@
   .video {
     width: 88px;
     height: 88px;
+  }
+}
+
+.verifyWallet {
+  min-width: 600px;
+
+  .hardwalletErr {
+    justify-content: center;
+    margin-top: 12px;
   }
 }

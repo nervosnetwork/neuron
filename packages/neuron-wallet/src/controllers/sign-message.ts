@@ -4,12 +4,10 @@ import { ResponseCode } from '../utils/const'
 
 export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
-    const signature: string = await SignMessage.sign(
-      params.walletID,
-      params.address.trim(),
-      params.password,
-      params.message
-    )
+    const signature: string = await SignMessage.sign({
+      ...params,
+      address: params.address?.trim(),
+    })
     if (!signature) {
       throw new ServiceHasNoResponse('Sign')
     }

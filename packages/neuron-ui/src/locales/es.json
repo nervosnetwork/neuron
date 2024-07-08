@@ -194,6 +194,8 @@
     "import-keystore": {
       "title": "Importar Keystore",
       "select-file": "Seleccionar Archivo",
+      "import-failure": "Error de importación",
+      "import-failure-msg": "Neuron no soporta la importación del archivo keystore de ckb-cli debido a diferentes reglas de derivación del archivo keystore.",
       "label": {
         "path": "Archivo de Claves",
         "name": "Nombre de la Billetera",
@@ -801,7 +803,8 @@
       "updates-found-do-you-want-to-update": "Hay una actualización ({{versión}}) disponible",
       "install-update": "Actualización inmediata",
       "updates-downloaded-about-to-quit-and-install": "Actualización descargada. Listo para instalar y reiniciar.",
-      "quit-and-install": "Instalar y reiniciar"
+      "quit-and-install-restart": "Instalar y reiniciar",
+      "quit-and-install": "Inmediata Instalar"
     },
     "datetime": {
       "mon": {
@@ -1119,6 +1122,8 @@
         "export": "Exportar Tx"
       },
       "multi-details": "Detalles de la dirección multifirma",
+      "synchronization-abort": "Abortar sincronización",
+      "synchronization-abort-msg": "Salir de la ventana actual provocará que se aborte la sincronización de multisig, por favor confirme si desea salir.",
       "create-dialog": {
         "title": "Crear dirección multifirma",
         "preview-title": "La dirección multifirma se ha generado",
@@ -1280,8 +1285,10 @@
     "lock-window": {
       "neuron-is-locked": "La ventana de Neuron está bloqueada",
       "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "forget-password": "Olvidé mi contraseña?",
       "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
-      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}",
+      "verify-wallet": "Verificar"
     }
   }
 }
