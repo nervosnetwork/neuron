@@ -4,6 +4,7 @@ import { Method as SdkRpcMethod } from '@ckb-lumos/rpc/lib/method'
 import {
   ResultFormatter as resultFormatter,
   ParamsFormatter as paramsFormatter,
+  type CKBComponents,
   type ParamsFormatter,
 } from '@ckb-lumos/lumos/rpc'
 import { Base } from '@ckb-lumos/rpc/lib/Base'
@@ -16,12 +17,11 @@ import { request } from 'undici'
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
-import type { CKBComponents } from '@ckb-lumos/lumos/rpc'
 
 export interface LightScriptFilter {
   script: Script
   blockNumber: CKBComponents.BlockNumber
-  scriptType: CKBRPC.ScriptType
+  scriptType: CKBComponents.ScriptType
 }
 
 export type LightScriptSyncStatus = LightScriptFilter
