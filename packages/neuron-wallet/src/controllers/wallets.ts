@@ -232,7 +232,7 @@ export default class WalletsController {
       throw new WalletNotFound(id)
     }
 
-    const props: { name: string; keystore?: Keystore; device?: DeviceInfo; startBlockNumber?: string } = {
+    const props: { name: string; keystore?: hd.Keystore; device?: DeviceInfo; startBlockNumber?: string } = {
       name: name || wallet.name,
       startBlockNumber,
     }
