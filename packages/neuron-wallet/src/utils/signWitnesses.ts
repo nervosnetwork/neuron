@@ -3,8 +3,6 @@ import { serializeWitnessArgs } from './serialization'
 import { CKBHasher } from '@ckb-lumos/lumos/utils'
 import { hd } from '@ckb-lumos/lumos'
 
-const { key } = hd
-
 type StructuredWitness = CKBComponents.WitnessArgs | CKBComponents.Witness
 
 // https://github.com/nervosnetwork/ckb-system-scripts/wiki/How-to-sign-transaction#signing
@@ -43,6 +41,6 @@ export const signWitnesses = ({
   })
   const message = hasher.digestHex()
 
-  emptyWitness.lock = key.signRecoverable(message, privateKey)
+  emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
   return [serializeWitnessArgs(emptyWitness), ...witnesses.slice(1)]
 }

@@ -46,8 +46,6 @@ import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/lumos/common-scripts'
 
-const { key, Keychain } = hd
-
 interface SignInfo {
   witnessArgs: WitnessArgs
   lockHash: string
@@ -434,7 +432,7 @@ export default class TransactionSender {
     if (!wallet.isHardware()) {
       // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
-      emptyWitness.lock = key.signRecoverable(message, privateKey)
+      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]
@@ -932,7 +930,7 @@ export default class TransactionSender {
   // Derive all child private keys for specified BIP44 paths.
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
-    const masterKeychain = new Keychain(
+    const masterKeychain = new hd.Keychain(
       Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
       Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )

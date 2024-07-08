@@ -19,8 +19,6 @@ import Script from '../../src/models/chain/script'
 import Input from '../../src/models/chain/input'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 
-const { AddressType } = hd
-
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()
 const stubbedGenerateWithdrawChequeTx = jest.fn()
@@ -148,7 +146,7 @@ describe('AssetAccountService', () => {
 
     const keyInfo = HdPublicKeyInfo.fromObject({
       walletId,
-      addressType: AddressType.Receiving,
+      addressType: hd.AddressType.Receiving,
       addressIndex: 0,
       publicKeyInBlake160: blake160,
     })

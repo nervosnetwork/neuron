@@ -1,12 +1,9 @@
 import type { HexString, Block, Script } from '@ckb-lumos/lumos'
-import { RPC as CKBRPC } from '@ckb-lumos/lumos'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import { Method as SdkRpcMethod } from '@ckb-lumos/rpc/lib/method'
-import {
-  ResultFormatter as resultFormatter,
-  ParamsFormatter as paramsFormatter,
-  type CKBComponents,
-  type ParamsFormatter,
-} from '@ckb-lumos/lumos/rpc'
+import { type CKBComponents, type ParamsFormatter } from '@ckb-lumos/lumos/rpc'
+import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
+import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
 import { Base } from '@ckb-lumos/rpc/lib/Base'
 import {
   MethodInBatchNotFoundException,
@@ -67,7 +64,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [
       (searchKey: {
         script: CKBComponents.Script
-        scriptType: CKBRPC.ScriptType
+        scriptType: CKBComponents.ScriptType
         blockRange: [HexString, HexString]
       }) => ({
         script: {
@@ -149,7 +146,11 @@ export class LightRPC extends Base {
   // TODO: the type is not the same as full node here
   // @ts-ignore
   getTransactions: (
-    searchKey: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; blockRange: [HexString, HexString] },
+    searchKey: {
+      script: CKBComponents.Script
+      scriptType: CKBComponents.ScriptType
+      blockRange: [HexString, HexString]
+    },
     order: 'asc' | 'desc',
     limit: HexString,
     afterCursor: HexString

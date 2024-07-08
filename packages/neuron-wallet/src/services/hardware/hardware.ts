@@ -10,12 +10,10 @@ import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
 import { hd } from '@ckb-lumos/lumos'
 import AssetAccountInfo from '../../models/asset-account-info'
 
-const { AccountExtendedPublicKey } = hd
-
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
   public isConnected: boolean
-  protected defaultPath = AccountExtendedPublicKey.ckbAccountPath
+  protected defaultPath = hd.AccountExtendedPublicKey.ckbAccountPath
 
   constructor(device: DeviceInfo) {
     this.deviceInfo = device

@@ -69,8 +69,13 @@
     "react-refresh": "0.14.0",
     "node-fetch": "2.6.13",
     "@ckb-lumos/ckb-indexer": "0.23.0",
-    "@ckb-lumos/rpc": "0.23.0",
-    "@ckb-lumos/lumos": "0.23.0"
+    "@ckb-lumos/base": "0.23.0",
+    "@ckb-lumos/bi": "0.23.0",
+    "@ckb-lumos/codec": "0.23.0",
+    "@ckb-lumos/common-scripts": "0.23.0",
+    "@ckb-lumos/config-manager": "0.23.0",
+    "@ckb-lumos/lumos": "0.23.0",
+    "@ckb-lumos/rpc": "0.23.0"
   },
   "volta": {
     "node": "20.10.0"

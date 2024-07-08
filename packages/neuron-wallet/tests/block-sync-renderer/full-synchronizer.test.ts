@@ -54,7 +54,7 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('@ckb-lumos/lumos', () => {
+  jest.doMock('@ckb-lumos/ckb-indexer', () => {
     return {
       Indexer: stubbedIndexerConstructor.mockImplementation(() => ({
         tip: stubbedTipFn,

@@ -15,17 +15,13 @@ import AddressDbChangedSubject from '../models/subjects/address-db-changed-subje
 import AddressMeta from '../database/address/meta'
 import queueWrapper from '../utils/queue'
 
-const { AddressType } = hd
-type AccountExtendedPublicKey = hd.AccountExtendedPublicKey
-type AddressType = hd.AddressType
-
 const MAX_ADDRESS_COUNT = 100
 
 export interface AddressMetaInfo {
   walletId: string
-  addressType: AddressType
+  addressType: hd.AddressType
   addressIndex: number
-  accountExtendedPublicKey: AccountExtendedPublicKey
+  accountExtendedPublicKey: hd.AccountExtendedPublicKey
 }
 
 export default class AddressService {
@@ -62,7 +58,7 @@ export default class AddressService {
 
   private static async generateAndSave(
     walletId: string,
-    extendedKey: AccountExtendedPublicKey,
+    extendedKey: hd.AccountExtendedPublicKey,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
@@ -94,7 +90,7 @@ export default class AddressService {
 
   private static async recursiveGenerateAndSave(
     walletId: string,
-    extendedKey: AccountExtendedPublicKey,
+    extendedKey: hd.AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
@@ -105,8 +101,8 @@ export default class AddressService {
       changeAddressCount
     )
     if (!receivingCount && !changeCount) return undefined
-    const maxReceivingAddressIndex = await this.maxAddressIndex(walletId, AddressType.Receiving)
-    const maxChangeAddressIndex = await this.maxAddressIndex(walletId, AddressType.Change)
+    const maxReceivingAddressIndex = await this.maxAddressIndex(walletId, hd.AddressType.Receiving)
+    const maxChangeAddressIndex = await this.maxAddressIndex(walletId, hd.AddressType.Change)
     const nextReceivingIndex = maxReceivingAddressIndex === undefined ? 0 : maxReceivingAddressIndex + 1
     const nextChangeIndex = maxChangeAddressIndex === undefined ? 0 : maxChangeAddressIndex + 1
 
@@ -163,7 +159,7 @@ export default class AddressService {
     changeAddressCount,
   }: {
     walletId: string
-    extendedKey: AccountExtendedPublicKey
+    extendedKey: hd.AccountExtendedPublicKey
     isImporting?: boolean
     receivingAddressCount?: number
     changeAddressCount?: number
@@ -191,7 +187,7 @@ export default class AddressService {
   }: {
     walletId: string
     publicKey: string
-    addressType: AddressType
+    addressType: hd.AddressType
     addressIndex: number
   }): Promise<AddressInterface | undefined> {
     const isMainnet = NetworksService.getInstance().isMainnet()
@@ -227,7 +223,7 @@ export default class AddressService {
   // Generate both receiving and change addresses.
   public static generateAddresses = (
     walletId: string,
-    extendedKey: AccountExtendedPublicKey,
+    extendedKey: hd.AccountExtendedPublicKey,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
@@ -242,7 +238,7 @@ export default class AddressService {
     const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => {
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
-        addressType: AddressType.Receiving,
+        addressType: hd.AddressType.Receiving,
         addressIndex: idx + receivingStartIndex,
         accountExtendedPublicKey: extendedKey,
       }
@@ -251,7 +247,7 @@ export default class AddressService {
     const change = Array.from({ length: changeAddressCount }).map((_, idx) => {
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
-        addressType: AddressType.Change,
+        addressType: hd.AddressType.Change,
         addressIndex: idx + changeStartIndex,
         accountExtendedPublicKey: extendedKey,
       }
@@ -281,7 +277,7 @@ export default class AddressService {
     return address
   }
 
-  private static async maxAddressIndex(walletId: string, addressType: AddressType): Promise<number | undefined> {
+  private static async maxAddressIndex(walletId: string, addressType: hd.AddressType): Promise<number | undefined> {
     const result = await getConnection()
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
@@ -300,8 +296,8 @@ export default class AddressService {
   private static async getGroupedUnusedAddressesByWalletId(walletId: string) {
     const allUnusedAddresses = await this.getUnusedAddressesByWalletId(walletId)
 
-    const unusedReceivingAddresses = allUnusedAddresses.filter(addr => addr.addressType === AddressType.Receiving)
-    const unusedChangeAddresses = allUnusedAddresses.filter(addr => addr.addressType === AddressType.Change)
+    const unusedReceivingAddresses = allUnusedAddresses.filter(addr => addr.addressType === hd.AddressType.Receiving)
+    const unusedChangeAddresses = allUnusedAddresses.filter(addr => addr.addressType === hd.AddressType.Change)
 
     return [unusedReceivingAddresses, unusedChangeAddresses]
   }
@@ -353,7 +349,7 @@ export default class AddressService {
     const publicKeyInfo = await getConnection()
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
-      .where({ walletId, addressType: AddressType.Receiving })
+      .where({ walletId, addressType: hd.AddressType.Receiving })
       .orderBy('addressIndex', 'ASC')
       .getOne()
 

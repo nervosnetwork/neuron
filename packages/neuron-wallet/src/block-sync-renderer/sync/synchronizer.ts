@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
 import { type QueryOptions } from '@ckb-lumos/base'
-import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/lumos'
+import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 import AddressMeta from '../../database/address/meta'
 import { Address } from '../../models/address'
 import IndexerCacheService from './indexer-cache-service'

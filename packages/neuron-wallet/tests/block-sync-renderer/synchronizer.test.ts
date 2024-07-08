@@ -1,5 +1,5 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { hd, type Cell } from '@ckb-lumos/lumos'
+import { type Cell, hd } from '@ckb-lumos/lumos'
 import { QueryOptions } from '@ckb-lumos/base'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
@@ -74,7 +74,7 @@ const resetMocks = () => {
   stubbedCellCellectFn.mockReset()
 }
 
-jest.mock('@ckb-lumos/lumos', () => {
+jest.mock('@ckb-lumos/ckb-indexer', () => {
   return {
     Indexer: class {
       constructor(...params: unknown[]) {

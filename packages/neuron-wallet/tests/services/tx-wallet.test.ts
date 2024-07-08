@@ -4,8 +4,6 @@ import { hd } from '@ckb-lumos/lumos'
 import TransactionSender from '../../src/services/transaction-sender'
 import { signWitnesses } from '../../src/utils/signWitnesses'
 
-const { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey } = hd
-
 describe('sign witness', () => {
   const witness = {
     lock: undefined,
@@ -43,17 +41,17 @@ describe('get keys with paths', () => {
 
   it('get keys', () => {
     const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)
-    const masterKeychain = Keychain.fromSeed(seed)
-    const extendedKey = new ExtendedPrivateKey(
+    const masterKeychain = hd.Keychain.fromSeed(seed)
+    const extendedKey = new hd.ExtendedPrivateKey(
       bytes.hexify(masterKeychain.privateKey),
       bytes.hexify(masterKeychain.chainCode)
     )
     const privateKey = bytes.hexify(masterKeychain.derivePath(receivingPath).privateKey)
     expect(privateKey).toEqual(receivingPrivateKey)
-    const keystore = Keystore.create(extendedKey, password)
+    const keystore = hd.Keystore.create(extendedKey, password)
 
-    const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
-    const accountExtendedPublicKey = new AccountExtendedPublicKey(
+    const accountKeychain = masterKeychain.derivePath(hd.AccountExtendedPublicKey.ckbAccountPath)
+    const accountExtendedPublicKey = new hd.AccountExtendedPublicKey(
       bytes.hexify(accountKeychain.publicKey),
       bytes.hexify(accountKeychain.chainCode)
     )

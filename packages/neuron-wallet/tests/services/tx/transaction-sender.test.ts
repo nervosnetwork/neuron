@@ -146,7 +146,7 @@ jest.doMock('services/hardware', () => ({
   }),
 }))
 
-jest.doMock('@ckb-lumos/lumos', () => {
+jest.doMock('@ckb-lumos/lumos/rpc', () => {
   return {
     CKBRPC: class CKBRPC {
       url: string
@@ -205,8 +205,6 @@ import Multisig from '../../../src/models/multisig'
 import { addressToScript } from '../../../src/utils/scriptAndAddress'
 import { serializeWitnessArgs } from '../../../src/utils/serialization'
 
-const { AddressType, Keystore } = hd
-
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
   '0x36c329ed630d6ce750712a477543672adab57f4c',
@@ -259,7 +257,7 @@ describe('TransactionSender Test', () => {
     name: 'wallet-test1',
     id: '11',
     extendedKey: 'a',
-    keystore: new Keystore(
+    keystore: new hd.Keystore(
       {
         cipher: 'wallet1',
         cipherparams: { iv: 'wallet1' },
@@ -328,7 +326,7 @@ describe('TransactionSender Test', () => {
       walletId: fakeWallet.id,
       address: '',
       path: `m/44'/309'/0'/0/0`,
-      addressType: AddressType.Receiving,
+      addressType: hd.AddressType.Receiving,
       addressIndex: 1,
       txCount: 0,
       liveBalance: '0',

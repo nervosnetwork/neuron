@@ -4,14 +4,12 @@ import AddressMeta from '../../../src/database/address/meta'
 import Multisig from '../../../src/models/multisig'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 
-const { AddressType } = hd
-
 describe('Address Dao tests', () => {
   const address: Address = {
     walletId: '1',
     address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
-    addressType: AddressType.Receiving,
+    addressType: hd.AddressType.Receiving,
     addressIndex: 0,
     txCount: 0,
     liveBalance: '0',

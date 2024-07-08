@@ -6,9 +6,7 @@ import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
 import SyncInfoEntity from '../../database/chain/entities/sync-info'
 import { getConnection } from '../../database/chain/connection'
-import { CellCollector } from '@ckb-lumos/lumos'
-import { Indexer as CkbIndexer } from '@ckb-lumos/lumos'
-import { TransactionCollector } from '@ckb-lumos/ckb-indexer'
+import { TransactionCollector, Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]

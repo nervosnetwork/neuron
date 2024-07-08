@@ -143,16 +143,13 @@ describe('indexer cache service', () => {
 
     resetMocks()
 
-    jest.doMock('@ckb-lumos/lumos', () => {
+    jest.doMock('@ckb-lumos/ckb-indexer', () => {
       return {
         Indexer: stubbedIndexerConstructor,
         TransactionCollector: stubbedTransactionCollectorConstructor,
+        CellCollector: stubbedCellCollectorConstructor,
       }
     })
-
-    jest.doMock('@ckb-lumos/lumos', () => ({
-      CellCollector: stubbedCellCollectorConstructor,
-    }))
 
     stubbedGetTipBlockNumberFn.mockResolvedValue(mockTipBlockNumber)
     rpcService = new stubbedRPCServiceConstructor()
