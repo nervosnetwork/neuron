@@ -9,7 +9,7 @@ import {
   Navigation as NavigationSubject,
   Command as CommandSubject,
 } from 'services/subjects'
-import { useOnLocalStorageChange, useOnLocaleChange } from 'utils'
+import { useOnLocalStorageChange } from 'utils'
 import PageContainer from 'components/PageContainer'
 import WalletSetting from 'components/WalletSetting'
 import GeneralSetting from 'components/GeneralSetting'
@@ -28,9 +28,7 @@ const Settings = () => {
   const dispatch = useDispatch()
   const globalState = useGlobalState()
   const navigate = useNavigate()
-  const [t, i18n] = useTranslation()
-
-  useOnLocaleChange(i18n)
+  const [t] = useTranslation()
 
   useEffect(() => {
     const onNavigate = (url: string) => navigate(url)

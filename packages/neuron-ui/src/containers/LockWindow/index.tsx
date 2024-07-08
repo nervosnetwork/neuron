@@ -7,7 +7,7 @@ import DarkUnLockMp4 from 'widgets/Icons/dark-unlock.mp4'
 import UnLockMp4 from 'widgets/Icons/unlock.mp4'
 import SplitPasswordInput from 'widgets/SplitPasswordInput'
 import { useTranslation } from 'react-i18next'
-import { clsx, isSuccessResponse } from 'utils'
+import { clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import { isDark, signMessage, unlockWindow } from 'services/remote'
 import { retryUnlockWindow } from 'services/localCache'
 import { MILLISECS_PER_HOUR, MILLISECS_PER_MIN, MILLISECS_PER_SEC } from 'utils/getSyncLeftTime'
@@ -34,7 +34,8 @@ const getWaitMillisecs = (retryTimes: number) => {
 
 const LockWindow = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch()
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
   useEffect(() => {
     getLockWindowInfo(dispatch)
   }, [])
