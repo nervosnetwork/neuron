@@ -1,3 +1,5 @@
+import { UDTType } from '../utils/const'
+
 export default class AssetAccount {
   public id?: number
   public tokenID: string
@@ -7,6 +9,7 @@ export default class AssetAccount {
   public decimal: string
   public balance: string
   public blake160: string
+  public udtType?: UDTType
 
   constructor(
     tokenID: string,
@@ -16,7 +19,8 @@ export default class AssetAccount {
     decimal: string,
     balance: string,
     blake160: string,
-    id?: number
+    id?: number,
+    udtType?: UDTType
   ) {
     this.tokenID = tokenID
     this.symbol = symbol
@@ -26,6 +30,7 @@ export default class AssetAccount {
     this.balance = balance
     this.blake160 = blake160
     this.id = id
+    this.udtType = udtType
   }
 
   public static fromObject(params: {
@@ -37,6 +42,7 @@ export default class AssetAccount {
     balance: string
     blake160: string
     id?: number
+    udtType?: UDTType
   }): AssetAccount {
     return new AssetAccount(
       params.tokenID,
@@ -46,7 +52,8 @@ export default class AssetAccount {
       params.decimal,
       params.balance,
       params.blake160,
-      params.id
+      params.id,
+      params.udtType
     )
   }
 }

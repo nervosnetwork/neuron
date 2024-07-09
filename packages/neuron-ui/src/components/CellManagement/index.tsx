@@ -193,7 +193,7 @@ const getColumns = ({
               <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
                 <UnLock
                   data-disabled={!!lockedReason}
-                  onClick={onAction}
+                  onClick={lockedReason ? undefined : onAction}
                   data-action={Actions.Unlock}
                   data-index={index}
                 />
@@ -202,7 +202,7 @@ const getColumns = ({
               <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
                 <LockCell
                   data-disabled={!!lockedReason}
-                  onClick={onAction}
+                  onClick={lockedReason ? undefined : onAction}
                   data-action={Actions.Lock}
                   data-index={index}
                 />

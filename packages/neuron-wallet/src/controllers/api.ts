@@ -817,10 +817,6 @@ export default class ApiController {
       return this.#sudtController.getSUDTTokenInfo(params)
     })
 
-    handle('get-sudt-type-script-hash', async (_, params: { tokenID: string }) => {
-      return this.#sudtController.getSUDTTypeScriptHash(params)
-    })
-
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.destroyAssetAccount(params)
     })

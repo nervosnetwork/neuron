@@ -1,4 +1,9 @@
 declare namespace Controller {
+  enum UDTType {
+    SUDT = 'sUDT',
+    XUDT = 'xUDT',
+  }
+
   interface RequestOpenInExplorerParams {
     key: string
     type: 'transaction'
@@ -217,6 +222,7 @@ declare namespace Controller {
     balance: string
     blake160: string
     address: string
+    udtType?: UDTType
   }
 
   namespace GetSUDTAccount {
@@ -244,6 +250,7 @@ declare namespace Controller {
       symbol: string
       decimal: string
       feeRate: string
+      udtType?: UDTType
     }
     interface Response {
       assetAccount: any
@@ -254,7 +261,7 @@ declare namespace Controller {
   namespace SendCreateSUDTAccountTransaction {
     interface Params {
       walletID: string
-      assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
+      assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID' | 'udtType'>
       tx: any
       password?: string
     }
@@ -385,9 +392,9 @@ declare namespace Controller {
   }
 
   namespace GenerateClaimChequeTransaction {
-    type AssetAccount = Record<
-      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName',
-      string
+    type AssetAccount = Pick<
+      SUDTAccount,
+      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName' | 'udtType'
     >
 
     interface Params {

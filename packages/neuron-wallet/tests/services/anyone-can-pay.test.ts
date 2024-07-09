@@ -5,7 +5,7 @@ import { initConnection, closeConnection, getConnection } from '../setupAndTeard
 import { AcpSendSameAccountError, TargetLockError, TargetOutputNotFoundError } from '../../src/exceptions'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { MIN_SUDT_CAPACITY } from '../../src/utils/const'
+import { MIN_SUDT_CAPACITY, UDTType } from '../../src/utils/const'
 
 const addressParseMock = jest.fn()
 jest.mock('../../src/models/address-parser', () => ({
@@ -78,7 +78,9 @@ describe('anyone-can-pay-service', () => {
       'tokenName',
       '8',
       '0',
-      '0x62260b4dd406bee8a021185edaa60b7a77f7e99a'
+      '0x62260b4dd406bee8a021185edaa60b7a77f7e99a',
+      undefined,
+      UDTType.SUDT
     )
   )
   const ckbAssetAccount = AssetAccountEntity.fromModel(
@@ -292,7 +294,8 @@ describe('anyone-can-pay-service', () => {
       //@ts-ignore
       await AnyoneCanPayService.getSUDTTargetOutput(
         SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        'tokenID'
+        'tokenID',
+        UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
@@ -305,7 +308,8 @@ describe('anyone-can-pay-service', () => {
       //@ts-ignore
       await AnyoneCanPayService.getSUDTTargetOutput(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        'tokenID'
+        'tokenID',
+        UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
@@ -345,7 +349,11 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const args = `0x${'0'.repeat(40)}`
       //@ts-ignore
-      await AnyoneCanPayService.getSUDTTargetOutput(new AssetAccountInfo().generateChequeScript(args, args), 'tokenID')
+      await AnyoneCanPayService.getSUDTTargetOutput(
+        new AssetAccountInfo().generateChequeScript(args, args),
+        'tokenID',
+        UDTType.SUDT
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(162 * 10 ** 8).toString(),
         lock: new AssetAccountInfo().generateChequeScript(args, args),

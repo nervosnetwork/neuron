@@ -74,7 +74,7 @@ const TransactionType = ({
           i18nKey: `overview.${item.type}SUDT`,
           components: [
             <UANTokenName
-              name={item.sudtInfo.sUDT.tokenName}
+              name={item.sudtInfo.sUDT.tokenName || 'Unknown'}
               symbol={item.sudtInfo.sUDT.symbol}
               className={tokenNameClassName}
             />,

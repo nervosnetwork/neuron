@@ -42,6 +42,7 @@ export default class LightSynchronizer extends Synchronizer {
     const fetchCellDeps = [
       assetAccountInfo.anyoneCanPayCellDep,
       assetAccountInfo.sudtCellDep,
+      assetAccountInfo.xudtCellDep,
       assetAccountInfo.getNftClassInfo().cellDep,
       assetAccountInfo.getNftInfo().cellDep,
       assetAccountInfo.getNftIssuerInfo().cellDep,

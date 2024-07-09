@@ -57,6 +57,7 @@ export enum CustomizedType {
   NFTIssuer = 'NFTIssuer',
 
   SUDT = 'SUDT',
+  XUDT = 'XUDT',
 
   Spore = 'Spore',
   SporeCluster = 'SporeCluster',
@@ -79,6 +80,7 @@ export enum TypeScriptCategory {
   NFTClass = CustomizedType.NFTClass,
   NFTIssuer = CustomizedType.NFTIssuer,
   SUDT = CustomizedType.SUDT,
+  XUDT = CustomizedType.XUDT,
   Spore = CustomizedType.Spore,
   Unknown = CustomizedType.Unknown,
 }
@@ -296,6 +298,7 @@ export default class CellsService {
     const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash
     const nftCodehash = assetAccountInfo.getNftInfo().codeHash
     const sudtCodehash = assetAccountInfo.getSudtCodeHash()
+    const xudtCodeHash = assetAccountInfo.infos.xudt.codeHash
     const sporeInfos = assetAccountInfo.getSporeInfos()
 
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 =>
@@ -304,7 +307,7 @@ export default class CellsService {
 
     const skip = (pageNo - 1) * pageSize
 
-    const allMultiSignOutputs = await getConnection()
+    const allCustomizedOutputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
@@ -365,7 +368,7 @@ export default class CellsService {
     // to make the Spore NFT data available,
     // we need to fetch it from RPC instead of database
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
-    const sporeOutputs = allMultiSignOutputs.filter(item =>
+    const sporeOutputs = allCustomizedOutputs.filter(item =>
       sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
     )
 
@@ -393,7 +396,7 @@ export default class CellsService {
       })
     )
 
-    const matchedOutputs = allMultiSignOutputs.filter(o => {
+    const matchedOutputs = allCustomizedOutputs.filter(o => {
       if (o.multiSignBlake160) {
         return multiSignHashes.has(o.multiSignBlake160)
       }
@@ -406,7 +409,11 @@ export default class CellsService {
         )
       }
 
-      if (o.hasData && o.typeCodeHash === sudtCodehash && o.lockCodeHash === assetAccountInfo.anyoneCanPayCodeHash) {
+      if (
+        o.hasData &&
+        (o.typeCodeHash === sudtCodehash || o.typeCodeHash === xudtCodeHash) &&
+        o.lockCodeHash === assetAccountInfo.anyoneCanPayCodeHash
+      ) {
         return false
       }
 
@@ -466,8 +473,14 @@ export default class CellsService {
         })
       } else if (o.typeCodeHash === sudtCodehash) {
         cell.setCustomizedAssetInfo({
-          lock: CustomizedLock.SUDT,
+          lock: '',
           type: CustomizedType.SUDT,
+          data: '',
+        })
+      } else if (o.typeCodeHash === xudtCodeHash) {
+        cell.setCustomizedAssetInfo({
+          lock: '',
+          type: CustomizedType.XUDT,
           data: '',
         })
       } else if (sporeInfos.some(info => o.typeCodeHash && bytes.equal(info.codeHash, o.typeCodeHash))) {
@@ -1365,6 +1378,8 @@ export default class CellsService {
           return TypeScriptCategory.NFTClass
         case assetAccountInfo.getSudtCodeHash():
           return TypeScriptCategory.SUDT
+        case assetAccountInfo.infos.xudt.codeHash:
+          return TypeScriptCategory.XUDT
         case SystemScriptInfo.DAO_CODE_HASH:
           return TypeScriptCategory.DAO
         default:

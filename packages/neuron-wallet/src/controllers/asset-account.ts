@@ -3,7 +3,7 @@ import AssetAccount from '../models/asset-account'
 import Transaction from '../models/chain/transaction'
 import AssetAccountService from '../services/asset-account-service'
 import { ServiceHasNoResponse } from '../exceptions'
-import { ResponseCode } from '../utils/const'
+import { ResponseCode, UDTType } from '../utils/const'
 import NetworksService from '../services/networks'
 import AssetAccountInfo from '../models/asset-account-info'
 import TransactionSender from '../services/transaction-sender'
@@ -22,6 +22,7 @@ export interface GenerateCreateAssetAccountTxParams {
   decimal: string
   feeRate: string
   fee: string
+  udtType?: UDTType
 }
 
 export interface SendCreateAssetAccountTxParams {
@@ -137,16 +138,7 @@ export default class AssetAccountController {
       tx: Transaction
     }>
   > {
-    const result = await AssetAccountService.generateCreateTx(
-      params.walletID,
-      params.tokenID,
-      params.symbol,
-      params.accountName,
-      params.tokenName,
-      params.decimal,
-      params.feeRate,
-      params.fee
-    )
+    const result = await AssetAccountService.generateCreateTx(params)
 
     if (!result) {
       throw new ServiceHasNoResponse('AssetAccount')
