@@ -37,8 +37,8 @@ const getTransactionStatus = async (hash: string) => {
   }
   if (txWithStatus.txStatus.isRejected()) {
     return {
-      status: TransactionStatus.Failed,
-      isRejected: true,
+      tx: null,
+      status: TransactionStatus.Rejected,
       blockHash: null,
     }
   }
@@ -67,7 +67,6 @@ const trackingStatus = async () => {
           tx: txWithStatus.tx,
           status: txWithStatus.status,
           blockHash: txWithStatus.blockHash,
-          isRejected: !!txWithStatus.isRejected,
         }
       } catch (error) {
         // ignore error, get failed skip current update
@@ -75,18 +74,9 @@ const trackingStatus = async () => {
     })
   )
 
-  const failedTxs = txs.filter(
-    (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Failed; isRejected: boolean } =>
-      tx?.status === TransactionStatus.Failed
-  )
-  const successTxs = txs.filter(
-    (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Success; isRejected: boolean } =>
-      tx?.status === TransactionStatus.Success
-  )
-  const rejectedTxs = txs.filter(
-    (tx): tx is (TransactionDetail | null) & { status: TransactionStatus.Failed; isRejected: boolean } =>
-      !!tx?.isRejected
-  )
+  const failedTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Failed)
+  const successTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Success)
+  const rejectedTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Rejected)
 
   if (failedTxs.length) {
     await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))

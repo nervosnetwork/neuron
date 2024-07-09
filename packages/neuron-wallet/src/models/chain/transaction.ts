@@ -14,6 +14,7 @@ export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
   Failed = 'failed',
+  Rejected = 'rejected',
 }
 
 export interface SudtTokenInfo {
