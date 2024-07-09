@@ -57,8 +57,8 @@ const MnemonicInput = ({
   )
 
   const onDocumentClick = useCallback(
-    (e: any) => {
-      if (mounted.current && !root.current?.contains?.(e.target) && focusIndex) {
+    (e: MouseEvent) => {
+      if (mounted.current && e.target instanceof Node && !root.current?.contains?.(e.target) && focusIndex) {
         setFocusIndex(-1)
       }
     },

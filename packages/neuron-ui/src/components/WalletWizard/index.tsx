@@ -293,8 +293,8 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         </div>
       )}
       <div className={styles.text}>{t(message)}</div>
-      {type === MnemonicAction.Import ? <CreateFirstWalletNav /> : null}
-      {type === MnemonicAction.Create ? (
+      {type === MnemonicAction.Import && <CreateFirstWalletNav />}
+      {type === MnemonicAction.Create && (
         <div className={styles.createCommend}>
           <div className={styles.commendItem}>
             <SuccessInfo type="success" />
@@ -309,8 +309,8 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
             {t('wizard.do-not-save-scrrenshots')}
           </div>
         </div>
-      ) : null}
-      {type === MnemonicAction.Verify ? <div className={styles.hint}>{t('wizard.input-seed-verify')}</div> : null}
+      )}
+      {type === MnemonicAction.Verify && <div className={styles.hint}>{t('wizard.input-seed-verify')}</div>}
       <MnemonicInput
         disabled={isCreate}
         words={generated}
@@ -318,9 +318,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         onChangeInputWord={onChangeInput}
         blankIndexes={MnemonicAction.Import ? undefined : blankIndexes}
       />
-      {type === MnemonicAction.Import ? (
-        <div className={styles.tips}>{t('wizard.input-seed-first-empty-space')}</div>
-      ) : null}
+      {type === MnemonicAction.Import && <div className={styles.tips}>{t('wizard.input-seed-first-empty-space')}</div>}
       <div className={styles.actions}>
         <Button type="submit" label={t('wizard.next')} onClick={onNext} disabled={disableNext} />
         <Button type="text" label={t('wizard.back')} onClick={onBack} />

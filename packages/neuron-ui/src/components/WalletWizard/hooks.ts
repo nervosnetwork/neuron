@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react'
 
+const MNEMONIC_SENTENCE_WORDS = 12
+
 export const useInputWords = () => {
-  const [inputsWords, setInputsWords] = useState<string[]>(new Array(12).fill(''))
+  const [inputsWords, setInputsWords] = useState<string[]>(new Array(MNEMONIC_SENTENCE_WORDS).fill(''))
   const onChangeInput = useCallback(
     (
       e:
@@ -21,7 +23,7 @@ export const useInputWords = () => {
           .trim()
           .replace(/[^0-9a-z]+/g, ' ')
           .split(' ')
-        if (list.length === 12) {
+        if (list.length === MNEMONIC_SENTENCE_WORDS) {
           setInputsWords(list)
           return
         }
