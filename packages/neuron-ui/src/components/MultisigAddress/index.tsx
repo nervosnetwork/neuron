@@ -29,6 +29,7 @@ import {
   Edit,
   Confirming,
   Question,
+  LineDownArrow,
 } from 'widgets/Icons/icon'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
@@ -400,6 +401,7 @@ const MultisigAddress = () => {
                       <div className={styles.action}>
                         <Tooltip
                           tipClassName={styles.tip}
+                          className={styles.tipContent}
                           tip={
                             <div className={styles.actionOptions}>
                               {(!multisigBanlances[item.fullPayload] || multisigBanlances[item.fullPayload] === '0'
@@ -422,7 +424,10 @@ const MultisigAddress = () => {
                           trigger="click"
                           showTriangle
                         >
-                          <div className={styles.hoverBtn}>{t('multisig-address.table.more')}</div>
+                          <div className={styles.hoverBtn}>
+                            {t('multisig-address.table.more')}
+                            <LineDownArrow className={styles.expand} />
+                          </div>
                         </Tooltip>
                       </div>
                     )
