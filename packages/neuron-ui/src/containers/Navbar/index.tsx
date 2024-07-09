@@ -14,7 +14,7 @@ import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
 import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
-import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
+import { RoutePath, clsx, isSuccessResponse } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 import styles from './navbar.module.scss'
 
@@ -74,7 +74,6 @@ const Navbar = () => {
     updater: { version, isUpdated },
   } = neuronWallet
   const [t, i18n] = useTranslation()
-  useOnLocaleChange(i18n)
   const [isClickedSetting, setIsClickedSetting] = useState<boolean>(false)
   const selectedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
 
