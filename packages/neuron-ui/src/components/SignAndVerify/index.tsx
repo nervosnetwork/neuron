@@ -3,14 +3,7 @@ import { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import {
-  ErrorCode,
-  isSuccessResponse,
-  shannonToCKBFormatter,
-  useExitOnWalletChange,
-  useGoBack,
-  useOnLocaleChange,
-} from 'utils'
+import { ErrorCode, isSuccessResponse, shannonToCKBFormatter, useExitOnWalletChange, useGoBack } from 'utils'
 import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
@@ -33,14 +26,12 @@ interface PasswordDialogProps {
 }
 
 const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
-  const [t, i18n] = useTranslation()
+  const [t] = useTranslation()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const disabled = !password || loading
-
-  useOnLocaleChange(i18n)
 
   useEffect(() => {
     if (!show) {
@@ -131,7 +122,7 @@ const Notifications = ({ notification, onDismiss, t, failReason }: Notifications
   ) : null
 
 const SignAndVerify = () => {
-  const [t, i18n] = useTranslation()
+  const [t] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
   const [failReason, setFailReason] = useState<string | undefined>('')
   const [showDialog, setShowDialog] = useState(true)
@@ -141,7 +132,6 @@ const SignAndVerify = () => {
   const [address, setAddress] = useState('')
   const { wallet } = useGlobalState()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  useOnLocaleChange(i18n)
   useExitOnWalletChange()
 
   const handlePasswordDialogOpen = useCallback(() => {
