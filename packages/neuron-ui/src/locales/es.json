@@ -1200,7 +1200,7 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Nodo externo detectado",
-        "body-tips-without-network": "Has seleccionado el nodo interno pero has iniciado el nodo externo. Si deseas continuar usando el nodo externo, por favor añade una nueva red.",
+        "body-tips-without-network": "Has seleccionado el nodo interno pero has iniciado el nodo externo. Si deseas continuar usando un nodo externo, por favor añade una nueva red.",
         "body-tips-with-network": "Actualmente has seleccionado un nodo interno pero has iniciado un nodo externo. Si necesitas continuar usando el nodo externo, por favor cambia a otra red externa o añade una nueva red.",
         "add-network": "Agregar red",
         "ignore-external-node": "Ignorar nodo externo"

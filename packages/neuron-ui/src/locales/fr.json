@@ -1210,7 +1210,7 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Détection d'un noeud externe",
-        "body-tips-without-network": "Vous avez sélectionné le nœud interne mais démarré le nœud externe. Si vous souhaitez continuer à utiliser le nœud externe, veuillez ajouter un nouveau réseau.",
+        "body-tips-without-network": "Vous avez sélectionné le nœud interne mais démarré le nœud externe. Si vous souhaitez continuer à utiliser un nœud externe, veuillez ajouter un nouveau réseau.",
         "body-tips-with-network": "Vous avez actuellement sélectionné un nœud interne mais démarré un nœud externe. Si vous avez besoin de continuer à utiliser le nœud externe, veuillez passer à un autre réseau externe ou ajouter un nouveau réseau.",
         "add-network": "Ajouter un réseau",
         "ignore-external-node": "Ignorer le noeud externe"

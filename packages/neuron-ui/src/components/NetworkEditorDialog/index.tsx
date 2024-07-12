@@ -68,7 +68,7 @@ const NetworkEditorDialog = ({
         dataset: { field = '' },
       } = e.target as HTMLInputElement
       let error = ''
-      let fieldValue = value as string | number
+      let fieldValue: string | number = value
       try {
         if (field === 'name') {
           validateNetworkName(value, usedNetworkNames)
