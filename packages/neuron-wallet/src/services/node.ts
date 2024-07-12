@@ -263,7 +263,7 @@ class NodeService {
     }
   }
 
-  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string, type: CKBNodeType) {
+  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string, type: CKBNodeType = 'full') {
     const compatibilities = this.getNeuronCompatibilityCKB()
     const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
     const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
