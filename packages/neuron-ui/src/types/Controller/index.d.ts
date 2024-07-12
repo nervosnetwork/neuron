@@ -113,14 +113,21 @@ declare namespace Controller {
     description: string
   }
 
+  enum NetworkType {
+    Default, // internal full node
+    Normal,
+    Light, // internal Light node
+  }
+
   interface CreateNetworkParams {
     name: string
     remote: string
+    type: NetworkType
   }
 
   interface UpdateNetworkParams {
     networkID: string
-    options: Partial<{ name: string; remote: string }>
+    options: Partial<{ name: string; remote: string; type: NetworkType }>
   }
 
   interface UpdateTransactionDescriptionParams {

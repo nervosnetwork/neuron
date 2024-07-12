@@ -453,7 +453,10 @@
         "testnet": "測試網",
         "lightMainnet": "輕節點主網",
         "devnet": "開發網",
-        "switch-network-type": "切換到 {{type}}"
+        "switch-network-type": "切換到 {{type}}",
+        "type": "類型",
+        "full-node": "全節點",
+        "light-client-node": "輕客戶端節點"
       },
       "locale": {
         "en": "English",
@@ -1210,11 +1213,10 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "檢測到外部節點",
-        "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
-        "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
+        "body-tips-without-network": "您選擇了內部節點，但啟動了外部節點。如果您想繼續使用外部節點，請添加一個新網絡",
+        "body-tips-with-network": "您當前選擇了內部節點，但啟動了外部節點。如果需要繼續使用外部節點，請切換到另一個外部網絡或添加一個新網絡",
         "add-network": "添加網絡",
-        "ignore-external-node": "忽略外部節點",
-        "external-node-is-light": "由於輕客戶端的安全假設不同，Neuron 不支持外部輕客戶端節點。您想連接到 \"Light Client\" 嗎？"
+        "ignore-external-node": "忽略外部節點"
       },
       "no-disk-space-dialog": {
         "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
