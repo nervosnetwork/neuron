@@ -122,7 +122,7 @@ declare namespace Controller {
   interface CreateNetworkParams {
     name: string
     remote: string
-    type: NetworkType
+    networkType: NetworkType
   }
 
   interface UpdateNetworkParams {

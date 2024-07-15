@@ -5,6 +5,7 @@ import Dialog from 'widgets/Dialog'
 import { validateNetworkName, validateURL } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { isErrorWithI18n } from 'exceptions'
+import { NetworkType } from 'utils/const'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditorDialog.module.scss'
 
@@ -96,7 +97,7 @@ const NetworkEditorDialog = ({
     id: id!,
     name: editor.name,
     remote: editor.url,
-    type: editor.type,
+    networkType: editor.type,
     networks,
     callback: onSuccess,
     dispatch,
@@ -119,8 +120,8 @@ const NetworkEditorDialog = ({
         <div className={styles.radioGroup}>
           <p className={styles.label}>{t('settings.network.type')}</p>
           {[
-            { value: '1', label: t('settings.network.full-node') },
-            { value: '2', label: t('settings.network.light-client-node') },
+            { value: `${NetworkType.Normal}`, label: t('settings.network.full-node') },
+            { value: `${NetworkType.Light}`, label: t('settings.network.light-client-node') },
           ].map(item => (
             <div className={styles.radioItem} key={item.value}>
               <label htmlFor={item.value}>

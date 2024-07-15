@@ -86,6 +86,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     }
   }, [currentId, networks])
 
+  // packages/neuron-wallet/src/services/networks.ts#L39
   const isInternalLightClient = (id: string) => id.includes('light_client')
 
   const showNetworks = useMemo(() => {
