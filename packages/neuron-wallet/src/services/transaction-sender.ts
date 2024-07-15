@@ -58,6 +58,9 @@ interface PathAndPrivateKey {
   privateKey: string
 }
 
+// @ts-ignore
+let arr = []
+
 export default class TransactionSender {
   static MULTI_SIGN_ARGS_LENGTH = 58
 
@@ -97,23 +100,55 @@ export default class TransactionSender {
   }
 
   public async broadcastTx(walletID: string = '', tx: Transaction, amendHash = '') {
+    arr.push({ walletID, tx, amendHash })
+    // @ts-ignore
+    logger.info('arr----', arr)
+    if (arr.length % 2 !== 0) {
+      return Promise.resolve('')
+    }
+    // @ts-ignore
+    logger.info('arr--process---', arr)
     const currentNetwork = NetworksService.getInstance().getCurrent()
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
-    await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
-    const txHash = tx.hash!
 
-    await TransactionPersistor.saveSentTx(tx, txHash)
-    await MultisigService.saveSentMultisigOutput(tx)
-    if (amendHash) {
-      await AmendTransactionService.save(txHash, amendHash)
-    }
+    // @ts-ignore
+    arr.slice(-2).forEach(async item => {
+      // @ts-ignore
+      await rpc.sendTransaction(item.tx.toSDKRawTransaction(), 'passthrough')
+      const txHash = item.tx.hash!
 
-    if (walletID) {
-      const wallet = WalletService.getInstance().get(walletID)
-      await wallet.checkAndGenerateAddresses()
-    }
-    return txHash
+      await TransactionPersistor.saveSentTx(item.tx, txHash)
+      await MultisigService.saveSentMultisigOutput(item.tx)
+      if (item.amendHash) {
+        await AmendTransactionService.save(txHash, item.amendHash)
+      }
+
+      if (item.walletID) {
+        const wallet = WalletService.getInstance().get(item.walletID)
+        await wallet.checkAndGenerateAddresses()
+      }
+    })
+    return tx.hash!
   }
+
+  // public async broadcastTx(walletID: string = '', tx: Transaction, amendHash = '') {
+  //   const currentNetwork = NetworksService.getInstance().getCurrent()
+  //   const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
+  //   await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+  //   const txHash = tx.hash!
+
+  //   await TransactionPersistor.saveSentTx(tx, txHash)
+  //   await MultisigService.saveSentMultisigOutput(tx)
+  //   if (amendHash) {
+  //     await AmendTransactionService.save(txHash, amendHash)
+  //   }
+
+  //   if (walletID) {
+  //     const wallet = WalletService.getInstance().get(walletID)
+  //     await wallet.checkAndGenerateAddresses()
+  //   }
+  //   return txHash
+  // }
 
   public async sign(
     walletID: string = '',

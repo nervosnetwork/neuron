@@ -84,6 +84,10 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
 
   useEffect(() => {
     setAmendabled(false)
+    // @ts-ignore
+    getOnChainTransaction(hash).then(res => {
+      console.log('OnChainTransaction----', res)
+    })
     if (status !== 'success' && column.type !== 'receive' && !isWatchOnly) {
       getOnChainTransaction(hash).then(tx => {
         // @ts-expect-error Replace-By-Fee (RBF)
