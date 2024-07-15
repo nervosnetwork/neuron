@@ -54,6 +54,7 @@
     "@ckb-lumos/rpc": "0.21.1",
     "@ckb-lumos/base": "0.21.1",
     "@ckb-lumos/codec": "0.21.1",
+    "@ckb-lumos/hd": "0.21.1",
     "@ckb-lumos/helpers": "0.21.1",
     "@ckb-lumos/config-manager": "0.21.1",
     "@ckb-lumos/common-scripts": "0.21.1",
