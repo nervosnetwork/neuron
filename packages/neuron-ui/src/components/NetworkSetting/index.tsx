@@ -86,16 +86,17 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     }
   }, [currentId, networks])
 
-  // packages/neuron-wallet/src/services/networks.ts#L39
-  const isInternalLightClient = (id: string) => id.includes('light_client')
+  const isInternalLightClient = (network?: State.Network) =>
+    network && network.readonly && network.type === NetworkType.Light
 
   const showNetworks = useMemo(() => {
     const internalLightNodeId = lastShowInternalNodeIds.get(NetworkType.Light)
-    if (isInternalLightClient(internalLightNodeId)) {
-      return networks.filter(network => !isInternalLightClient(network.id) || network.id === internalLightNodeId)
+    const lastShowNetwork = networks.find(v => v.id === internalLightNodeId)
+    if (isInternalLightClient(lastShowNetwork)) {
+      return networks.filter(network => !isInternalLightClient(network) || network.id === internalLightNodeId)
     }
-    const index = networks.findIndex(network => isInternalLightClient(network.id))
-    return networks.filter((network, i) => !isInternalLightClient(network.id) || index === i)
+    const index = networks.findIndex(network => isInternalLightClient(network))
+    return networks.filter((network, i) => !isInternalLightClient(network) || index === i)
   }, [currentId, networks])
 
   return (
@@ -118,7 +119,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           ),
           suffix: (
             <div className={styles.suffix}>
-              {currentId === network.id && isInternalLightClient(network.id) && network.type === NetworkType.Light ? (
+              {currentId === network.id && isInternalLightClient(network) ? (
                 <Tooltip
                   tip={
                     <div>

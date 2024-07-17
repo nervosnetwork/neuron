@@ -100,7 +100,7 @@ export const useOnSubmit = ({
       createNetwork({
         name,
         remote,
-        networkType,
+        type: networkType,
       })(dispatch, callback)
       return
     }
