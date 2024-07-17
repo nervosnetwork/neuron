@@ -149,6 +149,7 @@ const SUDTCreateDialog = ({
     isCKB: !isUDT,
     existingAccountNames,
     t,
+    udtType,
   })
   const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName && accountType
 

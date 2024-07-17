@@ -88,7 +88,7 @@ const SUDTUpdateDialog = ({
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
 
-  const tokenErrors = useSUDTAccountInfoErrors({ info, isCKB, existingAccountNames, t })
+  const tokenErrors = useSUDTAccountInfoErrors({ info, isCKB, existingAccountNames, t, udtType })
 
   const isTokenReady = Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
