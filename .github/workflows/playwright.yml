@@ -11,8 +11,10 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+    - name: Install Lerna
+      run: yarn global add lerna
     - name: Install dependencies
-      run: npm ci
+      run: yarn
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
