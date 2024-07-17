@@ -20,7 +20,7 @@ import i18n from 'utils/i18n'
 import MnemonicInput from 'widgets/MnemonicInput'
 import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'components/ReplaceDuplicateWalletDialog'
 import Alert from 'widgets/Alert'
-import { Loading } from 'widgets/Icons/icon'
+import { Loading, SuccessInfo, Error as ErrorIcon } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
 import { showGlobalAlertDialog, useDispatch } from 'states'
 import { importedWalletDialogShown } from 'services/localCache'
@@ -182,19 +182,17 @@ const Welcome = ({ rootPath = '/wizard/', wallets = [], dispatch }: WizardElemen
 
 Welcome.displayName = 'Welcome'
 
-const typeHits: Record<MnemonicAction, string> = {
-  [MnemonicAction.Create]: 'wizard.write-down-seed',
-  [MnemonicAction.Verify]: 'wizard.input-seed-verify',
-  [MnemonicAction.Import]: '',
-}
-
 const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: WizardElementProps) => {
   const { generated, imported } = state
   const navigate = useNavigate()
   const { type = MnemonicAction.Create } = useParams<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const isCreate = type === MnemonicAction.Create
-  const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
+  const message = {
+    [MnemonicAction.Create]: 'wizard.your-wallet-seed-is',
+    [MnemonicAction.Verify]: 'wizard.replenish-your-seed',
+    [MnemonicAction.Import]: 'wizard.input-your-seed',
+  }[type]
   const { inputsWords, onChangeInput, setInputsWords } = useInputWords()
   const [searchParams] = useSearchParams()
   const disableNext =
@@ -202,6 +200,8 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
     (type === MnemonicAction.Verify && generated !== inputsWords.join(' '))
 
   const [step, changeStep] = useState(0)
+  const [blankIndexes, setBlankIndexes] = useState<number[]>([])
+
   useEffect(() => {
     if (type === MnemonicAction.Create) {
       generateMnemonic().then(res => {
@@ -210,7 +210,15 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
             type: 'generated',
             payload: res.result,
           })
-          setInputsWords(new Array(12).fill(''))
+          const uniqueRandomArray = new Set<number>()
+          while (uniqueRandomArray.size < 3) {
+            const randomInt = Math.floor(Math.random() * 12)
+            uniqueRandomArray.add(randomInt)
+          }
+          const nums = [...uniqueRandomArray]
+          const list = res.result.split(' ').map((item: string, index: number) => (nums.includes(index) ? '' : item))
+          setBlankIndexes(nums)
+          setInputsWords(list)
         }
       })
     } else {
@@ -219,7 +227,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         payload: '',
       })
     }
-  }, [dispatch, type, navigate])
+  }, [dispatch, type, navigate, setBlankIndexes])
 
   const globalDispatch = useDispatch()
 
@@ -285,17 +293,32 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         </div>
       )}
       <div className={styles.text}>{t(message)}</div>
-      {type === MnemonicAction.Import ? (
-        <CreateFirstWalletNav />
-      ) : (
-        <div className={styles.hint}>{t(typeHits[type])}</div>
+      {type === MnemonicAction.Import && <CreateFirstWalletNav />}
+      {type === MnemonicAction.Create && (
+        <div className={styles.createCommend}>
+          <div className={styles.commendItem}>
+            <SuccessInfo type="success" />
+            {t('wizard.handwritten-recommended')}
+          </div>
+          <div className={styles.commendItem}>
+            <ErrorIcon />
+            {t('wizard.do-not-copy')}
+          </div>
+          <div className={styles.commendItem}>
+            <ErrorIcon />
+            {t('wizard.do-not-save-scrrenshots')}
+          </div>
+        </div>
       )}
+      {type === MnemonicAction.Verify && <div className={styles.hint}>{t('wizard.input-seed-verify')}</div>}
       <MnemonicInput
         disabled={isCreate}
         words={generated}
         inputsWords={inputsWords}
         onChangeInputWord={onChangeInput}
+        blankIndexes={MnemonicAction.Import ? undefined : blankIndexes}
       />
+      {type === MnemonicAction.Import && <div className={styles.tips}>{t('wizard.input-seed-first-empty-space')}</div>}
       <div className={styles.actions}>
         <Button type="submit" label={t('wizard.next')} onClick={onNext} disabled={disableNext} />
         <Button type="text" label={t('wizard.back')} onClick={onBack} />
