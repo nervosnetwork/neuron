@@ -1,4 +1,4 @@
-import { bytes, molecule } from '@ckb-lumos/codec'
+import { bytes, struct, createFixedBytesCodec } from '@ckb-lumos/lumos/codec'
 import CellDep, { DepType } from './chain/cell-dep'
 import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
@@ -6,8 +6,10 @@ import NetworksService from '../services/networks'
 import Transaction from './chain/transaction'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
-import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
 import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
+
+const createFixedHexBytesCodec = (byteLength: number) =>
+  createFixedBytesCodec({ byteLength, pack: bytes.bytify, unpack: bytes.hexify })
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -307,7 +309,7 @@ export default class AssetAccountInfo {
 
   public static findSignPathForCheque(addressInfos: Address[], chequeLockArgs: string) {
     const Bytes20 = createFixedHexBytesCodec(20)
-    const ChequeLockArgsCodec = molecule.struct(
+    const ChequeLockArgsCodec = struct(
       {
         receiverLockHash: Bytes20,
         senderLockHash: Bytes20,

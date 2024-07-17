@@ -18,7 +18,7 @@ import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import { signWitnesses } from '../utils/signWitnesses'
-import { bytes, number } from '@ckb-lumos/codec'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -41,10 +41,10 @@ import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
-import { key, Keychain } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
-import { dao } from '@ckb-lumos/common-scripts'
+import { dao } from '@ckb-lumos/lumos/common-scripts'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -417,13 +417,13 @@ export default class TransactionSender {
     const serializedEmptyWitnessSize = bytes.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
+    blake2b.update(bytes.hexify(Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
       const byteLength = bytes.bytify(wit).byteLength
-      blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
+      blake2b.update(bytes.hexify(Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
 
@@ -432,7 +432,7 @@ export default class TransactionSender {
     if (!wallet.isHardware()) {
       // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
-      emptyWitness.lock = key.signRecoverable(message, privateKey)
+      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]
@@ -930,7 +930,7 @@ export default class TransactionSender {
   // Derive all child private keys for specified BIP44 paths.
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
-    const masterKeychain = new Keychain(
+    const masterKeychain = new hd.Keychain(
       Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
       Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )

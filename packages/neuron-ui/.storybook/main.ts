@@ -12,6 +12,11 @@ export default {
     options: {},
   },
   webpackFinal: config => {
+    config.resolve.fallback = {
+      fs: false,
+      crypto: false,
+      buffer: false,
+    }
     config.resolve.alias = {
       ...config.resolve.alias,
       electron: require.resolve('./electron'),

@@ -1,7 +1,7 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
 import Script, { ScriptHashType } from '../../../models/chain/script'
 import OutPoint from '../../../models/chain/out-point'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { OutputStatus } from '../../../models/chain/output'
 
 @Entity()

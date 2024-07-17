@@ -1,4 +1,4 @@
-import type { Script } from '@ckb-lumos/base'
+import type { Script } from '@ckb-lumos/lumos'
 import LightSynchronizer from '../../src/block-sync-renderer/sync/light-synchronizer'
 import AddressMeta from '../../src/database/address/meta'
 

@@ -64,7 +64,7 @@ import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
-import { OutPoint } from '@ckb-lumos/base'
+import { type OutPoint } from '@ckb-lumos/lumos'
 import { updateApplicationMenu } from './app/menu'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'

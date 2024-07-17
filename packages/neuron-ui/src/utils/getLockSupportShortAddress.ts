@@ -1,4 +1,4 @@
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina, DefaultLockInfo, MultiSigLockInfo } from './enums'
 
 const getLockSupportShortAddress = (lock: CKBComponents.Script) => {

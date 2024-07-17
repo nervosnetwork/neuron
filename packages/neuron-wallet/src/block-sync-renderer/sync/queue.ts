@@ -144,7 +144,7 @@ export default class Queue {
       }
     }
     const headers = await rpc
-      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v]))
+      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v!]))
       .exec()
     headers.forEach((blockHeader: CKBComponents.BlockHeader, idx: number) => {
       if (blockHeader) {

@@ -11,7 +11,7 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import OutPoint from '../../src/models/chain/out-point'
 import { when } from 'jest-when'
 import SystemScriptInfo from '../../src/models/system-script-info'
@@ -146,7 +146,7 @@ describe('AssetAccountService', () => {
 
     const keyInfo = HdPublicKeyInfo.fromObject({
       walletId,
-      addressType: AddressType.Receiving,
+      addressType: hd.AddressType.Receiving,
       addressIndex: 0,
       publicKeyInBlake160: blake160,
     })
