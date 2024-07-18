@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { BI } from '@ckb-lumos/bi'
+import { BI } from '@ckb-lumos/lumos'
 import { app as electronApp, dialog, shell, app } from 'electron'
 import { t } from 'i18next'
 import { interval, BehaviorSubject, merge, Subject } from 'rxjs'

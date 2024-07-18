@@ -1,4 +1,4 @@
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import Multisig from './multisig'
 
 export default class MultisigConfigModel {

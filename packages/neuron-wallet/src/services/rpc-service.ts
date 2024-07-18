@@ -6,6 +6,7 @@ import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
 import { generateRPC } from '../utils/ckb-rpc'
 import { NetworkType } from '../models/network'
+import TxStatus, { TxStatusType } from '../models/chain/tx-status'
 
 export default class RpcService {
   private retryTime: number
@@ -29,20 +30,19 @@ export default class RpcService {
     return BlockHeader.fromSDK(result)
   }
 
-  /**
-   * TODO: rejected tx should be handled
-   * {
-   *   transaction: null,
-   *   txStatus: { blockHash: null, status: 'rejected' }
-   * }
-   */
-  public async getTransaction(hash: string): Promise<TransactionWithStatus | undefined> {
+  public async getTransaction(
+    hash: string
+  ): Promise<TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus }> {
     const result = await this.rpc.getTransaction(hash)
     if (result?.transaction) {
       return TransactionWithStatus.fromSDK(result)
     }
-    if ((result.txStatus as any) === 'rejected') {
+    if (result.txStatus.status === TxStatusType.Rejected) {
       logger.warn(`Transaction[${hash}] was rejected`)
+      return {
+        transaction: null,
+        txStatus: TxStatus.fromSDK(result.txStatus),
+      }
     }
     return undefined
   }

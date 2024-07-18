@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn, TableIndex } from "typeorm"
 import Multisig from "../../../models/multisig"
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { SyncAddressType } from "../entities/sync-progress"
 import MultisigConfig from "../entities/multisig-config"
 

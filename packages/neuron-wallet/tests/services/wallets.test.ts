@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
 import { WalletFunctionNotSupported, DuplicateImportWallet } from '../../src/exceptions/wallet'
-import { AddressType, Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { Manufacturer } from '../../src/services/hardware/common'
 import { prefixWith0x } from '../../src/utils/scriptAndAddress'
 
@@ -76,7 +76,7 @@ describe('wallet service', () => {
       name: 'wallet-test1',
       id: '',
       extendedKey: `${fakePublicKey}${fakeChainCode}`,
-      keystore: new Keystore(
+      keystore: new hd.Keystore(
         {
           cipher: 'wallet1',
           cipherparams: { iv: 'wallet1' },
@@ -99,7 +99,7 @@ describe('wallet service', () => {
       name: 'wallet-test2',
       id: '',
       extendedKey: 'b'.repeat(66) + '2'.repeat(64),
-      keystore: new Keystore(
+      keystore: new hd.Keystore(
         {
           cipher: 'wallet2',
           cipherparams: { iv: 'wallet2' },
@@ -122,7 +122,7 @@ describe('wallet service', () => {
       name: 'wallet-test3',
       id: '',
       extendedKey: 'c'.repeat(66) + '3'.repeat(64),
-      keystore: new Keystore(
+      keystore: new hd.Keystore(
         {
           cipher: 'wallet3',
           cipherparams: { iv: 'wallet1' },
@@ -152,7 +152,7 @@ describe('wallet service', () => {
         descriptor: '',
         vendorId: '10086',
         addressIndex: 0,
-        addressType: AddressType.Receiving,
+        addressType: hd.AddressType.Receiving,
       },
     }
 
@@ -160,7 +160,7 @@ describe('wallet service', () => {
       name: 'wallet-test5',
       id: '',
       extendedKey: 'b'.repeat(66) + '2'.repeat(64),
-      keystore: new Keystore(
+      keystore: new hd.Keystore(
         {
           cipher: 'wallet5',
           cipherparams: { iv: 'wallet1' },
@@ -294,7 +294,7 @@ describe('wallet service', () => {
         await wallet.checkAndGenerateAddresses()
       })
       it('calls AddressService.generateAndSaveForExtendedKey', async () => {
-        const { publicKey } = AccountExtendedPublicKey.parse(wallet4.extendedKey)
+        const { publicKey } = hd.AccountExtendedPublicKey.parse(wallet4.extendedKey)
         expect(stubbedGenerateAndSaveForPublicKeyQueueAsyncPush).toHaveBeenCalledWith({
           walletId: createdWallet.id,
           publicKey,

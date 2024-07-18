@@ -1,4 +1,4 @@
-import { formatUnit } from '@ckb-lumos/bi'
+import { formatUnit } from '@ckb-lumos/lumos/utils'
 
 const sudtValueToAmount = (value: string | null = '0', decimal: string | null = '') => {
   return value === null || value === '0'

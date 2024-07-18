@@ -1,5 +1,5 @@
 import { In, MigrationInterface, QueryRunner } from "typeorm";
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { ScriptHashType } from "../../../models/chain/script";
 import Output from "../entities/output";
 

@@ -1,5 +1,5 @@
-import { since } from '@ckb-lumos/base'
-import { number, bytes } from '@ckb-lumos/codec'
+import { since } from '@ckb-lumos/lumos'
+import { bytes, Uint128LE, Uint64LE } from '@ckb-lumos/lumos/codec'
 import { MILLISECONDS, PAGE_SIZE } from './const'
 
 export const listParams = (search: string) => {
@@ -45,7 +45,7 @@ export const toUint128Le = (hexString: string) => {
     s = s.slice(0, 34)
   }
 
-  return bytes.hexify(number.Uint128LE.pack(s))
+  return bytes.hexify(Uint128LE.pack(s))
 }
 
 export const getLockTimestamp = ({
@@ -57,7 +57,7 @@ export const getLockTimestamp = ({
   epoch: string
   bestKnownBlockTimestamp: number
 }) => {
-  const targetEpochInfo = epochParser(bytes.hexify(number.Uint64LE.pack(`0x${lockArgs.slice(-16)}`)))
+  const targetEpochInfo = epochParser(bytes.hexify(Uint64LE.pack(`0x${lockArgs.slice(-16)}`)))
   const currentEpochInfo = epochParser(epoch)
   const targetEpochFraction =
     Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1

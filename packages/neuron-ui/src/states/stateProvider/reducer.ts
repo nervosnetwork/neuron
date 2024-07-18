@@ -1,4 +1,4 @@
-import type { OutPoint } from '@ckb-lumos/base'
+import type { OutPoint } from '@ckb-lumos/lumos'
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'

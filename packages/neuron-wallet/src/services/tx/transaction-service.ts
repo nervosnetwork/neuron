@@ -1,4 +1,4 @@
-import { CKBRPC } from '@ckb-lumos/rpc'
+import { CKBRPC } from '@ckb-lumos/lumos/rpc'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
 import { getConnection } from '../../database/chain/connection'
@@ -639,7 +639,7 @@ export class TransactionsService {
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
                 walletId = :walletId
-            ) 
+            )
             ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
           UNION
           SELECT
@@ -652,7 +652,7 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId 
+                walletId = :walletId
             )
             ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
         ) AS cell

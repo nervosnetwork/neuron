@@ -1,4 +1,4 @@
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import CellsService from '../../services/cells'
 import {
   CapacityTooSmall,
@@ -72,7 +72,7 @@ export class TransactionGenerator {
       if (!nftCell) return
 
       const nftTx = await this.getRpcService().getTransaction(outPoint.txHash)
-      const nftOriginalOutputData = nftTx?.transaction.outputsData[Number(outPoint.index)]
+      const nftOriginalOutputData = nftTx?.transaction?.outputsData[Number(outPoint.index)]
       if (!nftOriginalOutputData) return
 
       nftCell.data = nftOriginalOutputData

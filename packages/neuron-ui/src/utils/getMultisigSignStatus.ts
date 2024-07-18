@@ -1,5 +1,5 @@
 import { addressToScript } from 'utils'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 import { MultisigConfig } from 'services/remote'
 
 export const getMultisigSignStatus = ({

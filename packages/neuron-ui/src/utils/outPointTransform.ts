@@ -1,4 +1,4 @@
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 
 export const outPointToStr = (value: CKBComponents.OutPoint): string => {
   return `${value.txHash}_${value.index}`

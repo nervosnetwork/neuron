@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
-import { bytes } from '@ckb-lumos/codec'
-import { since } from '@ckb-lumos/base'
+import { bytes } from '@ckb-lumos/lumos/codec'
+import { since } from '@ckb-lumos/lumos'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'

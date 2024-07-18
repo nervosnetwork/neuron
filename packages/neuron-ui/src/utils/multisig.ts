@@ -1,4 +1,4 @@
-import { ckbHash } from '@ckb-lumos/base/lib/utils'
+import { ckbHash } from '@ckb-lumos/lumos/utils'
 import { scriptToAddress } from 'utils'
 import { MultiSigLockInfo } from './enums'
 import { MAX_M_N_NUMBER } from './const'

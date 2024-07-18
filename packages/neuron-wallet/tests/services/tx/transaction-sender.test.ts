@@ -1,4 +1,5 @@
-import { bytes } from '@ckb-lumos/codec'
+import { CKBComponents } from '@ckb-lumos/lumos/rpc'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import 'dotenv/config'
 
 const stubbedRPCServiceConstructor = jest.fn()
@@ -145,7 +146,7 @@ jest.doMock('services/hardware', () => ({
   }),
 }))
 
-jest.doMock('@ckb-lumos/rpc', () => {
+jest.doMock('@ckb-lumos/lumos/rpc', () => {
   return {
     CKBRPC: class CKBRPC {
       url: string
@@ -158,7 +159,7 @@ jest.doMock('@ckb-lumos/rpc', () => {
   }
 })
 
-jest.doMock('@ckb-lumos/common-scripts', () => {
+jest.doMock('@ckb-lumos/lumos/common-scripts', () => {
   return {
     dao: {
       calculateMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
@@ -187,7 +188,7 @@ import OutPoint from '../../../src/models/chain/out-point'
 import Input from '../../../src/models/chain/input'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Output from '../../../src/models/chain/output'
-import { AddressType, Keystore } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
@@ -256,7 +257,7 @@ describe('TransactionSender Test', () => {
     name: 'wallet-test1',
     id: '11',
     extendedKey: 'a',
-    keystore: new Keystore(
+    keystore: new hd.Keystore(
       {
         cipher: 'wallet1',
         cipherparams: { iv: 'wallet1' },
@@ -325,7 +326,7 @@ describe('TransactionSender Test', () => {
       walletId: fakeWallet.id,
       address: '',
       path: `m/44'/309'/0'/0/0`,
-      addressType: AddressType.Receiving,
+      addressType: hd.AddressType.Receiving,
       addressIndex: 1,
       txCount: 0,
       liveBalance: '0',
