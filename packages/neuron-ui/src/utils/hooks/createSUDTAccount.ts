@@ -43,6 +43,7 @@ export const useIsInsufficientToCreateSUDTAccount = ({
         symbol: DEFAULT_SUDT_FIELDS.symbol,
         decimal: '0',
         feeRate: `${suggestFeeRate}`,
+        udtType: UDTType.SUDT,
       }
       return generateCreateSUDTAccountTransaction(params).catch(() => false)
     }

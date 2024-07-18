@@ -69,6 +69,7 @@ const SUDTMigrateToNewAccountDialog = ({
                 decimal: tokenInfo.decimal,
                 balance: sudtAmount.amountToCopy,
                 blake160: res.result.outputs[0].lock.args,
+                udtType,
               },
             },
           })

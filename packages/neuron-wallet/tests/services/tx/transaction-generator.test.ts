@@ -2563,11 +2563,11 @@ describe('TransactionGenerator', () => {
           })
           const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
           const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash)) as Transaction
-          expect(res.outputs).toHaveLength(3)
+          expect(res.outputs).toHaveLength(2)
           expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
-          expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee ?? 0)).toString())
-          expect(res.inputs).toHaveLength(3)
-          expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
+          expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee ?? 0)).toString())
+          expect(res.inputs).toHaveLength(2)
+          expect(res.inputs[1].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
         })
       })
 

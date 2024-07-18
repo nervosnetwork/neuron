@@ -204,9 +204,9 @@ describe('anyone-can-pay-service', () => {
         assetAccountEntity.id
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: targetLockScript,
         type: new AssetAccountInfo().generateSudtScript(assetAccount.tokenID),
+        data: '0x00000000000000000000000000000000',
       })
       expect(generateAnyoneCanPayToSudtTxMock).toHaveBeenCalledWith(
         'walletId',
@@ -298,9 +298,9 @@ describe('anyone-can-pay-service', () => {
         UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: SystemScriptInfo.generateSecpScript(assetAccount.blake160),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
     it('send to anyone pay address not exist', async () => {
@@ -312,9 +312,9 @@ describe('anyone-can-pay-service', () => {
         UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
     it('send to anyone pay address exist', async () => {
@@ -355,9 +355,9 @@ describe('anyone-can-pay-service', () => {
         UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(162 * 10 ** 8).toString(),
         lock: new AssetAccountInfo().generateChequeScript(args, args),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
   })

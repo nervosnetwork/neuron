@@ -39,6 +39,7 @@ import { LOCKTIME_ARGS_LENGTH, MIN_CELL_CAPACITY } from '../utils/const'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import CellLocalInfoService from './cell-local-info'
 import CellLocalInfo from '../database/chain/entities/cell-local-info'
+import { helpers } from '@ckb-lumos/lumos'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -87,7 +88,6 @@ export enum TypeScriptCategory {
 
 export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10 ** 8)
-  private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10 ** 8)
 
   public static async getBalancesByWalletId(walletId: string): Promise<{
     liveBalances: Map<string, string>
@@ -1126,8 +1126,14 @@ export default class CellsService {
       } else {
         totalSize += TransactionSize.secpLockWitness()
         inputOriginCells.push(cell)
-        // capacity - 142CKB, 142CKB remaining for change
-        inputCapacities -= this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+        inputCapacities -= helpers.minimalCellCapacity({
+          cellOutput: {
+            capacity: cell.capacity,
+            lock: cell.lock(),
+            type: cell.type(),
+          },
+          data: cell.data,
+        })
         totalSize += TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData()
       }
       inputs.push(input)
@@ -1154,12 +1160,20 @@ export default class CellsService {
         .map(i => BigInt(i.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       let capacity: bigint = BigInt(0)
-      if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= extraPayCapacity) {
+      const curCellMinCapacity = helpers.minimalCellCapacity({
+        cellOutput: {
+          capacity: cell.capacity,
+          lock: cell.lock(),
+          type: cell.type(),
+        },
+        data: cell.data,
+      })
+      if (BigInt(cellCapacity) - curCellMinCapacity >= extraPayCapacity) {
         capacity = BigInt(cellCapacity) - extraPayCapacity
         extraPayCapacity = BigInt(0)
       } else {
-        capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
-        extraPayCapacity = extraPayCapacity - (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
+        capacity = curCellMinCapacity
+        extraPayCapacity = extraPayCapacity - (BigInt(cellCapacity) - curCellMinCapacity)
       }
       const output = Output.fromObject({
         capacity: capacity.toString(),

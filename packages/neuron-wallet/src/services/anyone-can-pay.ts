@@ -21,6 +21,7 @@ import CellsService from './cells'
 import { MIN_SUDT_CAPACITY, UDTType } from '../utils/const'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
+import BufferUtils from '../utils/buffer'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -115,9 +116,10 @@ export default class AnyoneCanPayService {
   private static async getSUDTTargetOutput(lockScript: Script, tokenID: string, udtType: UDTType) {
     if (SystemScriptInfo.isSecpScript(lockScript)) {
       return Output.fromObject({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: lockScript,
         type: new AssetAccountInfo().generateUdtScript(tokenID, udtType),
+        // use amount 0 to place holder amount
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
       })
     }
     const liveCellService = LiveCellService.getInstance()
@@ -136,9 +138,10 @@ export default class AnyoneCanPayService {
     }
 
     return Output.fromObject({
-      capacity: AnyoneCanPayService.getSUDTAddCapacity(lockScript.args),
       lock: lockScript,
       type: new AssetAccountInfo().generateUdtScript(tokenID, udtType),
+      // use amount 0 to place holder amount
+      data: BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
   }
 
