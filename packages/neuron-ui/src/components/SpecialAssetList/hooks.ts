@@ -180,13 +180,6 @@ export const useSpecialAssetColumnInfo = ({
           }
           break
         }
-        case PresetScript.SUDT: {
-          status = 'user-defined-token'
-          const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
-          const amountInfo = getSUDTAmount({ tokenInfo, data })
-          amount = amountInfo.amount
-          break
-        }
         default: {
           // ignore
         }
@@ -220,6 +213,14 @@ export const useSpecialAssetColumnInfo = ({
           amount = t('special-assets.unknown-asset')
           break
         }
+        case PresetScript.XUDT:
+        case PresetScript.SUDT: {
+          status = 'user-defined-token'
+          const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
+          const amountInfo = getSUDTAmount({ tokenInfo, data })
+          amount = amountInfo.amount
+          break
+        }
         default: {
           break
         }
@@ -235,6 +236,7 @@ export const useSpecialAssetColumnInfo = ({
         epochsInfo,
         isSpore,
         sporeClusterInfo,
+        udtType: assetInfo.type,
       }
     },
     [epoch, bestKnownBlockTimestamp, tokenInfoList, t]

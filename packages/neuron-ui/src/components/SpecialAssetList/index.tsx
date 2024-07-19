@@ -238,6 +238,7 @@ const SpecialAssetList = () => {
         symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
         decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
         isCKB: false,
+        udtType: accountToClaim.account.udtType,
         onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
           const params: any = accountToClaim?.account || {}
           Object.keys(info).forEach(key => {
@@ -371,6 +372,12 @@ const SpecialAssetList = () => {
           }
           break
         }
+        default: {
+          // ignore
+        }
+      }
+      switch (cell.customizedAssetInfo.type) {
+        case PresetScript.XUDT:
         case PresetScript.SUDT: {
           setMigrateCell(cell)
           const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
@@ -379,9 +386,8 @@ const SpecialAssetList = () => {
           setIsMigrateDialogOpen(true)
           break
         }
-        default: {
-          // ignore
-        }
+        default:
+          break
       }
     },
     [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList, handleActionSuccess]
@@ -437,8 +443,15 @@ const SpecialAssetList = () => {
                   customizedAssetInfo,
                 } = item
 
-                const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
-                  handleGetSpecialAssetColumnInfo(item)
+                const {
+                  status,
+                  targetTime,
+                  isLockedCheque,
+                  isNFTTransferable,
+                  isNFTClassOrIssuer,
+                  epochsInfo,
+                  udtType,
+                } = handleGetSpecialAssetColumnInfo(item)
 
                 if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
                   return (
@@ -458,22 +471,15 @@ const SpecialAssetList = () => {
                   ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) || isLockedCheque
 
                 if (showTip) {
-                  if (customizedAssetInfo.lock !== PresetScript.Cheque || isLockedCheque) {
-                    tip = t(`special-assets.${status}-tooltip`, {
-                      epochs: epochsInfo?.target.toFixed(2),
-                      year: targetTime ? new Date(targetTime).getFullYear() : '',
-                      month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-                      day: targetTime ? new Date(targetTime).getDate() : '',
-                      hour: targetTime ? new Date(targetTime).getHours() : '',
-                      minute: targetTime ? new Date(targetTime).getMinutes() : '',
-                    })
-                  }
-                  if (status === 'user-defined-token') {
-                    tip = t('special-assets.user-defined-asset-tooltip')
-                  }
-                  if (status === 'user-defined-token') {
-                    tip = t('special-assets.user-defined-token-tooltip')
-                  }
+                  tip = t(`special-assets.${status}-tooltip`, {
+                    udtType,
+                    epochs: epochsInfo?.target.toFixed(2),
+                    year: targetTime ? new Date(targetTime).getFullYear() : '',
+                    month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                    day: targetTime ? new Date(targetTime).getDate() : '',
+                    hour: targetTime ? new Date(targetTime).getHours() : '',
+                    minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                  })
                 }
 
                 const btnDisabled =
@@ -490,7 +496,7 @@ const SpecialAssetList = () => {
                           data-idx={index}
                           data-status={status}
                           type="primary"
-                          label={t(`special-assets.${status}`)}
+                          label={t(`special-assets.${status}`, { udtType })}
                           className={styles.actionBtn}
                           onClick={handleAction}
                           disabled={!!btnDisabled}

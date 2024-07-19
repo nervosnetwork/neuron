@@ -108,7 +108,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [paramsFormatter.toHash],
     resultFormatters: (result: {
       status: 'fetched' | 'fetching' | 'added' | 'not_found'
-      data?: RPC.TransactionWithStatus
+      data?: Parameters<typeof resultFormatter.toTransactionWithStatus>[0]
     }) => {
       return {
         status: result.status,

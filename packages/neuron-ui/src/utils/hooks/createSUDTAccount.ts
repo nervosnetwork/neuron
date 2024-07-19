@@ -3,15 +3,12 @@ import { TFunction } from 'i18next'
 import { useEffect, useCallback } from 'react'
 import { AccountType, TokenInfo } from 'components/SUDTCreateDialog'
 import { AppActions, StateAction } from 'states'
-import {
-  generateCreateSUDTAccountTransaction,
-  openExternal,
-  getSUDTTypeScriptHash,
-  invokeShowErrorMessage,
-} from 'services/remote'
+import { generateCreateSUDTAccountTransaction, openExternal, invokeShowErrorMessage } from 'services/remote'
 import { getExplorerUrl } from 'utils'
+import { predefined } from '@ckb-lumos/config-manager'
+import { utils } from '@ckb-lumos/base'
 import useGetCountDownAndFeeRateStats from './useGetCountDownAndFeeRateStats'
-import { ErrorCode } from '../enums'
+import { ErrorCode, UDTType } from '../enums'
 import { isSuccessResponse } from '../is'
 import {
   MIN_CKB_REQUIRED_BY_CKB_SUDT,
@@ -46,6 +43,7 @@ export const useIsInsufficientToCreateSUDTAccount = ({
         symbol: DEFAULT_SUDT_FIELDS.symbol,
         decimal: '0',
         feeRate: `${suggestFeeRate}`,
+        udtType: UDTType.SUDT,
       }
       return generateCreateSUDTAccountTransaction(params).catch(() => false)
     }
@@ -77,6 +75,7 @@ export const useIsInsufficientToCreateSUDTAccount = ({
         setInsufficient({
           [AccountType.CKB]: insufficientToCreateCKBAccount,
           [AccountType.SUDT]: insufficientToCreateSUDTAccount,
+          [AccountType.XUDT]: insufficientToCreateSUDTAccount,
         })
       })
   }, [walletId, balance, setInsufficient, suggestFeeRate])
@@ -94,7 +93,10 @@ export const useOnGenerateNewAccountTransaction = ({
   t: TFunction
 }) =>
   useCallback(
-    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo, onSuccess?: () => void) => {
+    (
+      { tokenId, tokenName, accountName, symbol, decimal, udtType }: TokenInfo & { udtType?: UDTType },
+      onSuccess?: () => void
+    ) => {
       return generateCreateSUDTAccountTransaction({
         walletID: walletId,
         tokenID: tokenId,
@@ -103,6 +105,7 @@ export const useOnGenerateNewAccountTransaction = ({
         symbol,
         decimal,
         feeRate: `${MEDIUM_FEE_RATE}`,
+        udtType,
       })
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -131,15 +134,18 @@ export const useOnGenerateNewAccountTransaction = ({
     [onGenerated, walletId, dispatch, t]
   )
 
-export const useOpenSUDTTokenUrl = (tokenID: string, isMainnet?: boolean) =>
+export const useOpenUDTTokenUrl = (tokenID: string, udtType?: UDTType, isMainnet?: boolean) =>
   useCallback(() => {
-    if (tokenID) {
-      getSUDTTypeScriptHash({ tokenID }).then(res => {
-        if (isSuccessResponse(res) && res.result) {
-          openExternal(`${getExplorerUrl(isMainnet)}/sudt/${res.result}`)
-        }
+    if (tokenID && udtType) {
+      const { SUDT, XUDT } = isMainnet ? predefined.LINA.SCRIPTS : predefined.AGGRON4.SCRIPTS
+      const udtScript = udtType === UDTType.SUDT ? SUDT : XUDT
+      const scriptHash = utils.computeScriptHash({
+        codeHash: udtScript.CODE_HASH,
+        hashType: udtScript.HASH_TYPE,
+        args: tokenID,
       })
+      openExternal(`${getExplorerUrl(isMainnet)}/${udtType === UDTType.SUDT ? 'sudt' : 'xudt'}/${scriptHash}`)
     }
   }, [isMainnet, tokenID])
 
-export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction, useOpenSUDTTokenUrl }
+export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction, useOpenUDTTokenUrl }

@@ -53,7 +53,7 @@
 .actions {
   display: flex;
   gap: 16px;
-  & > svg {
+  & svg {
     cursor: pointer;
     &[data-disabled='true'] {
       cursor: not-allowed;

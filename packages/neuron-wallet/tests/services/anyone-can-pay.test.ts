@@ -5,7 +5,7 @@ import { initConnection, closeConnection, getConnection } from '../setupAndTeard
 import { AcpSendSameAccountError, TargetLockError, TargetOutputNotFoundError } from '../../src/exceptions'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { MIN_SUDT_CAPACITY } from '../../src/utils/const'
+import { MIN_SUDT_CAPACITY, UDTType } from '../../src/utils/const'
 
 const addressParseMock = jest.fn()
 jest.mock('../../src/models/address-parser', () => ({
@@ -78,7 +78,9 @@ describe('anyone-can-pay-service', () => {
       'tokenName',
       '8',
       '0',
-      '0x62260b4dd406bee8a021185edaa60b7a77f7e99a'
+      '0x62260b4dd406bee8a021185edaa60b7a77f7e99a',
+      undefined,
+      UDTType.SUDT
     )
   )
   const ckbAssetAccount = AssetAccountEntity.fromModel(
@@ -202,9 +204,9 @@ describe('anyone-can-pay-service', () => {
         assetAccountEntity.id
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: targetLockScript,
         type: new AssetAccountInfo().generateSudtScript(assetAccount.tokenID),
+        data: '0x00000000000000000000000000000000',
       })
       expect(generateAnyoneCanPayToSudtTxMock).toHaveBeenCalledWith(
         'walletId',
@@ -292,12 +294,13 @@ describe('anyone-can-pay-service', () => {
       //@ts-ignore
       await AnyoneCanPayService.getSUDTTargetOutput(
         SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        'tokenID'
+        'tokenID',
+        UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: SystemScriptInfo.generateSecpScript(assetAccount.blake160),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
     it('send to anyone pay address not exist', async () => {
@@ -305,12 +308,13 @@ describe('anyone-can-pay-service', () => {
       //@ts-ignore
       await AnyoneCanPayService.getSUDTTargetOutput(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        'tokenID'
+        'tokenID',
+        UDTType.SUDT
       )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
     it('send to anyone pay address exist', async () => {
@@ -345,11 +349,15 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const args = `0x${'0'.repeat(40)}`
       //@ts-ignore
-      await AnyoneCanPayService.getSUDTTargetOutput(new AssetAccountInfo().generateChequeScript(args, args), 'tokenID')
+      await AnyoneCanPayService.getSUDTTargetOutput(
+        new AssetAccountInfo().generateChequeScript(args, args),
+        'tokenID',
+        UDTType.SUDT
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
-        capacity: BigInt(162 * 10 ** 8).toString(),
         lock: new AssetAccountInfo().generateChequeScript(args, args),
         type: new AssetAccountInfo().generateSudtScript('tokenID'),
+        data: '0x00000000000000000000000000000000',
       })
     })
   })
@@ -358,7 +366,8 @@ describe('anyone-can-pay-service', () => {
     it('is secp256 address', async () => {
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        '0x00'
+        '0x00',
+        UDTType.SUDT
       )
       expect(res).toBe(undefined)
     })
@@ -373,7 +382,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue({})
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        '0x00'
+        '0x00',
+        UDTType.SUDT
       )
       expect(res).toBe(undefined)
     })
@@ -381,7 +391,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        '0x00'
+        `0x${'00'.repeat(32)}`,
+        UDTType.SUDT
       )
       expect(res).toBe(BigInt(MIN_SUDT_CAPACITY).toString())
     })
@@ -389,7 +400,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160),
-        '0x00'
+        `0x${'00'.repeat(32)}`,
+        UDTType.SUDT
       )
       expect(res).toBe(BigInt(162 * 10 ** 8).toString())
     })

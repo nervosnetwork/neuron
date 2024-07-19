@@ -1,3 +1,12 @@
+jest.doMock('../../src/models/subjects/multisig-config-db-changed-subject', () => ({
+  getSubject() {
+    return {
+      next: jest.fn(),
+      subscribe: jest.fn(),
+    }
+  },
+}))
+
 import MultisigConfig from '../../src/database/chain/entities/multisig-config'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
@@ -85,13 +94,14 @@ describe('multisig service', () => {
     multisigConfigModel.id = res?.id
     await getConnection().manager.save(multisigOutput)
     rpcBatchRequestMock.mockResolvedValue([])
-  })
+  }, 20_000)
   afterEach(async () => {
     const connection = getConnection()
-    await connection.synchronize(true)
+    await connection.getRepository(MultisigConfig).clear()
+    await connection.getRepository(MultisigOutput).clear()
     rpcBatchRequestMock.mockReset()
     multisigOutputChangedSubjectNextMock.mockReset()
-  })
+  }, 20_000)
 
   describe('save multisig config', () => {
     it('has exist', async () => {

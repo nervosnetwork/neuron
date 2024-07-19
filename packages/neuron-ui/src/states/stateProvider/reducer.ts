@@ -234,7 +234,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.sUDTAccounts = action.payload
         .filter(account => account.id !== undefined)
         .sort(sortAccounts)
-        .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal }) => ({
+        .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal, udtType }) => ({
           accountId: id!.toString(),
           accountName,
           tokenName,
@@ -243,6 +243,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
           address,
           decimal,
           tokenId: tokenID,
+          udtType,
         }))
       break
     }

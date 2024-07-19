@@ -42,6 +42,7 @@ export interface NFTInfo {
 export enum AssetAccountType {
   CKB = 'CKB',
   SUDT = 'sUDT',
+  XUDT = 'xUDT',
 }
 
 export default class Transaction {

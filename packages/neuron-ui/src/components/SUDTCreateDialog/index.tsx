@@ -10,13 +10,15 @@ import {
   isSuccessResponse,
   useSUDTAccountInfoErrors,
   useFetchTokenInfoList,
-  useOpenSUDTTokenUrl,
+  useOpenUDTTokenUrl,
+  UDTType,
 } from 'utils'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
 export enum AccountType {
   SUDT = 'sudt',
+  XUDT = 'xudt',
   CKB = 'ckb',
 }
 
@@ -33,10 +35,10 @@ export interface TokenInfo extends BasicInfo {
 
 export interface SUDTCreateDialogProps extends TokenInfo {
   isMainnet: boolean
-  onSubmit: (info: TokenInfo) => void
+  onSubmit: (info: TokenInfo & { udtType?: UDTType }) => void
   onCancel: () => void
   existingAccountNames?: string[]
-  insufficient?: { [AccountType.CKB]: boolean; [AccountType.SUDT]: boolean }
+  insufficient?: { [P in AccountType]: boolean }
 }
 
 enum DialogSection {
@@ -48,6 +50,10 @@ const accountTypes: { key: AccountType; label: string }[] = [
   {
     key: AccountType.SUDT,
     label: 's-udt.create-dialog.sudt-account',
+  },
+  {
+    key: AccountType.XUDT,
+    label: 's-udt.create-dialog.xudt-account',
   },
   {
     key: AccountType.CKB,
@@ -121,13 +127,18 @@ const SUDTCreateDialog = ({
   onSubmit,
   onCancel,
   existingAccountNames = [],
-  insufficient = { [AccountType.CKB]: false, [AccountType.SUDT]: false },
+  insufficient = { [AccountType.CKB]: false, [AccountType.SUDT]: false, [AccountType.XUDT]: false },
   isMainnet,
 }: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
   Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel' | 'insufficient'>) => {
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
-  const [accountType, setAccountType] = useState([AccountType.SUDT, AccountType.CKB].find(at => !insufficient[at]))
+  const [accountType, setAccountType] = useState(
+    [AccountType.SUDT, AccountType.CKB, AccountType.XUDT].find(at => !insufficient[at])
+  )
+  const isUDT = accountType === AccountType.SUDT || accountType === AccountType.XUDT
+  // eslint-disable-next-line no-nested-ternary
+  const udtType = isUDT ? (accountType === AccountType.SUDT ? UDTType.SUDT : UDTType.XUDT) : undefined
   const [step, setStep] = useState(DialogSection.Account)
   const tokenInfoList = useFetchTokenInfoList()
 
@@ -135,9 +146,10 @@ const SUDTCreateDialog = ({
 
   const tokenErrors = useSUDTAccountInfoErrors({
     info,
-    isCKB: AccountType.CKB === accountType,
+    isCKB: !isUDT,
     existingAccountNames,
     t,
+    udtType,
   })
   const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName && accountType
 
@@ -190,7 +202,7 @@ const SUDTCreateDialog = ({
       }
       case DialogSection.Token: {
         if (isTokenReady) {
-          onSubmit({ ...info, accountName: info.accountName.trim(), tokenName: info.tokenName.trim() })
+          onSubmit({ ...info, udtType, accountName: info.accountName.trim(), tokenName: info.tokenName.trim() })
         }
         break
       }
@@ -216,7 +228,7 @@ const SUDTCreateDialog = ({
       }
     }
   }
-  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
+  const openSUDTTokenUrl = useOpenUDTTokenUrl(info.tokenId, udtType, isMainnet)
   return (
     <Dialog
       show
@@ -285,14 +297,16 @@ const SUDTCreateDialog = ({
                     className={styles.settingField}
                     placeholder={t(`s-udt.create-dialog.input.${field.label}`)}
                     hint={
-                      !tokenErrors[field.key] && field.key === 'tokenId' && accountType === AccountType.SUDT
-                        ? t(`s-udt.create-dialog.placeholder.${field.label}`)
+                      !tokenErrors[field.key] && field.key === 'tokenId' && isUDT
+                        ? t(`s-udt.create-dialog.placeholder.${field.label}`, {
+                            udtType: AccountType.SUDT === accountType ? 'sUDT' : 'xUDT',
+                          })
                         : undefined
                     }
                   />
                 ))}
             </div>
-            {accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
+            {isUDT && !tokenErrors.tokenId && info.tokenId && (
               <button
                 type="button"
                 className={styles.explorerNavButton}
