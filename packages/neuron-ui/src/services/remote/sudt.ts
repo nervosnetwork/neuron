@@ -1,3 +1,4 @@
+import { UDTType } from 'utils'
 import { remoteApi } from './remoteApiWrapper'
 
 export const getAnyoneCanPayScript = remoteApi<void>('get-anyone-can-pay-script')
@@ -21,9 +22,10 @@ export const generateSUDTTransaction = remoteApi<Controller.GenerateSUDTTransact
   'generate-send-to-anyone-can-pay-tx'
 )
 
-export const getHoldSUDTCellCapacity = remoteApi<{ address: string; tokenID: string }, string | undefined>(
-  'get-hold-sudt-cell-capacity'
-)
+export const getHoldSUDTCellCapacity = remoteApi<
+  { address: string; tokenID: string; udtType?: UDTType },
+  string | undefined
+>('get-hold-sudt-cell-capacity')
 
 export const sendSUDTTransaction = remoteApi<Controller.SendSUDTTransaction.Params>('send-to-anyone-can-pay')
 
@@ -32,10 +34,5 @@ export const migrateAcp = remoteApi<Controller.MigrateAcp.Params>('migrate-acp')
 export const getSUDTTokenInfo = remoteApi<Controller.GetSUDTTokenInfo.Params, Controller.GetSUDTTokenInfo.Response>(
   'get-sudt-token-info'
 )
-
-export const getSUDTTypeScriptHash = remoteApi<
-  Controller.GetSUDTTokenInfo.Params,
-  Controller.GetSUDTTokenInfo.Response
->('get-sudt-type-script-hash')
 
 export const generateSudtMigrateAcpTx = remoteApi('generate-sudt-migrate-acp-tx')

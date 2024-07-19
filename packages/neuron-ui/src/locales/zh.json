@@ -512,10 +512,10 @@
         "title": "创建资产账户"
       },
       "send-sudt": {
-        "title": "发起 sUDT 交易"
+        "title": "发起 UDT 交易"
       },
       "transfer-to-sudt": {
-        "title": "转入 sUDT 账户"
+        "title": "转入 UDT 账户"
       },
       "send-ckb-asset": {
         "title": "发起 CKB 交易"
@@ -524,7 +524,7 @@
         "title": "发起 CKB 交易"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "发起 sUDT 交易"
+        "title": "发起 UDT 交易"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "发起 CKB 交易"
@@ -956,7 +956,7 @@
       "locked-asset": "已锁定",
       "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日(锁定时间根据区块链实际运行情况会有一定的误差)。",
       "withdraw-asset-tooltip": "预计解锁时间为 {{year}}年{{month}}月{{day}}日 {{hour}}时{{minute}}分(根据区块链实际运行情况会有一定的误差)。",
-      "user-defined-token-tooltip": "将 sUDT 资产转移到 sUDT 账户",
+      "user-defined-token-tooltip": "将 {{udtType}} 资产转移到 {{udtType}} 账户",
       "claim-asset": "领取",
       "withdraw-asset": "撤回",
       "view-details": "查看详情",
@@ -967,14 +967,14 @@
       "transfer-nft": "转让",
       "user-defined-token": "迁移",
       "transfer-nft-success": "转让资产成功",
-      "migrate-sudt-success": "转换成新的 sUDT 资产账户成功",
-      "send-sudt-success": "转入 sUDT 账户成功",
+      "migrate-sudt-success": "转换成新的 {{udtType}} 资产账户成功",
+      "send-sudt-success": "转入 {{udtType}} 账户成功",
       "unlock-success": "资产已领取，可前往交易历史查看详情",
       "withdraw-cheque-success": "资产已撤回，可前往交易历史查看详情",
       "claim-cheque-success": "资产已领取，可前往交易历史查看详情"
     },
     "migrate-sudt": {
-      "title": "迁移至 sUDT 资产账户",
+      "title": "迁移至 {{udtType}} 资产账户",
       "choose-title": "选择迁移方式",
       "next": "下一步",
       "back": "上一步",
@@ -982,14 +982,14 @@
       "input-symbol": "请输入简称",
       "input-decimal": "请输入小数位",
       "turn-into-new-account": {
-        "title": "转换成新的 sUDT 资产账户",
-        "sub-title": "将 sUDT 资产转换成 sUDT 资产账户, 至少占用 142 CKBytes",
+        "title": "转换成新的 {{udtType}} 资产账户",
+        "sub-title": "将 {{udtType}} 资产转换成 {{udtType}} 资产账户, 至少占用 142 CKBytes",
         "cancel": "取消",
         "confirm": "确认"
       },
       "transfer-to-exist-account": {
-        "title": "转入 sUDT 账户",
-        "sub-title": "将全部 sUDT 余额转入已存在的 sUDT 资产账户, 请确保目标账户存在"
+        "title": "转入 {{udtType}} 账户",
+        "sub-title": "将全部 {{udtType}} 余额转入已存在的 {{udtType}} 资产账户, 请确保目标账户存在"
       },
       "cancel": "取消",
       "confirm": "确认",
@@ -1015,6 +1015,7 @@
         "select-account-type": "选择账户类型",
         "account-name": "账户名称",
         "sudt-account": "sUDT 账户",
+        "xudt-account": "xUDT 账户",
         "ckb-account": "CKB 账户",
         "set-token-info": "设置代币信息",
         "token-id": "代币ID",
@@ -1035,7 +1036,7 @@
           "decimal": "请输入小数位"
         },
         "placeholder": {
-          "token-id": "代币 ID 即 sUDT Type Script 的 Args，等同于该 token 发行者的 lock hash。"
+          "token-id": "代币 ID 即 {{udtType}} Type Script 的 Args，等同于该 token 发行者的 lock hash。"
         }
       },
       "send": {

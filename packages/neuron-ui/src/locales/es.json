@@ -502,10 +502,10 @@
         "title": "Crear Cuenta de Activos"
       },
       "send-sudt": {
-        "title": "Enviar sUDT"
+        "title": "Enviar UDT"
       },
       "transfer-to-sudt": {
-        "title": "Enviar a cuenta sUDT"
+        "title": "Enviar a cuenta UDT"
       },
       "send-ckb-asset": {
         "title": "Enviar CKB"
@@ -514,7 +514,7 @@
         "title": "Enviar CKB"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "Enviar sUDT"
+        "title": "Enviar UDT"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "Enviar CKB"
@@ -946,7 +946,7 @@
       "locked-asset": "Bloqueado",
       "locked-asset-tooltip": "El parámetro de bloqueo es de {{epochs}} épocas, la fecha de lanzamiento estimada es {{year}}-{{month}}-{{day}} (según la altura del bloque en ejecución real, pueden haber algunas variaciones de tiempo en el tiempo de bloqueo).",
       "withdraw-asset-tooltip": "Hora estimada de lanzamiento es {{year}}-{{month}}-{{day}} {{hour}}:{{minute}} (según la altura del bloque en ejecución real).",
-      "user-defined-token-tooltip": "Migre el activo sUDT a una cuenta de activos sUDT",
+      "user-defined-token-tooltip": "Migre el activo {{udtType}} a una cuenta de activos {{udtType}}",
       "claim-asset": "Reclamar",
       "withdraw-asset": "Retirar",
       "view-details": "Ver detalles",
@@ -957,14 +957,14 @@
       "transfer-nft": "Enviar",
       "user-defined-token": "Migrar",
       "transfer-nft-success": "Transferencia de activos exitosa",
-      "migrate-sudt-success": "Conversión a nueva cuenta de activo sUDT exitosa",
-      "send-sudt-success": "Transferencia exitosa a la cuenta de activo sUDT",
+      "migrate-sudt-success": "Conversión a nueva cuenta de activo {{udtType}} exitosa",
+      "send-sudt-success": "Transferencia exitosa a la cuenta de activo {{udtType}}",
       "unlock-success": "Activo reclamado. Vaya al historial de transacciones para obtener más detalles.",
       "withdraw-cheque-success": "El activo fue retirado. Vaya al historial de transacciones para obtener más detalles.",
       "claim-cheque-success": "Activo reclamado. Vaya al historial de transacciones para obtener más detalles."
     },
     "migrate-sudt": {
-      "title": "Migrar a una cuenta de activo sUDT",
+      "title": "Migrar a una cuenta de activo {{udtType}}",
       "choose-title": "Modo de migración",
       "next": "Siguiente",
       "back": "Atrás",
@@ -972,14 +972,14 @@
       "input-symbol": "Por favor ingrese el símbolo",
       "input-decimal": "Por favor ingrese el decimal",
       "turn-into-new-account": {
-        "title": "Conviértalo en una nueva cuenta de activo sUDT",
-        "sub-title": "Convierta el activo sUDT en una nueva cuenta sUDT, ocupa al menos 142 CKbytes.",
+        "title": "Conviértalo en una nueva cuenta de activo {{udtType}}",
+        "sub-title": "Convierta el activo {{udtType}} en una nueva cuenta {{udtType}}, ocupa al menos 142 CKbytes.",
         "cancel": "Cancelar",
         "confirm": "Confirmar"
       },
       "transfer-to-exist-account": {
-        "title": "Transferir a una cuenta de activo sUDT",
-        "sub-title": "Transfiera todo el saldo sUDT a una cuenta sUDT existente. Asegúrese de que la cuenta objetivo esté activa."
+        "title": "Transferir a una cuenta de activo {{udtType}}",
+        "sub-title": "Transfiera todo el saldo {{udtType}} a una cuenta {{udtType}} existente. Asegúrese de que la cuenta objetivo esté activa."
       },
       "cancel": "Cancelar",
       "confirm": "Confirmar",
@@ -1005,6 +1005,7 @@
         "select-account-type": "Seleccione el tipo de cuenta",
         "account-name": "Nombre de la cuenta",
         "sudt-account": "Cuenta de activos sUDT",
+        "xudt-account": "Cuenta de activos xUDT",
         "delete-failed": "No se pudo eliminar la configuración multifirma, el motivo del fallo: {{reason}}",
         "ckb-account": "Cuenta CKB",
         "set-token-info": "Establecer información del token",
@@ -1026,7 +1027,7 @@
           "decimal": "Ingrese el decimal"
         },
         "placeholder": {
-          "token-id": "El ID del token es el Args del sUDT Type Script, que es el mismo que el hash de bloqueo del emisor del token."
+          "token-id": "El ID del token es el Args del {{udtType}} Type Script, que es el mismo que el hash de bloqueo del emisor del token."
         }
       },
       "send": {

@@ -337,7 +337,7 @@ export const useUpdateDepositEpochList = ({
   useEffect(() => {
     if (connectionStatus === 'online') {
       getBlockHashes(records.map(v => v.depositOutPoint?.txHash).filter(v => !!v) as string[]).then(
-        depositBlockHashes => {
+        (depositBlockHashes: { txHash: string; blockHash: string | undefined }[]) => {
           const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
           records.forEach(record => {

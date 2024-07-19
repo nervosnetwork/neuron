@@ -4,6 +4,7 @@ import { closeConnection, getConnection, initConnection } from '../setupAndTeard
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 import accounts from '../setupAndTeardown/accounts.fixture'
+import { UDTType } from '../../src/utils/const'
 
 const defaultTokenId = '0x' + '0'.repeat(64)
 
@@ -162,19 +163,19 @@ describe('sudt token info service', () => {
     })
 
     it('no token info', async () => {
-      await expect(SudtTokenInfoService.getSudtTokenInfo('0x')).resolves.toBeNull()
+      await expect(SudtTokenInfoService.getSudtTokenInfo('0x', UDTType.SUDT)).resolves.toBeNull()
     })
 
     it('token info not match', async () => {
       const entity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save([entity.sudtTokenInfo, entity])
-      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`)).resolves.toBeNull()
+      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`, UDTType.SUDT)).resolves.toBeNull()
     })
 
     it('match token info', async () => {
       const entity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save([entity.sudtTokenInfo, entity])
-      const result = await SudtTokenInfoService.getSudtTokenInfo(assetAccount.tokenID)
+      const result = await SudtTokenInfoService.getSudtTokenInfo(assetAccount.tokenID, UDTType.SUDT)
       expect(result).toBeDefined()
       expect(result?.assetAccounts).toHaveLength(1)
     })

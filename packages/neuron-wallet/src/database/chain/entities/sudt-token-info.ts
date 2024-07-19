@@ -1,13 +1,20 @@
 import { Entity, Column, Index, OneToMany, PrimaryColumn } from 'typeorm'
 import AssetAccount from './asset-account'
+import { UDTType } from '../../../utils/const'
 
 @Entity()
-@Index(['tokenID'], { unique: true })
+@Index(['tokenID', 'udtType'], { unique: true })
 export default class SudtTokenInfo {
   @PrimaryColumn({
     type: 'varchar',
   })
   tokenID!: string
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  udtType?: UDTType
 
   @Column({
     type: 'varchar',
@@ -33,6 +40,7 @@ export default class SudtTokenInfo {
       tokenName: this.tokenName,
       symbol: this.symbol,
       decimal: this.decimal,
+      udtType: this.udtType,
     }
   }
 }

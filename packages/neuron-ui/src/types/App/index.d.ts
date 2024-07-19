@@ -132,6 +132,11 @@ declare namespace State {
     amendHash?: string
   }
 
+  enum UDTType {
+    SUDT = 'sUDT',
+    XUDT = 'xUDT',
+  }
+
   interface SUDTAccount {
     accountId: string
     accountName?: string
@@ -141,6 +146,7 @@ declare namespace State {
     tokenId: string
     address: string
     decimal: string
+    udtType?: UDTType
   }
 
   type GlobalAlertDialog = {
@@ -364,6 +370,7 @@ declare namespace State {
     NFTClass = 'NFTClass',
     NFTIssuer = 'NFTIssuer',
     SUDT = 'SUDT',
+    XUDT = 'XUDT',
     Spore = 'Spore',
     Unknown = 'Unknown',
   }
@@ -382,7 +389,7 @@ declare namespace State {
   }
   interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
     lockedReason?: { key: string; params?: Record<string, any> }
-    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Spore' | 'Unknown'
+    cellType?: 'CKB' | 'SUDT' | 'XUDT' | 'NFT' | 'Spore' | 'Unknown'
   }
 
   interface UpdateLiveCellLocalInfo {

@@ -13,7 +13,7 @@ import {
   showPageNotice,
   useDispatch,
 } from 'states'
-import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS, isSuccessResponse } from 'utils'
+import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS, isSuccessResponse, UDTType } from 'utils'
 import {
   validateTokenId,
   validateAssetAccountName,
@@ -282,6 +282,7 @@ export const useSUDTAccountInfoErrors = ({
   existingAccountNames,
   isCKB,
   t,
+  udtType,
 }: {
   info: {
     accountName: string
@@ -294,6 +295,7 @@ export const useSUDTAccountInfoErrors = ({
   existingAccountNames: string[]
   isCKB: boolean
   t: TFunction
+  udtType?: UDTType
 }) =>
   useMemo(() => {
     const tokenErrors = {
@@ -311,7 +313,7 @@ export const useSUDTAccountInfoErrors = ({
         validator: validateAssetAccountName,
       },
       symbol: { params: { symbol, isCKB }, validator: validateSymbol },
-      tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
+      tokenId: { params: { tokenId, isCKB, udtType }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
       balance: { params: { balance }, validator: typeof balance === 'undefined' ? () => {} : validateDecimal },

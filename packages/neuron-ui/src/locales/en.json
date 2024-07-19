@@ -519,10 +519,10 @@
         "title": "Create Asset Account"
       },
       "send-sudt": {
-        "title": "Send sUDT"
+        "title": "Send UDT"
       },
       "transfer-to-sudt": {
-        "title": "Send to sUDT account"
+        "title": "Send to UDT account"
       },
       "send-ckb-asset": {
         "title": "Send CKB"
@@ -531,7 +531,7 @@
         "title": "Send CKB"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "Send sUDT"
+        "title": "Send UDT"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "Send CKB"
@@ -963,7 +963,7 @@
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
       "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
-      "user-defined-token-tooltip": "Migrate sUDT asset to a sUDT Asset Account",
+      "user-defined-token-tooltip": "Migrate {{udtType}} asset to a {{udtType}} Asset Account",
       "claim-asset": "Claim",
       "withdraw-asset": "Withdraw",
       "view-details": "View Details",
@@ -974,14 +974,14 @@
       "transfer-nft": "Send",
       "user-defined-token": "Migrate",
       "transfer-nft-success": "Transfer of assets successful",
-      "migrate-sudt-success": "Conversion to new sUDT asset account successful",
-      "send-sudt-success": "Transfer to sUDT account successful",
+      "migrate-sudt-success": "Conversion to new {{udtType}} asset account successful",
+      "send-sudt-success": "Transfer to {{udtType}} account successful",
       "unlock-success": "Asset claimed, go to transaction history for details",
       "withdraw-cheque-success": "Asset withdrawn, go to transaction history for details",
       "claim-cheque-success": "Asset claimed, go to transaction history for details"
     },
     "migrate-sudt": {
-      "title": "Migrate to a sUDT Asset Account",
+      "title": "Migrate to a {{udtType}} Asset Account",
       "choose-title": "Migration mode",
       "next": "Next",
       "back": "Back",
@@ -989,14 +989,14 @@
       "input-symbol": "Please input symbol",
       "input-decimal": "Please input decimal",
       "turn-into-new-account": {
-        "title": "Turn into a new sUDT Asset Account",
-        "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
+        "title": "Turn into a new {{udtType}} Asset Account",
+        "sub-title": "Turn the {{udtType}} Asset into a new {{udtType}} Account, occupies at least 142 CKBytes",
         "cancel": "Cancel",
         "confirm": "Confirm"
       },
       "transfer-to-exist-account": {
-        "title": "Transfer to a sUDT Asset Account",
-        "sub-title": "Transfer all sUDT balance to an existing sUDT Account, please make sure the target account is alive"
+        "title": "Transfer to a {{udtType}} Asset Account",
+        "sub-title": "Transfer all {{udtType}} balance to an existing {{udtType}} Account, please make sure the target account is alive"
       },
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -1022,6 +1022,7 @@
         "select-account-type": "Select account type",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
+        "xudt-account": "xUDT Account",
         "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
         "ckb-account": "CKB Account",
         "set-token-info": "Set Token Info",
@@ -1043,7 +1044,7 @@
           "decimal": "Please input decimal"
         },
         "placeholder": {
-          "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
+          "token-id": "Token ID is the Args of the {{udtType}} Type Script, which is the same as the lock hash of the token issuer."
         }
       },
       "send": {
