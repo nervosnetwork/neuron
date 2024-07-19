@@ -24,7 +24,7 @@ import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
 import WalletsService from '../services/wallets'
 import SettingsService, { Locale } from '../services/settings'
-import { ResponseCode } from '../utils/const'
+import { ResponseCode, UDTType } from '../utils/const'
 import { clean as cleanChain } from '../database/chain'
 import WalletsController from '../controllers/wallets'
 import TransactionsController from '../controllers/transactions'
@@ -801,9 +801,12 @@ export default class ApiController {
       return this.#anyoneCanPayController.generateTx(params)
     })
 
-    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string; tokenID: string }) => {
-      return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID)
-    })
+    handle(
+      'get-hold-sudt-cell-capacity',
+      async (_, params: { address: string; tokenID: string; udtType?: UDTType }) => {
+        return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID, params.udtType)
+      }
+    )
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.#anyoneCanPayController.sendTx(params)

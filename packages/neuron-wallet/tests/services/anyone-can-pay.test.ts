@@ -366,7 +366,8 @@ describe('anyone-can-pay-service', () => {
     it('is secp256 address', async () => {
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        '0x00'
+        '0x00',
+        UDTType.SUDT
       )
       expect(res).toBe(undefined)
     })
@@ -381,7 +382,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue({})
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        '0x00'
+        '0x00',
+        UDTType.SUDT
       )
       expect(res).toBe(undefined)
     })
@@ -389,7 +391,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        '0x00'
+        `0x${'00'.repeat(32)}`,
+        UDTType.SUDT
       )
       expect(res).toBe(BigInt(MIN_SUDT_CAPACITY).toString())
     })
@@ -397,7 +400,8 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160),
-        '0x00'
+        `0x${'00'.repeat(32)}`,
+        UDTType.SUDT
       )
       expect(res).toBe(BigInt(162 * 10 ** 8).toString())
     })

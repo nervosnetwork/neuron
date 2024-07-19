@@ -22,6 +22,7 @@ import { MIN_SUDT_CAPACITY, UDTType } from '../utils/const'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
 import BufferUtils from '../utils/buffer'
+import { helpers } from '@ckb-lumos/lumos'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -145,23 +146,31 @@ export default class AnyoneCanPayService {
     })
   }
 
-  private static getSUDTAddCapacity(args: string) {
-    const addArgsLength = BigInt(args.slice(2).length / 2 - 20) * BigInt(10 ** 8)
-    return (addArgsLength + BigInt(MIN_SUDT_CAPACITY)).toString()
-  }
-
-  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string) {
+  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string, udtType?: UDTType) {
     if (SystemScriptInfo.isSecpScript(lockScript) || tokenID === 'CKBytes') {
       return undefined
     }
     const liveCellService = LiveCellService.getInstance()
+    const typeScript = new AssetAccountInfo().generateUdtScript(tokenID, udtType)
+    if (!typeScript) {
+      return undefined
+    }
     const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
       lockScript,
-      new AssetAccountInfo().generateSudtScript(tokenID)
+      typeScript
     )
     if (targetOutputLiveCell && new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
       return undefined
     }
-    return AnyoneCanPayService.getSUDTAddCapacity(lockScript.args)
+    return helpers
+      .minimalCellCapacity({
+        cellOutput: {
+          capacity: MIN_SUDT_CAPACITY.toString(),
+          lock: lockScript,
+          type: typeScript,
+        },
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
+      })
+      .toString()
   }
 }
