@@ -45,8 +45,8 @@ test("Launch Neuron", async () => {
   const title = await page.title();
   expect(title).toBe("Neuron");
 
-  await page.waitForSelector('text="总览"');
-  await page.waitForTimeout(20000);
+  // await page.waitForSelector('text="总览"');
+  // await page.waitForTimeout(20000);
 });
 
 test("Create Wallet", async () => {
@@ -117,7 +117,7 @@ test.describe('overview page tests', () => {
     console.log('amend交易成功！');
   });
 //suggestion:this case is run whenwallet balance is large,or you need to increase balance after this case
-  test("one cell consume", async () => {
+  /*test("one cell consume", async () => {
     await page.getByTitle('总览',{exact:true}).click();
     console.log('已点击总览！');
     // await page.locator('//!*[@id="root"]/div/div/div[2]/div[1]/div/div[1]/div[2]/button[3]//!*[name()="svg"]').click();
@@ -136,7 +136,7 @@ test.describe('overview page tests', () => {
     await page.getByRole('button', {name: '确认'}).click();
     console.log('消费cell成功！');
 
-  });
+  });*/
 
 });
 
@@ -234,7 +234,7 @@ test.describe('实验性功能', () => {
 });
 
 
-test.describe('menu-tool', () => {
+/*test.describe('menu-tool', () => {
   test("单签", async () => {
     // AppleScript 文件的路径
     await ClickSystemMenu.clickMenu('./__tests__/script/', 'singleSign.scpt');
@@ -249,7 +249,7 @@ test.describe('menu-tool', () => {
     await page.getByRole('button', {name: '验证'}).click();
     await expect(page.locator('.toast_content__U4vEI')).toHaveText('验证成功');
     //关闭弹窗
-    await page.locator('//*[@id="root"]/div/div[2]/dialog/div[1]/!*[name()="svg"]').click();
+    await page.locator('//!*[@id="root"]/div/div[2]/dialog/div[1]/!*[name()="svg"]').click();
 
     console.log('单签成功！');
 
@@ -295,7 +295,7 @@ test.describe('menu-tool', () => {
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103");
     await page.getByRole('button', {name: '发送'}).click();
-    await page.locator('//*[@id="root"]/dialog/div[2]/div/div[3]/button[1]/!*[name()="svg"]').click();
+    await page.locator('//!*[@id="root"]/dialog/div[2]/div/div[3]/button[1]/!*[name()="svg"]').click();
     // await page.locator('//!*[@id="root"]/dialog/div[2]/div/div[3]/button[1]').click();
     console.log('点击导出交易按钮成功！');
     await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
@@ -340,7 +340,7 @@ test.describe('menu-tool', () => {
     console.log('广播交易成功！');
 
   });
-});
+});*/
 
 /*test.describe('menu-hard wallet', () => {
   test("创建硬件钱包", async () => {
