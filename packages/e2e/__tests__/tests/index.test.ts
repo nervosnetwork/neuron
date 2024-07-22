@@ -51,6 +51,7 @@ test("Launch Neuron", async () => {
 
 test("Create Wallet", async () => {
   let createWallet = await page.getByText('钱包 1').isVisible();
+  console.log("createWallet"+createWallet);
   if (!createWallet) {
     await page.getByLabel("导入助记词").click();
     await page.locator("div").filter({hasText: /^1$/}).getByRole("textbox").click();
@@ -82,6 +83,17 @@ test("Create Wallet", async () => {
     await page.getByPlaceholder("重复密码").click();
     await page.getByPlaceholder("重复密码").fill("Aa111111");
     await page.getByLabel("完成创建").click();
+    await page.getByRole('button', {name: '开始同步'}).click();
+    await page.waitForTimeout(20000);
+
+    //本地启动全节点，并切换到全节点
+
+    await page.getByLabel('添加网络').click();
+    // await page.locator("id=url").fill("http://127.0.0.1:8114");
+    await page.locator("id=name").fill("testnet");
+    await page.getByRole('button', {name: '确认'}).click();
+    await page.getByRole('button', {name: '确认'}).click();
+
     await page.screenshot({path: "./test-results/createWallet.png"});
     console.log('钱包创建成功！');
 
@@ -92,7 +104,8 @@ test("Create Wallet", async () => {
 
 test.describe('overview page tests', () => {
   test("send transaction", async () => {
-    await page.waitForTimeout(10000);
+    //等待同步完成才能操作发送交易
+    await page.waitForTimeout(60000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('总览').click();
     await page.getByRole('button', {name: '转账'}).click();
