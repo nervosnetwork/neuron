@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.15.1
 
       - name: Update versions
         id: update_versions
@@ -37,7 +37,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Open PR to develop branch
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           title: Update ckb client versions
           commit-message: 'feat: update ckb client versions'
