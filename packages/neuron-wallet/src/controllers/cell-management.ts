@@ -1,4 +1,4 @@
-import type { OutPoint as OutPointSDK, Script } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK, Script } from '@ckb-lumos/lumos'
 import CellLocalInfo, { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import Output from '../models/chain/output'
 import CellsService, { LockScriptCategory, TypeScriptCategory } from '../services/cells'

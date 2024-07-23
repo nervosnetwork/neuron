@@ -5,7 +5,7 @@ import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpo
 import { getTransaction, getHeader } from 'services/chain'
 import Dialog from 'widgets/Dialog'
 import { Attention } from 'widgets/Icons/icon'
-import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/common-scripts/lib/dao'
+import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/lumos/common-scripts/dao'
 import styles from './withdrawDialog.module.scss'
 
 const { WITHDRAW_EPOCHS } = CONSTANTS

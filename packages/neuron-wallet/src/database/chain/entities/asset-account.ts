@@ -1,9 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
 import AssetAccountModel from '../../../models/asset-account'
 import SudtTokenInfo from './sudt-token-info'
+import { UDTType } from '../../../utils/const'
 
 @Entity()
-@Index(['tokenID', 'blake160'], { unique: true })
+@Index(['tokenID', 'blake160', 'udtType'], { unique: true })
 export default class AssetAccount {
   @PrimaryGeneratedColumn()
   id!: number
@@ -12,6 +13,12 @@ export default class AssetAccount {
     type: 'varchar',
   })
   tokenID!: string
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  udtType?: UDTType
 
   @Column({
     type: 'varchar',
@@ -40,12 +47,14 @@ export default class AssetAccount {
     assetAccount.accountName = info.accountName
     assetAccount.balance = info.balance
     assetAccount.blake160 = info.blake160
+    assetAccount.udtType = info.udtType
 
     const sudtTokenInfo = new SudtTokenInfo()
     sudtTokenInfo.tokenID = info.tokenID
     sudtTokenInfo.symbol = info.symbol
     sudtTokenInfo.tokenName = info.tokenName
     sudtTokenInfo.decimal = info.decimal
+    sudtTokenInfo.udtType = info.udtType
     assetAccount.sudtTokenInfo = sudtTokenInfo
 
     return assetAccount
@@ -60,7 +69,8 @@ export default class AssetAccount {
       this.sudtTokenInfo.decimal,
       this.balance,
       this.blake160,
-      this.id
+      this.id,
+      this.udtType
     )
   }
 }

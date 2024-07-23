@@ -1,7 +1,7 @@
 import AnyoneCanPayController from '../../src/controllers/anyone-can-pay'
 import Transaction from '../../src/models/chain/transaction'
 import { ServiceHasNoResponse } from '../../src/exceptions'
-import { ResponseCode } from '../../src/utils/const'
+import { ResponseCode, UDTType } from '../../src/utils/const'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import { addressToScript } from '../../src/utils/scriptAndAddress'
 
@@ -133,8 +133,8 @@ describe('anyone-can-pay-controller', () => {
     it('correct address', async () => {
       const address =
         'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
-      await anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')
-      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(addressToScript(address), 'tokenID')
+      await anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID', UDTType.SUDT)
+      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(addressToScript(address), 'tokenID', UDTType.SUDT)
     })
     it('error address', async () => {
       const address = 'ct1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'

@@ -1,5 +1,6 @@
 import TransactionSize from '../../src/models/transaction-size'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { bytes as byteUtils } from '@ckb-lumos/lumos/codec'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 import WitnessArgs from '../../src/models/chain/witness-args'
 import Transaction from '../../src/models/chain/transaction'
@@ -115,7 +116,6 @@ describe('TransactionSize', () => {
           args: '0x59a27ef3ba84f061517d13f42cf44ed020610061',
           hashType: 'type',
         },
-        type: null,
       },
     ],
     outputsData: ['0x1234', '0x'],

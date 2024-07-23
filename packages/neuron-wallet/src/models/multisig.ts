@@ -1,7 +1,7 @@
 import { MultisigPrefixError } from '../exceptions'
 import SystemScriptInfo from './system-script-info'
-import { since } from '@ckb-lumos/base'
-import { bytes, number } from '@ckb-lumos/codec'
+import { since } from '@ckb-lumos/lumos'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
 import Blake2b, { BLAKE160_HEX_LENGTH } from './blake2b'
 
 export interface MultisigPrefix {
@@ -38,7 +38,7 @@ export default class Multisig {
     const leftMinutes = totalMinutes % this.EPOCH_MINUTES
     const epochs = Math.floor(totalMinutes / this.EPOCH_MINUTES) + currentEpoch.number
     const result = this.epochSince(BigInt(this.EPOCH_MINUTES), BigInt(leftMinutes), BigInt(epochs))
-    return bytes.hexify(number.Uint64LE.pack(result))
+    return bytes.hexify(Uint64LE.pack(result))
   }
 
   static args(blake160: string, minutes: number, headerEpoch: string): string {
@@ -50,7 +50,7 @@ export default class Multisig {
   }
 
   static parseSince(args: string): bigint {
-    return number.Uint64LE.unpack(`0x${args.slice(BLAKE160_HEX_LENGTH)}`).toBigInt()
+    return Uint64LE.unpack(`0x${args.slice(BLAKE160_HEX_LENGTH)}`).toBigInt()
   }
 
   private static epochSince(length: bigint, index: bigint, number: bigint): bigint {

@@ -1,5 +1,5 @@
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
+import { bytes as byteUtils } from '@ckb-lumos/lumos/codec'
 import TypeChecker from '../../utils/type-checker'
 
 export enum ScriptHashType {

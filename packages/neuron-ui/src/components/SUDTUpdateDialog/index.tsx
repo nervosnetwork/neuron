@@ -2,13 +2,13 @@ import React, { useReducer, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { destroyAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
-import { isSuccessResponse } from 'utils'
+import { UDTType, isSuccessResponse } from 'utils'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
 import Tooltip from 'widgets/Tooltip'
 import { ReactComponent as Delete } from 'widgets/Icons/Delete.svg'
 import { ReactComponent as ExplorerIcon } from 'widgets/Icons/ExplorerIcon.svg'
-import { useSUDTAccountInfoErrors, useOpenSUDTTokenUrl } from 'utils/hooks'
+import { useSUDTAccountInfoErrors, useOpenUDTTokenUrl } from 'utils/hooks'
 import styles from './sUDTUpdateDialog.module.scss'
 
 export interface BasicInfo {
@@ -30,6 +30,7 @@ export interface SUDTUpdateDialogProps extends TokenInfo {
   onCancel: () => void
   existingAccountNames: string[]
   balance: string
+  udtType?: UDTType
 }
 
 const fields: { key: keyof Omit<TokenInfo, 'accountId' | 'isCKB'>; label: string }[] = [
@@ -78,6 +79,7 @@ const SUDTUpdateDialog = ({
   isCKB = false,
   existingAccountNames = [],
   balance,
+  udtType,
 }: SUDTUpdateDialogProps) => {
   const {
     wallet: { id: walletId },
@@ -86,7 +88,7 @@ const SUDTUpdateDialog = ({
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
 
-  const tokenErrors = useSUDTAccountInfoErrors({ info, isCKB, existingAccountNames, t })
+  const tokenErrors = useSUDTAccountInfoErrors({ info, isCKB, existingAccountNames, t, udtType })
 
   const isTokenReady = Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
@@ -106,7 +108,7 @@ const SUDTUpdateDialog = ({
       onSubmit({ ...info, accountName: info.accountName.trim(), tokenName: info.tokenName.trim(), accountId })
     }
   }
-  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
+  const openUDTTokenUrl = useOpenUDTTokenUrl(info.tokenId, udtType, isMainnet)
 
   const onDestroy = useCallback(() => {
     destroyAssetAccount({ walletID: walletId, id: accountId! }).then(res => {
@@ -184,7 +186,7 @@ const SUDTUpdateDialog = ({
           })}
         </div>
         {!isCKB && !tokenErrors.tokenId && info.tokenId && (
-          <button type="button" className={styles.explorerNavButton} onClick={openSUDTTokenUrl}>
+          <button type="button" className={styles.explorerNavButton} onClick={openUDTTokenUrl}>
             <ExplorerIcon /> {t('history.view-in-explorer-button-title')}
           </button>
         )}

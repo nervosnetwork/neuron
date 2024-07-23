@@ -1,4 +1,4 @@
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -9,7 +9,7 @@ export interface Address {
   walletId: string
   address: string
   path: string
-  addressType: AddressType
+  addressType: hd.AddressType
   addressIndex: number
   blake160: string
   txCount?: number

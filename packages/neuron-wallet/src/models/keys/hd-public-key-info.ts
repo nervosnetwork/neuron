@@ -1,11 +1,11 @@
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
 
 export default class HdPublicKeyInfoModel {
   public walletId: string
-  public addressType: AddressType
+  public addressType: hd.AddressType
   public addressIndex: number
   public publicKeyInBlake160: string
   public description?: string
@@ -22,12 +22,12 @@ export default class HdPublicKeyInfoModel {
   }
 
   public get path(): string {
-    return AccountExtendedPublicKey.pathFor(this.addressType, this.addressIndex)
+    return hd.AccountExtendedPublicKey.pathFor(this.addressType, this.addressIndex)
   }
 
   constructor(
     walletId: string,
-    addressType: AddressType,
+    addressType: hd.AddressType,
     addressIndex: number,
     publicKeyInBlake160: string,
     description?: string
@@ -41,7 +41,7 @@ export default class HdPublicKeyInfoModel {
 
   public static fromObject(params: {
     walletId: string
-    addressType: AddressType
+    addressType: hd.AddressType
     addressIndex: number
     publicKeyInBlake160: string
     description?: string

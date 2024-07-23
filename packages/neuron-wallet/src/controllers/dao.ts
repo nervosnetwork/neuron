@@ -1,4 +1,4 @@
-import { type OutPoint as OutPointSDK } from '@ckb-lumos/base'
+import { type OutPoint as OutPointSDK } from '@ckb-lumos/lumos'
 import { ServiceHasNoResponse, IsRequired } from '../exceptions'
 import { ResponseCode } from '../utils/const'
 import CellsService from '../services/cells'

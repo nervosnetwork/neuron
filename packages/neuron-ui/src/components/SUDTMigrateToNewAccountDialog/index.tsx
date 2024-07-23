@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
-import { getSUDTAmount, isSuccessResponse } from 'utils'
+import { getSUDTAmount, getUdtType, isSuccessResponse } from 'utils'
 import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, showGlobalAlertDialog, useDispatch } from 'states'
 import { useTokenInfo, TokenInfoType } from './hooks'
@@ -43,6 +43,7 @@ const SUDTMigrateToNewAccountDialog = ({
     tokenId: cell.type?.args,
     sUDTAccounts,
   })
+  const udtType = getUdtType(cell.type)
 
   const confirmDisabled = useMemo(
     () => fields.some(v => (tokenInfoErrors[v.key] || !tokenInfo[v.key]) && v.key !== 'balance'),
@@ -68,6 +69,7 @@ const SUDTMigrateToNewAccountDialog = ({
                 decimal: tokenInfo.decimal,
                 balance: sudtAmount.amountToCopy,
                 blake160: res.result.outputs[0].lock.args,
+                udtType,
               },
             },
           })
@@ -77,7 +79,7 @@ const SUDTMigrateToNewAccountDialog = ({
               walletID,
               actionType: 'create-sudt-account',
               onSuccess: () => {
-                onSuccess(t('special-assets.migrate-sudt-success'))
+                onSuccess(t('special-assets.migrate-sudt-success', { udtType }))
               },
             },
           })
@@ -121,7 +123,7 @@ const SUDTMigrateToNewAccountDialog = ({
     <Dialog
       className={styles.container}
       show
-      title={t('migrate-sudt.turn-into-new-account.title')}
+      title={t('migrate-sudt.turn-into-new-account.title', { udtType })}
       onCancel={onBack}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.confirm')}

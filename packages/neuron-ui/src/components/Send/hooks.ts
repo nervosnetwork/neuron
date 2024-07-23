@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'

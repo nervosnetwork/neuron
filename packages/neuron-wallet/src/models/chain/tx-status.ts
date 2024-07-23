@@ -4,6 +4,7 @@ export enum TxStatusType {
   Pending = 'pending',
   Proposed = 'proposed',
   Committed = 'committed',
+  Rejected = 'rejected',
 }
 
 export default class TxStatus {
@@ -26,6 +27,10 @@ export default class TxStatus {
 
   public isCommitted(): boolean {
     return this.status === TxStatusType.Committed
+  }
+
+  public isRejected(): boolean {
+    return this.status === TxStatusType.Rejected
   }
 
   public toSDK() {

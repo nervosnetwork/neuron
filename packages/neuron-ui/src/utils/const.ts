@@ -20,6 +20,7 @@ export const MAINNET_CLIENT_LIST = [FULL_NODE_MAINNET, LIGHT_CLIENT_MAINNET]
 
 export const MIN_DEPOSIT_AMOUNT = 102
 export const TOKEN_ID_LENGTH = 66
+export const XUDT_TOKEN_ID_LENGTH = 68
 
 export const SHANNON_CKB_RATIO = 1e8
 

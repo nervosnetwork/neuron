@@ -15,7 +15,7 @@ import {
   OfflineSignJSON,
   getMultisigSyncProgress,
 } from 'services/remote'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')

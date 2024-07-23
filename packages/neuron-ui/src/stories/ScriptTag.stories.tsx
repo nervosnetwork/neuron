@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import { action } from '@storybook/addon-actions'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import ScriptTag from 'components/ScriptTag'
 
 const scripts: Record<string, CKBComponents.Script> = {

@@ -1,4 +1,4 @@
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import Multisig from '../models/multisig'
 import MultisigConfigModel from '../models/multisig-config'
 import { Signatures, SignStatus } from '../models/offline-sign'

@@ -1,4 +1,5 @@
-import { bytes, molecule } from '@ckb-lumos/codec'
+import { bytes, struct, createFixedBytesCodec } from '@ckb-lumos/lumos/codec'
+import { predefined } from '@ckb-lumos/config-manager'
 import CellDep, { DepType } from './chain/cell-dep'
 import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
@@ -6,8 +7,11 @@ import NetworksService from '../services/networks'
 import Transaction from './chain/transaction'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
-import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
+import { UDTType } from '../utils/const'
 import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
+
+const createFixedHexBytesCodec = (byteLength: number) =>
+  createFixedBytesCodec({ byteLength, pack: bytes.bytify, unpack: bytes.hexify })
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -25,6 +29,7 @@ export default class AssetAccountInfo {
   private nftIssuerInfo: ScriptCellInfo
   private nftClassInfo: ScriptCellInfo
   private nftInfo: ScriptCellInfo
+  private xudt: ScriptCellInfo
 
   private sporeInfos: ScriptCellInfo[]
   private sporeClusterInfos: ScriptCellInfo[]
@@ -37,19 +42,32 @@ export default class AssetAccountInfo {
       sudt: this.sudt,
       sudtInfo: this.sudtInfo,
       anyoneCanPay: this.anyoneCanPayInfo,
+      xudt: this.xudt,
     }
   }
 
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
-    if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
-      this.sudt = {
-        cellDep: new CellDep(
-          new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
-          process.env.MAINNET_SUDT_DEP_TYPE! as DepType
-        ),
-        codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
-      }
+    const isMainnet = genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH
+    const { XUDT, SUDT, ANYONE_CAN_PAY } = isMainnet ? predefined.LINA.SCRIPTS : predefined.AGGRON4.SCRIPTS
+    this.xudt = {
+      cellDep: new CellDep(new OutPoint(XUDT.TX_HASH, XUDT.INDEX), XUDT.DEP_TYPE as DepType),
+      codeHash: XUDT.CODE_HASH,
+      hashType: XUDT.HASH_TYPE as ScriptHashType,
+    }
+    this.sudt = {
+      cellDep: new CellDep(new OutPoint(SUDT.TX_HASH, SUDT.INDEX), SUDT.DEP_TYPE as DepType),
+      codeHash: SUDT.CODE_HASH,
+      hashType: SUDT.HASH_TYPE as ScriptHashType,
+    }
+    this.anyoneCanPayInfo = {
+      cellDep: new CellDep(
+        new OutPoint(ANYONE_CAN_PAY.TX_HASH, ANYONE_CAN_PAY.INDEX),
+        ANYONE_CAN_PAY.DEP_TYPE as DepType
+      ),
+      codeHash: ANYONE_CAN_PAY.CODE_HASH,
+      hashType: ANYONE_CAN_PAY.HASH_TYPE as ScriptHashType,
+    }
+    if (isMainnet) {
       this.sudtInfo = {
         cellDep: new CellDep(
           new OutPoint(process.env.MAINNET_SUDT_INFO_DEP_TXHASH!, process.env.MAINNET_SUDT_INFO_DEP_INDEX!),
@@ -57,14 +75,6 @@ export default class AssetAccountInfo {
         ),
         codeHash: process.env.MAINNET_SUDT_INFO_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
-      }
-      this.anyoneCanPayInfo = {
-        cellDep: new CellDep(
-          new OutPoint(process.env.MAINNET_ACP_DEP_TXHASH!, process.env.MAINNET_ACP_DEP_INDEX!),
-          process.env.MAINNET_ACP_DEP_TYPE! as DepType
-        ),
-        codeHash: process.env.MAINNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -114,19 +124,10 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
-
       // TODO infos for mainnet
       this.sporeInfos = []
       this.sporeClusterInfos = []
     } else {
-      this.sudt = {
-        cellDep: new CellDep(
-          new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
-          process.env.TESTNET_SUDT_DEP_TYPE! as DepType
-        ),
-        codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
-      }
       this.sudtInfo = {
         cellDep: new CellDep(
           new OutPoint(process.env.TESTNET_SUDT_INFO_DEP_TXHASH!, process.env.TESTNET_SUDT_INFO_DEP_INDEX!),
@@ -134,14 +135,6 @@ export default class AssetAccountInfo {
         ),
         codeHash: process.env.TESTNET_SUDT_INFO_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
-      }
-      this.anyoneCanPayInfo = {
-        cellDep: new CellDep(
-          new OutPoint(process.env.TESTNET_ACP_DEP_TXHASH!, process.env.TESTNET_ACP_DEP_INDEX!),
-          process.env.TESTNET_ACP_DEP_TYPE! as DepType
-        ),
-        codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -211,6 +204,10 @@ export default class AssetAccountInfo {
     return this.anyoneCanPayInfo.cellDep
   }
 
+  public get xudtCellDep(): CellDep {
+    return this.xudt.cellDep
+  }
+
   public get anyoneCanPayCodeHash(): string {
     return this.anyoneCanPayInfo.codeHash
   }
@@ -243,10 +240,6 @@ export default class AssetAccountInfo {
     return this.sporeClusterInfos
   }
 
-  public getAcpCodeHash(): string {
-    return this.anyoneCanPayInfo.codeHash
-  }
-
   public getSudtCodeHash(): string {
     return this.sudt.codeHash
   }
@@ -271,8 +264,27 @@ export default class AssetAccountInfo {
     return new Script(info.codeHash, args, info.hashType)
   }
 
+  public generateXudtScript(args: string): Script {
+    return new Script(this.xudt.codeHash, args, this.xudt.hashType)
+  }
+
+  public generateUdtScript(args: string, udtType?: UDTType): Script | undefined {
+    switch (udtType) {
+      case UDTType.SUDT:
+        return this.generateSudtScript(args)
+      case UDTType.XUDT:
+        return this.generateXudtScript(args)
+      default:
+        return undefined
+    }
+  }
+
   public isSudtScript(script: Script): boolean {
     return script.codeHash === this.sudt.codeHash && script.hashType === this.sudt.hashType
+  }
+
+  public isXudtScript(script: Script): boolean {
+    return script.codeHash === this.xudt.codeHash && script.hashType === this.xudt.hashType
   }
 
   public isAnyoneCanPayScript(script: Script): boolean {
@@ -307,7 +319,7 @@ export default class AssetAccountInfo {
 
   public static findSignPathForCheque(addressInfos: Address[], chequeLockArgs: string) {
     const Bytes20 = createFixedHexBytesCodec(20)
-    const ChequeLockArgsCodec = molecule.struct(
+    const ChequeLockArgsCodec = struct(
       {
         receiverLockHash: Bytes20,
         senderLockHash: Bytes20,

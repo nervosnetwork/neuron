@@ -11,13 +11,14 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import { closeConnection, createAccounts, getConnection, initConnection } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import OutPoint from '../../src/models/chain/out-point'
 import { when } from 'jest-when'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import Script from '../../src/models/chain/script'
 import Input from '../../src/models/chain/input'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
+import { UDTType } from '../../src/utils/const'
 
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()
@@ -59,7 +60,8 @@ const generateOutput = (
   tokenAmount = '100',
   customData: string | undefined = undefined,
   status: OutputStatus = OutputStatus.Live,
-  lock?: Script
+  lock?: Script,
+  udtType?: UDTType
 ) => {
   const outputEntity = new OutputEntity()
   outputEntity.outPointTxHash = randomHex()
@@ -76,7 +78,7 @@ const generateOutput = (
   outputEntity.data = customData || '0x'
   outputEntity.hasData = customData ? true : false
   if (tokenID !== 'CKBytes') {
-    const type = assetAccountInfo.generateSudtScript(tokenID)
+    const type = assetAccountInfo.generateUdtScript(tokenID, udtType ?? UDTType.SUDT)!
     outputEntity.typeCodeHash = type.codeHash
     outputEntity.typeArgs = type.args
     outputEntity.typeHashType = type.hashType
@@ -146,7 +148,7 @@ describe('AssetAccountService', () => {
 
     const keyInfo = HdPublicKeyInfo.fromObject({
       walletId,
-      addressType: AddressType.Receiving,
+      addressType: hd.AddressType.Receiving,
       addressIndex: 0,
       publicKeyInBlake160: blake160,
     })
@@ -251,6 +253,7 @@ describe('AssetAccountService', () => {
 
   describe('#getAll', () => {
     const tokenID = '0x' + '0'.repeat(64)
+    const xUdtTokenID = '0x' + '1'.repeat(64)
 
     describe('with both sUDT and CKB accounts', () => {
       describe('with live cells', () => {
@@ -264,6 +267,17 @@ describe('AssetAccountService', () => {
               balance: '0',
               accountName: 'sUDT',
               blake160,
+              udtType: UDTType.SUDT,
+            }),
+            AssetAccount.fromObject({
+              tokenID: xUdtTokenID,
+              symbol: 'xUDT',
+              tokenName: 'xUDT',
+              decimal: '0',
+              balance: '0',
+              accountName: 'xUDT',
+              blake160,
+              udtType: UDTType.XUDT,
             }),
             AssetAccount.fromObject({
               tokenID: 'CKBytes',
@@ -280,6 +294,7 @@ describe('AssetAccountService', () => {
             generateOutput(undefined, undefined, undefined, toShannon(1000)),
             generateOutput(tokenID),
             generateOutput(tokenID),
+            generateOutput(xUdtTokenID),
           ]
           await createAccounts(assetAccounts, outputs)
         })
@@ -302,6 +317,17 @@ describe('AssetAccountService', () => {
               balance: '0',
               accountName: 'sUDT',
               blake160,
+              udtType: UDTType.SUDT,
+            }),
+            AssetAccount.fromObject({
+              tokenID: xUdtTokenID,
+              symbol: 'xUDT',
+              tokenName: 'xUDT',
+              decimal: '0',
+              balance: '0',
+              accountName: 'xUDT',
+              blake160,
+              udtType: UDTType.XUDT,
             }),
             AssetAccount.fromObject({
               tokenID: 'CKBytes',
@@ -318,13 +344,35 @@ describe('AssetAccountService', () => {
             generateOutput(undefined, undefined, undefined, toShannon(1000), undefined, undefined, OutputStatus.Sent),
             generateOutput(tokenID),
             generateOutput(tokenID, undefined, undefined, undefined, undefined, undefined, OutputStatus.Sent),
+            generateOutput(
+              xUdtTokenID,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              UDTType.XUDT
+            ),
+            generateOutput(
+              xUdtTokenID,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              OutputStatus.Sent,
+              undefined,
+              UDTType.XUDT
+            ),
           ]
           await createAccounts(assetAccounts, outputs)
         })
         it('includes balance calculations for both sUDT and CKB accounts', async () => {
           const result = await AssetAccountService.getAll(walletId)
 
-          expect(result.length).toEqual(2)
+          expect(result.length).toEqual(3)
           expect(result.find((a: any) => a.tokenID === tokenID)?.balance).toEqual('200')
           expect(result.find((a: any) => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(2000 - 61).toString())
         })
@@ -507,6 +555,7 @@ describe('AssetAccountService', () => {
             balance: '0',
             accountName: 'sUDT',
             blake160,
+            udtType: UDTType.SUDT,
           }),
           AssetAccount.fromObject({
             tokenID: 'CKBytes',
@@ -962,7 +1011,9 @@ describe('AssetAccountService', () => {
       '',
       '',
       '0',
-      '0x0000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000',
+      undefined,
+      UDTType.SUDT
     )
     const tx = {}
     beforeEach(async () => {

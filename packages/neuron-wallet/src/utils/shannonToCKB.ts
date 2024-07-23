@@ -1,4 +1,6 @@
-import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
+import { formatUnit } from '@ckb-lumos/lumos/utils'
+
+const ckbDecimals = 8
 
 const shannonToCKB = (shannon: bigint) => {
   return new Intl.NumberFormat('en-US', {

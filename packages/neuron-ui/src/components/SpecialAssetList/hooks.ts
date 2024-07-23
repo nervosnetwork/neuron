@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
-import { number, bytes } from '@ckb-lumos/codec'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
 import {
@@ -145,7 +145,7 @@ export const useSpecialAssetColumnInfo = ({
 
       switch (assetInfo.lock) {
         case PresetScript.Locktime: {
-          const targetEpochInfo = epochParser(bytes.hexify(number.Uint64LE.pack(`0x${lock.args.slice(-16)}`)))
+          const targetEpochInfo = epochParser(bytes.hexify(Uint64LE.pack(`0x${lock.args.slice(-16)}`)))
           const currentEpochInfo = epochParser(epoch)
           const targetEpochFraction =
             Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
@@ -178,13 +178,6 @@ export const useSpecialAssetColumnInfo = ({
           } catch {
             amount = 'sUDT Token'
           }
-          break
-        }
-        case PresetScript.SUDT: {
-          status = 'user-defined-token'
-          const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
-          const amountInfo = getSUDTAmount({ tokenInfo, data })
-          amount = amountInfo.amount
           break
         }
         default: {
@@ -220,6 +213,14 @@ export const useSpecialAssetColumnInfo = ({
           amount = t('special-assets.unknown-asset')
           break
         }
+        case PresetScript.XUDT:
+        case PresetScript.SUDT: {
+          status = 'user-defined-token'
+          const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
+          const amountInfo = getSUDTAmount({ tokenInfo, data })
+          amount = amountInfo.amount
+          break
+        }
         default: {
           break
         }
@@ -235,6 +236,7 @@ export const useSpecialAssetColumnInfo = ({
         epochsInfo,
         isSpore,
         sporeClusterInfo,
+        udtType: assetInfo.type,
       }
     },
     [epoch, bestKnownBlockTimestamp, tokenInfoList, t]

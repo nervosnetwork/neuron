@@ -1,5 +1,5 @@
 import { Brackets, In, IsNull, Not, type ObjectLiteral } from 'typeorm'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { getConnection } from '../database/chain/connection'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
@@ -31,7 +31,7 @@ import AssetAccountInfo from '../models/asset-account-info'
 import NFT from '../models/nft'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
 import { getClusterById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
 import NetworksService from './networks'
@@ -39,6 +39,7 @@ import { LOCKTIME_ARGS_LENGTH, MIN_CELL_CAPACITY } from '../utils/const'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import CellLocalInfoService from './cell-local-info'
 import CellLocalInfo from '../database/chain/entities/cell-local-info'
+import { helpers } from '@ckb-lumos/lumos'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -57,6 +58,7 @@ export enum CustomizedType {
   NFTIssuer = 'NFTIssuer',
 
   SUDT = 'SUDT',
+  XUDT = 'XUDT',
 
   Spore = 'Spore',
   SporeCluster = 'SporeCluster',
@@ -79,13 +81,13 @@ export enum TypeScriptCategory {
   NFTClass = CustomizedType.NFTClass,
   NFTIssuer = CustomizedType.NFTIssuer,
   SUDT = CustomizedType.SUDT,
+  XUDT = CustomizedType.XUDT,
   Spore = CustomizedType.Spore,
   Unknown = CustomizedType.Unknown,
 }
 
 export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10 ** 8)
-  private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10 ** 8)
 
   public static async getBalancesByWalletId(walletId: string): Promise<{
     liveBalances: Map<string, string>
@@ -296,6 +298,7 @@ export default class CellsService {
     const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash
     const nftCodehash = assetAccountInfo.getNftInfo().codeHash
     const sudtCodehash = assetAccountInfo.getSudtCodeHash()
+    const xudtCodeHash = assetAccountInfo.infos.xudt.codeHash
     const sporeInfos = assetAccountInfo.getSporeInfos()
 
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 =>
@@ -304,7 +307,7 @@ export default class CellsService {
 
     const skip = (pageNo - 1) * pageSize
 
-    const allMultiSignOutputs = await getConnection()
+    const allCustomizedOutputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
@@ -365,7 +368,7 @@ export default class CellsService {
     // to make the Spore NFT data available,
     // we need to fetch it from RPC instead of database
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
-    const sporeOutputs = allMultiSignOutputs.filter(item =>
+    const sporeOutputs = allCustomizedOutputs.filter(item =>
       sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
     )
 
@@ -393,7 +396,7 @@ export default class CellsService {
       })
     )
 
-    const matchedOutputs = allMultiSignOutputs.filter(o => {
+    const matchedOutputs = allCustomizedOutputs.filter(o => {
       if (o.multiSignBlake160) {
         return multiSignHashes.has(o.multiSignBlake160)
       }
@@ -406,7 +409,11 @@ export default class CellsService {
         )
       }
 
-      if (o.hasData && o.typeCodeHash === sudtCodehash && o.lockCodeHash === assetAccountInfo.anyoneCanPayCodeHash) {
+      if (
+        o.hasData &&
+        (o.typeCodeHash === sudtCodehash || o.typeCodeHash === xudtCodeHash) &&
+        o.lockCodeHash === assetAccountInfo.anyoneCanPayCodeHash
+      ) {
         return false
       }
 
@@ -466,8 +473,14 @@ export default class CellsService {
         })
       } else if (o.typeCodeHash === sudtCodehash) {
         cell.setCustomizedAssetInfo({
-          lock: CustomizedLock.SUDT,
+          lock: '',
           type: CustomizedType.SUDT,
+          data: '',
+        })
+      } else if (o.typeCodeHash === xudtCodeHash) {
+        cell.setCustomizedAssetInfo({
+          lock: '',
+          type: CustomizedType.XUDT,
           data: '',
         })
       } else if (sporeInfos.some(info => o.typeCodeHash && bytes.equal(info.codeHash, o.typeCodeHash))) {
@@ -1113,8 +1126,14 @@ export default class CellsService {
       } else {
         totalSize += TransactionSize.secpLockWitness()
         inputOriginCells.push(cell)
-        // capacity - 142CKB, 142CKB remaining for change
-        inputCapacities -= this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+        inputCapacities -= helpers.minimalCellCapacity({
+          cellOutput: {
+            capacity: cell.capacity,
+            lock: cell.lock(),
+            type: cell.type(),
+          },
+          data: cell.data,
+        })
         totalSize += TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData()
       }
       inputs.push(input)
@@ -1141,12 +1160,20 @@ export default class CellsService {
         .map(i => BigInt(i.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       let capacity: bigint = BigInt(0)
-      if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= extraPayCapacity) {
+      const curCellMinCapacity = helpers.minimalCellCapacity({
+        cellOutput: {
+          capacity: cell.capacity,
+          lock: cell.lock(),
+          type: cell.type(),
+        },
+        data: cell.data,
+      })
+      if (BigInt(cellCapacity) - curCellMinCapacity >= extraPayCapacity) {
         capacity = BigInt(cellCapacity) - extraPayCapacity
         extraPayCapacity = BigInt(0)
       } else {
-        capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
-        extraPayCapacity = extraPayCapacity - (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
+        capacity = curCellMinCapacity
+        extraPayCapacity = extraPayCapacity - (BigInt(cellCapacity) - curCellMinCapacity)
       }
       const output = Output.fromObject({
         capacity: capacity.toString(),
@@ -1365,6 +1392,8 @@ export default class CellsService {
           return TypeScriptCategory.NFTClass
         case assetAccountInfo.getSudtCodeHash():
           return TypeScriptCategory.SUDT
+        case assetAccountInfo.infos.xudt.codeHash:
+          return TypeScriptCategory.XUDT
         case SystemScriptInfo.DAO_CODE_HASH:
           return TypeScriptCategory.DAO
         default:

@@ -1,5 +1,5 @@
 import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 import { systemScripts } from '../../../src/utils/systemScripts'
 import { NetworkType } from '../../../src/models/network'
@@ -76,7 +76,7 @@ describe('HdPublicKeyInfoModel', () => {
     describe('with change address type', () => {
       beforeEach(() => {
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
-          addressType: AddressType.Change,
+          addressType: hd.AddressType.Change,
           addressIndex: 1,
         })
       })
@@ -87,7 +87,7 @@ describe('HdPublicKeyInfoModel', () => {
     describe('with receive address type', () => {
       beforeEach(() => {
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
-          addressType: AddressType.Receiving,
+          addressType: hd.AddressType.Receiving,
           addressIndex: 1,
         })
       })
