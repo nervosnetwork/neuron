@@ -53,6 +53,7 @@ test("Create Wallet", async () => {
   let createWallet = await page.getByText('钱包 1').isVisible();
   console.log("createWallet"+createWallet);
   if (!createWallet) {
+    await page.screenshot({path: "./test-results/createWallet.png"});
     await page.getByLabel("导入助记词").click();
     await page.locator("div").filter({hasText: /^1$/}).getByRole("textbox").click();
     await page.locator("div").filter({hasText: /^1$/}).getByRole("textbox").fill("verb");
@@ -106,7 +107,7 @@ test("Create Wallet", async () => {
      }
 
 
-    await page.screenshot({path: "./test-results/createWallet.png"});
+    // await page.screenshot({path: "./test-results/createWallet.png"});
     console.log('钱包创建成功！');
 
   } else {
