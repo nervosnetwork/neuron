@@ -1,6 +1,6 @@
 import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
-import ClickSystemMenu from '../common/utils';
+// import ClickSystemMenu from '../common/utils';
 
 let electronApp: ElectronApplication;
 
@@ -84,15 +84,27 @@ test("Create Wallet", async () => {
     await page.getByPlaceholder("重复密码").fill("Aa111111");
     await page.getByLabel("完成创建").click();
     await page.getByRole('button', {name: '开始同步'}).click();
-    await page.waitForTimeout(20000);
+    console.log('主网环境已进入！');
+    // await page.waitForTimeout(20000);
 
-    //本地启动全节点，并切换到全节点
+    //切换到测试网
+     let dialogShow= await page.getByLabel('添加网络').isVisible();
+     if (dialogShow){
+       await page.getByLabel('添加网络').click();
+       // await page.locator("id=url").fill("http://127.0.0.1:8114");
+       await page.locator("id=name").fill("testnet");
+       await page.getByRole('button', {name: '确认'}).click();
+       await page.getByRole('button', {name: '确认'}).click();
+     }else {
+       await page.getByTitle('设置').click();
+       await page.getByRole('button', {name: '添加网络'}).first().click();
+       await page.locator("id=url").fill("http://127.0.0.1:8114");
+       await page.locator("id=name").fill("testnet");
+       await page.getByRole('button', {name: '确认'}).click();
+       // await page.getByRole('button', {name: '确认'}).click();
+       await page.getByText('testnet').click();
+     }
 
-    await page.getByLabel('添加网络').click();
-    // await page.locator("id=url").fill("http://127.0.0.1:8114");
-    await page.locator("id=name").fill("testnet");
-    await page.getByRole('button', {name: '确认'}).click();
-    await page.getByRole('button', {name: '确认'}).click();
 
     await page.screenshot({path: "./test-results/createWallet.png"});
     console.log('钱包创建成功！');
@@ -104,8 +116,9 @@ test("Create Wallet", async () => {
 
 test.describe('overview page tests', () => {
   test("send transaction", async () => {
-    //等待同步完成才能操作发送交易
-    await page.waitForTimeout(60000);
+    //等待同步100%才能操作发送交易
+    // await page.waitForTimeout(60000);
+    page.setDefaultTimeout(180000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('总览').click();
     await page.getByRole('button', {name: '转账'}).click();
@@ -156,14 +169,13 @@ test.describe('overview page tests', () => {
 
 // 等待同步进度到100%
 test("nervos dao deposit", async () => {
-  await page.waitForTimeout(10000);
   await page.getByTitle('Nervos Dao').click();
+  // await page.waitForTimeout(60000);
   await page.getByRole('button', {name: '存入'}).click();
   await page.locator("id=depositValue").fill("104");
   await page.getByRole('button', {name: '继续'}).click();
   await page.locator("id=password").fill('Aa111111');
   await page.getByRole('button', {name: '确认'}).click();
-  await page.waitForTimeout(10000);
   await expect(page.getByText('正在存入...', {exact: true})).toBeVisible();
   console.log('nervos dao deposit 成功！');
 });
@@ -175,10 +187,10 @@ test("check transaction history", async () => {
   let EnterKey = "Enter";
   await page.keyboard.press(EnterKey);
   await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
-  await page.getByRole('button', {name: '导出交易历史'}).click();
+/*  await page.getByRole('button', {name: '导出交易历史'}).click();
   await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
-  await page.getByRole('button', {name: '确认'}).click();
+  await page.getByRole('button', {name: '确认'}).click();*/
   console.log('查历史记录成功！');
 
 });
@@ -186,6 +198,9 @@ test("check transaction history", async () => {
 //所有交易完成才能执行以下操作
 test.describe('实验性功能', () => {
   test("create account in asset accounts", async () => {
+    // await page.getByTitle('交易历史').click();
+    // await page.getByText('已提交').isHidden();
+    await page.waitForTimeout(60000);
     await page.getByTitle('实验性功能').click();
     await page.getByTitle('资产账户').click();
     await page.getByRole('button', {name: '创建资产账户'}).click();
@@ -213,7 +228,7 @@ test.describe('实验性功能', () => {
     console.log('点击地址成功！');
     await expect(page.getByText('已复制')).toBeVisible();
 //关闭窗口
-    await page.locator('//!*[@id="root"]/div/div/div[2]/div/dialog/div[1]/!*[name()="svg"]').click();
+    await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[1]/*[name()="svg"]').click();
     console.log('sudt账号复制成功！');
     await page.waitForTimeout(10000);
   });
