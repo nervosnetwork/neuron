@@ -4,9 +4,13 @@ import {test, expect} from "@playwright/test";
 
 let electronApp: ElectronApplication;
 
-
 test.beforeAll(async () => {
   electronApp = await electron.launch({args: ["../../packages/neuron-wallet/dist/main.js"]});
+  await new Promise((resolve) => {
+    electronApp.once("window", async (page) => {
+      resolve(page)
+    });
+  })
   electronApp.on("window", async (page) => {
     const filename = page.url()?.split("/").pop();
     console.log(`Window opened: ${filename}`);
@@ -20,12 +24,9 @@ test.beforeAll(async () => {
   });
 });
 
-/*
-test.afterAll(async () => {
-  await electronApp.close();
-});
-*/
-
+test.afterAll(async() => {
+  await electronApp.close()
+})
 
 let page: Page;
 
@@ -50,11 +51,12 @@ test("Launch Neuron", async () => {
 });
 
 test("Create Wallet", async () => {
+  page = await electronApp.firstWindow();
   let createWallet = await page.getByText('钱包 1').isVisible();
   console.log("createWallet"+createWallet);
   if (!createWallet) {
     await page.screenshot({path: "./test-results/createWallet.png"});
-    await page.getByLabel("导入助记词").click();
+    await page.getByLabel("Import Wallet Seed").click();
     await page.locator("div").filter({hasText: /^1$/}).getByRole("textbox").click();
     await page.locator("div").filter({hasText: /^1$/}).getByRole("textbox").fill("verb");
     await page.locator("div").filter({hasText: /^2$/}).getByRole("textbox").click();
@@ -79,29 +81,29 @@ test("Create Wallet", async () => {
     await page.locator("div").filter({hasText: /^11$/}).getByRole("textbox").fill("portion");
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").click();
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").fill("hero");
-    await page.getByLabel("下一步").click();
-    await page.getByPlaceholder("请设置一个强密码用于保护您的钱包").fill("Aa111111");
-    await page.getByPlaceholder("重复密码").click();
-    await page.getByPlaceholder("重复密码").fill("Aa111111");
-    await page.getByLabel("完成创建").click();
-    await page.getByRole('button', {name: '开始同步'}).click();
+    await page.getByLabel("Next").click();
+    await page.getByPlaceholder("Create a strong password to protect your wallet").fill("Aa111111");
+    await page.getByPlaceholder("Repeat Password").click();
+    await page.getByPlaceholder("Repeat Password").fill("Aa111111");
+    await page.getByLabel("Finish Creating").click();
+    await page.getByRole('button', {name: 'Start Sync'}).click();
     console.log('主网环境已进入！');
     // await page.waitForTimeout(20000);
 
     //切换到测试网
-     let dialogShow= await page.getByLabel('添加网络').isVisible();
+     let dialogShow= await page.getByLabel('Add Network').isVisible();
      if (dialogShow){
-       await page.getByLabel('添加网络').click();
+       await page.getByLabel('Add Network').click();
        // await page.locator("id=url").fill("http://127.0.0.1:8114");
        await page.locator("id=name").fill("testnet");
-       await page.getByRole('button', {name: '确认'}).click();
-       await page.getByRole('button', {name: '确认'}).click();
+       await page.getByRole('button', {name: 'Ok'}).click();
+       await page.getByRole('button', {name: 'Ok'}).click();
      }else {
-       await page.getByTitle('设置').click();
-       await page.getByRole('button', {name: '添加网络'}).first().click();
+       await page.getByTitle('Settings').click();
+       await page.getByRole('button', {name: 'Add Network'}).first().click();
        await page.locator("id=url").fill("http://127.0.0.1:8114");
        await page.locator("id=name").fill("testnet");
-       await page.getByRole('button', {name: '确认'}).click();
+       await page.getByRole('button', {name: 'Ok'}).click();
        // await page.getByRole('button', {name: '确认'}).click();
        await page.getByText('testnet').click();
      }

@@ -4,7 +4,8 @@ const config: PlaywrightTestConfig = {
   testDir: "./__tests__/tests/",
   maxFailures: 2,
   timeout: 180000,
-  retries: 1
+  retries: 1,
+  globalSetup: require.resolve('./global-setup'),
 };
 
 export default config;
