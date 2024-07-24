@@ -56,7 +56,7 @@
     "chalk": "3.0.0",
     "dotenv": "8.6.0",
     "electron-log": "4.4.8",
-    "electron-updater": "4.6.5",
+    "electron-updater": "6.3.0",
     "electron-window-state": "5.0.3",
     "elliptic": "6.5.5",
     "hw-app-ckb": "0.1.2",
