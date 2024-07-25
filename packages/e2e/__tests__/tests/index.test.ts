@@ -82,6 +82,7 @@ test("Create Wallet", async () => {
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").click();
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").fill("hero");
     await page.getByLabel("Next").click();
+    await page.waitForTimeout(6000);
     await page.getByPlaceholder("Create a strong password to protect your wallet").fill("Aa111111");
     await page.getByPlaceholder("Repeat Password").click();
     await page.getByPlaceholder("Repeat Password").fill("Aa111111");
