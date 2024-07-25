@@ -56,6 +56,12 @@ $active-primary-color: color-mix(in srgb, #000000 40%, var(--primary-color));
     }
   }
 
+  &[data-type='dashed'] {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+  }
+
   &[data-type='text'] {
     color: var(--primary-color);
     background-color: transparent;

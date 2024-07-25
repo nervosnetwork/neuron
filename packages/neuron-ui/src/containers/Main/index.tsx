@@ -37,8 +37,6 @@ const MainContent = () => {
     [network, networks]
   )
 
-  const isLightClientNetwork = network?.type === 2
-
   useSyncChainData({
     chainURL: network?.remote ?? '',
     dispatch,
@@ -100,12 +98,6 @@ const MainContent = () => {
   }, [])
 
   const dialogProps = (function getDialogProps() {
-    if (isLightClientNetwork) {
-      return {
-        onConfirm: onCloseSwitchNetwork,
-        children: t('main.external-node-detected-dialog.external-node-is-light'),
-      }
-    }
     if (sameUrlNetworks.length) {
       return {
         onConfirm: onSwitchNetwork,
@@ -137,7 +129,11 @@ const MainContent = () => {
     return {
       onConfirm: onOpenEditorDialog,
       confirmText: t('main.external-node-detected-dialog.add-network'),
-      children: t('main.external-node-detected-dialog.body-tips-without-network'),
+      children: (
+        <span className={styles.chooseNetworkTip}>
+          {t('main.external-node-detected-dialog.body-tips-without-network')}
+        </span>
+      ),
     }
   })()
 
@@ -172,6 +168,8 @@ const MainContent = () => {
         cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
         title={t('main.external-node-detected-dialog.title')}
         className={styles.networkDialog}
+        confirmProps={{ type: 'dashed' }}
+        cancelProps={{ type: 'dashed' }}
       >
         {dialogProps.children}
       </Dialog>
