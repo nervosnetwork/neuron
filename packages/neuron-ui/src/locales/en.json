@@ -463,7 +463,10 @@
         "lightTestnet": "Light Testnet",
         "lightMainnet": "Light Mainnet",
         "devnet": "Devnet",
-        "switch-network-type": "Switch to {{type}}"
+        "switch-network-type": "Switch to {{type}}",
+        "type": "Type",
+        "full-node": "Full Node",
+        "light-client-node": "Light Client Node"
       },
       "locale": {
         "en": "English",
@@ -1221,12 +1224,11 @@
     },
     "main": {
       "external-node-detected-dialog": {
-        "title": "External node detected",
-        "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
-        "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
+        "title": "Detected external node",
+        "body-tips-without-network": "You have selected the internal node but started the external node, if you want to continue to use an external node, please add a new network.",
+        "body-tips-with-network": "You have currently selected an internal node but started an external node, if you need to continu using the external node please switch to another external network or add a new network.",
         "add-network": "Add Network",
-        "ignore-external-node": "Ignore external node",
-        "external-node-is-light": "Neuron does not support external light client nodes due to different security assumptions for light clients. Would you like to connect to the \"Light Client\" ?"
+        "ignore-external-node": "Ignore external node"
       },
       "no-disk-space-dialog": {
         "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",

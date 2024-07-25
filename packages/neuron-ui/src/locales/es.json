@@ -446,7 +446,10 @@
         "lightTestnet": "Light Testnet",
         "lightMainnet": "Light Mainnet",
         "devnet": "Devnet",
-        "switch-network-type": "Cambiar a {{type}}"
+        "switch-network-type": "Cambiar a {{type}}",
+        "type": "Tipo",
+        "full-node": "Nodo Completo",
+        "light-client-node": "Nodo Cliente Ligero"
       },
       "locale": {
         "en": "English",
@@ -1202,11 +1205,10 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Nodo externo detectado",
-        "body-tips-without-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, agregue una nueva opción de red para el nodo externo.",
-        "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
+        "body-tips-without-network": "Has seleccionado el nodo interno pero has iniciado el nodo externo. Si deseas continuar usando un nodo externo, por favor añade una nueva red.",
+        "body-tips-with-network": "Actualmente has seleccionado un nodo interno pero has iniciado un nodo externo. Si necesitas continuar usando el nodo externo, por favor cambia a otra red externa o añade una nueva red.",
         "add-network": "Agregar red",
-        "ignore-external-node": "Ignorar nodo externo",
-        "external-node-is-light": "Debido a las diferentes suposiciones de seguridad del cliente ligero, Neuron no admite nodos de cliente ligero externos. ¿Desea conectarse a un \"Light Client\" ?"
+        "ignore-external-node": "Ignorar nodo externo"
       },
       "no-disk-space-dialog": {
         "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",

@@ -5,6 +5,7 @@ import Dialog from 'widgets/Dialog'
 import { validateNetworkName, validateURL } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { isErrorWithI18n } from 'exceptions'
+import { NetworkType } from 'utils/const'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditorDialog.module.scss'
 
@@ -31,6 +32,7 @@ const NetworkEditorDialog = ({
   )
   const [t] = useTranslation()
   const [editor, setEditor] = useState({
+    type: 0,
     name: '',
     nameError: '',
     url: url ?? '',
@@ -39,6 +41,7 @@ const NetworkEditorDialog = ({
   const [isUpdating, setIsUpdating] = useState(false)
 
   const disabled = !!(
+    !editor.type ||
     !editor.name ||
     !editor.url ||
     editor.nameError ||
@@ -50,6 +53,7 @@ const NetworkEditorDialog = ({
   useEffect(() => {
     if (cachedNetwork) {
       setEditor({
+        type: cachedNetwork.type,
         name: cachedNetwork.name,
         nameError: '',
         url: cachedNetwork.remote,
@@ -65,11 +69,14 @@ const NetworkEditorDialog = ({
         dataset: { field = '' },
       } = e.target as HTMLInputElement
       let error = ''
+      let fieldValue: string | number = value
       try {
         if (field === 'name') {
           validateNetworkName(value, usedNetworkNames)
         } else if (field === 'url') {
           validateURL(value)
+        } else if (field === 'type') {
+          fieldValue = Number(value)
         }
       } catch (err) {
         if (isErrorWithI18n(err)) {
@@ -79,7 +86,7 @@ const NetworkEditorDialog = ({
 
       setEditor(state => ({
         ...state,
-        [field]: value,
+        [field]: fieldValue,
         [`${field}Error`]: error,
       }))
     },
@@ -90,6 +97,7 @@ const NetworkEditorDialog = ({
     id: id!,
     name: editor.name,
     remote: editor.url,
+    networkType: editor.type,
     networks,
     callback: onSuccess,
     dispatch,
@@ -109,6 +117,27 @@ const NetworkEditorDialog = ({
       isLoading={isUpdating}
     >
       <div className={styles.container}>
+        <div className={styles.radioGroup}>
+          <p className={styles.label}>{t('settings.network.type')}</p>
+          {[
+            { value: `${NetworkType.Normal}`, label: t('settings.network.full-node') },
+            { value: `${NetworkType.Light}`, label: t('settings.network.light-client-node') },
+          ].map(item => (
+            <div className={styles.radioItem} key={item.value}>
+              <label htmlFor={item.value}>
+                <input
+                  id={item.value}
+                  type="radio"
+                  value={item.value}
+                  data-field="type"
+                  checked={Number(item.value) === editor.type}
+                  onChange={onChange}
+                />
+                <span>{item.label}</span>
+              </label>
+            </div>
+          ))}
+        </div>
         <TextField
           value={editor.url}
           field="url"
@@ -118,6 +147,7 @@ const NetworkEditorDialog = ({
           placeholder={t('settings.network.edit-network.input-rpc')}
           autoFocus
           disabled={!!url}
+          className={styles.rpcItem}
         />
         <TextField
           value={editor.name}

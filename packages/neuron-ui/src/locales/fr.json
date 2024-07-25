@@ -453,7 +453,10 @@
         "lightTestnet": "Testnet léger",
         "lightMainnet": "Mainnet léger",
         "devnet": "Devnet",
-        "switch-network-type": "Basculer vers {{type}}"
+        "switch-network-type": "Basculer vers {{type}}",
+        "type": "Type",
+        "full-node": "Nœud Complet",
+        "light-client-node": "Nœud Client Léger"
       },
       "locale": {
         "en": "English",
@@ -1212,11 +1215,10 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Détection d'un noeud externe",
-        "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
-        "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
+        "body-tips-without-network": "Vous avez sélectionné le nœud interne mais démarré le nœud externe. Si vous souhaitez continuer à utiliser un nœud externe, veuillez ajouter un nouveau réseau.",
+        "body-tips-with-network": "Vous avez actuellement sélectionné un nœud interne mais démarré un nœud externe. Si vous avez besoin de continuer à utiliser le nœud externe, veuillez passer à un autre réseau externe ou ajouter un nouveau réseau.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le noeud externe",
-        "external-node-is-light": "En raison de différentes hypothèses de sécurité du client léger, Neuron ne prend pas en charge les nœuds clients légers externes. Voulez-vous vous connecter à un \"Light Client\" ?"
+        "ignore-external-node": "Ignorer le noeud externe"
       },
       "no-disk-space-dialog": {
         "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
