@@ -246,8 +246,10 @@ export default class NetworksService extends Store {
         .getBlockchainInfo()
         .then(info => info.chain)
         .catch(() => '')
+    } else if (network.chain === 'ckb_dev') {
+      if (genesisHash === TESTNET_GENESIS_HASH) chain = LIGHT_CLIENT_TESTNET
+      if (genesisHash === MAINNET_GENESIS_HASH) chain = LIGHT_CLIENT_MAINNET
     }
-
     if (genesisHash !== network.genesisHash && chain !== '') {
       network.genesisHash = genesisHash
       network.chain = chain

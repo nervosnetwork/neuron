@@ -28,6 +28,8 @@ export enum VerifyCkbVersionResult {
   Incompatible,
 }
 
+type CKBNodeType = 'full' | 'light'
+
 class NodeService {
   private static instance: NodeService
 
@@ -156,11 +158,12 @@ class NodeService {
     const network = NetworksService.getInstance().getCurrent()
     if (!network.readonly) {
       const localNodeInfo = await new RpcService(network.remote, network.type).localNodeInfo()
-      const internalNodeVersion = this.getInternalNodeVersion()
+      const type: CKBNodeType = network.type === NetworkType.Light ? 'light' : 'full'
+      const internalNodeVersion = this.getInternalNodeVersion(type)
       const neuronVersion = app.getVersion()
       if (!internalNodeVersion || !localNodeInfo.version) return
       return {
-        ckbIsCompatible: this.isCkbCompatibility(neuronVersion, localNodeInfo.version),
+        ckbIsCompatible: this.isCkbCompatibility(neuronVersion, localNodeInfo.version, type),
         withIndexer: await this.isStartWithIndexer(),
         shouldUpdate: this.verifyCKbNodeShouldUpdate(internalNodeVersion, localNodeInfo.version),
       }
@@ -228,9 +231,9 @@ class NodeService {
       })
   }
 
-  private getInternalNodeVersion() {
+  private getInternalNodeVersion(type: CKBNodeType) {
     const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
-    const ckbVersionPath = path.join(appPath, '.ckb-version')
+    const ckbVersionPath = path.join(appPath, type === 'light' ? '.ckb-light-version' : '.ckb-version')
     if (fs.existsSync(ckbVersionPath)) {
       try {
         return fs.readFileSync(ckbVersionPath, 'utf8')?.split('\n')?.[0]?.slice(1)
@@ -260,11 +263,11 @@ class NodeService {
     }
   }
 
-  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string) {
+  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string, type: CKBNodeType = 'full') {
     const compatibilities = this.getNeuronCompatibilityCKB()
     const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
     const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
-    return compatibilities?.[neuronCompatibleVersion]?.full?.includes(externalCKBCompatibleVersion)
+    return compatibilities?.[neuronCompatibleVersion]?.[type]?.includes(externalCKBCompatibleVersion)
   }
 
   private verifyCKbNodeShouldUpdate(neuronCKBVersion: string, externalCKBVersion: string) {

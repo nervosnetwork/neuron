@@ -17,6 +17,7 @@ interface DialogProps {
   children?: React.ReactNode
   isLoading?: boolean
   confirmProps?: object
+  cancelProps?: object
   showHeader?: boolean
   showConfirm?: boolean
   showCancel?: boolean
@@ -39,6 +40,7 @@ const Dialog = ({
   children,
   isLoading,
   confirmProps = {},
+  cancelProps = {},
   showHeader = true,
   showConfirm = true,
   showCancel = true,
@@ -100,7 +102,12 @@ const Dialog = ({
         <div className={styles.footerWrap}>
           <form className={styles.footer}>
             {showCancel ? (
-              <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
+              <Button
+                type="cancel"
+                onClick={onCancel || closeDialog}
+                label={cancelText || t('common.cancel')}
+                {...cancelProps}
+              />
             ) : null}
             {showConfirm ? (
               <Button

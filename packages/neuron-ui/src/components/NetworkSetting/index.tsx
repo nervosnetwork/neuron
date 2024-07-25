@@ -86,9 +86,17 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     }
   }, [currentId, networks])
 
+  const isInternalLightClient = (network?: State.Network) =>
+    network && network.readonly && network.type === NetworkType.Light
+
   const showNetworks = useMemo(() => {
     const internalLightNodeId = lastShowInternalNodeIds.get(NetworkType.Light)
-    return networks.filter(v => v.type !== NetworkType.Light || v.id === internalLightNodeId)
+    const lastShowNetwork = networks.find(v => v.id === internalLightNodeId)
+    if (isInternalLightClient(lastShowNetwork)) {
+      return networks.filter(network => !isInternalLightClient(network) || network.id === internalLightNodeId)
+    }
+    const index = networks.findIndex(network => isInternalLightClient(network))
+    return networks.filter((network, i) => !isInternalLightClient(network) || index === i)
   }, [currentId, networks])
 
   return (
@@ -111,7 +119,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           ),
           suffix: (
             <div className={styles.suffix}>
-              {currentId === network.id && network.type === NetworkType.Light ? (
+              {currentId === network.id && isInternalLightClient(network) ? (
                 <Tooltip
                   tip={
                     <div>
