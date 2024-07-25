@@ -88,10 +88,11 @@ test("Create Wallet", async () => {
     await page.getByLabel("Finish Creating").click();
     await page.getByRole('button', {name: 'Start Sync'}).click();
     console.log('主网环境已进入！');
+
     // await page.waitForTimeout(20000);
 
     //切换到测试网
-     let dialogShow= await page.getByLabel('Add Network').isVisible();
+     /*let dialogShow= await page.getByLabel('Add Network').isVisible();
      if (dialogShow){
        await page.getByLabel('Add Network').click();
        // await page.locator("id=url").fill("http://127.0.0.1:8114");
@@ -106,7 +107,7 @@ test("Create Wallet", async () => {
        await page.getByRole('button', {name: 'Ok'}).click();
        // await page.getByRole('button', {name: '确认'}).click();
        await page.getByText('testnet').click();
-     }
+     }*/
 
 
     // await page.screenshot({path: "./test-results/createWallet.png"});
@@ -121,28 +122,33 @@ test.describe('overview page tests', () => {
   test("send transaction", async () => {
     //等待同步100%才能操作发送交易
     // await page.waitForTimeout(60000);
+    //切换到轻节点，并确定同步到100%
+    await page.getByTitle('Settings').click();
+    await page.locator('dialog').filter({ hasText: /^Confirm$/ }).getByLabel('Confirm')
+      .click();
+    await page.getByText('Light Client (http://127.0.0.1:9000)').click();
     page.setDefaultTimeout(180000);
     await page.waitForSelector('.syncStatus_synced__JM5ln');
-    await page.getByTitle('总览').click();
-    await page.getByRole('button', {name: '转账'}).click();
+    await page.getByTitle('Overview').click();
+    await page.getByRole('button', {name: 'Send'}).click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103.5");
-    await page.getByRole('button', {name: '发送'}).click();
+    await page.getByRole('button', {name: 'Send'}).click();
     await page.locator("id=password").fill('Aa111111');
-    await page.getByRole('button', {name: '确认'}).click();
+    await page.getByRole('button', {name: 'Confirm'}).click();
     await page.waitForTimeout(5000);
-    await expect(page.getByText('已提交')).toBeVisible();
+    await expect(page.getByText('Pending')).toBeVisible();
     console.log('发送交易成功！');
   });
 
 
   test("amend transaction ", async () => {
     await page.locator('//*[@id="root"]/div/div/div[2]/div[1]/table/tbody/tr[1]/td[7]').click();
-    await page.getByRole('button', {name: '修改'}).click();
-    await page.getByTitle('发送').click();
+    await page.getByRole('button', {name: 'Amend'}).click();
+    await page.getByTitle('Send').click();
     await page.locator("id=password").fill('Aa111111');
-    await page.getByRole('button', {name: '确认'}).click();
-    await expect(page.getByText('已提交').first()).toBeVisible();
+    await page.getByRole('button', {name: 'Confirm'}).click();
+    await expect(page.getByText('Confirming').first()).toBeVisible();
     console.log('amend交易成功！');
   });
 //suggestion:this case is run whenwallet balance is large,or you need to increase balance after this case
@@ -174,22 +180,22 @@ test.describe('overview page tests', () => {
 test("nervos dao deposit", async () => {
   await page.getByTitle('Nervos Dao').click();
   // await page.waitForTimeout(60000);
-  await page.getByRole('button', {name: '存入'}).click();
+  await page.getByRole('button', {name: 'Deposit'}).click();
   await page.locator("id=depositValue").fill("104");
-  await page.getByRole('button', {name: '继续'}).click();
+  await page.getByRole('button', {name: 'Proceed'}).click();
   await page.locator("id=password").fill('Aa111111');
-  await page.getByRole('button', {name: '确认'}).click();
-  await expect(page.getByText('正在存入...', {exact: true})).toBeVisible();
+  await page.getByRole('button', {name: 'Confirm'}).click();
+  await expect(page.getByText('Deposit in progress', {exact: true})).toBeVisible();
   console.log('nervos dao deposit 成功！');
 });
 
 
 test("check transaction history", async () => {
-  await page.getByTitle('交易历史').click();
-  await page.getByPlaceholder('使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索').fill('2024-05-23');
+  await page.getByTitle('History').click();
+  await page.getByPlaceholder('Search tx hash, address or date (yyyy-mm-dd)').fill('2024-05-23');
   let EnterKey = "Enter";
   await page.keyboard.press(EnterKey);
-  await expect(page.getByText('第 1 至 5 条记录, 共 5 条记录')).toBeVisible();
+  await expect(page.getByText('1 - 5 of 5')).toBeVisible();
 /*  await page.getByRole('button', {name: '导出交易历史'}).click();
   await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
@@ -204,20 +210,20 @@ test.describe('实验性功能', () => {
     // await page.getByTitle('交易历史').click();
     // await page.getByText('已提交').isHidden();
     await page.waitForTimeout(60000);
-    await page.getByTitle('实验性功能').click();
-    await page.getByTitle('资产账户').click();
-    await page.getByRole('button', {name: '创建资产账户'}).click();
+    await page.getByTitle('Experimental').click();
+    await page.getByTitle('Asset Accounts').click();
+    await page.getByRole('button', {name: 'Create Asset Account'}).click();
     const tp: number = Date.parse(new Date().toString());
     console.log('时间戳是:' + tp);
     await page.locator("id=accountName").fill("te" + tp);
-    await page.getByRole('button', {name: '下一步'}).click();
+    await page.getByRole('button', {name: 'Next'}).click();
     await page.locator("id=tokenId").fill("0xb1718e7c0175d8a6428a6ddca708b765803e3131d07c8e0046a94be310f1722b");
     await page.locator("id=tokenName").fill("tk01");
     await page.locator("id=symbol").fill("sy01");
     await page.locator("id=decimal").fill("4");
-    await page.getByRole('button', {name: '下一步'}).click();
+    await page.getByRole('button', {name: 'Next'}).click();
     await page.locator("id=password").fill("Aa111111");
-    await page.getByRole('button', {name: '确认'}).click();
+    await page.getByRole('button', {name: 'Confirm'}).click();
     await page.waitForTimeout(20000);
     await expect(page.getByText('te' + tp, {exact: true})).toBeVisible();
     console.log('创建sudt账号成功！');
@@ -225,11 +231,11 @@ test.describe('实验性功能', () => {
 
 
   test("receive ", async () => {
-    await page.getByRole('button', {name: '收款'}).first().click();
+    await page.getByRole('button', {name: 'Receive'}).first().click();
     console.log('点击收款成功！');
     await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
     console.log('点击地址成功！');
-    await expect(page.getByText('已复制')).toBeVisible();
+    await expect(page.getByText('Copied')).toBeVisible();
 //关闭窗口
     await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[1]/*[name()="svg"]').click();
     console.log('sudt账号复制成功！');
@@ -239,23 +245,23 @@ test.describe('实验性功能', () => {
 
   test("send ", async () => {
     //上笔记录为完成状态
-    await page.getByRole('button', {name: '转账'}).first().click();
+    await page.getByRole('button', {name: 'Send'}).first().click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqggcska5fafwdlfw9g0cttk5uzdcvuqj4qqz5d7q");
     await page.locator("id=amount").fill("0.001");
-    await page.getByRole('button', {name: '提交'}).click();
+    await page.getByRole('button', {name: 'Submit'}).click();
     await page.locator("id=password").fill('Aa111111');
-    await page.getByRole('button', {name: '确认'}).click();
+    await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('sudt账号发送交易成功！');
   });
 
 
   test("claim in customized page ", async () => {
-    await page.getByTitle('实验性功能').click();
-    await page.getByTitle('自定义资产').click();
-    await page.getByRole('button', {name: '领取'}).first().isEnabled();
-    await page.getByRole('button', {name: '领取'}).first().click();
+    await page.getByTitle('Experimental').click();
+    await page.getByTitle('Customized Assets').click();
+    await page.getByRole('button', {name: 'Claim'}).first().isEnabled();
+    await page.getByRole('button', {name: 'Claim'}).first().click();
     await page.locator("id=password").fill('Aa111111');
-    await page.getByRole('button', {name: '确认'}).click();
+    await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('领取自定义资产成功！');
 
 
