@@ -129,7 +129,11 @@ const MainContent = () => {
     return {
       onConfirm: onOpenEditorDialog,
       confirmText: t('main.external-node-detected-dialog.add-network'),
-      children: t('main.external-node-detected-dialog.body-tips-without-network'),
+      children: (
+        <span className={styles.chooseNetworkTip}>
+          {t('main.external-node-detected-dialog.body-tips-without-network')}
+        </span>
+      ),
     }
   })()
 
