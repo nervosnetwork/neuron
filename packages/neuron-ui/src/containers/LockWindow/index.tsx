@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AppActions, getLockWindowInfo, useDispatch, useState as useGlobalState } from 'states'
 import Spinner from 'widgets/Spinner'
 import Locked from 'widgets/Icons/Locked.png'
@@ -7,11 +7,14 @@ import DarkUnLockMp4 from 'widgets/Icons/dark-unlock.mp4'
 import UnLockMp4 from 'widgets/Icons/unlock.mp4'
 import SplitPasswordInput from 'widgets/SplitPasswordInput'
 import { useTranslation } from 'react-i18next'
-import { clsx, isSuccessResponse } from 'utils'
-import { isDark, unlockWindow } from 'services/remote'
+import { clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
+import { isDark, signMessage, unlockWindow } from 'services/remote'
 import { retryUnlockWindow } from 'services/localCache'
 import { MILLISECS_PER_HOUR, MILLISECS_PER_MIN, MILLISECS_PER_SEC } from 'utils/getSyncLeftTime'
+import { ControllerResponse } from 'services/remote/remoteApiWrapper'
+import LockWindowDialog from 'components/GeneralSetting/LockWindowDialog'
 import styles from './lockWindow.module.scss'
+import VerifyWallet from './verifyWallet'
 
 const passwordLen = 4
 const wrongEnterTimes = 3
@@ -24,12 +27,6 @@ const formatterLockMillisecs = (lockMillisecs: number) => {
 
 const getWaitMillisecs = (retryTimes: number) => {
   if (retryTimes % wrongEnterTimes === 0) {
-    if (retryTimes >= 3 * wrongEnterTimes) {
-      return 24 * MILLISECS_PER_HOUR
-    }
-    if (retryTimes > wrongEnterTimes) {
-      return 30 * MILLISECS_PER_MIN
-    }
     return 5 * MILLISECS_PER_MIN
   }
   return undefined
@@ -37,11 +34,12 @@ const getWaitMillisecs = (retryTimes: number) => {
 
 const LockWindow = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch()
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
   useEffect(() => {
     getLockWindowInfo(dispatch)
   }, [])
-  const { app } = useGlobalState()
+  const { app, wallet } = useGlobalState()
   const [password, setPassword] = useState<string[]>(new Array(passwordLen).fill(''))
   const [errMsg, setErrMsg] = useState('')
   const [retryUnlockInfo, setRetryUnlockInfo] = useState(retryUnlockWindow.get())
@@ -130,6 +128,25 @@ const LockWindow = ({ children }: { children: React.ReactNode }) => {
     }
     return () => clearInterval(interval)
   }, [retryUnlockInfo])
+  const splitPasswordInputRef = useRef<{ focus: () => void } | null>(null)
+  const [isVerifyWalletDialogShow, setIsVerifyWalletDialogShow] = useState(false)
+  const [isResetPasswordDialogShow, setIsResetPasswordDialogShow] = useState(false)
+  const onVerifyWallet = useCallback(
+    async (walletPassword?: string) => {
+      const res: ControllerResponse = await signMessage({
+        walletID: wallet?.id ?? '',
+        message: 'verify wallet for reset lock window password',
+        password: walletPassword ?? '',
+      })
+      if (isSuccessResponse(res)) {
+        setIsVerifyWalletDialogShow(false)
+        setIsResetPasswordDialogShow(true)
+      } else {
+        throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
+      }
+    },
+    [setIsResetPasswordDialogShow, setIsVerifyWalletDialogShow, wallet]
+  )
   if (!app.lockWindowInfo) {
     return (
       <div className={styles.loading}>
@@ -156,11 +173,47 @@ const LockWindow = ({ children }: { children: React.ReactNode }) => {
             disabled={retryUnlockInfo.retryTimes % wrongEnterTimes === 0 && !!retryUnlockInfo.lastRetryTime}
             values={password}
             onChange={onUpdatePassword}
+            ref={splitPasswordInputRef}
           />
         </div>
         <div className={styles.notice} data-has-err={!!errMsg}>
           {errMsg || t('lock-window.enter-lock-password')}
+          {wallet.isWatchOnly ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                setIsVerifyWalletDialogShow(true)
+              }}
+            >
+              {t('lock-window.forget-password')}
+            </button>
+          )}
         </div>
+        <VerifyWallet
+          show={isVerifyWalletDialogShow}
+          wallet={wallet}
+          onCancel={() => {
+            setIsVerifyWalletDialogShow(false)
+            setTimeout(() => {
+              // wait for dialog close
+              splitPasswordInputRef.current?.focus()
+            }, 10)
+          }}
+          onConfirm={onVerifyWallet}
+        />
+        <LockWindowDialog
+          show={isResetPasswordDialogShow}
+          onCancel={success => {
+            setIsResetPasswordDialogShow(false)
+            if (success) {
+              setPassword(new Array(passwordLen).fill(''))
+            }
+            setTimeout(() => {
+              // wait for dialog close
+              splitPasswordInputRef.current?.focus()
+            }, 10)
+          }}
+        />
       </div>
     )
   }

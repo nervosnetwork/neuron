@@ -2,7 +2,7 @@ import '../../src/types/ckbComponents.d.ts'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Address, AddressVersion } from '../../src/models/address'
 import Queue from '../../src/block-sync-renderer/sync/queue'
@@ -105,7 +105,7 @@ describe('queue', () => {
     blake160: `0x${'0'.repeat(40)}`,
     walletId: fakeWalletId,
     path: '',
-    addressType: AddressType.Receiving,
+    addressType: hd.AddressType.Receiving,
     addressIndex: 0,
     txCount: 0,
     liveBalance: '',

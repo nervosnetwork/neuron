@@ -1,10 +1,12 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { when } from 'jest-when'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import FullSynchronizer from '../../src/block-sync-renderer/sync/full-synchronizer'
 import { flushPromises } from '../test-utils'
+
+const { AddressType } = hd
 
 const stubbedTipFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()

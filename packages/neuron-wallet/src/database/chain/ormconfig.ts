@@ -69,6 +69,7 @@ import TxDescriptionSubscribe from './subscriber/tx-description-subscriber'
 import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
 import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
 import { AddStartBlockNumber1716539079505 } from './migrations/1716539079505-AddStartBlockNumber'
+import { AddUdtType1720089814860 } from './migrations/1720089814860-AddUdtType'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 export type ConnectionName = 'light' | 'full'
@@ -186,6 +187,7 @@ const getConnectionOptions = (genesisBlockHash: string, connectionName: Connecti
       RemoveAddressInIndexerCache1704357651876,
       AmendTransaction1709008125088,
       AddStartBlockNumber1716539079505,
+      AddUdtType1720089814860,
     ],
     subscribers: [
       AddressSubscribe,

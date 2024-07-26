@@ -1,5 +1,5 @@
-import { CellDep, OutPoint, Input, Output, RawTransaction, Transaction, blockchain, WitnessArgs } from '@ckb-lumos/base'
-import { bytes } from '@ckb-lumos/codec'
+import { CellDep, OutPoint, Input, Output, RawTransaction, Transaction, WitnessArgs } from '@ckb-lumos/lumos'
+import { bytes, blockchain } from '@ckb-lumos/lumos/codec'
 
 /**
  * @param outPoint always required when serialize

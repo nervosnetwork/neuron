@@ -1,4 +1,4 @@
-import { Tip } from '@ckb-lumos/base'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import RpcService from '../../services/rpc-service'
@@ -15,7 +15,7 @@ export default class FullSynchronizer extends Synchronizer {
     this.rpcService = new RpcService(nodeUrl, nodeType)
   }
 
-  private async synchronize(indexerTipBlock: Tip) {
+  private async synchronize(indexerTipBlock: CKBComponents.Tip) {
     if (!indexerTipBlock) {
       return
     }

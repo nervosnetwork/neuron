@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  useOnLocaleChange,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
   useExitOnWalletChange,
@@ -30,6 +29,7 @@ import {
   Edit,
   Confirming,
   Question,
+  LineDownArrow,
 } from 'widgets/Icons/icon'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
@@ -84,8 +84,7 @@ const LearnMore = React.memo(({ t }: { t: TFunction }) => (
 ))
 
 const MultisigAddress = () => {
-  const [t, i18n] = useTranslation()
-  useOnLocaleChange(i18n)
+  const [t] = useTranslation()
   useExitOnWalletChange()
   const {
     wallet: { id: walletId, addresses },
@@ -402,6 +401,7 @@ const MultisigAddress = () => {
                       <div className={styles.action}>
                         <Tooltip
                           tipClassName={styles.tip}
+                          className={styles.tipContent}
                           tip={
                             <div className={styles.actionOptions}>
                               {(!multisigBanlances[item.fullPayload] || multisigBanlances[item.fullPayload] === '0'
@@ -424,7 +424,10 @@ const MultisigAddress = () => {
                           trigger="click"
                           showTriangle
                         >
-                          <div className={styles.hoverBtn}>{t('multisig-address.table.more')}</div>
+                          <div className={styles.hoverBtn}>
+                            {t('multisig-address.table.more')}
+                            <LineDownArrow className={styles.expand} />
+                          </div>
                         </Tooltip>
                       </div>
                     )
@@ -492,10 +495,8 @@ const MultisigAddress = () => {
         confirmProps={{ type: 'cancel', className: styles.confirmBtn }}
       >
         <img src={AttentionCloseDialog} alt="Synchronization Abort" />
-        <h4>Synchronization Abort</h4>
-        <p>
-          Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.
-        </p>
+        <h4>{t('multisig-address.synchronization-abort')}</h4>
+        <p>{t('multisig-address.synchronization-abort-msg')}</p>
       </Dialog>
 
       {sendAction.sendFromMultisig && sendAction.isDialogOpen ? (

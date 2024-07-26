@@ -9,6 +9,7 @@ export const useOnSubmit = ({
   id = '',
   name = '',
   remote = '',
+  networkType,
   networks = [],
   callback,
   dispatch,
@@ -18,6 +19,7 @@ export const useOnSubmit = ({
   id: string
   name: string
   remote: string
+  networkType: Controller.NetworkType
   networks: Readonly<State.Network[]>
   callback: () => void
   dispatch: StateDispatch
@@ -25,7 +27,7 @@ export const useOnSubmit = ({
   setIsUpdating: React.Dispatch<boolean>
 }) =>
   useCallback((): void => {
-    if (disabled) {
+    if (disabled || !networkType) {
       return
     }
     let errorMessage: State.Message<ErrorCode, { fieldName: string; fieldValue?: string; length?: string }> | undefined
@@ -98,6 +100,7 @@ export const useOnSubmit = ({
       createNetwork({
         name,
         remote,
+        type: networkType,
       })(dispatch, callback)
       return
     }

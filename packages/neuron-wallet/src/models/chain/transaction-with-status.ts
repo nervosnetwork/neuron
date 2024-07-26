@@ -1,6 +1,8 @@
-import { TransactionWithStatus as APITransactionWithStatus } from '@ckb-lumos/base/lib/api'
+import { CKBComponents } from '@ckb-lumos/lumos/rpc'
 import Transaction from './transaction'
 import TxStatus from './tx-status'
+
+type APITransactionWithStatus = CKBComponents.TransactionWithStatus
 
 export default class TransactionWithStatus {
   public transaction: Transaction

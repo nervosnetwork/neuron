@@ -1,4 +1,9 @@
 declare namespace Controller {
+  enum UDTType {
+    SUDT = 'sUDT',
+    XUDT = 'xUDT',
+  }
+
   interface RequestOpenInExplorerParams {
     key: string
     type: 'transaction'
@@ -113,14 +118,21 @@ declare namespace Controller {
     description: string
   }
 
+  enum NetworkType {
+    Default, // internal full node
+    Normal,
+    Light, // internal Light node
+  }
+
   interface CreateNetworkParams {
     name: string
     remote: string
+    type: NetworkType
   }
 
   interface UpdateNetworkParams {
     networkID: string
-    options: Partial<{ name: string; remote: string }>
+    options: Partial<{ name: string; remote: string; type: NetworkType }>
   }
 
   interface UpdateTransactionDescriptionParams {
@@ -167,7 +179,7 @@ declare namespace Controller {
 
   interface SignMessageParams {
     walletID: string
-    address: string
+    address?: string
     password: string
     message: string
   }
@@ -217,6 +229,7 @@ declare namespace Controller {
     balance: string
     blake160: string
     address: string
+    udtType?: UDTType
   }
 
   namespace GetSUDTAccount {
@@ -244,6 +257,7 @@ declare namespace Controller {
       symbol: string
       decimal: string
       feeRate: string
+      udtType?: UDTType
     }
     interface Response {
       assetAccount: any
@@ -254,7 +268,7 @@ declare namespace Controller {
   namespace SendCreateSUDTAccountTransaction {
     interface Params {
       walletID: string
-      assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
+      assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID' | 'udtType'>
       tx: any
       password?: string
     }
@@ -385,9 +399,9 @@ declare namespace Controller {
   }
 
   namespace GenerateClaimChequeTransaction {
-    type AssetAccount = Record<
-      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName',
-      string
+    type AssetAccount = Pick<
+      SUDTAccount,
+      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName' | 'udtType'
     >
 
     interface Params {

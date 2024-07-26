@@ -1,4 +1,4 @@
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import CellsService from '../../services/cells'
 import {
   CapacityTooSmall,
@@ -31,7 +31,7 @@ import AddressService from '../../services/addresses'
 import { addressToScript } from '../../utils/scriptAndAddress'
 import MultisigConfigModel from '../../models/multisig-config'
 import WalletService from '../../services/wallets'
-import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
+import { MIN_CELL_CAPACITY, UDTType } from '../../utils/const'
 import AssetAccountService from '../../services/asset-account-service'
 import LiveCellService from '../../services/live-cell-service'
 import NetworksService from '../networks'
@@ -72,7 +72,7 @@ export class TransactionGenerator {
       if (!nftCell) return
 
       const nftTx = await this.getRpcService().getTransaction(outPoint.txHash)
-      const nftOriginalOutputData = nftTx?.transaction.outputsData[Number(outPoint.index)]
+      const nftOriginalOutputData = nftTx?.transaction?.outputsData[Number(outPoint.index)]
       if (!nftOriginalOutputData) return
 
       nftCell.data = nftOriginalOutputData
@@ -651,37 +651,51 @@ export class TransactionGenerator {
   }
 
   // sUDT
-  public static async generateCreateAnyoneCanPayTx(
-    tokenID: string,
-    walletId: string,
-    blake160: string,
-    changeBlake160: string,
-    feeRate: string,
+  public static async generateCreateAnyoneCanPayTx({
+    tokenID,
+    walletId,
+    blake160,
+    changeBlake160,
+    feeRate,
+    fee,
+    udtType,
+  }: {
+    tokenID: string
+    walletId: string
+    blake160: string
+    changeBlake160: string
+    feeRate: string
     fee: string
-  ): Promise<Transaction> {
+    udtType?: UDTType
+  }): Promise<Transaction> {
     // if tokenID === '' or 'CKBytes', create ckb cell
     const isCKB = tokenID === 'CKBytes' || tokenID === ''
+    if (!isCKB && !udtType) throw new Error('The udt token must has udt Type')
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
-    const needCapacities = isCKB ? BigInt(61 * 10 ** 8) : BigInt(142 * 10 ** 8)
+    const xudtCellDep = assetAccountInfo.xudtCellDep
     const output = Output.fromObject({
-      capacity: needCapacities.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
-      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      type: isCKB
+        ? null
+        : udtType === UDTType.SUDT
+        ? assetAccountInfo.generateSudtScript(tokenID)
+        : assetAccountInfo.generateXudtScript(tokenID),
       data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep],
+      cellDeps: [secpCellDep, sudtCellDep, xudtCellDep],
       inputs: [],
       outputs: [output],
       outputsData: [output.data],
       witnesses: [],
     })
     const baseSize: number = TransactionSize.tx(tx)
+    const needCapacities = BigInt(output.capacity)
     const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       needCapacities.toString(),
       walletId,
@@ -713,13 +727,21 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateCreateAnyoneCanPayTxUseAllBalance(
-    tokenID: string,
-    walletId: string,
-    blake160: string,
-    feeRate: string,
+  public static async generateCreateAnyoneCanPayTxUseAllBalance({
+    tokenID,
+    walletId,
+    blake160,
+    feeRate,
+    fee,
+    udtType,
+  }: {
+    tokenID: string
+    walletId: string
+    blake160: string
+    feeRate: string
     fee: string
-  ): Promise<Transaction> {
+    udtType?: UDTType
+  }): Promise<Transaction> {
     // if tokenID === '' or 'CKBytes', create ckb cell
     const isCKB = tokenID === 'CKBytes' || tokenID === ''
 
@@ -729,6 +751,7 @@ export class TransactionGenerator {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
+    const xudtCellDep = assetAccountInfo.xudtCellDep
 
     const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
 
@@ -741,14 +764,18 @@ export class TransactionGenerator {
     const output = Output.fromObject({
       capacity: totalCapacity.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
-      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      type: isCKB
+        ? null
+        : udtType === UDTType.SUDT
+        ? assetAccountInfo.generateSudtScript(tokenID)
+        : assetAccountInfo.generateXudtScript(tokenID),
       data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
 
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep],
+      cellDeps: [secpCellDep, sudtCellDep, xudtCellDep],
       inputs: allInputs,
       outputs: [output],
       outputsData: [output.data],
@@ -782,7 +809,7 @@ export class TransactionGenerator {
       throw new SudtAcpHaveDataError()
     }
     if (!isCKBAccount) {
-      cellDeps.push(assetAccountInfo.sudtCellDep)
+      cellDeps.push(assetAccountInfo.sudtCellDep, assetAccountInfo.xudtCellDep)
     }
 
     const output = Output.fromObject({
@@ -921,7 +948,6 @@ export class TransactionGenerator {
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
-    const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const targetAmount: bigint =
       amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
@@ -940,10 +966,14 @@ export class TransactionGenerator {
           data: targetOutput.data,
         })
       : undefined
+    const udtCellDep =
+      targetOutput.type && assetAccountInfo.isSudtScript(targetOutput.type)
+        ? assetAccountInfo.sudtCellDep
+        : assetAccountInfo.xudtCellDep
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, udtCellDep, anyoneCanPayDep],
       inputs: targetInput ? [targetInput] : [],
       outputs: [output],
       outputsData: [output.data],
@@ -987,7 +1017,7 @@ export class TransactionGenerator {
 
     // amount assertion
     TransactionGenerator.checkTxCapacity(tx, 'generateAnyoneCanPayToSudtTx capacity not match!')
-    TransactionGenerator.checkTxSudtAmount(tx, 'generateAnyoneCanPayToSudtTx sUDT amount not match!', assetAccountInfo)
+    TransactionGenerator.checkTxUdtAmount(tx, 'generateAnyoneCanPayToSudtTx sUDT amount not match!', assetAccountInfo)
 
     return tx
   }
@@ -1075,22 +1105,23 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const udtCellDep =
+      assetAccount.udtType === UDTType.SUDT ? assetAccountInfo.sudtCellDep : assetAccountInfo.xudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
     const senderAcpScript = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)
     const receiverLockScript = AddressParser.parse(receiverAddress)
 
     const chequeCellTmp = Output.fromObject({
-      capacity: BigInt(162 * 10 ** 8).toString(),
       lock: assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bytes.hexify(Buffer.alloc(20))),
-      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
+      type: assetAccountInfo.generateUdtScript(assetAccount.tokenID, assetAccount.udtType),
+      data: BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
 
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, udtCellDep, anyoneCanPayDep],
       inputs: [],
       outputs: [],
       outputsData: [],
@@ -1173,7 +1204,7 @@ export class TransactionGenerator {
     tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
     TransactionGenerator.checkTxCapacity(tx, 'generateCreateChequeTx capacity not match!')
-    TransactionGenerator.checkTxSudtAmount(tx, 'generateCreateChequeTx sUDT amount not match!', assetAccountInfo)
+    TransactionGenerator.checkTxUdtAmount(tx, 'generateCreateChequeTx sUDT amount not match!', assetAccountInfo)
 
     return tx
   }
@@ -1204,11 +1235,13 @@ export class TransactionGenerator {
     }
     const chequeSenderLock = senderInputsByLockHash[0].lockScript()
 
-    const acpCellCapacity = BigInt(142 * 10 ** 8)
     const assetAccountInfo = new AssetAccountInfo()
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const udtCellDep =
+      chequeCell.type && assetAccountInfo.isSudtScript(chequeCell.type)
+        ? assetAccountInfo.sudtCellDep
+        : assetAccountInfo.xudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const chequeDep = assetAccountInfo.getChequeInfo().cellDep
 
@@ -1229,7 +1262,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, chequeDep],
+      cellDeps: [secpCellDep, udtCellDep, anyoneCanPayDep, chequeDep],
       headerDeps: [],
       inputs: [chequeInput],
       outputs: [senderOutput],
@@ -1241,6 +1274,7 @@ export class TransactionGenerator {
     const receiverAcpCells = await CellsService.getACPCells(receiverAcpScript, chequeCell.type!)
 
     let requiredCapacity = BigInt(0)
+    let acpCellCapacity = BigInt(0)
     if (receiverAcpCells.length) {
       const originalReceiverAcpOutput = receiverAcpCells[0]
 
@@ -1264,16 +1298,16 @@ export class TransactionGenerator {
         data: originalReceiverAcpOutput.data,
       })
       tx.inputs.push(receiverAcpInput)
+      acpCellCapacity = BigInt(newReceiverAcpOutput.capacity)
       tx.outputs.push(newReceiverAcpOutput)
     } else {
-      requiredCapacity = acpCellCapacity
-
       const receiverAcpOutput = Output.fromObject({
-        capacity: acpCellCapacity.toString(),
         lock: receiverAcpScript,
         type: chequeCell.type,
         data: chequeCell.data,
       })
+      acpCellCapacity = BigInt(receiverAcpOutput.capacity)
+      requiredCapacity = BigInt(receiverAcpOutput.capacity)
 
       tx.outputs.push(receiverAcpOutput)
     }
@@ -1306,7 +1340,7 @@ export class TransactionGenerator {
     }
 
     TransactionGenerator.checkTxCapacity(tx, 'generateClaimChequeTx capacity not match!')
-    TransactionGenerator.checkTxSudtAmount(tx, 'generateClaimChequeTx sUDT amount not match!', assetAccountInfo)
+    TransactionGenerator.checkTxUdtAmount(tx, 'generateClaimChequeTx sUDT amount not match!', assetAccountInfo)
 
     return tx
   }
@@ -1378,12 +1412,13 @@ export class TransactionGenerator {
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const sudtCellDep = assetAccountInfo.sudtCellDep
+    const xudtCellDep = assetAccountInfo.xudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const chequeDep = assetAccountInfo.getChequeInfo().cellDep
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, chequeDep],
+      cellDeps: [secpCellDep, sudtCellDep, xudtCellDep, anyoneCanPayDep, chequeDep],
       headerDeps: [],
       inputs: [chequeSenderAcpInput, chequeInput],
       outputs: [senderAcpOutput],
@@ -1410,7 +1445,7 @@ export class TransactionGenerator {
     tx.outputsData.push('0x')
 
     TransactionGenerator.checkTxCapacity(tx, 'generateWithdrawChequeTx capacity not match!')
-    TransactionGenerator.checkTxSudtAmount(tx, 'generateWithdrawChequeTx sUDT amount not match!', assetAccountInfo)
+    TransactionGenerator.checkTxUdtAmount(tx, 'generateWithdrawChequeTx sUDT amount not match!', assetAccountInfo)
 
     return tx
   }
@@ -1456,7 +1491,6 @@ export class TransactionGenerator {
     ]
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-    const sudtCellDep = assetAccountInfo.sudtCellDep
     let outputs: Output[] = []
     let acpInputCell: Input | null = null
     const acpCodeHashes = new Set([sudtCell.lock.codeHash])
@@ -1511,7 +1545,12 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep, ...acpCellDeps.filter((v): v is CellDep => !!v)],
+      cellDeps: [
+        secpCellDep,
+        assetAccountInfo.sudtCellDep,
+        assetAccountInfo.xudtCellDep,
+        ...acpCellDeps.filter((v): v is CellDep => !!v),
+      ],
       inputs: sudtMigrateAcpInputs,
       outputs: outputs,
       outputsData: outputs.map(v => v.data || '0x'),
@@ -1521,7 +1560,7 @@ export class TransactionGenerator {
     const txSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
     tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
     const outputCapacity = BigInt(inputSudtCell.capacity) - BigInt(tx.fee)
-    if (outputCapacity >= BigInt(MIN_SUDT_CAPACITY)) {
+    if (outputCapacity >= tx.outputs[0].minimalCellCapacity()) {
       tx.outputs[0].capacity = outputCapacity.toString()
       return tx
     }
@@ -1577,18 +1616,29 @@ export class TransactionGenerator {
     )
   }
 
-  private static checkTxSudtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {
-    const inputAmount = tx.inputs
+  private static checkTxUdtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {
+    const sudtInputAmount = tx.inputs
       .filter(i => i.type && assetAccountInfo.isSudtScript(i.type))
       .map(i => BufferUtils.parseAmountFromSUDTData(i.data!))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const outputAmount = tx.outputs
+    const sudtOutputAmount = tx.outputs
       .filter(o => o.type && assetAccountInfo.isSudtScript(o.type))
       .map(o => BufferUtils.parseAmountFromSUDTData(o.data!))
       .reduce((result, c) => result + c, BigInt(0))
 
-    assert.equal(inputAmount.toString(), outputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
+    assert.equal(sudtInputAmount.toString(), sudtOutputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
+
+    const xudtInputAmount = tx.inputs
+      .filter(i => i.type && assetAccountInfo.isXudtScript(i.type))
+      .map(i => BufferUtils.parseAmountFromSUDTData(i.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const xudtOutputAmount = tx.outputs
+      .filter(o => o.type && assetAccountInfo.isXudtScript(o.type))
+      .map(o => BufferUtils.parseAmountFromSUDTData(o.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+    assert.equal(xudtInputAmount.toString(), xudtOutputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
   }
 }
 

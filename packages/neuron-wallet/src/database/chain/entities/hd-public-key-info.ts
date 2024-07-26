@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn } from 'typeorm'
 import HdPublicKeyInfoModel from '../../../models/keys/hd-public-key-info'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 
 @Entity()
 export default class HdPublicKeyInfo {
@@ -14,7 +14,7 @@ export default class HdPublicKeyInfo {
   walletId!: string
 
   @Column()
-  addressType!: AddressType
+  addressType!: hd.AddressType
 
   @Column()
   @Index()

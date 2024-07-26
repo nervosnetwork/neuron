@@ -1,4 +1,4 @@
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 
 const CODE_HASH_LENGTH = 32
 const HASH_TYPE_LENGTH = 1

@@ -1,10 +1,12 @@
 import { when } from 'jest-when'
 import AddressMeta from '../../src/database/address/meta'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { AddressVersion } from '../../src/models/address'
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../src/services/rpc-service'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
+
+const { AddressType } = hd
 
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()

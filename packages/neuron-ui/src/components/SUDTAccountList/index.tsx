@@ -24,6 +24,7 @@ import {
   isSuccessResponse,
   useIsInsufficientToCreateSUDTAccount,
   useOnGenerateNewAccountTransaction,
+  UDTType,
 } from 'utils'
 
 import { getSUDTAccountList, updateSUDTAccount } from 'services/remote'
@@ -48,7 +49,11 @@ const SUDTAccountList = () => {
   const [keyword, setKeyword] = useState('')
   const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [insufficient, setInsufficient] = useState({ [AccountType.CKB]: false, [AccountType.SUDT]: false })
+  const [insufficient, setInsufficient] = useState({
+    [AccountType.CKB]: false,
+    [AccountType.SUDT]: false,
+    [AccountType.XUDT]: false,
+  })
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const [receiveData, setReceiveData] = useState<DataProps | null>(null)
@@ -178,6 +183,7 @@ const SUDTAccountList = () => {
         tokenName: accountToUpdate.tokenName || DEFAULT_SUDT_FIELDS.tokenName,
         symbol: accountToUpdate.symbol || DEFAULT_SUDT_FIELDS.symbol,
         isCKB: accountToUpdate.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId,
+        udtType: accountToUpdate.udtType,
         onSubmit: (info: Omit<TokenInfo, 'isCKB'>) => {
           const params: any = { id: accountToUpdate.accountId }
           Object.keys(info).forEach(key => {
@@ -208,7 +214,7 @@ const SUDTAccountList = () => {
     : undefined
 
   const handleCreateAccount = useCallback(
-    (info: TokenInfo) => {
+    (info: TokenInfo & { udtType?: UDTType }) => {
       createAccount(info, () => {
         setNotice(t('s-udt.create-account-success'))
       })

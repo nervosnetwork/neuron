@@ -1,7 +1,7 @@
 import AssetAccountInfo from '../models/asset-account-info'
 import Transaction from '../models/chain/transaction'
 import { ServiceHasNoResponse } from '../exceptions'
-import { ResponseCode } from '../utils/const'
+import { ResponseCode, UDTType } from '../utils/const'
 import AnyoneCanPayService from '../services/anyone-can-pay'
 import TransactionSender from '../services/transaction-sender'
 import { set as setDescription } from '../services/tx/transaction-description'
@@ -49,10 +49,11 @@ export default class AnyoneCanPayController {
 
   public async getHoldSudtCellCapacity(
     receiveAddress: string,
-    tokenID: string
+    tokenID: string,
+    udtType?: UDTType
   ): Promise<Controller.Response<string | undefined>> {
     const lockScript = AddressParser.parse(receiveAddress)
-    const extraCKB = await AnyoneCanPayService.getHoldSUDTCellCapacity(lockScript, tokenID)
+    const extraCKB = await AnyoneCanPayService.getHoldSUDTCellCapacity(lockScript, tokenID, udtType)
     return {
       status: ResponseCode.Success,
       result: extraCKB,

@@ -1,14 +1,8 @@
-import { CKBRPC } from '@ckb-lumos/rpc'
+import { CKBRPC } from '@ckb-lumos/lumos/rpc'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
 import { getConnection } from '../../database/chain/connection'
-import Transaction, {
-  TransactionStatus,
-  SudtInfo,
-  NFTType,
-  NFTInfo,
-  AssetAccountType,
-} from '../../models/chain/transaction'
+import Transaction, { TransactionStatus, NFTType, AssetAccountType } from '../../models/chain/transaction'
 import InputEntity from '../../database/chain/entities/input'
 import AddressParser from '../../models/address-parser'
 import AssetAccountInfo from '../../models/asset-account-info'
@@ -22,6 +16,7 @@ import Input from '../../models/chain/input'
 import SudtTokenInfoService from '../sudt-token-info'
 import TransactionSize from '../../models/transaction-size'
 import Output from '../../models/chain/output'
+import { UDTType } from '../../utils/const'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -91,6 +86,145 @@ export class TransactionsService {
     if (aBalance > bBalance) return direction === DESC ? 1 : -1
     if (aBalance < bBalance) return direction === DESC ? -1 : 1
     return 0
+  }
+
+  private static async getSudtInfo({
+    txHash,
+    acpUdtInputs,
+    acpUdtOutputs,
+    udtType,
+  }: {
+    txHash: string
+    acpUdtInputs: InputEntity[]
+    acpUdtOutputs: OutputEntity[]
+    udtType: UDTType
+  }) {
+    const udtInput = acpUdtInputs.find(i => i.transactionHash === txHash)
+    const udtOutput = acpUdtOutputs.find(o => o.outPointTxHash === txHash)
+    const typeArgs: string | undefined | null = udtInput?.typeArgs ?? udtOutput?.typeArgs
+    const assetAccountType: AssetAccountType | undefined =
+      udtInput || udtOutput ? (udtType === UDTType.SUDT ? AssetAccountType.SUDT : AssetAccountType.XUDT) : undefined
+    if (!typeArgs) return undefined
+    const inputAmount = acpUdtInputs
+      .filter(i => i.transactionHash === txHash && i.typeArgs === typeArgs)
+      .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
+      .reduce((result, c) => result + c, BigInt(0))
+    const outputAmount = acpUdtOutputs
+      .filter(o => o.outPointTxHash === txHash && o.typeArgs === typeArgs)
+      .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
+      .reduce((result, c) => result + c, BigInt(0))
+    const amount = outputAmount - inputAmount
+    let txType = amount > 0 ? 'receive' : 'send'
+    if (udtInput && !udtOutput) {
+      txType = 'destroy'
+    } else if (!udtInput && udtOutput) {
+      txType = 'create'
+    }
+
+    return {
+      sudtInfo: {
+        sUDT: (await SudtTokenInfoService.getSudtTokenInfo(typeArgs, udtType)) ?? undefined,
+        amount: amount.toString(),
+      },
+      txType,
+      assetAccountType,
+    }
+  }
+
+  private static async getAssetCKBInfo({
+    txHash,
+    acpCKBInputs,
+    acpCKBOutputs,
+  }: {
+    txHash: string
+    acpCKBInputs: InputEntity[]
+    acpCKBOutputs: OutputEntity[]
+  }) {
+    const ckbAssetInput = acpCKBInputs.find(i => i.transactionHash === txHash)
+    const ckbAssetOutput = acpCKBOutputs.find(o => o.outPointTxHash === txHash)
+    if (!ckbAssetInput && !ckbAssetOutput) return
+    if (ckbAssetInput && !ckbAssetOutput) {
+      return {
+        txType: 'destroy',
+        assetAccountType: AssetAccountType.CKB,
+      }
+    }
+    if (!ckbAssetInput && ckbAssetOutput) {
+      return {
+        txType: 'create',
+        assetAccountType: AssetAccountType.CKB,
+      }
+    }
+  }
+
+  private static getNtfInfo({
+    txHash,
+    nftInputs,
+    nftOutputs,
+  }: {
+    txHash: string
+    nftInputs: InputEntity[]
+    nftOutputs: OutputEntity[]
+  }) {
+    const sendNFTCell = nftInputs.find(i => i.transactionHash === txHash)
+    const receiveNFTCell = nftOutputs.find(o => o.outPointTxHash === txHash)
+
+    if (sendNFTCell) {
+      return { type: NFTType.Send, data: sendNFTCell.typeArgs! }
+    }
+    if (receiveNFTCell) {
+      return { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
+    }
+  }
+
+  private static getDAOCapacity(
+    ckbChange: bigint,
+    txDaoInfo?: {
+      inputs: {
+        capacity: string
+        transactionHash: string
+        outPointTxHash: string
+        outPointIndex: string
+        data: string
+      }[]
+      outputs: {
+        capacity: string
+        transactionHash: string
+        daoData: string
+      }[]
+    }
+  ) {
+    if (!txDaoInfo) return
+    if (txDaoInfo.inputs.length && !txDaoInfo.outputs.length) {
+      return txDaoInfo.inputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, ckbChange).toString()
+    }
+    if (!txDaoInfo.inputs.length && txDaoInfo.outputs.length) {
+      return `-${txDaoInfo.outputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, BigInt(0)).toString()}`
+    }
+  }
+
+  private static groupAssetCells<T extends { typeScript: InputEntity['typeScript'] }>(cells: T[]) {
+    const assetAccountInfo = new AssetAccountInfo()
+    const acpSudtCells: T[] = []
+    const acpCKBCells: T[] = []
+    const acpXudtCells: T[] = []
+    cells.forEach(v => {
+      const typeScript = v.typeScript()
+      if (typeScript) {
+        if (assetAccountInfo.isSudtScript(typeScript)) {
+          acpSudtCells.push(v)
+        } else if (assetAccountInfo.isXudtScript(typeScript)) {
+          acpXudtCells.push(v)
+        }
+      } else {
+        acpCKBCells.push(v)
+      }
+    })
+    return {
+      acpCKBCells,
+      acpSudtCells,
+      acpXudtCells,
+    }
   }
 
   public static async getAllByAddresses(
@@ -359,14 +493,6 @@ export class TransactionsService {
       )
       .getMany()
 
-    const anyoneCanPayInputs = assetAccountInputs.filter(i => i.typeScript())
-
-    const anyoneCanPayOutputs = assetAccountOutputs.filter(i => i.typeScript())
-
-    const ckbAssetInputs = assetAccountInputs.filter(i => !i.typeScript())
-
-    const ckbAssetOutputs = assetAccountOutputs.filter(i => !i.typeScript())
-
     const inputPreviousTxHashes: string[] = inputs.map(i => i.outPointTxHash).filter(h => !!h) as string[]
 
     const daoCellOutPoints: { txHash: string; index: string }[] = (
@@ -410,114 +536,53 @@ export class TransactionsService {
       }
     })
 
+    const {
+      acpCKBCells: acpCKBInputs,
+      acpSudtCells: acpSudtInputs,
+      acpXudtCells: acpXudtInputs,
+    } = TransactionsService.groupAssetCells(assetAccountInputs)
+    const {
+      acpCKBCells: acpCKBOutputs,
+      acpSudtCells: acpSudtOutputs,
+      acpXudtCells: acpXudtOutputs,
+    } = TransactionsService.groupAssetCells(assetAccountOutputs)
     const txs = await Promise.all(
       transactions.map(async tx => {
         const value = sums.get(tx.hash!) || BigInt(0)
-
-        let typeArgs: string | undefined | null
-        let txType: string = value > BigInt(0) ? 'receive' : 'send'
-        let assetAccountType: AssetAccountType | undefined
-
-        const sudtInput = anyoneCanPayInputs.find(
-          i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!)
-        )
-        const sudtOutput = anyoneCanPayOutputs.find(
-          o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!)
-        )
-        if (sudtInput) {
-          typeArgs = sudtInput.typeArgs
-          if (!sudtOutput) {
-            txType = 'destroy'
-            assetAccountType = AssetAccountType.SUDT
-          }
-        } else {
-          if (sudtOutput) {
-            typeArgs = sudtOutput.typeArgs
-            txType = 'create'
-            assetAccountType = AssetAccountType.SUDT
-          }
-        }
-
-        const ckbAssetInput = ckbAssetInputs.find(i => i.transactionHash === tx.hash)
-        const ckbAssetOutput = ckbAssetOutputs.find(o => o.outPointTxHash === tx.hash)
-        if (ckbAssetInput && !ckbAssetOutput) {
-          txType = 'destroy'
-          assetAccountType = AssetAccountType.CKB
-        } else if (!ckbAssetInput && ckbAssetOutput) {
-          txType = 'create'
-          assetAccountType = AssetAccountType.CKB
-        }
-
-        let sudtInfo: SudtInfo | undefined
-
-        if (typeArgs) {
-          // const typeArgs = sudtInput.typeArgs
-          const inputAmount = anyoneCanPayInputs
-            .filter(
-              i =>
-                i.transactionHash === tx.hash &&
-                assetAccountInfo.isSudtScript(i.typeScript()!) &&
-                i.typeArgs === typeArgs
-            )
-            .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
-            .reduce((result, c) => result + c, BigInt(0))
-          const outputAmount = anyoneCanPayOutputs
-            .filter(
-              o =>
-                o.outPointTxHash === tx.hash &&
-                assetAccountInfo.isSudtScript(o.typeScript()!) &&
-                o.typeArgs === typeArgs
-            )
-            .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
-            .reduce((result, c) => result + c, BigInt(0))
-
-          const amount = outputAmount - inputAmount
-          const tokenInfo = await SudtTokenInfoService.getSudtTokenInfo(typeArgs)
-
-          if (tokenInfo) {
-            sudtInfo = {
-              sUDT: tokenInfo,
-              amount: amount.toString(),
-            }
-          }
-        }
-
-        const sendNFTCell = nftInputs.find(i => i.typeCodeHash === nftCodehash && i.transactionHash === tx.hash)
-        const receiveNFTCell = nftOutputs.find(o => o.typeCodeHash === nftCodehash && o.outPointTxHash === tx.hash)
-
-        let nftInfo: NFTInfo | undefined
-        if (sendNFTCell) {
-          nftInfo = { type: NFTType.Send, data: sendNFTCell.typeArgs! }
-        } else if (receiveNFTCell) {
-          nftInfo = { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
-        }
-
-        const txDaoInfo = daoInfo.get(tx.hash)
-        let daoCapacity: string | undefined
-        if (txDaoInfo) {
-          if (txDaoInfo.inputs.length && !txDaoInfo.outputs.length) {
-            daoCapacity = txDaoInfo.inputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, BigInt(value)).toString()
-          } else if (!txDaoInfo.inputs.length && txDaoInfo.outputs.length) {
-            daoCapacity = `-${txDaoInfo.outputs.reduce((pre, cur) => BigInt(cur.capacity) + pre, BigInt(0)).toString()}`
-          }
-        }
+        const typeScriptInfo =
+          (await TransactionsService.getSudtInfo({
+            txHash: tx.hash,
+            acpUdtInputs: acpSudtInputs,
+            acpUdtOutputs: acpSudtOutputs,
+            udtType: UDTType.SUDT,
+          })) ||
+          (await TransactionsService.getSudtInfo({
+            txHash: tx.hash,
+            acpUdtInputs: acpXudtInputs,
+            acpUdtOutputs: acpXudtOutputs,
+            udtType: UDTType.XUDT,
+          })) ||
+          (await TransactionsService.getAssetCKBInfo({
+            txHash: tx.hash,
+            acpCKBInputs,
+            acpCKBOutputs,
+          }))
 
         return Transaction.fromObject({
           timestamp: tx.timestamp,
           value: value.toString(),
           hash: tx.hash,
           version: tx.version,
-          type: txType,
-          assetAccountType: assetAccountType,
-          nervosDao: !!txDaoInfo,
           status: tx.status,
           description: tx.description,
           createdAt: tx.createdAt,
           updatedAt: tx.updatedAt,
           blockNumber: tx.blockNumber,
-          sudtInfo: sudtInfo,
-          nftInfo: nftInfo,
-          daoCapacity,
+          ...typeScriptInfo,
+          type: typeScriptInfo?.txType ?? (value > BigInt(0) ? 'receive' : 'send'),
+          nftInfo: TransactionsService.getNtfInfo({ txHash: tx.hash, nftInputs, nftOutputs }),
+          nervosDao: !!daoInfo.get(tx.hash),
+          daoCapacity: TransactionsService.getDAOCapacity(value, daoInfo.get(tx.hash)),
         })
       })
     )
@@ -639,7 +704,7 @@ export class TransactionsService {
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
                 walletId = :walletId
-            ) 
+            )
             ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
           UNION
           SELECT
@@ -652,7 +717,7 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId 
+                walletId = :walletId
             )
             ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
         ) AS cell

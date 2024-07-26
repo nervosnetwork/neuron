@@ -112,6 +112,7 @@ export enum ErrorCode {
   // active warning
   WaitForFullySynced = 600,
   DuplicateImportWallet = 118,
+  UnsupportedCkbCliKeystore = 119,
 }
 
 export enum SyncStatus {
@@ -125,6 +126,7 @@ export enum PresetScript {
   Locktime = 'SingleMultiSign',
   Cheque = 'Cheque',
   SUDT = 'SUDT',
+  XUDT = 'XUDT',
 }
 
 export enum CompensationPeriod {
@@ -240,6 +242,12 @@ export enum TypeScriptCategory {
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
   SUDT = 'SUDT',
+  XUDT = 'XUDT',
   Spore = 'Spore',
   Unknown = 'Unknown',
+}
+
+export enum UDTType {
+  SUDT = 'sUDT',
+  XUDT = 'xUDT',
 }

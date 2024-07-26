@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { type Cell, type OutPoint as IOutPoint } from '@ckb-lumos/base'
+import { type Cell, type OutPoint as IOutPoint } from '@ckb-lumos/lumos'
 
 const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,

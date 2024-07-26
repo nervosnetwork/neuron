@@ -1,6 +1,6 @@
 import { when } from 'jest-when'
-import { bytes } from '@ckb-lumos/codec'
-import { since } from '@ckb-lumos/base'
+import { bytes } from '@ckb-lumos/lumos/codec'
+import { since } from '@ckb-lumos/lumos'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import TransactionEntity from '../../../src/database/chain/entities/transaction'
@@ -87,6 +87,7 @@ import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
 import { closeConnection, getConnection, initConnection } from '../../setupAndTeardown'
+import { UDTType } from '../../../src/utils/const'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -2094,14 +2095,14 @@ describe('TransactionGenerator', () => {
     describe('generateCreateAnyoneCanPayTx', () => {
       const feeRate = '1000'
       it('create ckb', async () => {
-        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
-          'CKBytes',
-          walletId1,
-          alice.lockScript.args,
-          bob.lockScript.args,
+        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx({
+          tokenID: 'CKBytes',
+          walletId: walletId1,
+          blake160: alice.lockScript.args,
+          changeBlake160: bob.lockScript.args,
           feeRate,
-          '0'
-        )
+          fee: '0',
+        })
 
         // check fee
         const inputCapacities = tx.inputs.map(i => BigInt(i.capacity ?? 0)).reduce((result, c) => result + c, BigInt(0))
@@ -2129,14 +2130,15 @@ describe('TransactionGenerator', () => {
 
       it('create sudt', async () => {
         const tokenID = '0x' + '0'.repeat(64)
-        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
+        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx({
           tokenID,
-          walletId1,
-          alice.lockScript.args,
-          bob.lockScript.args,
+          walletId: walletId1,
+          blake160: alice.lockScript.args,
+          changeBlake160: bob.lockScript.args,
           feeRate,
-          '0'
-        )
+          fee: '0',
+          udtType: UDTType.SUDT,
+        })
 
         // check fee
         const inputCapacities = tx.inputs.map(i => BigInt(i.capacity ?? 0)).reduce((result, c) => result + c, BigInt(0))
@@ -2193,7 +2195,7 @@ describe('TransactionGenerator', () => {
             type: senderAcpLiveCell.type(),
             data: BufferUtils.writeBigUInt128LE(BigInt(110)),
           })
-          assetAccount = new AssetAccount(tokenID, '', '', '', '', '', alice.lockScript.args)
+          assetAccount = new AssetAccount(tokenID, '', '', '', '', '', alice.lockScript.args, undefined, UDTType.SUDT)
         })
         describe('with numeric send amount', () => {
           beforeEach(async () => {
@@ -2561,11 +2563,11 @@ describe('TransactionGenerator', () => {
           })
           const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
           const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash)) as Transaction
-          expect(res.outputs).toHaveLength(3)
+          expect(res.outputs).toHaveLength(2)
           expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
-          expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee ?? 0)).toString())
-          expect(res.inputs).toHaveLength(3)
-          expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
+          expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee ?? 0)).toString())
+          expect(res.inputs).toHaveLength(2)
+          expect(res.inputs[1].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
         })
       })
 
@@ -2633,13 +2635,13 @@ describe('TransactionGenerator', () => {
       const cells: OutputEntity[] = [generateCell(toShannon('100'), OutputStatus.Live, false, null)]
       await getConnection().manager.save(cells)
 
-      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
-        'CKBytes',
-        walletId1,
-        alice.lockScript.args,
+      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance({
+        tokenID: 'CKBytes',
+        walletId: walletId1,
+        blake160: alice.lockScript.args,
         feeRate,
-        '0'
-      )
+        fee: '0',
+      })
 
       // check fee
       const inputCapacities = tx.inputs.map(i => BigInt(i.capacity ?? 0)).reduce((result, c) => result + c, BigInt(0))
@@ -2667,13 +2669,14 @@ describe('TransactionGenerator', () => {
       await getConnection().manager.save(cells)
 
       const tokenID = '0x' + '0'.repeat(64)
-      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
+      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance({
         tokenID,
-        walletId1,
-        alice.lockScript.args,
+        walletId: walletId1,
+        blake160: alice.lockScript.args,
         feeRate,
-        '0'
-      )
+        fee: '0',
+        udtType: UDTType.SUDT,
+      })
 
       // check fee
       const inputCapacities = tx.inputs.map(i => BigInt(i.capacity ?? 0)).reduce((result, c) => result + c, BigInt(0))
@@ -2686,6 +2689,35 @@ describe('TransactionGenerator', () => {
       const output = tx.outputs[0]
       expect(output.capacity).toEqual((BigInt(143 * 10 ** 8) - BigInt(tx.fee ?? 0)).toString())
       expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
+      expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
+      expect(output.data).toEqual('0x' + '0'.repeat(32))
+    })
+
+    it('create xudt', async () => {
+      const cells: OutputEntity[] = [generateCell(toShannon('143'), OutputStatus.Live, false, null)]
+      await getConnection().manager.save(cells)
+
+      const tokenID = '0x' + '0'.repeat(64)
+      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance({
+        tokenID,
+        walletId: walletId1,
+        blake160: alice.lockScript.args,
+        feeRate,
+        fee: '0',
+        udtType: UDTType.XUDT,
+      })
+
+      // check fee
+      const inputCapacities = tx.inputs.map(i => BigInt(i.capacity ?? 0)).reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0))
+      expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
+
+      // check output
+      expect(tx.outputs.length).toEqual(1)
+
+      const output = tx.outputs[0]
+      expect(output.capacity).toEqual((BigInt(143 * 10 ** 8) - BigInt(tx.fee ?? 0)).toString())
+      expect(assetAccountInfo.isXudtScript(output.type!)).toBe(true)
       expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
       expect(output.data).toEqual('0x' + '0'.repeat(32))
     })

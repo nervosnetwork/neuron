@@ -144,8 +144,36 @@
     padding-right: 30px;
     &:hover {
       color: var(--primary-color);
+      .expand {
+        path {
+          stroke: var(--primary-color);
+        }
+      }
     }
   }
+
+  .expand {
+    margin-left: 2px;
+    width: 12px;
+    path {
+      stroke: var(--secondary-text-color);
+    }
+  }
+
+  .tipContent {
+    &[data-tip-show='true'] {
+      .hoverBtn {
+        color: var(--primary-color);
+      }
+      .expand {
+        transform: rotate(180deg);
+        path {
+          stroke: var(--primary-color);
+        }
+      }
+    }
+  }
+
   .action {
     padding-right: 20px;
     .tip {

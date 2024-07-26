@@ -1,4 +1,4 @@
-import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/lumos'
 import CellManagement from '../../src/controllers/cell-management'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
 import { AddressNotFound, CurrentWalletNotSet } from '../../src/exceptions'
@@ -57,8 +57,7 @@ jest.mock('../../src/services/addresses', () => ({
 }))
 
 jest.mock('../../src/services/sign-message', () => ({
-  sign: (walletID: string, address: string, password: string, message: string) =>
-    signMock(walletID, address, password, message),
+  sign: (params: { walletID: string; address?: string; password: string; message: string }) => signMock(params),
 }))
 
 jest.mock('../../src/services/cell-local-info', () => ({
@@ -155,7 +154,12 @@ describe('CellManage', () => {
       getAddressesByWalletIdMock.mockResolvedValueOnce([{ address }])
       const outPoints = [new OutPoint(`0x${'00'.repeat(32)}`, '0')]
       await CellManagement.updateLiveCellsLockStatus(outPoints, true, [lockScript], 'password')
-      expect(signMock).toBeCalledWith('walletId1', address, 'password', 'verify cell owner')
+      expect(signMock).toBeCalledWith({
+        walletID: 'walletId1',
+        password: 'password',
+        message: 'verify cell owner',
+        address,
+      })
       expect(updateLiveCellLockStatusMock).toBeCalledWith(outPoints, true)
     })
   })

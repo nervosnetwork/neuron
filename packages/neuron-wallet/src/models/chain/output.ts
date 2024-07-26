@@ -1,8 +1,9 @@
 import Script from './script'
 import OutPoint from './out-point'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
-import { BI } from '@ckb-lumos/bi'
+import { bytes as byteUtils } from '@ckb-lumos/lumos/codec'
+import { BI, helpers } from '@ckb-lumos/lumos'
 import TypeChecker from '../../utils/type-checker'
+import { MIN_CELL_CAPACITY } from '../../utils/const'
 
 // sent: pending transaction's output
 // pending: pending transaction's input
@@ -109,7 +110,7 @@ export default class Output {
     depositTimestamp,
     multiSignBlake160,
   }: {
-    capacity: string
+    capacity?: string
     data?: string
     lock: Script
     type?: Script | null
@@ -126,7 +127,18 @@ export default class Output {
     multiSignBlake160?: string | null
   }): Output {
     return new Output(
-      capacity,
+      capacity ??
+        helpers
+          .minimalCellCapacity({
+            cellOutput: {
+              // use MIN_CELL_CAPACITY to place holder
+              capacity: MIN_CELL_CAPACITY.toString(),
+              lock: Script.fromObject(lock),
+              type: type ? Script.fromObject(type) : undefined,
+            },
+            data: data ?? '0x',
+          })
+          .toString(),
       Script.fromObject(lock),
       type ? Script.fromObject(type) : type,
       data,
@@ -226,5 +238,16 @@ export default class Output {
       Script.fromSDK(output.lock),
       output.type ? Script.fromSDK(output.type) : output.type
     )
+  }
+
+  public minimalCellCapacity() {
+    return helpers.minimalCellCapacity({
+      cellOutput: {
+        capacity: this.capacity,
+        lock: this.lock,
+        type: this.type ?? undefined,
+      },
+      data: this.data,
+    })
   }
 }

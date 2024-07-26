@@ -1,28 +1,27 @@
-import type { HexString, Script, TransactionWithStatus } from '@ckb-lumos/base'
+import type { HexString, Script } from '@ckb-lumos/lumos'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import logger from '../../utils/logger'
 import { Address } from '../../models/address'
 import AddressMeta from '../../database/address/meta'
 import { scheduler } from 'timers/promises'
 import SyncProgressService from '../../services/sync-progress'
 import { Synchronizer } from './synchronizer'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import Multisig from '../../services/multisig'
 import SyncProgress, { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import WalletService from '../../services/wallets'
 import AssetAccountInfo from '../../models/asset-account-info'
 import { DepType } from '../../models/chain/cell-dep'
-import { molecule } from '@ckb-lumos/codec'
-import { blockchain } from '@ckb-lumos/base'
-import type { Base } from '@ckb-lumos/rpc/lib/Base'
-import { BI } from '@ckb-lumos/bi'
+import { vector, blockchain } from '@ckb-lumos/lumos/codec'
+import type { Base } from '@ckb-lumos/lumos/rpc'
+import { BI } from '@ckb-lumos/lumos'
 import IndexerCacheService from './indexer-cache-service'
-import { ScriptType } from '@ckb-lumos/ckb-indexer/lib/type'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import NetworksService from '../../services/networks'
 import { getConnection } from '../../database/chain/connection'
 
-const unpackGroup = molecule.vector(blockchain.OutPoint)
+const unpackGroup = vector(blockchain.OutPoint)
 const THRESHOLD_BLOCK_NUMBER_IN_DIFF_WALLET = 100_000
 
 export default class LightSynchronizer extends Synchronizer {
@@ -43,6 +42,7 @@ export default class LightSynchronizer extends Synchronizer {
     const fetchCellDeps = [
       assetAccountInfo.anyoneCanPayCellDep,
       assetAccountInfo.sudtCellDep,
+      assetAccountInfo.xudtCellDep,
       assetAccountInfo.getNftClassInfo().cellDep,
       assetAccountInfo.getNftInfo().cellDep,
       assetAccountInfo.getNftIssuerInfo().cellDep,
@@ -101,7 +101,7 @@ export default class LightSynchronizer extends Synchronizer {
   }: {
     script: Script
     blockRange: [HexString, HexString]
-    scriptType: ScriptType
+    scriptType: CKBComponents.ScriptType
   }) {
     const res = []
     let lastCursor: HexString | undefined = undefined
@@ -293,7 +293,9 @@ export default class LightSynchronizer extends Synchronizer {
 
   private async fetchPreviousOutputs(txHashes: string[]) {
     const transactions = await this.lightRpc
-      .createBatchRequest<'getTransaction', string[], TransactionWithStatus[]>(txHashes.map(v => ['getTransaction', v]))
+      .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+        txHashes.map(v => ['getTransaction', v])
+      )
       .exec()
     const previousTxHashes = new Set<string>()
     transactions
@@ -335,7 +337,9 @@ export default class LightSynchronizer extends Synchronizer {
 
   private async checkTxExist(txHashes: string[]) {
     const transactions = await this.lightRpc
-      .createBatchRequest<'getTransaction', string[], TransactionWithStatus[]>(txHashes.map(v => ['getTransaction', v]))
+      .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+        txHashes.map(v => ['getTransaction', v])
+      )
       .exec()
     return transactions.every(v => !!v.transaction)
   }
