@@ -180,10 +180,10 @@
     border: 1px solid var(--divide-line-color);
     background-color: var(--secondary-background-color);
     position: relative;
+    overflow: hidden;
 
     & > div {
       position: absolute;
-      left: -1px;
       top: -1px;
       height: 100%;
       border-radius: 8px;
