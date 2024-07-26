@@ -81,20 +81,20 @@ export default class Ledger extends Hardware {
     const hdPath = path === hd.AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path
     const signature = await this.ledgerCKB!.signTransaction(hdPath, rawTx, witnesses, context, this.defaultPath).catch(
       error => {
-        if (error instanceof Error) {
-          logger.error(
-            'Ledger: failed to sign the transaction',
-            error.message,
-            ' HD path:',
-            hdPath,
-            ' raw transaction:',
-            JSON.stringify(rawTx),
-            ' witnesses:',
-            JSON.stringify(witnesses),
-            ' context:',
-            JSON.stringify(context)
-          )
-        }
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        logger.error(
+          'Ledger: failed to sign the transaction ',
+          errorMessage,
+          ' HD path:',
+          hdPath,
+          ' raw transaction:',
+          JSON.stringify(rawTx),
+          ' witnesses:',
+          JSON.stringify(witnesses),
+          ' context:',
+          JSON.stringify(context)
+        )
+
         return Promise.reject(error)
       }
     )
