@@ -10,7 +10,6 @@ import {
   PayloadInBatchException,
   IdNotMatchedInBatchException,
 } from '@ckb-lumos/rpc/lib/exceptions'
-import { request } from 'undici'
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
@@ -335,12 +334,12 @@ export class LightRPC extends Base {
             return []
           }
 
-          const res = await request(node.url, {
+          const res = await fetch(node.url, {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: { 'content-type': 'application/json' },
           })
-          const batchRes = await res.body.json()
+          const batchRes = await res.json()
 
           if (!Array.isArray(batchRes)) {
             return []

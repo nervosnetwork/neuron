@@ -70,7 +70,6 @@
     "subleveldown": "4.1.4",
     "tslib": "2.6.3",
     "typeorm": "0.3.17",
-    "undici": "5.28.4",
     "uuid": "8.3.2"
   },
   "devDependencies": {
