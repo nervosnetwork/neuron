@@ -1224,6 +1224,10 @@
         "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
         "continue-sync": "Continuer la synchronisation",
         "migrate-data": "Migration des données"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "Le portefeuille de visualisation a déjà été importé, souhaitez-vous le remplacer ?",
+        "delete-tip": "Le même portefeuille original existe déjà, si vous souhaitez continuer l'importation, veuillez le supprimer."
       }
     },
     "cell-manage": {

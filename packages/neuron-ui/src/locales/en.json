@@ -1234,6 +1234,10 @@
         "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
         "continue-sync": "Continue Sync",
         "migrate-data": "Migrate Data"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "The watch wallet has been imported before, would you replace it?",
+        "delete-tip": "The same original wallet existed, if you want to continue importing please delete it."
       }
     },
     "cell-manage": {
