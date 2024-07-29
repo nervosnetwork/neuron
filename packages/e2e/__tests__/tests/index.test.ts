@@ -1,5 +1,6 @@
 import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
+import { scheduler } from "timers/promises";
 // import ClickSystemMenu from '../common/utils';
 
 let electronApp: ElectronApplication;
@@ -129,9 +130,11 @@ test.describe('overview page tests', () => {
     //   .click();
     page.setDefaultTimeout(180000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
-    await page.screenshot({path: "./test-results/createWallet.png"});
+    await scheduler.wait(20_000)
+    await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
+    await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByText('Set start block number').click();
     // await page.keyboard.press("Delete");
     await page.locator('id=startBlockNumber').fill('14066000');
