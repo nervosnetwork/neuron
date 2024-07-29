@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from 'react'
 import { useLocation, NavigateFunction, useNavigate } from 'react-router-dom'
-import { TFunction } from 'i18next'
+import type { TFunction } from 'i18next'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,

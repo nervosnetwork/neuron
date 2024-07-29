@@ -1217,7 +1217,7 @@
       },
       "import-exist-xpubkey-dialog": {
         "replace-tip": "El monedero de observación ya ha sido importado antes, ¿desea reemplazarlo?",
-        "delete-tip": "Existe el mismo monedero original, si desea continuar importando, por favor, elimínelo."
+        "delete-tip": "Existe el mismo monedero original. Si desea continuar con la importación, por favor elimínelo."
       }
     },
     "cell-manage": {

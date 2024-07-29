@@ -1230,7 +1230,7 @@
       },
       "import-exist-xpubkey-dialog": {
         "replace-tip": "該觀察錢包已被導入過，您想要替換它嗎？",
-        "delete-tip": "已存在相同的原始錢包，如果您想繼續導入，請刪除它"
+        "delete-tip": "已存在相同的原始錢包。如果您想繼續導入，請刪除它。"
       }
     },
     "cell-manage": {

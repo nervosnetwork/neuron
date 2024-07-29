@@ -1236,8 +1236,8 @@
         "migrate-data": "Migrate Data"
       },
       "import-exist-xpubkey-dialog": {
-        "replace-tip": "The watch wallet has been imported before, would you replace it?",
-        "delete-tip": "The same original wallet existed, if you want to continue importing please delete it."
+        "replace-tip": "The watch-wallet has been imported before, would you replace it?",
+        "delete-tip": "The same original wallet existed. If you want to continue with the import, please delete it.."
       }
     },
     "cell-manage": {

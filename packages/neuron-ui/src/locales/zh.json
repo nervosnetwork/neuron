@@ -1229,7 +1229,7 @@
       },
       "import-exist-xpubkey-dialog": {
         "replace-tip": "该观察钱包已被导入过，您想要替换它吗？",
-        "delete-tip": "已存在相同的原始钱包，如果您想继续导入，请删除它"
+        "delete-tip": "已存在相同的原始钱包。如果您想继续导入，请删除它。"
       }
     },
     "cell-manage": {

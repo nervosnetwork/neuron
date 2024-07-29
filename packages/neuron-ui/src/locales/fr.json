@@ -1226,8 +1226,8 @@
         "migrate-data": "Migration des données"
       },
       "import-exist-xpubkey-dialog": {
-        "replace-tip": "Le portefeuille de visualisation a déjà été importé, souhaitez-vous le remplacer ?",
-        "delete-tip": "Le même portefeuille original existe déjà, si vous souhaitez continuer l'importation, veuillez le supprimer."
+        "replace-tip": "Le portefeuille de visualisation a déjà été importé, souhaitez-vous le remplacer?",
+        "delete-tip": "Le même portefeuille original existe déjà. Si vous souhaitez continuer l'importation, veuillez le supprimer."
       }
     },
     "cell-manage": {
