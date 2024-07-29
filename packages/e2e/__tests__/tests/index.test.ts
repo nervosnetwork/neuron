@@ -129,6 +129,7 @@ test.describe('overview page tests', () => {
     //   .click();
     page.setDefaultTimeout(180000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
+    await page.screenshot({path: "./test-results/createWallet.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
     await page.getByText('Set start block number').click();
