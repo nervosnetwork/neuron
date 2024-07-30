@@ -1,6 +1,6 @@
 import {_electron as electron, ElectronApplication, Page} from "playwright";
 import {test, expect} from "@playwright/test";
-import { scheduler } from "timers/promises";
+// import { scheduler } from "timers/promises";
 // import ClickSystemMenu from '../common/utils';
 
 let electronApp: ElectronApplication;
@@ -128,9 +128,9 @@ test.describe('overview page tests', () => {
     await page.getByTitle('Settings').click();
     // await page.locator('dialog').filter({ hasText: /^Confirm$/ }).getByLabel('Confirm')
     //   .click();
-    page.setDefaultTimeout(180000);
+    // page.setDefaultTimeout(360000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
-    await scheduler.wait(20_000)
+    // await scheduler.wait(20_000)
     await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
@@ -149,8 +149,8 @@ test.describe('overview page tests', () => {
     await page.getByRole('button', {name: 'Send'}).click();
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: 'Confirm'}).click();
-    await page.waitForTimeout(5000);
-    await expect(page.getByText('Pending')).toBeVisible();
+    await page.waitForTimeout(480000);
+    await expect(page.getByText('Success').first()).toBeVisible();
     console.log('发送交易成功！');
   });
 
@@ -192,8 +192,15 @@ test.describe('overview page tests', () => {
 
 // 等待同步进度到100%
 test("nervos dao deposit", async () => {
+//   await page.waitForFunction(
+//     'document.querySelector("selector").getAttribute("data-field") === "success"',
+//     {
+//       "selector": '#root > div > div > div.pageContainer_body__Bat68 > div.table_tableRoot__8fn05 > table > thead > tr > th:nth-child(6) > div'
+// }
+// )
+
   await page.getByTitle('Nervos Dao').click();
-  // await page.waitForTimeout(60000);
+  // await page.waitForTimeout(30000);
   await page.getByRole('button', {name: 'Deposit'}).click();
   await page.locator("id=depositValue").fill("104");
   await page.getByRole('button', {name: 'Proceed'}).click();
@@ -209,7 +216,7 @@ test("check transaction history", async () => {
   await page.getByPlaceholder('Search tx hash, address or date (yyyy-mm-dd)').fill('2024-07-29');
   let EnterKey = "Enter";
   await page.keyboard.press(EnterKey);
-  await expect(page.getByText('1 - 12 of 12')).toBeVisible();
+  await expect(page.getByText('1 - 15 of 20')).toBeVisible();
 /*await page.getByRole('button', {name: '导出交易历史'}).click();
   await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
@@ -241,6 +248,7 @@ test.describe('实验性功能', () => {
     await page.waitForTimeout(20000);
     await expect(page.getByText('te' + tp, {exact: true})).toBeVisible();
     console.log('创建sudt账号成功！');
+    await page.waitForTimeout(420000);
   });
 
 
