@@ -44,9 +44,6 @@ jest.doMock('models/subjects/networks', () => {
     },
   }
 })
-jest.mock('undici', () => ({
-  request: () => jest.fn()(),
-}))
 jest.mock('services/multisig', () => ({
   syncMultisigOutput: () => jest.fn(),
 }))
