@@ -64,6 +64,7 @@ const MainContent = () => {
     showSwitchNetwork,
     lockWindowInfo,
     setIsLockDialogShow,
+    t,
   })
 
   useOnCurrentWalletChange({
@@ -147,6 +148,7 @@ const MainContent = () => {
         action={globalAlertDialog?.action}
         type={globalAlertDialog?.type ?? 'success'}
         onCancel={onCancelGlobalDialog}
+        onOk={globalAlertDialog?.onOk}
       />
       <Dialog show={isMigrateDialogShow} onCancel={onCancel} title={t('messages.migrate-ckb-data')} showFooter={false}>
         {t('messages.rebuild-sync')
