@@ -142,6 +142,7 @@ test.describe('overview page tests', () => {
     page.waitForTimeout(6000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
+    await page.screenshot({path: "./test-results/send_transaction_2.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103.5");
