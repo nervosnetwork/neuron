@@ -1,5 +1,5 @@
 import { DeviceInfo } from '../../src/services/hardware/common'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import type { Subscriber } from 'rxjs'
 
 enum Manufacturer {
@@ -12,7 +12,7 @@ export const ledgerNanoS: DeviceInfo = {
   product: 'Nano S',
   isBluetooth: false,
   manufacturer: Manufacturer.Ledger,
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
 }
 
@@ -22,7 +22,7 @@ export const LedgerNanoX: DeviceInfo = {
   product: 'Nano X',
   isBluetooth: true,
   manufacturer: Manufacturer.Ledger,
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
 }
 

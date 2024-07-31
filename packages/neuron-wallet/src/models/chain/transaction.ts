@@ -2,18 +2,19 @@ import CellDep from './cell-dep'
 import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
-import { BI } from '@ckb-lumos/bi'
+import { BI } from '@ckb-lumos/lumos'
 import { serializeRawTransaction, serializeWitnessArgs } from '../../utils/serialization'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
 import { Signatures } from '../../models/offline-sign'
-import { utils } from '@ckb-lumos/base'
+import { ckbHash } from '@ckb-lumos/lumos/utils'
 
 export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
   Failed = 'failed',
+  Rejected = 'rejected',
 }
 
 export interface SudtTokenInfo {
@@ -41,6 +42,7 @@ export interface NFTInfo {
 export enum AssetAccountType {
   CKB = 'CKB',
   SUDT = 'sUDT',
+  XUDT = 'xUDT',
 }
 
 export default class Transaction {
@@ -278,7 +280,7 @@ export default class Transaction {
   }
 
   public computeHash(): string {
-    return utils.ckbHash(serializeRawTransaction(this.toSDKRawTransaction()))
+    return ckbHash(serializeRawTransaction(this.toSDKRawTransaction()))
   }
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {

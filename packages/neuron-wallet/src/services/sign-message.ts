@@ -1,22 +1,32 @@
 import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
 import Blake2b from '../models/blake2b'
-import { key, Keychain } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
   private static ec = new EC('secp256k1')
   private static magicString = 'Nervos Message:'
 
-  public static async sign(walletID: string, address: string, password: string, message: string): Promise<string> {
+  public static async sign({
+    walletID,
+    password,
+    message,
+    address,
+  }: {
+    walletID: string
+    password: string
+    message: string
+    address?: string
+  }): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
     const addresses = await AddressService.getAddressesByWalletId(walletID)
-    let addr = addresses.find(addr => addr.address === address)
+    let addr = address ? addresses.find(addr => addr.address === address) : addresses[0]
     if (!addr) {
       throw new AddressNotFound()
     }
@@ -40,7 +50,7 @@ export default class SignMessage {
 
   private static signByPrivateKey(privateKey: string, message: string): string {
     const digest = SignMessage.signatureHash(message)
-    const signature = key.signRecoverable(digest, privateKey)
+    const signature = hd.key.signRecoverable(digest, privateKey)
     return signature
   }
 
@@ -91,7 +101,7 @@ export default class SignMessage {
 
   private static getPrivateKey(wallet: Wallet, path: string, password: string): string {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
-    const masterKeychain = new Keychain(
+    const masterKeychain = new hd.Keychain(
       Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
       Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
     )

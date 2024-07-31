@@ -1,5 +1,5 @@
-import { HexString } from '@ckb-lumos/base'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { HexString } from '@ckb-lumos/lumos'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 export enum SyncAddressType {

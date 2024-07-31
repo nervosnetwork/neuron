@@ -182,15 +182,19 @@
       "input-your-seed": "Veuillez entrer votre graine de Wallet",
       "password": "Mot de passe",
       "confirm-password": "Confirmer le mot de passe",
-      "set-wallet-name-and-password": "Nommez votre nouveau Wallet et choisissez un mot de passe fort pour le protéger",
-      "set-wallet-name": "Donnez un nom à votre nouveau Wallet",
-      "set-a-strong-password-to-protect-your-wallet": "Créez un mot de passe fort pour protéger votre Wallet",
+      "set-wallet-name-and-password": "Veuillez nommer votre portefeuille sur cet appareil et choisir un mot de passe fort pour le protéger",
+      "set-wallet-name": "Définissez un nom pour le portefeuille",
+      "set-a-strong-password-to-protect-your-wallet": "Veuillez définir un mot de passe fort pour protéger votre portefeuille",
       "wallet-suffix": "Wallet {{suffix}}",
-      "write-down-seed": "Notez votre graine de Wallet et enregistrez-la dans un endroit sûr",
+      "handwritten-recommended": "Transcription manuscrite recommandée",
+      "do-not-copy": "Ne pas copier",
+      "do-not-save-scrrenshots": "Ne pas sauvegarder de captures d'écran",
+      "replenish-your-seed": "Veuillez reconstituer la graine de votre portefeuille",
       "new-name": "Utilisez un nom inutilisé pour le nouveau Wallet",
       "complex-password": "Le mot de passe doit contenir entre 8 et 50 caractères, comprenant au moins trois catégories parmi les suivantes : lettres majuscules, lettres minuscules, chiffres et symboles spéciaux.",
       "same-password": "Le mot de passe et la confirmation du mot de passe doivent correspondre",
-      "input-seed-verify": "Saisissez la graine créée pour vérification",
+      "input-seed-verify": "Veuillez entrer la graine correcte du portefeuille ou cliquez sur retour pour recréer le portefeuille",
+      "input-seed-first-empty-space": "Vous pouvez coller l'intégralité de la graine du portefeuille dans le premier espace vide",
       "no-wallet": "Pas de Wallet ?",
       "create-wallet": "Créer un Wallet",
       "repeat-password": "Répéter le mot de passe",
@@ -201,6 +205,8 @@
     "import-keystore": {
       "title": "Importer le fichier Keystore",
       "select-file": "Choisir le fichier",
+      "import-failure": "Échec de l'importation",
+      "import-failure-msg": "Neuron ne prend pas en charge l'importation du fichier Keystore de ckb-cli en raison de différentes règles de dérivation du fichier Keystore.",
       "label": {
         "path": "Fichier Keystore",
         "name": "Nom du Wallet",
@@ -447,7 +453,10 @@
         "lightTestnet": "Testnet léger",
         "lightMainnet": "Mainnet léger",
         "devnet": "Devnet",
-        "switch-network-type": "Basculer vers {{type}}"
+        "switch-network-type": "Basculer vers {{type}}",
+        "type": "Type",
+        "full-node": "Nœud Complet",
+        "light-client-node": "Nœud Client Léger"
       },
       "locale": {
         "en": "English",
@@ -500,10 +509,10 @@
         "title": "Créer un compte d'actif"
       },
       "send-sudt": {
-        "title": "Envoyer sUDT"
+        "title": "Envoyer UDT"
       },
       "transfer-to-sudt": {
-        "title": "Envoyer vers le compte sUDT"
+        "title": "Envoyer vers le compte UDT"
       },
       "send-ckb-asset": {
         "title": "Envoyer CKB"
@@ -512,7 +521,7 @@
         "title": "Envoyer CKB"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "Envoyer sUDT"
+        "title": "Envoyer UDT"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "Envoyer CKB"
@@ -808,7 +817,8 @@
       "updates-found-do-you-want-to-update": "Une mise à jour ({{version}}) est disponible",
       "install-update": "Mise à jour immédiate",
       "updates-downloaded-about-to-quit-and-install": "Mise à jour téléchargée. Prêt à installer et relancer.",
-      "quit-and-install": "Installer et relancer"
+      "quit-and-install-restart": "Installer et relancer",
+      "quit-and-install": "Immédiate Installer"
     },
     "datetime": {
       "mon": {
@@ -943,7 +953,7 @@
       "locked-asset": "Verrouillé",
       "locked-asset-tooltip": "Le paramètre de verrouillage est de {{epochs}} époques, la date de libération estimée est le {{year}}-{{month}}-{{day}} (selon la hauteur de bloc réelle en cours d'exécution, il peut y avoir des variances de temps dans le verrouillage).",
       "withdraw-asset-tooltip": "L'heure de libération estimée est le {{year}}-{{month}}-{{day}} à {{hour}}:{{minute}} (selon la hauteur de bloc réelle en cours d'exécution).",
-      "user-defined-token-tooltip": "Migrer l'actif sUDT vers un compte d'actif sUDT",
+      "user-defined-token-tooltip": "Migrer l'actif {{udtType}} vers un compte d'actif {{udtType}}",
       "claim-asset": "Réclamation",
       "withdraw-asset": "Retrait",
       "view-details": "Voir les détails",
@@ -954,14 +964,14 @@
       "transfer-nft": "Envoyer",
       "user-defined-token": "Migrer",
       "transfer-nft-success": "Transfert d'actifs réussi",
-      "migrate-sudt-success": "Conversion en nouveau compte d'actif sUDT réussie",
-      "send-sudt-success": "Transfert vers le compte sUDT réussi",
+      "migrate-sudt-success": "Conversion en nouveau compte d'actif {{udtType}} réussie",
+      "send-sudt-success": "Transfert vers le compte {{udtType}} réussi",
       "unlock-success": "Actif réclamé, consultez l'historique des transactions pour plus de détails",
       "withdraw-cheque-success": "Actif retiré, consultez l'historique des transactions pour plus de détails",
       "claim-cheque-success": "Actif réclamé, consultez l'historique des transactions pour plus de détails"
     },
     "migrate-sudt": {
-      "title": "Migrer vers un compte d'actif sUDT",
+      "title": "Migrer vers un compte d'actif {{udtType}}",
       "choose-title": "Mode de migration",
       "next": "Suivant",
       "back": "Retour",
@@ -969,14 +979,14 @@
       "input-symbol": "Veuillez saisir le symbole",
       "input-decimal": "Veuillez saisir la décimale",
       "turn-into-new-account": {
-        "title": "Transformez en un nouveau compte d'actif sUDT",
-        "sub-title": "Transformez l'actif sUDT en un nouveau compte sUDT, occupe au moins 142 CKBytes",
+        "title": "Transformez en un nouveau compte d'actif {{udtType}}",
+        "sub-title": "Transformez l'actif {{udtType}} en un nouveau compte {{udtType}}, occupe au moins 142 CKBytes",
         "cancel": "Annuler",
         "confirm": "Confirmer"
       },
       "transfer-to-exist-account": {
-        "title": "Transférer vers un compte d'actif sUDT",
-        "sub-title": "Transférez tout le solde sUDT vers un compte sUDT existant, assurez-vous que le compte cible est actif"
+        "title": "Transférer vers un compte d'actif {{udtType}}",
+        "sub-title": "Transférez tout le solde {{udtType}} vers un compte {{udtType}} existant, assurez-vous que le compte cible est actif"
       },
       "cancel": "Annuler",
       "confirm": "Confirmer",
@@ -1002,6 +1012,7 @@
         "select-account-type": "Sélectionner le type de compte",
         "account-name": "Nom du compte",
         "sudt-account": "Compte sUDT",
+        "xudt-account": "Compte xUDT",
         "delete-failed": "Échec de la suppression de la configuration multisig, raison de l'échec : {{reason}}",
         "ckb-account": "Compte CKB",
         "set-token-info": "Définir les informations du token",
@@ -1023,7 +1034,7 @@
           "decimal": "Veuillez saisir la décimale"
         },
         "placeholder": {
-          "token-id": "L'ID du token est l'argument du script de type sUDT, qui est identique au hachage de verrouillage de l'émetteur du token."
+          "token-id": "L'ID du token est l'argument du script de type {{udtType}}, qui est identique au hachage de verrouillage de l'émetteur du token."
         }
       },
       "send": {
@@ -1073,6 +1084,8 @@
     },
     "multisig-address": {
       "window-title": "Adresses Multisig",
+      "guide-tip": "Pour les nouveaux utilisateurs, vous pouvez consulter la documentation pour <0>en savoir plus</0>.",
+      "learn-more": "en savoir plus",
       "search": {
         "placeholder": "recherche par adresse multisig, alias"
       },
@@ -1124,6 +1137,8 @@
         "export": "Exporter Tx"
       },
       "multi-details": "Détails de l'adresse multisig",
+      "synchronization-abort": "Abandon de la synchronisation",
+      "synchronization-abort-msg": "Quitter la fenêtre actuelle entraînera l'abandon de la synchronisation multisig, veuillez confirmer si vous souhaitez quitter.",
       "create-dialog": {
         "title": "Créer une adresse multisig",
         "preview-title": "L'adresse multisig a été générée",
@@ -1200,16 +1215,19 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Détection d'un noeud externe",
-        "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
-        "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
+        "body-tips-without-network": "Vous avez sélectionné le nœud interne mais démarré le nœud externe. Si vous souhaitez continuer à utiliser un nœud externe, veuillez ajouter un nouveau réseau.",
+        "body-tips-with-network": "Vous avez actuellement sélectionné un nœud interne mais démarré un nœud externe. Si vous avez besoin de continuer à utiliser le nœud externe, veuillez passer à un autre réseau externe ou ajouter un nouveau réseau.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le noeud externe",
-        "external-node-is-light": "En raison de différentes hypothèses de sécurité du client léger, Neuron ne prend pas en charge les nœuds clients légers externes. Voulez-vous vous connecter à un \"Light Client\" ?"
+        "ignore-external-node": "Ignorer le noeud externe"
       },
       "no-disk-space-dialog": {
         "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
         "continue-sync": "Continuer la synchronisation",
         "migrate-data": "Migration des données"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "Le portefeuille de visualisation a déjà été importé, souhaitez-vous le remplacer?",
+        "delete-tip": "Le même portefeuille original existe déjà. Si vous souhaitez continuer l'importation, veuillez le supprimer."
       }
     },
     "cell-manage": {
@@ -1288,8 +1306,10 @@
     "lock-window": {
       "neuron-is-locked": "a fenêtre de Neuron est verrouillée",
       "enter-lock-password": "Entrer le mot de passe de verrouillage d'écran",
+      "forget-password": "Mot de passe oublié?",
       "lock-password-error": "Mot de passe de verrouillage d'écran incorrect",
-      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}"
+      "failed-times": "Échec plus de {{frequency}} fois, veuillez réessayer après {{time}}",
+      "verify-wallet": "Vérifier"
     }
   }
 }

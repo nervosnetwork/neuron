@@ -175,15 +175,19 @@
       "input-your-seed": "请输入您的助记词",
       "password": "密码",
       "confirm-password": "确认密码",
-      "set-wallet-name-and-password": "为新钱包命名, 并设置密码",
-      "set-wallet-name": "为钱包设置名称",
-      "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
+      "set-wallet-name-and-password": "请在此设备上为您的钱包命名，并选择一个强密码来保护它",
+      "set-wallet-name": "为钱包设置一个名称",
+      "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码来保护您的钱包",
       "wallet-suffix": "钱包 {{suffix}}",
-      "write-down-seed": "请记下您的助记词并保存到安全的地方",
+      "handwritten-recommended": "推荐手写抄录",
+      "do-not-copy": "不要复制",
+      "do-not-save-scrrenshots": "不要保存截图",
+      "replenish-your-seed": "请补充您的助记词",
       "new-name": "输入新的钱包名称",
       "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中至少三类字符组成的字符串。",
       "same-password": "两次输入密码应一致",
-      "input-seed-verify": "输入新生成的助记词进行验证",
+      "input-seed-verify": "请输入正确的助记词或点击返回重新创建钱包",
+      "input-seed-first-empty-space": "您可以将整个钱包助记词粘贴到第一个空格处",
       "no-wallet": "还没有钱包?",
       "create-wallet": "立即创建新钱包",
       "repeat-password": "重复密码",
@@ -195,6 +199,8 @@
     "import-keystore": {
       "title": "导入 Keystore 文件",
       "select-file": "选择文件",
+      "import-failure": "导入失败",
+      "import-failure-msg": "由于不同的 Keystore 文件派生规则，Neuron 不支持导入 ckb-cli 的 Keystore 文件。",
       "label": {
         "path": "Keystore 文件",
         "name": "钱包名称",
@@ -450,7 +456,10 @@
         "lightTestnet": "轻节点测试网",
         "lightMainnet": "轻节点主网",
         "devnet": "开发网",
-        "switch-network-type": "切换到 {{type}}"
+        "switch-network-type": "切换到 {{type}}",
+        "type": "类型",
+        "full-node": "全节点",
+        "light-client-node": "轻客户端节点"
       },
       "locale": {
         "en": "English",
@@ -503,10 +512,10 @@
         "title": "创建资产账户"
       },
       "send-sudt": {
-        "title": "发起 sUDT 交易"
+        "title": "发起 UDT 交易"
       },
       "transfer-to-sudt": {
-        "title": "转入 sUDT 账户"
+        "title": "转入 UDT 账户"
       },
       "send-ckb-asset": {
         "title": "发起 CKB 交易"
@@ -515,7 +524,7 @@
         "title": "发起 CKB 交易"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "发起 sUDT 交易"
+        "title": "发起 UDT 交易"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "发起 CKB 交易"
@@ -811,7 +820,8 @@
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
       "install-update": "立即更新",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
-      "quit-and-install": "安装并重启应用"
+      "quit-and-install-restart": "安装并重启应用",
+      "quit-and-install": "立即安装"
     },
     "datetime": {
       "mon": {
@@ -946,7 +956,7 @@
       "locked-asset": "已锁定",
       "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日(锁定时间根据区块链实际运行情况会有一定的误差)。",
       "withdraw-asset-tooltip": "预计解锁时间为 {{year}}年{{month}}月{{day}}日 {{hour}}时{{minute}}分(根据区块链实际运行情况会有一定的误差)。",
-      "user-defined-token-tooltip": "将 sUDT 资产转移到 sUDT 账户",
+      "user-defined-token-tooltip": "将 {{udtType}} 资产转移到 {{udtType}} 账户",
       "claim-asset": "领取",
       "withdraw-asset": "撤回",
       "view-details": "查看详情",
@@ -957,14 +967,14 @@
       "transfer-nft": "转让",
       "user-defined-token": "迁移",
       "transfer-nft-success": "转让资产成功",
-      "migrate-sudt-success": "转换成新的 sUDT 资产账户成功",
-      "send-sudt-success": "转入 sUDT 账户成功",
+      "migrate-sudt-success": "转换成新的 {{udtType}} 资产账户成功",
+      "send-sudt-success": "转入 {{udtType}} 账户成功",
       "unlock-success": "资产已领取，可前往交易历史查看详情",
       "withdraw-cheque-success": "资产已撤回，可前往交易历史查看详情",
       "claim-cheque-success": "资产已领取，可前往交易历史查看详情"
     },
     "migrate-sudt": {
-      "title": "迁移至 sUDT 资产账户",
+      "title": "迁移至 {{udtType}} 资产账户",
       "choose-title": "选择迁移方式",
       "next": "下一步",
       "back": "上一步",
@@ -972,14 +982,14 @@
       "input-symbol": "请输入简称",
       "input-decimal": "请输入小数位",
       "turn-into-new-account": {
-        "title": "转换成新的 sUDT 资产账户",
-        "sub-title": "将 sUDT 资产转换成 sUDT 资产账户, 至少占用 142 CKBytes",
+        "title": "转换成新的 {{udtType}} 资产账户",
+        "sub-title": "将 {{udtType}} 资产转换成 {{udtType}} 资产账户, 至少占用 142 CKBytes",
         "cancel": "取消",
         "confirm": "确认"
       },
       "transfer-to-exist-account": {
-        "title": "转入 sUDT 账户",
-        "sub-title": "将全部 sUDT 余额转入已存在的 sUDT 资产账户, 请确保目标账户存在"
+        "title": "转入 {{udtType}} 账户",
+        "sub-title": "将全部 {{udtType}} 余额转入已存在的 {{udtType}} 资产账户, 请确保目标账户存在"
       },
       "cancel": "取消",
       "confirm": "确认",
@@ -1005,6 +1015,7 @@
         "select-account-type": "选择账户类型",
         "account-name": "账户名称",
         "sudt-account": "sUDT 账户",
+        "xudt-account": "xUDT 账户",
         "ckb-account": "CKB 账户",
         "set-token-info": "设置代币信息",
         "token-id": "代币ID",
@@ -1025,7 +1036,7 @@
           "decimal": "请输入小数位"
         },
         "placeholder": {
-          "token-id": "代币 ID 即 sUDT Type Script 的 Args，等同于该 token 发行者的 lock hash。"
+          "token-id": "代币 ID 即 {{udtType}} Type Script 的 Args，等同于该 token 发行者的 lock hash。"
         }
       },
       "send": {
@@ -1075,6 +1086,8 @@
     },
     "multisig-address": {
       "window-title": "多签地址",
+      "guide-tip": "对于首次使用您可以查看文档以 <0>了解更多</0>。",
+      "learn-more": "了解更多",
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },
@@ -1126,6 +1139,8 @@
         "export": "导出交易"
       },
       "multi-details": "多签地址详情",
+      "synchronization-abort": "同步中止",
+      "synchronization-abort-msg": "离开当前窗口将导致多签同步中止，请确认是否离开。",
       "create-dialog": {
         "title": "创建多重签名地址",
         "preview-title": "多签地址已生成",
@@ -1202,16 +1217,19 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "检测到外部节点",
-        "body-tips-without-network": "\"Internal Node\" 仅用于连接内置节点，请添加新的网络选项以连接外部节点。",
-        "body-tips-with-network": "\"Internal Node\" 仅用于连接内置节点，请选择以下网络选项或添加新的网络选项以连接外部节点。",
+        "body-tips-without-network": "您选择了内部节点，但启动了外部节点。如果您想继续使用外部节点，请添加一个新网络",
+        "body-tips-with-network": "您当前选择了内部节点，但启动了外部节点。如果需要继续使用外部节点，请切换到另一个外部网络或添加一个新网络",
         "add-network": "添加网络",
-        "ignore-external-node": "忽略外部节点",
-        "external-node-is-light": "由于轻客户端的安全假设不同，Neuron 不支持外部轻客户端节点。您想连接到 \"Light Client\" 吗？"
+        "ignore-external-node": "忽略外部节点"
       },
       "no-disk-space-dialog": {
         "tip": "由于磁盘空间不足，同步已停止。 <br /> 请分配更多磁盘空间或将数据迁移到其他磁盘。",
         "continue-sync": "继续同步",
         "migrate-data": "迁移数据"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "该观察钱包已被导入过，您想要替换它吗？",
+        "delete-tip": "已存在相同的原始钱包。如果您想继续导入，请删除它。"
       }
     },
     "cell-manage": {
@@ -1226,8 +1244,8 @@
           "description": "备注",
           "action": "操作"
         },
-        "locked": "锁定",
-        "unlocked": "解锁",
+        "locked": "已锁定",
+        "unlocked": "已解锁",
         "default-description": "无"
       },
       "cell-detail-dialog": {
@@ -1260,8 +1278,8 @@
         "capacity": "解锁所选 Cell {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "消耗 Cell",
-        "warn-consume": "消耗Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
+        "title": "花费 Cell",
+        "warn-consume": "花费Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
       },
       "cell-consolidate-dialog": {
         "title": "合并 Cells",
@@ -1271,7 +1289,7 @@
       "password-placeholder": "请输入钱包密码",
       "lock": "锁定",
       "unlock": "解锁",
-      "consume": "消耗",
+      "consume": "花费",
       "verify": "验证",
       "consolidate": "合并"
     },
@@ -1290,8 +1308,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron 窗口已锁定",
       "enter-lock-password": "输入锁屏密码",
+      "forget-password": "忘记密码？",
       "lock-password-error": "锁屏密码错误",
-      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试"
+      "failed-times": "失败超过 {{frequency}} 次, 请在 {{time}} 后重试",
+      "verify-wallet": "验证"
     }
   }
 }

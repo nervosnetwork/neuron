@@ -23,7 +23,7 @@ import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
 import { useSearchParams } from 'react-router-dom'
 import CellInfoDialog from 'components/CellInfoDialog'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 import Hardware from 'widgets/Icons/Hardware.png'
 import Button from 'widgets/Button'
 import Alert from 'widgets/Alert'
@@ -193,7 +193,7 @@ const getColumns = ({
               <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
                 <UnLock
                   data-disabled={!!lockedReason}
-                  onClick={onAction}
+                  onClick={lockedReason ? undefined : onAction}
                   data-action={Actions.Unlock}
                   data-index={index}
                 />
@@ -202,7 +202,7 @@ const getColumns = ({
               <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
                 <LockCell
                   data-disabled={!!lockedReason}
-                  onClick={onAction}
+                  onClick={lockedReason ? undefined : onAction}
                   data-action={Actions.Lock}
                   data-index={index}
                 />

@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
-import { Keystore, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
 import { DefaultAddressNumber } from '../utils/scriptAndAddress'
@@ -29,7 +29,7 @@ export interface WalletProperties {
   extendedKey: string // Serialized account extended public key
   isHDWallet?: boolean
   device?: DeviceInfo
-  keystore?: Keystore
+  keystore?: hd.Keystore
   startBlockNumber?: string
 }
 
@@ -76,11 +76,11 @@ export abstract class Wallet {
     throw new Error('not implemented')
   }
 
-  public loadKeystore = (): Keystore => {
+  public loadKeystore = (): hd.Keystore => {
     throw new WalletFunctionNotSupported(this.loadKeystore.name)
   }
 
-  public saveKeystore = (_keystore: Keystore): void => {
+  public saveKeystore = (_keystore: hd.Keystore): void => {
     throw new WalletFunctionNotSupported(this.saveKeystore.name)
   }
 
@@ -92,7 +92,7 @@ export abstract class Wallet {
     throw new WalletFunctionNotSupported(this.getDeviceInfo.name)
   }
 
-  public accountExtendedPublicKey = (): AccountExtendedPublicKey => {
+  public accountExtendedPublicKey = (): hd.AccountExtendedPublicKey => {
     throw new WalletFunctionNotSupported(this.accountExtendedPublicKey.name)
   }
 
@@ -149,8 +149,8 @@ export class FileKeystoreWallet extends Wallet {
     this.isHD = true
   }
 
-  accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey)
+  accountExtendedPublicKey = (): hd.AccountExtendedPublicKey => {
+    return hd.AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   public toJSON = () => {
@@ -166,14 +166,14 @@ export class FileKeystoreWallet extends Wallet {
 
   public loadKeystore = () => {
     const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
-    return Keystore.fromJson(data)
+    return hd.Keystore.fromJson(data)
   }
 
   static fromJSON = (json: WalletProperties) => {
     return new FileKeystoreWallet(json)
   }
 
-  public saveKeystore = (keystore: Keystore): void => {
+  public saveKeystore = (keystore: hd.Keystore): void => {
     fileService.writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify({ ...keystore, id: this.id }))
   }
 
@@ -235,8 +235,8 @@ export class HardwareWallet extends Wallet {
     this.isHD = false
   }
 
-  accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey)
+  accountExtendedPublicKey = (): hd.AccountExtendedPublicKey => {
+    return hd.AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
   static fromJSON = (json: WalletProperties) => {
@@ -249,7 +249,7 @@ export class HardwareWallet extends Wallet {
 
   public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
     const { addressType, addressIndex } = this.getDeviceInfo()
-    const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
+    const { publicKey } = hd.AccountExtendedPublicKey.parse(this.extendedKey)
     const address = await AddressService.generateAndSaveForPublicKeyQueue.asyncPush({
       walletId: this.id,
       publicKey,
@@ -405,9 +405,19 @@ export default class WalletService {
       wallet.saveKeystore(props.keystore!)
     }
 
-    if (this.getAll().find(item => item.extendedKey === props.extendedKey)) {
+    const existWalletInfo = this.getAll().find(item => item.extendedKey === props.extendedKey)
+    if (existWalletInfo) {
+      const existWallet = FileKeystoreWallet.fromJSON(existWalletInfo)
+      const existWalletIsWatchOnly = existWallet.isHDWallet() && existWallet.loadKeystore().isEmpty()
       this.importedWallet = wallet
-      throw new DuplicateImportWallet(JSON.stringify({ extendedKey: props.extendedKey, id }))
+      throw new DuplicateImportWallet(
+        JSON.stringify({
+          extendedKey: props.extendedKey,
+          existWalletIsWatchOnly,
+          existingWalletId: existWallet.id,
+          id,
+        })
+      )
     }
 
     this.listStore.writeSync(this.walletsKey, [...this.getAll(), wallet.toJSON()])

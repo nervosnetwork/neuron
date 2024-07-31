@@ -24,15 +24,44 @@
   }
 
   & .wordItem {
+    position: relative;
+    color: var(--input-second-color);
     &:focus-within {
-      color: #00c891;
+      color: var(--main-text-color);
     }
     &:not(:focus-within) {
       &.errorWords {
-        color: #ff1e1e;
         & > input {
           border-bottom: 1px solid #ff1e1e;
-          color: #ff1e1e;
+        }
+      }
+    }
+
+    .dropdown {
+      position: absolute;
+      height: 132px;
+      overflow-y: auto;
+      min-width: 72px;
+      background: var(--secondary-background-color);
+      padding: 2px;
+      border-radius: 6px;
+      z-index: 10;
+      top: 24px;
+      left: 16px;
+
+      .dropdownItem {
+        margin-bottom: 4px;
+        line-height: 16px;
+        padding: 4px;
+        color: var(--main-text-color);
+        border-radius: 4px;
+        border: none;
+        width: 100%;
+        background: none;
+        text-align: start;
+        cursor: pointer;
+        &:hover {
+          background: var(--hover-background-color);
         }
       }
     }
@@ -57,6 +86,11 @@
 
       &:focus {
         border-bottom: 1px solid #00c891;
+      }
+
+      &:disabled {
+        color: var(--input-second-color);
+        border-bottom: none;
       }
     }
   }

@@ -1,0 +1,23 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  width: 680px;
+
+  .content {
+    max-width: 60%;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--main-text-color);
+
+    button {
+      border: none;
+      background: none;
+      color: var(--primary-color);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState } from 'react'
 import { useLocation, NavigateFunction, useNavigate } from 'react-router-dom'
+import type { TFunction } from 'i18next'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -9,6 +10,7 @@ import {
   initAppState,
   showGlobalAlertDialog,
   updateLockWindowInfo,
+  dismissGlobalAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
 import {
@@ -18,6 +20,7 @@ import {
   setCurrentNetwork,
   startNodeIgnoreExternal,
   startSync,
+  replaceWallet,
 } from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
@@ -117,6 +120,7 @@ export const useSubscription = ({
   showSwitchNetwork,
   lockWindowInfo,
   setIsLockDialogShow,
+  t,
 }: {
   walletID: string
   chain: State.Chain
@@ -127,6 +131,7 @@ export const useSubscription = ({
   showSwitchNetwork: () => void
   lockWindowInfo: State.App['lockWindowInfo']
   setIsLockDialogShow: (v: boolean) => void
+  t: TFunction
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
 
@@ -318,6 +323,36 @@ export const useSubscription = ({
               setIsLockDialogShow(true)
             }
             break
+          case 'import-exist-xpubkey': {
+            if (payload) {
+              const { existWalletIsWatchOnly, existingWalletId, id: importedWalletId } = JSON.parse(payload)
+              if (existWalletIsWatchOnly) {
+                showGlobalAlertDialog({
+                  type: 'warning',
+                  message: t('main.import-exist-xpubkey-dialog.replace-tip'),
+                  action: 'all',
+                  onOk: () => {
+                    replaceWallet({
+                      existingWalletId,
+                      importedWalletId,
+                    }).then(res => {
+                      if (isSuccessResponse(res)) {
+                        dismissGlobalAlertDialog()(dispatch)
+                        navigate(RoutePath.Overview)
+                      }
+                    })
+                  },
+                })(dispatch)
+              } else {
+                showGlobalAlertDialog({
+                  type: 'warning',
+                  message: t('main.import-exist-xpubkey-dialog.delete-tip'),
+                  action: 'ok',
+                })(dispatch)
+              }
+            }
+            break
+          }
           default: {
             break
           }

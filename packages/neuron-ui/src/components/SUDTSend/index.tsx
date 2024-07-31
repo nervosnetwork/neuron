@@ -30,7 +30,7 @@ import {
   validateAmountRange,
   CONSTANTS,
 } from 'utils'
-import { SendType } from 'utils/enums'
+import { SendType, UDTType } from 'utils/enums'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import { Attention } from 'widgets/Icons/icon'
@@ -114,10 +114,13 @@ const SUDTSend = () => {
   const addressLockType = useAddressLockType(sendState.address, isMainnet)
   const isSecp256k1Addr = addressLockType === AddressLockType.secp256
 
-  const [accountInfo, setAccountInfo] = useState<Pick<
-    Required<SUDTAccount>,
-    'accountId' | 'accountName' | 'tokenName' | 'balance' | 'tokenId' | 'decimal' | 'symbol'
-  > | null>(null)
+  const [accountInfo, setAccountInfo] = useState<
+    | (Pick<
+        Required<SUDTAccount>,
+        'accountId' | 'accountName' | 'tokenName' | 'balance' | 'tokenId' | 'decimal' | 'symbol'
+      > & { udtType?: UDTType })
+    | null
+  >(null)
   const accountType = accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? AccountType.CKB : AccountType.SUDT
   const { sendType, onChange: onChangeSendType } = useSendType({ addressLockType, accountType })
 
@@ -142,6 +145,7 @@ const SUDTSend = () => {
               tokenId: account.tokenID,
               decimal: account.decimal,
               symbol: account.symbol || DEFAULT_SUDT_FIELDS.symbol,
+              udtType: account.udtType,
             })
             return true
           }
@@ -204,6 +208,7 @@ const SUDTSend = () => {
     addressLockType,
     accountInfo,
     isAddressCorrect: !errors.address,
+    udtType: accountInfo?.udtType,
   })
   const isOptionCorrect = !!(!options?.length || sendType)
   const isSubmittable = isFormReady && experimental?.tx && !remoteError && isOptionCorrect

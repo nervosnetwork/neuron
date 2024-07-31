@@ -24,6 +24,11 @@ export enum ResponseCode {
   Success,
 }
 
+export enum UDTType {
+  SUDT = 'sUDT',
+  XUDT = 'xUDT',
+}
+
 export default {
   ResponseCode,
 }

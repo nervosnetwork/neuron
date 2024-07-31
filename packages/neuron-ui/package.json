@@ -50,13 +50,15 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
-    "@ckb-lumos/bi": "0.21.1",
-    "@ckb-lumos/rpc": "0.21.1",
-    "@ckb-lumos/base": "0.21.1",
-    "@ckb-lumos/codec": "0.21.1",
-    "@ckb-lumos/helpers": "0.21.1",
-    "@ckb-lumos/config-manager": "0.21.1",
-    "@ckb-lumos/common-scripts": "0.21.1",
+    "@ckb-lumos/lumos": "0.23.0",
+    "@ckb-lumos/bi": "0.23.0",
+    "@ckb-lumos/rpc": "0.23.0",
+    "@ckb-lumos/base": "0.23.0",
+    "@ckb-lumos/codec": "0.23.0",
+    "@ckb-lumos/hd": "0.23.0",
+    "@ckb-lumos/helpers": "0.23.0",
+    "@ckb-lumos/config-manager": "0.23.0",
+    "@ckb-lumos/common-scripts": "0.23.0",
     "canvg": "2.0.0",
     "i18next": "23.7.11",
     "immer": "9.0.21",
@@ -69,7 +71,7 @@
     "react-router-dom": "6.21.1",
     "react-transition-group": "4.4.5",
     "sass": "1.69.5",
-    "tslib": "2.6.2"
+    "tslib": "2.6.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
@@ -95,7 +97,7 @@
     "babel-jest": "25.5.1",
     "electron": "30.0.0",
     "enzyme": "3.11.0",
-    "enzyme-adapter-react-16": "1.15.7",
+    "enzyme-adapter-react-16": "1.15.8",
     "eslint-config-airbnb": "19.0.4",
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-jsx-a11y": "6.7.1",

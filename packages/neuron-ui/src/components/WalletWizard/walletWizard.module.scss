@@ -94,6 +94,27 @@ $line-gap: 15px;
   .actions {
     @include form-footer;
   }
+  .createCommend {
+    margin: 24px 0 34px;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    .commendItem {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      color: var(--error-color);
+      &:first-child {
+        color: var(--secondary-text-color);
+      }
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
 }
 
 @keyframes rotating {
@@ -110,12 +131,16 @@ $line-gap: 15px;
 
   .title {
     @include header-title;
-    margin-bottom: 16px;
+    max-width: 611px;
+    margin: 0 auto 16px;
   }
 
   .input {
     width: 500px;
     margin: 0 auto;
+    input {
+      font-family: 'Inter-Regular';
+    }
   }
 
   .inputNotice {
@@ -141,14 +166,20 @@ $line-gap: 15px;
 
 .hint {
   font-size: 16px;
-  font-weight: 500;
   line-height: 22px;
   color: var(--secondary-text-color);
+  margin-top: 16px;
   margin-bottom: 40px;
   & > a {
     color: var(--link-color);
     text-decoration: none;
   }
+}
+
+.tips {
+  font-size: 14px;
+  color: var(--secondary-text-color);
+  margin-top: 12px;
 }
 
 .steps {

@@ -24,7 +24,7 @@ import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
 import WalletsService from '../services/wallets'
 import SettingsService, { Locale } from '../services/settings'
-import { ResponseCode } from '../utils/const'
+import { ResponseCode, UDTType } from '../utils/const'
 import { clean as cleanChain } from '../database/chain'
 import WalletsController from '../controllers/wallets'
 import TransactionsController from '../controllers/transactions'
@@ -64,7 +64,10 @@ import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
-import { OutPoint } from '@ckb-lumos/base'
+import { type OutPoint } from '@ckb-lumos/lumos'
+import { updateApplicationMenu } from './app/menu'
+import { DuplicateImportWallet } from '../exceptions'
+import CommandSubject from '../models/subjects/command'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
@@ -104,7 +107,19 @@ export default class ApiController {
             DataUpdateSubject.next({ dataType: 'new-xpubkey-wallet', actionType: 'create' })
           })
           .catch(error => {
-            dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+            if (error instanceof DuplicateImportWallet) {
+              const window = BrowserWindow.getFocusedWindow()
+              if (window) {
+                CommandSubject.next({
+                  winID: window.id,
+                  type: 'import-exist-xpubkey',
+                  payload: error.message,
+                  dispatchToUI: true,
+                })
+              }
+            } else {
+              dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+            }
           })
         break
       }
@@ -317,6 +332,7 @@ export default class ApiController {
 
     handle('update-lock-window-info', async (_, params: { locked?: boolean; password?: string }) => {
       SettingsService.getInstance().updateLockWindowInfo(params)
+      updateApplicationMenu(BrowserWindow.getFocusedWindow())
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().lockWindowInfo,
@@ -799,9 +815,12 @@ export default class ApiController {
       return this.#anyoneCanPayController.generateTx(params)
     })
 
-    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string; tokenID: string }) => {
-      return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID)
-    })
+    handle(
+      'get-hold-sudt-cell-capacity',
+      async (_, params: { address: string; tokenID: string; udtType?: UDTType }) => {
+        return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID, params.udtType)
+      }
+    )
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.#anyoneCanPayController.sendTx(params)
@@ -813,10 +832,6 @@ export default class ApiController {
 
     handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
       return this.#sudtController.getSUDTTokenInfo(params)
-    })
-
-    handle('get-sudt-type-script-hash', async (_, params: { tokenID: string }) => {
-      return this.#sudtController.getSUDTTypeScriptHash(params)
     })
 
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {

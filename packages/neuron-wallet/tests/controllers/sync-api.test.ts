@@ -44,14 +44,13 @@ jest.doMock('models/subjects/networks', () => {
     },
   }
 })
-jest.doMock('services/ckb-runner', () => ({
-  getLookingValidTargetStatus: jest.fn(),
-}))
-jest.mock('undici', () => ({
-  request: () => jest.fn()(),
-}))
 jest.mock('services/multisig', () => ({
   syncMultisigOutput: () => jest.fn(),
+}))
+jest.mock('env', () => ({
+  app: {
+    isPackaged: true,
+  },
 }))
 
 describe('SyncApiController', () => {
@@ -131,7 +130,7 @@ describe('SyncApiController', () => {
         bestKnownBlockNumber: bestKnownBlockNumber.toString(16),
         bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
       })
-      getCurrentNetworkMock.mockReturnValue({ remote: fakeNodeUrl })
+      getCurrentNetworkMock.mockReturnValue({ remote: fakeNodeUrl, type: 0 })
       stubbedGetTipHeader.mockResolvedValue({ timestamp: '180000' })
     })
     describe('on cache-tip-block-updated', () => {
@@ -148,8 +147,14 @@ describe('SyncApiController', () => {
           timestamp: '187000',
         }
         beforeEach(async () => {
+          process.env.CKB_NODE_ASSUME_VALID_TARGET = '0x'
+          process.env.CKB_NODE_ASSUME_VALID_TARGET_BLOCK_NUMBER = '100000'
           await sendFakeCacheBlockTipEvent(fakeState1)
           await sendFakeCacheBlockTipEvent(fakeState2)
+        })
+        afterAll(() => {
+          delete process.env['CKB_NODE_ASSUME_VALID_TARGET']
+          delete process.env['CKB_NODE_ASSUME_VALID_TARGET_BLOCK_NUMBER']
         })
         it('broadcast event of synced', () => {
           expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
@@ -163,6 +168,8 @@ describe('SyncApiController', () => {
             cacheRate: undefined,
             estimate: undefined,
             status: 3,
+            isLookingValidTarget: true,
+            validTarget: '0x',
           })
         })
         it('#getSyncStatus returns synced', async () => {
@@ -203,6 +210,7 @@ describe('SyncApiController', () => {
             cacheRate: undefined,
             estimate: undefined,
             status: 2,
+            isLookingValidTarget: false,
           })
         })
         it('#getSyncStatus returns syncing', async () => {
@@ -240,6 +248,7 @@ describe('SyncApiController', () => {
             cacheRate: undefined,
             estimate: undefined,
             status: 1,
+            isLookingValidTarget: false,
           })
         })
         it('#getSyncStatus returns sync pending', async () => {
@@ -271,6 +280,7 @@ describe('SyncApiController', () => {
               cacheRate: undefined,
               estimate: undefined,
               status: 2,
+              isLookingValidTarget: false,
             })
           })
           it('stores next block number', () => {
@@ -304,6 +314,7 @@ describe('SyncApiController', () => {
             cacheRate: undefined,
             estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate),
             status: 2,
+            isLookingValidTarget: false,
           }
           beforeEach(async () => {
             await sendFakeCacheBlockTipEvent(fakeState1)
@@ -399,6 +410,7 @@ describe('SyncApiController', () => {
               cacheRate: undefined,
               estimate: undefined,
               status: 2,
+              isLookingValidTarget: false,
             })
           })
           it('stores next block number', () => {
@@ -446,6 +458,7 @@ describe('SyncApiController', () => {
               indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
               estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate),
               status: 2,
+              isLookingValidTarget: false,
             })
           })
           it('stores next block number', () => {
@@ -472,6 +485,7 @@ describe('SyncApiController', () => {
                 indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
                 estimate: undefined,
                 status: 2,
+                isLookingValidTarget: false,
               })
             })
             it('#getSyncStatus returns syncing', async () => {
@@ -516,6 +530,7 @@ describe('SyncApiController', () => {
             cacheRate: undefined,
             estimate: undefined,
             status: 2,
+            isLookingValidTarget: false,
           })
         })
         it('#getSyncStatus returns syncing', async () => {

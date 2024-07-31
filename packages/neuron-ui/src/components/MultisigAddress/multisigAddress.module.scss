@@ -144,8 +144,36 @@
     padding-right: 30px;
     &:hover {
       color: var(--primary-color);
+      .expand {
+        path {
+          stroke: var(--primary-color);
+        }
+      }
     }
   }
+
+  .expand {
+    margin-left: 2px;
+    width: 12px;
+    path {
+      stroke: var(--secondary-text-color);
+    }
+  }
+
+  .tipContent {
+    &[data-tip-show='true'] {
+      .hoverBtn {
+        color: var(--primary-color);
+      }
+      .expand {
+        transform: rotate(180deg);
+        path {
+          stroke: var(--primary-color);
+        }
+      }
+    }
+  }
+
   .action {
     padding-right: 20px;
     .tip {
@@ -226,5 +254,61 @@
 
   path {
     fill: var(--primary-color);
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.multiGuideTip {
+  display: inline-flex;
+  margin-left: 4px;
+
+  & > svg {
+    g {
+      fill: none;
+    }
+    path {
+      fill: none;
+      stroke: var(--secondary-text-color);
+    }
+    &:hover,
+    &:active {
+      path {
+        stroke: var(--primary-color);
+      }
+    }
+  }
+  .multiGuide {
+    position: fixed !important;
+    transform: translateX(0) translateY(-100%) !important;
+    width: 270px;
+    white-space: break-spaces !important;
+
+    button {
+      border: none;
+      background-color: transparent;
+      color: var(--primary-color);
+      padding: 0;
+      cursor: pointer;
+    }
+
+    &::after {
+      content: '';
+      width: 270px;
+      height: 50px;
+      background-color: rebeccapurple;
+      display: block;
+      position: absolute;
+      background-color: transparent;
+    }
+  }
+
+  &:hover {
+    .multiGuide {
+      display: table !important;
+    }
   }
 }

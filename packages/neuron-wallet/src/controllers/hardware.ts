@@ -2,7 +2,7 @@ import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/c
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
 import { connectDeviceFailed } from '../exceptions'
-import { AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 
 export default class HardwareController {
   public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
@@ -50,7 +50,7 @@ export default class HardwareController {
 
   public async getPublicKey(): Promise<Controller.Response<PublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
-    const defaultPath = AccountExtendedPublicKey.ckbAccountPath
+    const defaultPath = hd.AccountExtendedPublicKey.ckbAccountPath
     const pubkey = await device.getPublicKey(defaultPath)
 
     return {

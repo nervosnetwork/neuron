@@ -1,27 +1,27 @@
+import { predefined } from '@ckb-lumos/config-manager'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import CellDep, { DepType } from '../../src/models/chain/cell-dep'
 import OutPoint from '../../src/models/chain/out-point'
-import { ScriptHashType } from '../../src/models/chain/script'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import AddressMeta from '../../src/database/address/meta'
 
+const { AddressType } = hd
+
 describe('AssetAccountInfo', () => {
+  const { SUDT, ANYONE_CAN_PAY } = predefined.AGGRON4.SCRIPTS
   const testnetSudtInfo = {
-    cellDep: new CellDep(
-      new OutPoint('0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958', '0'),
-      DepType.Code
-    ),
-    codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
-    hashType: ScriptHashType.Data,
+    cellDep: new CellDep(new OutPoint(SUDT.TX_HASH, SUDT.INDEX), SUDT.DEP_TYPE as DepType),
+    codeHash: SUDT.CODE_HASH,
+    hashType: SUDT.HASH_TYPE,
   }
 
   const testnetAnyoneCanPayInfo = {
     cellDep: new CellDep(
-      new OutPoint('0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c', '0'),
-      DepType.DepGroup
+      new OutPoint(ANYONE_CAN_PAY.TX_HASH, ANYONE_CAN_PAY.INDEX),
+      ANYONE_CAN_PAY.DEP_TYPE as DepType
     ),
-    codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH,
-    hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE,
+    codeHash: ANYONE_CAN_PAY.CODE_HASH,
+    hashType: ANYONE_CAN_PAY.HASH_TYPE,
   }
 
   describe('testnet', () => {

@@ -175,15 +175,19 @@
       "input-your-seed": "Por favor introduce la frase semilla de tu billetera",
       "password": "Contraseña",
       "confirm-password": "Confirmar Contraseña",
-      "set-wallet-name-and-password": "Nombra tu nueva billetera y elige una contraseña segura para protegerla",
-      "set-wallet-name": "Dale un nombre a tu nueva billetera",
-      "set-a-strong-password-to-protect-your-wallet": "Crea una contraseña segura para proteger tu billetera",
+      "set-wallet-name-and-password": "Por favor, nombra tu billetera en este dispositivo y elige una contraseña fuerte para protegerla",
+      "set-wallet-name": "Establece un nombre para la billetera",
+      "set-a-strong-password-to-protect-your-wallet": "Por favor, establece una contraseña fuerte para proteger tu billetera",
       "wallet-suffix": "Billetera {{suffix}}",
-      "write-down-seed": "Escribe la frase semilla de tu billetera y guárdala en un lugar seguro",
+      "handwritten-recommended": "Se recomienda transcripción a mano",
+      "do-not-copy": "No copiar",
+      "do-not-save-scrrenshots": "No guardar capturas de pantalla",
+      "replenish-your-seed": "Por favor, repón la semilla de tu billetera",
       "new-name": "Usa un nombre no usado previamente para la nueva billetera",
       "complex-password": "La contraseña debe tener entre 8 y 50 caracteres y contener al menos tres categorías de caracteres entre las siguientes: letras en mayúscula, letras en minúscula, números y símbolos especiales.",
       "same-password": "La contraseña y la confirmación de contraseña deben coincidir",
-      "input-seed-verify": "Ingresa la frase semilla creada para verificar",
+      "input-seed-verify": "Por favor, ingresa la semilla correcta de la billetera o haz clic en regresar para recrear la billetera",
+      "input-seed-first-empty-space": "Puede pegar toda la semilla del monedero en el primer espacio vacío",
       "no-wallet": "¿No tienes una billetera?",
       "create-wallet": "Crear Billetera",
       "repeat-password": "Repetir Contraseña",
@@ -194,6 +198,8 @@
     "import-keystore": {
       "title": "Importar Keystore",
       "select-file": "Seleccionar Archivo",
+      "import-failure": "Error de importación",
+      "import-failure-msg": "Neuron no soporta la importación del archivo keystore de ckb-cli debido a diferentes reglas de derivación del archivo keystore.",
       "label": {
         "path": "Archivo de Claves",
         "name": "Nombre de la Billetera",
@@ -440,7 +446,10 @@
         "lightTestnet": "Light Testnet",
         "lightMainnet": "Light Mainnet",
         "devnet": "Devnet",
-        "switch-network-type": "Cambiar a {{type}}"
+        "switch-network-type": "Cambiar a {{type}}",
+        "type": "Tipo",
+        "full-node": "Nodo Completo",
+        "light-client-node": "Nodo Cliente Ligero"
       },
       "locale": {
         "en": "English",
@@ -493,10 +502,10 @@
         "title": "Crear Cuenta de Activos"
       },
       "send-sudt": {
-        "title": "Enviar sUDT"
+        "title": "Enviar UDT"
       },
       "transfer-to-sudt": {
-        "title": "Enviar a cuenta sUDT"
+        "title": "Enviar a cuenta UDT"
       },
       "send-ckb-asset": {
         "title": "Enviar CKB"
@@ -505,7 +514,7 @@
         "title": "Enviar CKB"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "Enviar sUDT"
+        "title": "Enviar UDT"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "Enviar CKB"
@@ -801,7 +810,8 @@
       "updates-found-do-you-want-to-update": "Hay una actualización ({{versión}}) disponible",
       "install-update": "Actualización inmediata",
       "updates-downloaded-about-to-quit-and-install": "Actualización descargada. Listo para instalar y reiniciar.",
-      "quit-and-install": "Instalar y reiniciar"
+      "quit-and-install-restart": "Instalar y reiniciar",
+      "quit-and-install": "Inmediata Instalar"
     },
     "datetime": {
       "mon": {
@@ -936,7 +946,7 @@
       "locked-asset": "Bloqueado",
       "locked-asset-tooltip": "El parámetro de bloqueo es de {{epochs}} épocas, la fecha de lanzamiento estimada es {{year}}-{{month}}-{{day}} (según la altura del bloque en ejecución real, pueden haber algunas variaciones de tiempo en el tiempo de bloqueo).",
       "withdraw-asset-tooltip": "Hora estimada de lanzamiento es {{year}}-{{month}}-{{day}} {{hour}}:{{minute}} (según la altura del bloque en ejecución real).",
-      "user-defined-token-tooltip": "Migre el activo sUDT a una cuenta de activos sUDT",
+      "user-defined-token-tooltip": "Migre el activo {{udtType}} a una cuenta de activos {{udtType}}",
       "claim-asset": "Reclamar",
       "withdraw-asset": "Retirar",
       "view-details": "Ver detalles",
@@ -947,14 +957,14 @@
       "transfer-nft": "Enviar",
       "user-defined-token": "Migrar",
       "transfer-nft-success": "Transferencia de activos exitosa",
-      "migrate-sudt-success": "Conversión a nueva cuenta de activo sUDT exitosa",
-      "send-sudt-success": "Transferencia exitosa a la cuenta de activo sUDT",
+      "migrate-sudt-success": "Conversión a nueva cuenta de activo {{udtType}} exitosa",
+      "send-sudt-success": "Transferencia exitosa a la cuenta de activo {{udtType}}",
       "unlock-success": "Activo reclamado. Vaya al historial de transacciones para obtener más detalles.",
       "withdraw-cheque-success": "El activo fue retirado. Vaya al historial de transacciones para obtener más detalles.",
       "claim-cheque-success": "Activo reclamado. Vaya al historial de transacciones para obtener más detalles."
     },
     "migrate-sudt": {
-      "title": "Migrar a una cuenta de activo sUDT",
+      "title": "Migrar a una cuenta de activo {{udtType}}",
       "choose-title": "Modo de migración",
       "next": "Siguiente",
       "back": "Atrás",
@@ -962,14 +972,14 @@
       "input-symbol": "Por favor ingrese el símbolo",
       "input-decimal": "Por favor ingrese el decimal",
       "turn-into-new-account": {
-        "title": "Conviértalo en una nueva cuenta de activo sUDT",
-        "sub-title": "Convierta el activo sUDT en una nueva cuenta sUDT, ocupa al menos 142 CKbytes.",
+        "title": "Conviértalo en una nueva cuenta de activo {{udtType}}",
+        "sub-title": "Convierta el activo {{udtType}} en una nueva cuenta {{udtType}}, ocupa al menos 142 CKbytes.",
         "cancel": "Cancelar",
         "confirm": "Confirmar"
       },
       "transfer-to-exist-account": {
-        "title": "Transferir a una cuenta de activo sUDT",
-        "sub-title": "Transfiera todo el saldo sUDT a una cuenta sUDT existente. Asegúrese de que la cuenta objetivo esté activa."
+        "title": "Transferir a una cuenta de activo {{udtType}}",
+        "sub-title": "Transfiera todo el saldo {{udtType}} a una cuenta {{udtType}} existente. Asegúrese de que la cuenta objetivo esté activa."
       },
       "cancel": "Cancelar",
       "confirm": "Confirmar",
@@ -995,6 +1005,7 @@
         "select-account-type": "Seleccione el tipo de cuenta",
         "account-name": "Nombre de la cuenta",
         "sudt-account": "Cuenta de activos sUDT",
+        "xudt-account": "Cuenta de activos xUDT",
         "delete-failed": "No se pudo eliminar la configuración multifirma, el motivo del fallo: {{reason}}",
         "ckb-account": "Cuenta CKB",
         "set-token-info": "Establecer información del token",
@@ -1016,7 +1027,7 @@
           "decimal": "Ingrese el decimal"
         },
         "placeholder": {
-          "token-id": "El ID del token es el Args del sUDT Type Script, que es el mismo que el hash de bloqueo del emisor del token."
+          "token-id": "El ID del token es el Args del {{udtType}} Type Script, que es el mismo que el hash de bloqueo del emisor del token."
         }
       },
       "send": {
@@ -1066,6 +1077,8 @@
     },
     "multisig-address": {
       "window-title": "Direcciones de Multifirma",
+      "guide-tip": "Para los usuarios nuevos, pueden consultar la documentación para obtener <0>más información</0>.",
+      "learn-more": "más información",
       "search": {
         "placeholder": "buscar por dirección de multifirma, alias"
       },
@@ -1117,6 +1130,8 @@
         "export": "Exportar Tx"
       },
       "multi-details": "Detalles de la dirección multifirma",
+      "synchronization-abort": "Abortar sincronización",
+      "synchronization-abort-msg": "Salir de la ventana actual provocará que se aborte la sincronización de multisig, por favor confirme si desea salir.",
       "create-dialog": {
         "title": "Crear dirección multifirma",
         "preview-title": "La dirección multifirma se ha generado",
@@ -1190,16 +1205,19 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "Nodo externo detectado",
-        "body-tips-without-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, agregue una nueva opción de red para el nodo externo.",
-        "body-tips-with-network": "\"Internal Node\" está reservado para el nodo CKB incorporado, seleccione una de las siguientes opciones de red o agregue una nueva para el nodo externo.",
+        "body-tips-without-network": "Has seleccionado el nodo interno pero has iniciado el nodo externo. Si deseas continuar usando un nodo externo, por favor añade una nueva red.",
+        "body-tips-with-network": "Actualmente has seleccionado un nodo interno pero has iniciado un nodo externo. Si necesitas continuar usando el nodo externo, por favor cambia a otra red externa o añade una nueva red.",
         "add-network": "Agregar red",
-        "ignore-external-node": "Ignorar nodo externo",
-        "external-node-is-light": "Debido a las diferentes suposiciones de seguridad del cliente ligero, Neuron no admite nodos de cliente ligero externos. ¿Desea conectarse a un \"Light Client\" ?"
+        "ignore-external-node": "Ignorar nodo externo"
       },
       "no-disk-space-dialog": {
         "tip": "La sincronización se ha detenido debido a falta de espacio en disco. <br /> Asigne más espacio en disco o migre los datos a otro disco.",
         "continue-sync": "Continuar sincronización",
         "migrate-data": "Migrar datos"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "El monedero de observación ya ha sido importado antes, ¿desea reemplazarlo?",
+        "delete-tip": "Existe el mismo monedero original. Si desea continuar con la importación, por favor elimínelo."
       }
     },
     "cell-manage": {
@@ -1278,8 +1296,10 @@
     "lock-window": {
       "neuron-is-locked": "La ventana de Neuron está bloqueada",
       "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
+      "forget-password": "Olvidé mi contraseña?",
       "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
-      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}"
+      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}",
+      "verify-wallet": "Verificar"
     }
   }
 }

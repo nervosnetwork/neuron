@@ -1,9 +1,7 @@
-import type { ParamsFormatter } from '@ckb-lumos/rpc'
-import type { Block } from '@ckb-lumos/base'
-import type { Script } from '@ckb-lumos/base'
-import { HexString } from '@ckb-lumos/base'
+import type { HexString, Block, Script } from '@ckb-lumos/lumos'
 import { CKBRPC } from '@ckb-lumos/rpc'
 import { Method as SdkRpcMethod } from '@ckb-lumos/rpc/lib/method'
+import { type CKBComponents, type ParamsFormatter } from '@ckb-lumos/lumos/rpc'
 import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
 import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
 import { Base } from '@ckb-lumos/rpc/lib/Base'
@@ -12,16 +10,14 @@ import {
   PayloadInBatchException,
   IdNotMatchedInBatchException,
 } from '@ckb-lumos/rpc/lib/exceptions'
-import { request } from 'undici'
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
-import type { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 
 export interface LightScriptFilter {
   script: Script
   blockNumber: CKBComponents.BlockNumber
-  scriptType: CKBRPC.ScriptType
+  scriptType: CKBComponents.ScriptType
 }
 
 export type LightScriptSyncStatus = LightScriptFilter
@@ -67,7 +63,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [
       (searchKey: {
         script: CKBComponents.Script
-        scriptType: CKBRPC.ScriptType
+        scriptType: CKBComponents.ScriptType
         blockRange: [HexString, HexString]
       }) => ({
         script: {
@@ -111,7 +107,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [paramsFormatter.toHash],
     resultFormatters: (result: {
       status: 'fetched' | 'fetching' | 'added' | 'not_found'
-      data?: RPC.TransactionWithStatus
+      data?: Parameters<typeof resultFormatter.toTransactionWithStatus>[0]
     }) => {
       return {
         status: result.status,
@@ -149,7 +145,11 @@ export class LightRPC extends Base {
   // TODO: the type is not the same as full node here
   // @ts-ignore
   getTransactions: (
-    searchKey: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; blockRange: [HexString, HexString] },
+    searchKey: {
+      script: CKBComponents.Script
+      scriptType: CKBComponents.ScriptType
+      blockRange: [HexString, HexString]
+    },
     order: 'asc' | 'desc',
     limit: HexString,
     afterCursor: HexString
@@ -334,12 +334,12 @@ export class LightRPC extends Base {
             return []
           }
 
-          const res = await request(node.url, {
+          const res = await fetch(node.url, {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: { 'content-type': 'application/json' },
           })
-          const batchRes = await res.body.json()
+          const batchRes = await res.json()
 
           if (!Array.isArray(batchRes)) {
             return []

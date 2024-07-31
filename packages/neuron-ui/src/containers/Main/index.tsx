@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -28,7 +28,7 @@ const MainContent = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { networkID } = chain
-  const [t, i18n] = useTranslation()
+  const [t] = useTranslation()
 
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
 
@@ -36,8 +36,6 @@ const MainContent = () => {
     () => networks.filter(v => v.remote === network?.remote && !v.readonly),
     [network, networks]
   )
-
-  const isLightClientNetwork = network?.type === 2
 
   useSyncChainData({
     chainURL: network?.remote ?? '',
@@ -66,6 +64,7 @@ const MainContent = () => {
     showSwitchNetwork,
     lockWindowInfo,
     setIsLockDialogShow,
+    t,
   })
 
   useOnCurrentWalletChange({
@@ -74,7 +73,6 @@ const MainContent = () => {
     navigate,
     dispatch,
   })
-  useOnLocaleChange(i18n)
   const onContextMenu = useOnDefaultContextMenu(t)
   const onCancelGlobalDialog = useCallback(() => {
     dismissGlobalAlertDialog()(dispatch)
@@ -101,12 +99,6 @@ const MainContent = () => {
   }, [])
 
   const dialogProps = (function getDialogProps() {
-    if (isLightClientNetwork) {
-      return {
-        onConfirm: onCloseSwitchNetwork,
-        children: t('main.external-node-detected-dialog.external-node-is-light'),
-      }
-    }
     if (sameUrlNetworks.length) {
       return {
         onConfirm: onSwitchNetwork,
@@ -138,7 +130,11 @@ const MainContent = () => {
     return {
       onConfirm: onOpenEditorDialog,
       confirmText: t('main.external-node-detected-dialog.add-network'),
-      children: t('main.external-node-detected-dialog.body-tips-without-network'),
+      children: (
+        <span className={styles.chooseNetworkTip}>
+          {t('main.external-node-detected-dialog.body-tips-without-network')}
+        </span>
+      ),
     }
   })()
 
@@ -152,6 +148,7 @@ const MainContent = () => {
         action={globalAlertDialog?.action}
         type={globalAlertDialog?.type ?? 'success'}
         onCancel={onCancelGlobalDialog}
+        onOk={globalAlertDialog?.onOk}
       />
       <Dialog show={isMigrateDialogShow} onCancel={onCancel} title={t('messages.migrate-ckb-data')} showFooter={false}>
         {t('messages.rebuild-sync')
@@ -173,6 +170,8 @@ const MainContent = () => {
         cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
         title={t('main.external-node-detected-dialog.title')}
         className={styles.networkDialog}
+        confirmProps={{ type: 'dashed' }}
+        cancelProps={{ type: 'dashed' }}
       >
         {dialogProps.children}
       </Dialog>

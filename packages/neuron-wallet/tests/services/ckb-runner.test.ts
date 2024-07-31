@@ -1,6 +1,5 @@
 import { EventEmitter } from 'typeorm/platform/PlatformTools'
 import path from 'path'
-import { scheduler } from 'timers/promises'
 
 const stubbedChildProcess = jest.fn()
 const stubbedSpawn = jest.fn()
@@ -92,13 +91,7 @@ jest.doMock('../../src/utils/toml', () => ({
 jest.doMock('../../src/utils/get-usable-port', () => ({
   getUsablePort: getUsablePortMock,
 }))
-const {
-  startCkbNode,
-  stopCkbNode,
-  getLookingValidTargetStatus,
-  migrateCkbData,
-  getNodeUrl,
-} = require('../../src/services/ckb-runner')
+const { startCkbNode, stopCkbNode, migrateCkbData, getNodeUrl } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
@@ -196,54 +189,6 @@ describe('ckb runner', () => {
           it('throws error', () => {
             expect(hasError).toEqual(true)
           })
-        })
-      })
-
-      describe('with assume valid target', () => {
-        beforeEach(async () => {
-          stubbedProcess.platform = platform
-          app.isPackaged = true
-          stubbedProcess.env = { CKB_NODE_ASSUME_VALID_TARGET: '0x' + '0'.repeat(64) }
-          stubbedExistsSync.mockReturnValue(true)
-          await startCkbNode()
-        })
-        afterEach(async () => {
-          app.isPackaged = false
-          stubbedProcess.env = {}
-          const promise = stopCkbNode()
-          stubbedCkb.emit('close')
-          await promise
-        })
-        it('runs ckb binary', () => {
-          expect(stubbedSpawn).toHaveBeenCalledWith(
-            expect.stringContaining(path.join('bin', 'ckb')),
-            ['run', '-C', ckbDataPath, '--indexer', '--assume-valid-target', '0x' + '0'.repeat(64)],
-            { stdio: ['ignore', 'pipe', 'pipe'] }
-          )
-        })
-        it('is Looking valid target', () => {
-          stubbedCkb.stdout.emit(
-            'data',
-            `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`
-          )
-          expect(getLookingValidTargetStatus()).toBeTruthy()
-        })
-        it('is Looking valid target', async () => {
-          stubbedCkb.stdout.emit(
-            'data',
-            `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`
-          )
-          await scheduler.wait(11000)
-          stubbedCkb.stdout.emit('data', `had find valid target`)
-          expect(getLookingValidTargetStatus()).toBeFalsy()
-        }, 15000)
-        it('ckb has closed', async () => {
-          stubbedCkb.stdout.emit(
-            'data',
-            `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`
-          )
-          stubbedCkb.emit('close')
-          expect(getLookingValidTargetStatus()).toBeFalsy()
         })
       })
 

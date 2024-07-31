@@ -18,7 +18,8 @@ import { ErrorCode, LockScriptCategory, RoutePath, TypeScriptCategory, isSuccess
 import { SortType } from 'widgets/Table'
 
 const cellTypeOrder: Record<string, number> = {
-  [TypeScriptCategory.SUDT]: 1,
+  [TypeScriptCategory.SUDT]: 0,
+  [TypeScriptCategory.XUDT]: 1,
   [TypeScriptCategory.NFT]: 2,
   [TypeScriptCategory.Spore]: 3,
   [TypeScriptCategory.Unknown]: 4,
@@ -46,6 +47,9 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
         break
       case TypeScriptCategory.DAO:
         lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'Nervos DAO' } }
+        break
+      case TypeScriptCategory.XUDT:
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'XUDT' } }
         break
       case TypeScriptCategory.Unknown:
         lockedReason = { key: 'cell-manage.locked-reason.Unknown' }
@@ -82,6 +86,7 @@ const getCellType = (item: State.LiveCellWithLocalInfo) => {
     switch (item.typeScriptType) {
       case TypeScriptCategory.NFT:
       case TypeScriptCategory.SUDT:
+      case TypeScriptCategory.XUDT:
       case TypeScriptCategory.Spore:
       case TypeScriptCategory.Unknown:
         return item.typeScriptType
@@ -398,7 +403,7 @@ export const usePassword = () => {
 }
 
 export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: TFunction }) => {
-  const isWin32 = useMemo(() => {
+  const isWin32 = useMemo<boolean>(() => {
     return getPlatform() === 'win32'
   }, [])
   const [error, setError] = useState<ErrorCode | string | undefined>()

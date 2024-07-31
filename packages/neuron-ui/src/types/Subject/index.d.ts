@@ -17,6 +17,7 @@ declare namespace Command {
     | 'sign-verify'
     | 'multisig-address'
     | 'lock-window'
+    | 'import-exist-xpubkey'
   type Payload = string | null
 }
 

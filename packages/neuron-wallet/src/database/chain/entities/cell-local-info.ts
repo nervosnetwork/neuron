@@ -1,4 +1,4 @@
-import type { OutPoint } from '@ckb-lumos/base'
+import type { OutPoint } from '@ckb-lumos/lumos'
 import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 @Entity()

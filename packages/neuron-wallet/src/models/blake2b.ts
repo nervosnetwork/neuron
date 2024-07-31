@@ -1,5 +1,5 @@
-import { CKBHasher } from '@ckb-lumos/base/lib/utils'
-import { bytes } from '@ckb-lumos/codec'
+import { CKBHasher } from '@ckb-lumos/lumos/utils'
+import { bytes } from '@ckb-lumos/lumos/codec'
 
 export const BLAKE160_HEX_LENGTH = 42
 

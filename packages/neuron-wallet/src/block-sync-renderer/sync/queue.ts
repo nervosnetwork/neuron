@@ -133,8 +133,8 @@ export default class Queue {
     for (let index = 0; index < txsWithStatus.length; index++) {
       if (txsWithStatus[index]?.transaction) {
         const tx = Transaction.fromSDK(txsWithStatus[index].transaction)
-        tx.blockHash = txsWithStatus[index].txStatus.blockHash!
-        blockHashes.push(tx.blockHash)
+        tx.blockHash = txsWithStatus[index].txStatus.blockHash
+        blockHashes.push(tx.blockHash!)
         txs.push(tx)
       } else {
         if ((txsWithStatus[index].txStatus as any) === 'rejected') {
@@ -144,7 +144,7 @@ export default class Queue {
       }
     }
     const headers = await rpc
-      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v]))
+      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v!]))
       .exec()
     headers.forEach((blockHeader: CKBComponents.BlockHeader, idx: number) => {
       if (blockHeader) {
@@ -231,7 +231,7 @@ export default class Queue {
       }
       await TransactionPersistor.saveFetchTx(tx, this.#lockArgsSet)
       for (const info of anyoneCanPayInfos) {
-        await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
+        await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160, info.udtType)
       }
 
       await this.#checkAndGenerateAddressesByTx(tx)

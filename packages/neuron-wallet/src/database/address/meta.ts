@@ -1,6 +1,6 @@
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import { Address, AddressVersion } from '../../models/address'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import Script from '../../models/chain/script'
 import SystemScriptInfo from '../../models/system-script-info'
 import AssetAccountInfo from '../../models/asset-account-info'
@@ -11,7 +11,7 @@ export default class AddressMeta implements Address {
   walletId: string
   address: string
   path: string
-  addressType: AddressType
+  addressType: hd.AddressType
   addressIndex: number
   blake160: string
   txCount?: number
@@ -28,7 +28,7 @@ export default class AddressMeta implements Address {
     walletId: string,
     address: string,
     path: string,
-    addressType: AddressType,
+    addressType: hd.AddressType,
     addressIndex: number,
     blake160: string,
     version?: AddressVersion,

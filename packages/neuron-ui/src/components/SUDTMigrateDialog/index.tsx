@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import { MIN_CKB_REQUIRED_BY_NORMAL_SUDT, SHANNON_CKB_RATIO } from 'utils/const'
 import Dialog from 'widgets/Dialog'
+import { PresetScript, UDTType } from 'utils'
 import styles from './sUDTMigrateDialog.module.scss'
 
 const items = [
@@ -38,12 +39,13 @@ const SUDTMigrateDialog = ({
     setType('')
     onCancel()
   }
+  const udtType = cell.customizedAssetInfo.type === PresetScript.SUDT ? UDTType.SUDT : UDTType.XUDT
 
   return (
     <Dialog
       className={styles.container}
       show
-      title={t('migrate-sudt.title')}
+      title={t('migrate-sudt.title', { udtType })}
       onCancel={handleCancel}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.next')}
@@ -64,8 +66,8 @@ const SUDTMigrateDialog = ({
             role="button"
             tabIndex={idx}
           >
-            <div className={styles.title}>{t(v.title)}</div>
-            <div className={styles.subTitle}>{t(v.subTitle)}</div>
+            <div className={styles.title}>{t(v.title, { udtType })}</div>
+            <div className={styles.subTitle}>{t(v.subTitle, { udtType })}</div>
           </div>
         ))}
       </>

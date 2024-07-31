@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.12.0
+          - 20.15.1
         os:
           - macos-latest
           - ubuntu-20.04
@@ -45,6 +45,37 @@ jobs:
         if: ${{ github.event_name == 'issue_comment' }}
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
+
+      - name: Ensure no more commits after the triggering comment
+        uses: actions/github-script@v7
+        if: ${{ github.event_name == 'issue_comment' }}
+        env:
+          ISSUE_NUMBER: ${{github.event.issue.number}}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        with:
+          script: |
+            const { ISSUE_NUMBER, COMMENT_ID } = process.env
+            let page = 1
+            let hasFoundComment = false
+            while(true) {
+              const { data: timelines } = await github.rest.issues.listEventsForTimeline({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ISSUE_NUMBER,
+                page,
+                per_page: 100,
+              })
+              if (timelines.some(v => {
+                hasFoundComment = hasFoundComment || (v.event === 'commented' && `${v.id}` === `${COMMENT_ID}`)
+                return hasFoundComment && v.event === 'committed'
+              })) {
+                throw new Error('The last commit comes after the comment, please comment and package after last commit')
+              }
+              if (timelines.length === 0) {
+                return
+              }
+              page += 1
+            }
 
       - name: Setup Node
         uses: actions/setup-node@v4

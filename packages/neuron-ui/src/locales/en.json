@@ -182,15 +182,19 @@
       "input-your-seed": "Please input your wallet seed",
       "password": "Password",
       "confirm-password": "Confirm Password",
-      "set-wallet-name-and-password": "Name your new wallet, and choose a strong password to protect it",
-      "set-wallet-name": "Give your new wallet a name",
-      "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
+      "set-wallet-name-and-password": "Please name your wallet on this device and choose a strong password to protect it",
+      "set-wallet-name": "Set a name for the wallet",
+      "set-a-strong-password-to-protect-your-wallet": "Please set a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}",
-      "write-down-seed": "Write down your wallet seed and save it in a safe place",
+      "handwritten-recommended": "Handwritten transcription recommended",
+      "do-not-copy": "Do not copy",
+      "do-not-save-scrrenshots": "Do not save scrrenshots",
+      "replenish-your-seed": "Please replenish your wallet seed",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
       "same-password": "The password and confirm password should match",
-      "input-seed-verify": "Input created seed to verify",
+      "input-seed-verify": "Please enter the correct wallet seed or click back to recreate the wallet",
+      "input-seed-first-empty-space": "You can paste the entire wallet seed to the first empty space",
       "no-wallet": "No wallet?",
       "create-wallet": "Create Wallet",
       "repeat-password": "Repeat Password",
@@ -202,6 +206,8 @@
     "import-keystore": {
       "title": "Import Keystore File",
       "select-file": "Choose File",
+      "import-failure": "Import Failure",
+      "import-failure-msg": "Neuron does not support importing ckb-cli's keystore file due to different keystore file derivation rules.",
       "label": {
         "path": "Keystore File",
         "name": "Wallet Name",
@@ -457,7 +463,10 @@
         "lightTestnet": "Light Testnet",
         "lightMainnet": "Light Mainnet",
         "devnet": "Devnet",
-        "switch-network-type": "Switch to {{type}}"
+        "switch-network-type": "Switch to {{type}}",
+        "type": "Type",
+        "full-node": "Full Node",
+        "light-client-node": "Light Client Node"
       },
       "locale": {
         "en": "English",
@@ -510,10 +519,10 @@
         "title": "Create Asset Account"
       },
       "send-sudt": {
-        "title": "Send sUDT"
+        "title": "Send UDT"
       },
       "transfer-to-sudt": {
-        "title": "Send to sUDT account"
+        "title": "Send to UDT account"
       },
       "send-ckb-asset": {
         "title": "Send CKB"
@@ -522,7 +531,7 @@
         "title": "Send CKB"
       },
       "send-acp-sudt-to-new-cell": {
-        "title": "Send sUDT"
+        "title": "Send UDT"
       },
       "send-acp-ckb-to-new-cell": {
         "title": "Send CKB"
@@ -818,7 +827,8 @@
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
       "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
-      "quit-and-install": "Install and relaunch"
+      "quit-and-install-restart": "Install and relaunch",
+      "quit-and-install": "Immediate Install"
     },
     "datetime": {
       "mon": {
@@ -953,7 +963,7 @@
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
       "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
-      "user-defined-token-tooltip": "Migrate sUDT asset to a sUDT Asset Account",
+      "user-defined-token-tooltip": "Migrate {{udtType}} asset to a {{udtType}} Asset Account",
       "claim-asset": "Claim",
       "withdraw-asset": "Withdraw",
       "view-details": "View Details",
@@ -964,14 +974,14 @@
       "transfer-nft": "Send",
       "user-defined-token": "Migrate",
       "transfer-nft-success": "Transfer of assets successful",
-      "migrate-sudt-success": "Conversion to new sUDT asset account successful",
-      "send-sudt-success": "Transfer to sUDT account successful",
+      "migrate-sudt-success": "Conversion to new {{udtType}} asset account successful",
+      "send-sudt-success": "Transfer to {{udtType}} account successful",
       "unlock-success": "Asset claimed, go to transaction history for details",
       "withdraw-cheque-success": "Asset withdrawn, go to transaction history for details",
       "claim-cheque-success": "Asset claimed, go to transaction history for details"
     },
     "migrate-sudt": {
-      "title": "Migrate to a sUDT Asset Account",
+      "title": "Migrate to a {{udtType}} Asset Account",
       "choose-title": "Migration mode",
       "next": "Next",
       "back": "Back",
@@ -979,14 +989,14 @@
       "input-symbol": "Please input symbol",
       "input-decimal": "Please input decimal",
       "turn-into-new-account": {
-        "title": "Turn into a new sUDT Asset Account",
-        "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
+        "title": "Turn into a new {{udtType}} Asset Account",
+        "sub-title": "Turn the {{udtType}} Asset into a new {{udtType}} Account, occupies at least 142 CKBytes",
         "cancel": "Cancel",
         "confirm": "Confirm"
       },
       "transfer-to-exist-account": {
-        "title": "Transfer to a sUDT Asset Account",
-        "sub-title": "Transfer all sUDT balance to an existing sUDT Account, please make sure the target account is alive"
+        "title": "Transfer to a {{udtType}} Asset Account",
+        "sub-title": "Transfer all {{udtType}} balance to an existing {{udtType}} Account, please make sure the target account is alive"
       },
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -1012,6 +1022,7 @@
         "select-account-type": "Select account type",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
+        "xudt-account": "xUDT Account",
         "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
         "ckb-account": "CKB Account",
         "set-token-info": "Set Token Info",
@@ -1033,7 +1044,7 @@
           "decimal": "Please input decimal"
         },
         "placeholder": {
-          "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
+          "token-id": "Token ID is the Args of the {{udtType}} Type Script, which is the same as the lock hash of the token issuer."
         }
       },
       "send": {
@@ -1083,6 +1094,8 @@
     },
     "multisig-address": {
       "window-title": "Multisig Addresses",
+      "guide-tip": "Refer to the Multisig documentation to <0>learn more</0>.",
+      "learn-more": "learn more",
       "search": {
         "placeholder": "search by multisig address,alias"
       },
@@ -1134,6 +1147,8 @@
         "export": "Export Tx"
       },
       "multi-details": "Multisig address details",
+      "synchronization-abort": "Synchronization Abort",
+      "synchronization-abort-msg": "Leaving the current window will cause the multisig synchronization to be aborted, so please confirm to leave.",
       "create-dialog": {
         "title": "Create multisig address",
         "preview-title": "Multisig address has been generated",
@@ -1209,17 +1224,20 @@
     },
     "main": {
       "external-node-detected-dialog": {
-        "title": "External node detected",
-        "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
-        "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
+        "title": "Detected external node",
+        "body-tips-without-network": "You have selected the internal node but started the external node, if you want to continue to use an external node, please add a new network.",
+        "body-tips-with-network": "You have currently selected an internal node but started an external node, if you need to continu using the external node please switch to another external network or add a new network.",
         "add-network": "Add Network",
-        "ignore-external-node": "Ignore external node",
-        "external-node-is-light": "Neuron does not support external light client nodes due to different security assumptions for light clients. Would you like to connect to the \"Light Client\" ?"
+        "ignore-external-node": "Ignore external node"
       },
       "no-disk-space-dialog": {
         "tip": "Due to insufficient disk space, synchronization has been stopped. <br /> Please allocate more disk space or migrate the data to another disk.",
         "continue-sync": "Continue Sync",
         "migrate-data": "Migrate Data"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "The watch-wallet has been imported before, would you replace it?",
+        "delete-tip": "The same original wallet existed. If you want to continue with the import, please delete it.."
       }
     },
     "cell-manage": {
@@ -1298,8 +1316,10 @@
     "lock-window": {
       "neuron-is-locked": "Neuron's window has been locked",
       "enter-lock-password": "Enter lock password",
+      "forget-password": "Forget password?",
       "lock-password-error": "Lock windows password error",
-      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}"
+      "failed-times": "Failed more than {{frequency}} times, please retry after {{time}}",
+      "verify-wallet": "Verify"
     }
   }
 }
