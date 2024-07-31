@@ -64,7 +64,7 @@ export const startCkbNodeWithData = async (option: {
 
 export const startCkbMiner = (option: { decPath: string; binPath: string }) => {
   if (ckb == null) {
-    console.error(`CKB:\tckb is not closed, close it before start...`)
+    console.error(`CKB:\tckb is not started, please start ckb before starting miner...`)
     return
   }
   if (ckbMiner !== null) {
