@@ -144,6 +144,7 @@ export default {
         "{{path}} n'a pas de configuration et de stockage de noeud CKB, appuyez sur Confirmer pour synchroniser à partir de zéro",
       'light-client-sudt-acp-error':
         "Le mode client léger ne prend pas en charge l'envoi d'actifs vers le compte d'actifs d'autrui",
+      'address-required': "L'adresse ne peut pas être vide.",
     },
     messageBox: {
       button: {

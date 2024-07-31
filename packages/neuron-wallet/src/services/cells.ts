@@ -1420,7 +1420,7 @@ export default class CellsService {
         typeHashType: SystemScriptInfo.DAO_HASH_TYPE,
       })
       .getMany()
-    if (!inputEntities.length) throw new Error(`No unlock transaction use ${unlockHash} as input`)
+    if (!inputEntities.length) throw new Error(`This is not an unlock dao transaction ${unlockHash}`)
     const inputPreviousTxHashes = inputEntities.map(v => v.outPointTxHash)
     const outputEntities = await getConnection()
       .getRepository(OutputEntity)
