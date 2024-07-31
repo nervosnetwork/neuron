@@ -2,6 +2,7 @@ import * as process from 'process'
 import { rmSync } from 'node:fs'
 import fs from 'fs'
 import * as tar from 'tar'
+import { scheduler } from 'timers/promises'
 
 export const platform = (): string => {
   switch (process.platform) {
@@ -26,20 +27,7 @@ function createTimeoutError(message?: string): Error {
  * @param milliseconds
  */
 export function delay(milliseconds: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
-/**
- * A simple {@link Promise.race} implementation,
- * to avoid incompatible Promise.race running in earlier JavaScript runtime.
- * @param promises
- */
-export function race<T>(promises: Promise<T>[]): Promise<T> {
-  return new Promise((resolve, reject) => {
-    promises.forEach(promise => {
-      promise.then(resolve, reject)
-    })
-  })
+  return scheduler.wait(milliseconds)
 }
 
 export interface TimeoutOptions {
@@ -60,7 +48,7 @@ export function timeout<T>(promise: Promise<T>, options: TimeoutOptions | number
     Promise.reject(message instanceof Error ? message : createTimeoutError(message))
   )
 
-  return race<T>([promise, timeoutPromise])
+  return Promise.race<T>([promise, timeoutPromise])
 }
 
 export interface RetryOptions {

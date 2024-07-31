@@ -1,5 +1,5 @@
 export const CKB_CONFIG = {
-  ckbConfigPath: 'source/ckb/',
+  ckbConfigPath: 'source/ckb',
   ckbLightClientConfigPath: 'source/ckb-light-client',
   binPath: 'source/bin',
 }
@@ -14,7 +14,9 @@ export const CKB_CHAIN_DATA = {
 
 export const NEURON_CONFIG_DATA = {
   binPath: 'neuron',
-  envPath: 'source/neuron/.env',
+  envPath: {
+    dbBlock2000: 'source/neuron/.env',
+  },
   networks: {
     dev: 'source/neuron/dev-wallet1/dev/networks/index.dev.json',
     light: 'source/neuron/dev-wallet1/dev/networks/index.light.json',
@@ -40,3 +42,17 @@ export const SQLITE_DATA_PATH = {
       'source/neuron-cell-data/2000/lightNode/wallet1/cell-0x9c96d0b369b5fd42d7e6b30d6dfdb46e32dac7293bf84de9d1e2d11ca7930717.sqlite',
   },
 }
+export const fixtures = [
+  {
+    name: 'Sync account1 with 10000 blocks',
+    neuronVersion: '',
+    genesisHash: '0x9c96d0b369b5fd42d7e6b30d6dfdb46e32dac7293bf84de9d1e2d11ca7930717',
+    ckbConfig: CKB_CONFIG,
+    neuronConfig: NEURON_CONFIG_DATA,
+    syncAccount: NEURON_CONFIG_DATA.accounts.account1,
+    ckbDataDb: CKB_CHAIN_DATA.dbBlock2000,
+    compareFullNodeSqlitePath: SQLITE_DATA_PATH.dbBlock2000.fullNode,
+    compareLightNodeSqlitePath: SQLITE_DATA_PATH.dbBlock2000.lightNode,
+    tmpPath: 'tmp',
+  },
+]

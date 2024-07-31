@@ -6,6 +6,7 @@ import { ChildProcess, spawn } from 'child_process'
 import * as fs from 'fs'
 import { CKB_RPC_URL } from './ckb-runner'
 import { BI, RPC } from '@ckb-lumos/lumos'
+import { scheduler } from 'timers/promises'
 
 let neuron: ChildProcess | null = null
 
@@ -91,16 +92,8 @@ export const startNeuronWithConfig = async (option: {
   let decPath = path.join(getNeuronPath(), ...['networks', 'index.json'])
   cpSync(option.network.indexJsonPath, decPath)
 
-  if (option.network.selectNetwork !== undefined) {
-    //todo
-    changeNetworkByName(option.network.selectNetwork)
-  }
   // cp wallet file
   cpSync(option.wallets.walletsPath, path.join(getNeuronPath(), ...['wallets']), { recursive: true })
-
-  if (option.wallets.selectWallet !== undefined) {
-    changeWalletByName(option.wallets.selectWallet)
-  }
 
   // start
   neuron = spawn(getNeuronStartCmd(), {
@@ -150,7 +143,7 @@ export const waitNeuronSyncSuccess = async (retries: number) => {
     if (syncResult.result) {
       return syncResult.result
     }
-    await asyncSleep(1000)
+    await scheduler.wait(1000)
   }
   return Promise.reject('waitNeuronSyncSuccess time out ')
 }
@@ -175,22 +168,10 @@ export const stopNeuron = async () => {
   })
 }
 
-function changeNetworkByName(selectNetwork: string) {
-  console.log('change :', selectNetwork)
-}
-
-function changeWalletByName(selectWallet: string) {
-  console.log('changeWalletByName:', selectWallet)
-}
-
 export const cleanNeuronSyncCells = () => {
   rm(path.join(getNeuronPath(), ...['cells']))
 }
 
 export const backupNeuronCells = (decPath: string) => {
   cpSync(path.join(getNeuronPath(), ...['cells']), decPath, { recursive: true })
-}
-
-export function asyncSleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }

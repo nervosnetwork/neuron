@@ -48,68 +48,61 @@ export class SqliteDataComparator {
     fs.appendFileSync(path, `${output}\n\n`)
   }
 
-  private async compareTableData(path: string, tableName: string, excludedFields: string[]) {
-    return new Promise<void>((resolve, reject) => {
-      this.db1.all(
-        `SELECT *
-         FROM [${tableName}]`,
-        (err, rowsDb1: RowData[]) => {
-          if (err) {
-            reject(err)
-            return
-          }
-
-          this.db2.all(
-            `SELECT *
-             FROM [${tableName}]`,
-            (err, rowsDb2: RowData[]) => {
-              if (err) {
-                reject(err)
-                return
-              }
-
-              const uniqueToDb1 = rowsDb1.filter(
-                row1 =>
-                  !rowsDb2.some(row2 =>
-                    Object.keys(row1)
-                      .filter(key => !excludedFields.includes(key))
-                      .every(key => row1[key] === row2[key])
-                  )
-              )
-
-              const uniqueToDb2 = rowsDb2.filter(
-                row2 =>
-                  !rowsDb1.some(row1 =>
-                    Object.keys(row2)
-                      .filter(key => !excludedFields.includes(key))
-                      .every(key => row1[key] === row2[key])
-                  )
-              )
-              let ret = uniqueToDb1.length == 0 && uniqueToDb2.length == 0
-              console.log(
-                `${tableName} uniqueToDb1.length:${uniqueToDb1.length},uniqueToDb2.length:${uniqueToDb2.length} `
-              )
-              if (!ret) {
-                fs.writeFileSync(path, '')
-                const output =
-                  `## Table: ${tableName}\n\n` +
-                  `### Unique to Database 1:\n${this.formatTableMarkdown(uniqueToDb1)}\n\n` +
-                  `### Unique to Database 2:\n${this.formatTableMarkdown(uniqueToDb2)}\n\n`
-                this.formatOutputToFile(path, output)
-                console.log('compare failed ')
-                this.compareResult[tableName] = false
-                this.compareResult.result = false
-                resolve()
-              } else {
-                this.compareResult[tableName] = true
-                console.log('compare successful ')
-              }
-              resolve()
-            }
-          )
+  private queryDb(db: sqlite3.Database, tableName: string): Promise<RowData[]> {
+    return new Promise((resolve, reject) => {
+      db.all(`SELECT * FROM [${tableName}]`, (err, rows: RowData[]) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(rows)
         }
-      )
+      })
     })
+  }
+
+  private async compareTableData(path: string, tableName: string, excludedFields: string[]): Promise<void> {
+    try {
+      const rowsDb1 = await this.queryDb(this.db1, tableName)
+      const rowsDb2 = await this.queryDb(this.db2, tableName)
+
+      const uniqueToDb1 = rowsDb1.filter(
+        row1 =>
+          !rowsDb2.some(row2 =>
+            Object.keys(row1)
+              .filter(key => !excludedFields.includes(key))
+              .every(key => row1[key] === row2[key])
+          )
+      )
+
+      const uniqueToDb2 = rowsDb2.filter(
+        row2 =>
+          !rowsDb1.some(row1 =>
+            Object.keys(row2)
+              .filter(key => !excludedFields.includes(key))
+              .every(key => row1[key] === row2[key])
+          )
+      )
+
+      let ret = uniqueToDb1.length === 0 && uniqueToDb2.length === 0
+      console.log(`${tableName} uniqueToDb1.length:${uniqueToDb1.length},uniqueToDb2.length:${uniqueToDb2.length} `)
+
+      if (!ret) {
+        fs.writeFileSync(path, '')
+        const output =
+          `## Table: ${tableName}\n\n` +
+          `### Unique to Database 1:\n${this.formatTableMarkdown(uniqueToDb1)}\n\n` +
+          `### Unique to Database 2:\n${this.formatTableMarkdown(uniqueToDb2)}\n\n`
+        this.formatOutputToFile(path, output)
+        console.log('compare failed ')
+        this.compareResult[tableName] = false
+        this.compareResult.result = false
+      } else {
+        this.compareResult[tableName] = true
+        console.log('compare successful ')
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   async compare(options: ComparisonOptions, dirName: string) {
@@ -121,6 +114,7 @@ export class SqliteDataComparator {
       console.log('compare finished :', options.fileName)
     } catch (error) {
       console.error('Error:', error)
+      this.compareResult.result = false
     }
   }
 
