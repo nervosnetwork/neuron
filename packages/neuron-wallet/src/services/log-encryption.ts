@@ -1,66 +1,101 @@
-import { randomBytes, createCipheriv, createHash, publicEncrypt, createPublicKey } from 'node:crypto'
-import { machineIdSync } from '../utils/machineid'
+import { randomBytes, createCipheriv, publicEncrypt, privateDecrypt, createDecipheriv } from 'node:crypto'
 import logger from '../utils/logger'
 
+export const DEFAULT_ALGORITHM = 'aes-256-cbc'
+
 export default class LogEncryption {
-  private static instance: LogEncryption
-  private static algorithm = 'aes-256-cbc'
-
   /**
-   * A determinable AES key for encrypting log message
+   * We use CBC mode here to prevent pattern-discerned
+   * > a one-bit change in a plaintext or initialization vector (IV) affects all following ciphertext blocks
    * @private
    */
-  private static localLogKey: Uint8Array
+  private readonly algorithm = DEFAULT_ALGORITHM
+
+  private readonly adminPublicKey: string
 
   /**
-   * The RSA encrypted {@link localLogKey} in base64 format
-   * @private
+   *
+   * @param adminPublicKey a PEM-formatted RSA public key
    */
-  private static encryptedLogKey: string
-
-  private constructor() {}
-
-  static getInstance(): LogEncryption {
-    if (!LogEncryption.instance) {
-      const adminPublicKey = process.env.LOG_ENCRYPTION_PUBLIC_KEY
-      if (!adminPublicKey) {
-        throw new Error('LOG_ENCRYPTION_PUBLIC_KEY is required to create LogEncryption instance')
-      }
-
-      const localLogKey = Buffer.from(createHash('sha256').update(machineIdSync(false)).digest())
-      LogEncryption.localLogKey = localLogKey
-      LogEncryption.encryptedLogKey = publicEncrypt(createPublicKey(adminPublicKey!), localLogKey).toString('base64')
-
-      LogEncryption.instance = new LogEncryption()
-      logger.info('LogEncryption key', LogEncryption.encryptedLogKey)
-    }
-
-    return LogEncryption.instance
+  constructor(adminPublicKey: string) {
+    this.adminPublicKey = adminPublicKey
   }
 
   /**
    * Encrypt a message
    * @param message
-   * @param iv
    */
-  encrypt(message: unknown, iv?: Uint8Array): string {
+  encrypt(message: unknown): string {
     if (message == null) return ''
-    let prependIV = false
-    if (!iv) {
-      prependIV = true
-      iv = randomBytes(16)
-    }
+    if (!this.adminPublicKey) return 'The admin public key does not exist, skip encrypting message'
 
-    const cipher = createCipheriv(LogEncryption.algorithm, LogEncryption.localLogKey, iv)
+    const localLogKey = randomBytes(32)
+    const iv = randomBytes(16)
+
+    const cipher = createCipheriv(this.algorithm, localLogKey, iv)
     const serializedMessage = typeof message === 'string' ? message : JSON.stringify(message, JSONSerializer)
+
+    const encryptedLogKey = publicEncrypt(this.adminPublicKey, localLogKey).toString('base64')
     const encryptedMsg = Buffer.concat([cipher.update(serializedMessage), cipher.final()]).toString('base64')
 
-    if (prependIV) {
-      return `[iv:${Buffer.from(iv).toString('base64')}] ${encryptedMsg}`
+    return `[key:${encryptedLogKey}] [iv:${iv.toString('base64')}] ${encryptedMsg}`
+  }
+
+  private static instance: LogEncryption
+
+  static getInstance(): LogEncryption {
+    if (!LogEncryption.instance) {
+      const adminPublicKey = process.env.LOG_ENCRYPTION_PUBLIC_KEY ?? ''
+      if (!adminPublicKey) {
+        logger.warn('LOG_ENCRYPTION_PUBLIC_KEY is required to create LogEncryption instance')
+      }
+
+      LogEncryption.instance = new LogEncryption(adminPublicKey)
     }
 
-    return encryptedMsg
+    return LogEncryption.instance
   }
+}
+
+export class LogDecryption {
+  private readonly adminPrivateKey: string
+
+  constructor(adminPrivateKey: string) {
+    this.adminPrivateKey = adminPrivateKey
+  }
+
+  decrypt(encryptedMessage: string): string {
+    const { iv, key, content } = parseMessage(encryptedMessage)
+
+    const decipher = createDecipheriv(
+      DEFAULT_ALGORITHM,
+      privateDecrypt(this.adminPrivateKey, Buffer.from(key, 'base64')),
+      Buffer.from(iv, 'base64')
+    )
+
+    return Buffer.concat([decipher.update(content, 'base64'), decipher.final()]).toString('utf-8')
+  }
+}
+
+function parseMessage(message: string) {
+  const result: Record<string, string> = {}
+  const regex = /\[([^\]:]+):([^\]]+)]/g
+  let match
+  let lastIndex = 0
+
+  while ((match = regex.exec(message)) !== null) {
+    const [, key, value] = match
+    result[key.trim()] = value.trim()
+    lastIndex = regex.lastIndex
+  }
+
+  // Extract remaining content after the last bracket
+  const remainingContent = message.slice(lastIndex).trim()
+  if (remainingContent) {
+    result.content = remainingContent
+  }
+
+  return result
 }
 
 const JSONSerializer = (_key: string, value: any) => {
@@ -69,5 +104,3 @@ const JSONSerializer = (_key: string, value: any) => {
   }
   return value
 }
-
-logger.info(LogEncryption.getInstance().encrypt('hello world'))
