@@ -66,6 +66,8 @@ import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import { CKBLightRunner } from '../services/light-runner'
 import { type OutPoint } from '@ckb-lumos/lumos'
 import { updateApplicationMenu } from './app/menu'
+import { DuplicateImportWallet } from '../exceptions'
+import CommandSubject from '../models/subjects/command'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
@@ -105,7 +107,19 @@ export default class ApiController {
             DataUpdateSubject.next({ dataType: 'new-xpubkey-wallet', actionType: 'create' })
           })
           .catch(error => {
-            dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+            if (error instanceof DuplicateImportWallet) {
+              const window = BrowserWindow.getFocusedWindow()
+              if (window) {
+                CommandSubject.next({
+                  winID: window.id,
+                  type: 'import-exist-xpubkey',
+                  payload: error.message,
+                  dispatchToUI: true,
+                })
+              }
+            } else {
+              dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+            }
           })
         break
       }
