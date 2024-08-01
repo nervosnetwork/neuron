@@ -54,7 +54,7 @@ export const startCkbNodeWithData = async (option: {
         return res
       }),
     {
-      timeout: 5_000,
+      timeout: 15_000,
       delay: 100,
       retries: 100,
     }

@@ -4,6 +4,7 @@ import { cpSync, mkdirSync } from 'node:fs'
 import * as fs from 'fs'
 
 let ckbLight: ChildProcess | null = null
+let ckbLightLog: fs.WriteStream | null = null
 
 const ckbLightBinary = (binPath: string): string => {
   const binary = `${binPath}/ckb-light-client`
@@ -38,15 +39,15 @@ export const startCkbLightNodeWithConfig = async (option: { binPath: string; con
     }
   )
   // let logPath = path.join(option.decPath, "light.log")
-  let logPath = 'tmp/light.log'
-  let log = fs.createWriteStream(logPath)
+  let logPath = `tmp/light-${Date.now()}.log`
+  ckbLightLog = fs.createWriteStream(logPath)
   ckbLight.stderr &&
     ckbLight.stderr.on('data', data => {
-      log.write(data)
+      ckbLightLog?.write(data)
     })
   ckbLight.stdout &&
     ckbLight.stdout.on('data', data => {
-      log.write(data)
+      ckbLightLog?.write(data)
     })
 }
 
@@ -57,6 +58,10 @@ export const stopLightCkbNode = async () => {
       console.info('CKB light:\tkilling node')
       ckbLight.once('close', () => resolve())
       ckbLight.kill()
+      if (ckbLightLog) {
+        ckbLightLog.close()
+        ckbLightLog = null
+      }
       ckbLight = null
     } else {
       resolve()
