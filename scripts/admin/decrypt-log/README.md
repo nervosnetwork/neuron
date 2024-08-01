@@ -4,6 +4,16 @@
 
 An environment variable `LOG_ENCRYPTION_PUBLIC_KEY` must be set to enable log encryption when releasing Neuron. If the variable is not set, a placeholder message will be left in the log file.
 
+To generate a keypair
+
+```sh
+# for ADMIN_PRIVATE_KEY
+openssl genrsa -out key.pem 2048
+
+# for LOG_ENCRYPTION_PUBLIC_KEY
+openssl rsa -in key.pem -outform PEM -pubout -out public.pem
+```
+
 ## Decryption
 
 An encrypted log looks the following block

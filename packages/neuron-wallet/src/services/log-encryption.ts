@@ -11,6 +11,10 @@ export default class LogEncryption {
    */
   private readonly algorithm = DEFAULT_ALGORITHM
 
+  /**
+   * A PEM-formatted RSA public key
+   * @private
+   */
   private readonly adminPublicKey: string
 
   /**
@@ -77,6 +81,23 @@ export class LogDecryption {
   }
 }
 
+/**
+ * Parse a message into a JSON
+ *
+ * Input:
+ * ```
+ * [key1:value2] [key2:value2] remain content
+ * ```
+ * Output:
+ * ```json
+ * {
+ *   "key1": "value1",
+ *   "key2": "value2",
+ *   "content": "remain content"
+ *  }
+ * ```
+ * @param message
+ */
 function parseMessage(message: string) {
   const result: Record<string, string> = {}
   const regex = /\[([^\]:]+):([^\]]+)]/g
