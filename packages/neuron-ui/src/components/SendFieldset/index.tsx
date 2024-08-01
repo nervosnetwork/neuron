@@ -68,7 +68,7 @@ const SendFieldset = ({
   return (
     <div className={clsx(styles.container, className)}>
       <TextField
-        className={`${styles.addresstField} ${styles.textFieldClass}`}
+        className={`${styles.addressField} ${styles.textFieldClass}`}
         placeholder={t('send.input-address')}
         rows={item.address ? 2 : 1}
         label={
