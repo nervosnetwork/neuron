@@ -670,6 +670,7 @@
         "308": "La cantidad no es suficiente",
         "309": "El destinatario debe actualizar la dirección de su cuenta para aceptar más transferencias.",
         "310": "Por favor introduzca una dirección {{tagName}}",
+        "311": "Por favor introduzca una dirección",
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
         "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
