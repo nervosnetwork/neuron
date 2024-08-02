@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { useState as useGlobalState, useDispatch, AppActions, showGlobalAlertDialog } from 'states'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Pagination from 'widgets/Pagination'
@@ -195,14 +195,11 @@ const SpecialAssetList = () => {
             setCells(items)
             setTotalCount(+count)
           } else {
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'alert',
-                timestamp: +new Date(),
-                content: typeof res.message === 'string' ? res.message : res.message.content!,
-              },
-            })
+            showGlobalAlertDialog({
+              type: 'failed',
+              message: typeof res.message === 'string' ? res.message : res.message.content!,
+              action: 'ok',
+            })(dispatch)
           }
         })
         .then(() => {
@@ -280,10 +277,11 @@ const SpecialAssetList = () => {
       } = e.target
       const cell = cells.find(c => c.outPoint.txHash === txHash && c.outPoint.index === idx)
       if (!cell) {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: { type: 'alert', timestamp: +new Date(), content: 'Cannot find the cell' },
-        })
+        showGlobalAlertDialog({
+          type: 'failed',
+          message: 'Cannot find the cell',
+          action: 'ok',
+        })(dispatch)
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
@@ -322,14 +320,11 @@ const SpecialAssetList = () => {
               },
             })
           } else {
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'alert',
-                timestamp: +new Date(),
-                content: typeof res.message === 'string' ? res.message : res.message.content!,
-              },
-            })
+            showGlobalAlertDialog({
+              type: 'failed',
+              message: typeof res.message === 'string' ? res.message : res.message.content!,
+              action: 'ok',
+            })(dispatch)
           }
         }
       switch (cell.customizedAssetInfo.lock) {
@@ -355,14 +350,11 @@ const SpecialAssetList = () => {
                   })
                 }
               } else {
-                dispatch({
-                  type: AppActions.AddNotification,
-                  payload: {
-                    type: 'alert',
-                    timestamp: +new Date(),
-                    content: typeof res.message === 'string' ? res.message : res.message.content!,
-                  },
-                })
+                showGlobalAlertDialog({
+                  type: 'failed',
+                  message: typeof res.message === 'string' ? res.message : res.message.content!,
+                  action: 'ok',
+                })(dispatch)
               }
             })
           } else {

@@ -1,7 +1,7 @@
 import React, { useReducer, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { destroyAssetAccount } from 'services/remote'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { useState as useGlobalState, useDispatch, AppActions, showGlobalAlertDialog } from 'states'
 import { UDTType, isSuccessResponse } from 'utils'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
@@ -123,14 +123,11 @@ const SUDTUpdateDialog = ({
           },
         })
       } else {
-        globalDispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: typeof res.message === 'string' ? res.message : res.message.content!,
-          },
-        })
+        showGlobalAlertDialog({
+          type: 'failed',
+          message: typeof res.message === 'string' ? res.message : res.message.content!,
+          action: 'ok',
+        })(globalDispatch)
       }
     })
   }, [globalDispatch, walletId, accountId])

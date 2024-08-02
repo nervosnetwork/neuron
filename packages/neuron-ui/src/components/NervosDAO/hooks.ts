@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from 'react'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
-import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
+import { updateNervosDaoData, clearNervosDaoData, showGlobalAlertDialog } from 'states/stateProvider/actionCreators'
 
 import { NavigateFunction } from 'react-router-dom'
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
@@ -142,14 +142,11 @@ export const useOnWithdrawDialogSubmit = ({
           }
         })
         .catch((err: Error) => {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: err.message,
-            },
-          })
+          showGlobalAlertDialog({
+            type: 'failed',
+            message: err.message,
+            action: 'ok',
+          })(dispatch)
         })
     }
     setActiveRecord(null)
@@ -208,14 +205,11 @@ export const useOnActionClick = ({
               }
             })
             .catch((err: Error) => {
-              dispatch({
-                type: AppActions.AddNotification,
-                payload: {
-                  type: 'alert',
-                  timestamp: +new Date(),
-                  content: err.message,
-                },
-              })
+              showGlobalAlertDialog({
+                type: 'failed',
+                message: err.message,
+                action: 'ok',
+              })(dispatch)
             })
         } else {
           setActiveRecord(record)
