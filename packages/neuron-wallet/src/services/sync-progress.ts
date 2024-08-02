@@ -19,6 +19,9 @@ export default class SyncProgressService {
       .getRepository(SyncProgress)
       .find({
         select: ['hash'],
+        where: {
+          delete: false,
+        },
       })
     const existHashes = new Set(existProgresses.map(v => v.hash))
     const newSyncProgreses = syncProgresses.filter(v => !existHashes.has(v.hash))
@@ -99,6 +102,20 @@ export default class SyncProgressService {
       .orderBy('syncedBlockNumber', 'ASC')
       .getOne()
     return item?.syncedBlockNumber || 0
+  }
+
+  static async getMinSyncedBlockNumberInWallets(walletIds: string[]) {
+    const item = await getConnection()
+      .getRepository(SyncProgress)
+      .createQueryBuilder()
+      .where({
+        delete: false,
+        addressType: SyncAddressType.Default,
+        walletId: In(walletIds),
+      })
+      .orderBy('syncedBlockNumber', 'ASC')
+      .getOne()
+    return item?.syncedBlockNumber
   }
 
   static async getWalletMinLocalSavedBlockNumber() {

@@ -142,7 +142,7 @@ describe('unit tests for IndexerConnector', () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
       // @ts-ignore private method
       const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
-      expect(result).toStrictEqual([undefined, []])
+      expect(result).toStrictEqual([undefined, [], []])
     })
     it('get cached tx and sort by block number', async () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockImplementation(walletId =>
@@ -166,7 +166,7 @@ describe('unit tests for IndexerConnector', () => {
       )
       // @ts-ignore private method
       const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
-      expect(result).toStrictEqual(['2', ['hash2']])
+      expect(result).toStrictEqual(['2', ['hash2'], [walletId2]])
     })
   })
 

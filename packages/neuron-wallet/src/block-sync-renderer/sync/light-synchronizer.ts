@@ -236,8 +236,8 @@ export default class LightSynchronizer extends Synchronizer {
     const deleteScript = retainedSyncScripts.filter(v => !allScriptHashes.has(scriptToHash(v.script)))
     await this.lightRpc.setScripts(deleteScript, 'delete')
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
-    await SyncProgressService.initSyncProgress(addScripts)
     await SyncProgressService.updateSyncProgressFlag(walletIds)
+    await SyncProgressService.initSyncProgress(addScripts)
   }
 
   private async initMultisigSyncProgress() {
@@ -345,16 +345,16 @@ export default class LightSynchronizer extends Synchronizer {
   }
 
   async processTxsInNextBlockNumber() {
-    const [nextBlockNumber, txHashesInNextBlock] = await this.getTxHashesWithNextUnprocessedBlockNumber()
-    const minSyncBlockNumber = await SyncProgressService.getCurrentWalletMinSyncedBlockNumber(
-      this.syncMultisig ? SyncAddressType.Multisig : undefined
-    )
+    const [nextBlockNumber, txHashesInNextBlock, walletIds] = await this.getTxHashesWithNextUnprocessedBlockNumber()
+    const minSyncBlockNumber = this.syncMultisig
+      ? await SyncProgressService.getCurrentWalletMinSyncedBlockNumber(SyncAddressType.Multisig)
+      : await SyncProgressService.getMinSyncedBlockNumberInWallets(walletIds)
     if (
       nextBlockNumber !== undefined &&
       txHashesInNextBlock.length &&
       // For light client, if tx hash has been called with fetch_transaction, the tx can not return by get_transactions
       // So before derived address synced to bigger than next synced block number, do not sync the next block number
-      minSyncBlockNumber >= parseInt(nextBlockNumber) &&
+      (minSyncBlockNumber === undefined || minSyncBlockNumber >= parseInt(nextBlockNumber)) &&
       // check whether the tx is sync from light client, after split the light client and full DB file, this check will remove
       (await this.checkTxExist(txHashesInNextBlock))
     ) {
