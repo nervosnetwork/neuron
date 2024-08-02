@@ -86,8 +86,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber, isWatchOnl
     setAmendabled(false)
     if (status !== 'success' && column.type !== 'receive' && !isWatchOnly) {
       getOnChainTransaction(hash).then(tx => {
-        // @ts-expect-error Replace-By-Fee (RBF)
-        const { min_replace_fee: minReplaceFee } = tx
+        const { minReplaceFee } = tx
         if (minReplaceFee) {
           setAmendabled(true)
         }
