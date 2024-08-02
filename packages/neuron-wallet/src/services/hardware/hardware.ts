@@ -90,7 +90,7 @@ export abstract class Hardware {
           i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160])
         )!.blake160
         const serializedMultiSign: string = Multisig.serialize([blake160])
-        const witnesses = await TransactionSender.signSingleMultiSignScript(
+        const witnesses = TransactionSender.signSingleMultiSignScript(
           path,
           serializedWitnesses,
           txHash,
