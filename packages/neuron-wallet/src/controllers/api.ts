@@ -1005,7 +1005,10 @@ export default class ApiController {
         // All objects, array, class instance need to be serialized before sent to the IPC
         return typeof res === 'object' ? JSON.parse(JSON.stringify(res)) : res
       } catch (err) {
-        logger.warn(`API Controller:\tchannel handling error: ${err}`, err.stack)
+        logger.warn(
+          `API Controller:\tchannel handling error: ${err.logMessage ?? err}`,
+          !err.logMessage ? err.stack : undefined
+        )
 
         if (err.code === 'ECONNREFUSED') {
           const NODE_DISCONNECTED_CODE = 104

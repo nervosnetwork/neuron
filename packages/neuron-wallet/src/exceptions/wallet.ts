@@ -80,6 +80,7 @@ export class WalletFunctionNotSupported extends Error {
 
 export class DuplicateImportWallet extends Error {
   public code = 118
+  public logMessage = 'Duplicate import wallet'
   constructor(errorStr: string) {
     super(errorStr)
   }
