@@ -38,7 +38,6 @@ export enum AppActions {
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
   SetGlobalDialog = 'setGlobalDialog',
-  AddNotification = 'addNotification',
   DismissNotification = 'dismissNotification',
   ClearNotificationsOfCode = 'clearNotificationsOfCode',
   ClearNotifications = 'clearNotifications',
@@ -84,7 +83,6 @@ export type StateAction =
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
   | { type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }
-  | { type: AppActions.AddNotification; payload: State.Message }
   | { type: AppActions.DismissNotification; payload: number } // payload: timestamp
   | { type: AppActions.ClearNotificationsOfCode; payload: ErrorCode } // payload: code
   | { type: AppActions.ClearNotifications }
@@ -316,15 +314,6 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.SetGlobalDialog: {
       state.app.globalDialog = action.payload
-      break
-    }
-    case AppActions.AddNotification: {
-      /**
-       * payload: { type, content }
-       */
-      // NOTICE: for simplicity, only one notification will be displayed
-      state.app.notifications.push(action.payload)
-      state.app.showTopAlert = true
       break
     }
     case AppActions.DismissNotification: {
