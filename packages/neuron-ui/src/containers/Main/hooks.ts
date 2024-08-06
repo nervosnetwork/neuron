@@ -325,15 +325,15 @@ export const useSubscription = ({
             break
           case 'import-exist-xpubkey': {
             if (payload) {
-              const { existWalletIsWatchOnly, existingWalletId, id: importedWalletId } = JSON.parse(payload)
-              if (existWalletIsWatchOnly) {
+              const { duplicateWatchedWalletIds, id: importedWalletId } = JSON.parse(payload)
+              if (duplicateWatchedWalletIds.length) {
                 showGlobalAlertDialog({
                   type: 'warning',
                   message: t('main.import-exist-xpubkey-dialog.replace-tip'),
                   action: 'all',
                   onOk: () => {
                     replaceWallet({
-                      existingWalletId,
+                      existingWalletId: duplicateWatchedWalletIds[0],
                       importedWalletId,
                     }).then(res => {
                       if (isSuccessResponse(res)) {
