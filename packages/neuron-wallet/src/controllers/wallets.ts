@@ -22,6 +22,7 @@ import {
   MainnetAddressRequired,
   TestnetAddressRequired,
   UnsupportedCkbCliKeystore,
+  DuplicateImportWallet,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import TransactionSender from '../services/transaction-sender'
@@ -338,7 +339,7 @@ export default class WalletsController {
               result: wallet,
             }
           } catch (e) {
-            if (e instanceof UsedName) {
+            if (e instanceof UsedName || e instanceof DuplicateImportWallet) {
               throw e
             }
             throw new InvalidJSON()

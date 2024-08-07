@@ -1227,6 +1227,10 @@
         "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
         "continue-sync": "繼續同步",
         "migrate-data": "遷移數據"
+      },
+      "import-exist-xpubkey-dialog": {
+        "replace-tip": "該觀察錢包已被導入過，您想要替換它嗎？",
+        "delete-tip": "已存在相同的原始錢包。如果您想繼續導入，請刪除它。"
       }
     },
     "cell-manage": {
