@@ -1,7 +1,7 @@
 import { type Script, hd } from '@ckb-lumos/lumos'
-import { predefined } from '@ckb-lumos/lumos/config'
 import { encodeToAddress, parseAddress } from '@ckb-lumos/lumos/helpers'
 import { systemScripts } from './systemScripts'
+import { AGGRON4, LINA } from '../utils/systemScripts'
 
 export enum DefaultAddressNumber {
   Change = 10,
@@ -22,7 +22,7 @@ export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
 }
 
 export const scriptToAddress = (script: CKBComponents.Script, isMainnet = true): string => {
-  const lumosConfig = !isMainnet ? predefined.AGGRON4 : predefined.LINA
+  const lumosConfig = !isMainnet ? AGGRON4 : LINA
   return encodeToAddress(
     // omit keys other than codeHash, args and hashType
     {
@@ -39,6 +39,6 @@ export const addressToScript = (address: string): Script => {
   if (prefix !== 'ckt' && prefix !== 'ckb') {
     throw new Error('Invalid address prefix')
   }
-  const lumosConfig = prefix === 'ckt' ? predefined.AGGRON4 : predefined.LINA
+  const lumosConfig = prefix === 'ckt' ? AGGRON4 : LINA
   return parseAddress(address, { config: lumosConfig })
 }

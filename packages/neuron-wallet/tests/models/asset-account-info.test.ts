@@ -1,4 +1,4 @@
-import { predefined } from '@ckb-lumos/config-manager'
+import { AGGRON4 } from '../../src/utils/systemScripts'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import CellDep, { DepType } from '../../src/models/chain/cell-dep'
 import OutPoint from '../../src/models/chain/out-point'
@@ -8,7 +8,7 @@ import AddressMeta from '../../src/database/address/meta'
 const { AddressType } = hd
 
 describe('AssetAccountInfo', () => {
-  const { SUDT, ANYONE_CAN_PAY } = predefined.AGGRON4.SCRIPTS
+  const { SUDT, ANYONE_CAN_PAY } = AGGRON4.SCRIPTS
   const testnetSudtInfo = {
     cellDep: new CellDep(new OutPoint(SUDT.TX_HASH, SUDT.INDEX), SUDT.DEP_TYPE as DepType),
     codeHash: SUDT.CODE_HASH,
