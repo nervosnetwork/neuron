@@ -9,7 +9,7 @@ import { replaceWallet } from 'services/remote'
 import styles from './replaceDuplicateWalletDialog.module.scss'
 
 const useReplaceDuplicateWallet = () => {
-  const [extendedKey, setExtendedKey] = useState('')
+  const [duplicateWalletIds, setDuplicateWalletIds] = useState([])
   const [importedWalletId, setImportedWalletId] = useState('')
 
   const onClose = useCallback(() => {
@@ -28,7 +28,7 @@ const useReplaceDuplicateWallet = () => {
       const msg = typeof message === 'string' ? '' : message.content
       if (msg) {
         const obj = JSON.parse(msg)
-        setExtendedKey(obj.extendedKey)
+        setDuplicateWalletIds(obj.duplicateWalletIds)
         setImportedWalletId(obj.id)
       }
     } catch (error) {
@@ -36,14 +36,14 @@ const useReplaceDuplicateWallet = () => {
     }
   }
 
-  const show = useMemo(() => !!extendedKey && !!importedWalletId, [importedWalletId, extendedKey])
+  const show = useMemo(() => !!duplicateWalletIds.length && !!importedWalletId, [importedWalletId, duplicateWalletIds])
 
   return {
     onImportingExitingWalletError,
     dialogProps: {
       show,
       onClose,
-      extendedKey,
+      duplicateWalletIds,
       importedWalletId,
     },
   }
@@ -52,12 +52,12 @@ const useReplaceDuplicateWallet = () => {
 const ReplaceDuplicateWalletDialog = ({
   show,
   onClose,
-  extendedKey,
+  duplicateWalletIds,
   importedWalletId,
 }: {
   show: boolean
   onClose: () => void
-  extendedKey: string
+  duplicateWalletIds: string[]
   importedWalletId: string
 }) => {
   const {
@@ -68,7 +68,10 @@ const ReplaceDuplicateWalletDialog = ({
   const [selectedId, setSelectedId] = useState('')
   const [t] = useTranslation()
 
-  const group = useMemo(() => wallets.filter(item => item.extendedKey === extendedKey), [wallets, extendedKey])
+  const group = useMemo(
+    () => wallets.filter(item => duplicateWalletIds.includes(item.id)),
+    [wallets, duplicateWalletIds]
+  )
 
   const handleGroupChange = useCallback(
     (checked: string) => {
