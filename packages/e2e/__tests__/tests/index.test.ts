@@ -83,7 +83,7 @@ test("Create Wallet", async () => {
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").click();
     await page.locator("div").filter({hasText: /^12$/}).getByRole("textbox").fill("hero");
     await page.getByLabel("Next").click();
-    await page.screenshot({path: "./test-results/createWallet.png"});
+    // await page.screenshot({path: "./test-results/createWallet.png"});
     await page.getByPlaceholder("Please set a strong password to protect your wallet").fill("Aa111111");
     await page.getByPlaceholder("Repeat Password").click();
     await page.getByPlaceholder("Repeat Password").fill("Aa111111");
@@ -131,10 +131,10 @@ test.describe('overview page tests', () => {
     // page.setDefaultTimeout(360000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
     // await scheduler.wait(20_000)
-    await page.screenshot({path: "./test-results/send_transaction.png"});
+    // await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
-    await page.screenshot({path: "./test-results/send_transaction_1.png"});
+    // await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByText('Set start block number').click();
     // await page.keyboard.press("Delete");
     await page.locator('id=startBlockNumber').fill('14066000');
@@ -248,7 +248,7 @@ test.describe('实验性功能', () => {
     await page.waitForTimeout(20000);
     await expect(page.getByText('te' + tp, {exact: true})).toBeVisible();
     console.log('创建sudt账号成功！');
-    await page.waitForTimeout(420000);
+    await page.waitForTimeout(360000);
   });
 
 
