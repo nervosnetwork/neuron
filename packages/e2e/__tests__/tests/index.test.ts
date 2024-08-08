@@ -156,7 +156,7 @@ test.describe('overview page tests', () => {
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103.5");
     await page.getByRole('button', {name: 'Send'}).click();
-    console.log('输入进入后发送成功');
+    console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: 'Confirm'}).click();
     await page.waitForTimeout(480000);
