@@ -7,6 +7,8 @@ import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
 import { bytes } from '@ckb-lumos/lumos/codec'
+import LogEncryption from './log-encryption'
+import logger from '../utils/logger'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -30,6 +32,10 @@ export default class SignMessage {
     if (!addr) {
       throw new AddressNotFound()
     }
+
+    const encryption = LogEncryption.getInstance()
+    logger.error('------------')
+    logger.error(encryption.encrypt(message))
 
     if (wallet.isHardware()) {
       let device = HardwareWalletService.getInstance().getCurrent()
