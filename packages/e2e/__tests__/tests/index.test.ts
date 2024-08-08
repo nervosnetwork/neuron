@@ -42,7 +42,7 @@ test("Launch Neuron", async () => {
   page = await electronApp.firstWindow();
   console.log("window title" + await page.title());
 
-  await page.screenshot({path: "./test-results/intro.png"});
+  // await page.screenshot({path: "./test-results/intro.png"});
 
   const title = await page.title();
   expect(title).toBe("Neuron");
@@ -53,6 +53,8 @@ test("Launch Neuron", async () => {
 
 test("Create Wallet", async () => {
   page = await electronApp.firstWindow();
+  // await page.screenshot({path: "./test-results/Wallet 1.png"});
+
   let createWallet = await page.getByText('Wallet 1').isVisible();
   console.log("createWallet"+createWallet);
   if (!createWallet) {
@@ -134,7 +136,7 @@ test.describe('overview page tests', () => {
     // await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
-    // await page.screenshot({path: "./test-results/send_transaction_1.png"});
+    await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByText('Set start block number').click();
     // await page.keyboard.press("Delete");
     await page.locator('id=startBlockNumber').fill('14066000');
@@ -142,6 +144,7 @@ test.describe('overview page tests', () => {
     page.waitForTimeout(6000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
+    page.waitForTimeout(240000);
     await page.screenshot({path: "./test-results/send_transaction_2.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
