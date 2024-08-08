@@ -81,15 +81,11 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
 
 export const addNotification = (message: State.Message<ErrorCode>) => (dispatch: StateDispatch) => {
   dispatch({
-    type: AppActions.AddNotification,
-    payload: message,
-  })
-}
-
-export const dismissNotification = (timestamp: number) => (dispatch: StateDispatch) => {
-  dispatch({
-    type: AppActions.DismissNotification,
-    payload: timestamp,
+    type: AppActions.UpdateGlobalAlertDialog,
+    payload: {
+      type: ['success', 'failed'].includes(message.type) ? message.type : 'warning',
+      message: message.content,
+    } as State.GlobalAlertDialog,
   })
 }
 

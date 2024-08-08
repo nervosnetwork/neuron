@@ -1897,7 +1897,7 @@ describe('CellsService', () => {
     it('no input', async () => {
       const input = await saveTxAndInput()
       await expect(CellsService.getDaoWithdrawAndDeposit(input.transactionHash)).rejects.toThrow(
-        new Error(`No unlock transaction use ${input.transactionHash} as input`)
+        new Error(`This is not an unlock dao transaction ${input.transactionHash}`)
       )
     })
     it('can not find output', async () => {

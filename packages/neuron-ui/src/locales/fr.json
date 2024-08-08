@@ -677,6 +677,7 @@
         "308": "Le montant n'est pas suffisant",
         "309": "Le destinataire doit mettre à niveau son adresse de compte pour accepter davantage de transferts.",
         "310": "Veuillez entrer une adresse {{tagName}}",
+        "311": "Veuillez entrer une adresse",
         "402": "L'application CKB n'est pas ouverte. Veuillez ouvrir l'application CKB sur votre appareil.",
         "403": "Aucun appareil détecté. Veuillez connecter votre appareil",
         "404": "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté.",

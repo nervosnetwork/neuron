@@ -525,9 +525,9 @@ describe('wallet service', () => {
       try {
         walletService.create(wallet5)
       } catch (error) {
-        const { extendedKey, id } = JSON.parse(error.message)
+        const { duplicateWalletIds, id } = JSON.parse(error.message)
         await walletService.replace(createdWallet2.id, id)
-        expect(extendedKey).toBe(prefixWith0x('b'.repeat(66) + '2'.repeat(64)))
+        expect(duplicateWalletIds).toStrictEqual([createdWallet2.id])
         expect(() => walletService.get(createdWallet2.id)).toThrowError()
         expect(walletService.get(id).name).toBe(wallet5.name)
       }

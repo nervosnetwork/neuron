@@ -405,16 +405,17 @@ export default class WalletService {
       wallet.saveKeystore(props.keystore!)
     }
 
-    const existWalletInfo = this.getAll().find(item => item.extendedKey === props.extendedKey)
-    if (existWalletInfo) {
-      const existWallet = FileKeystoreWallet.fromJSON(existWalletInfo)
-      const existWalletIsWatchOnly = existWallet.isHDWallet() && existWallet.loadKeystore().isEmpty()
+    const existWalletsProperties = this.getAll().filter(item => item.extendedKey === props.extendedKey)
+    if (existWalletsProperties.length) {
+      const existWallets = existWalletsProperties.map(v => this.get(v.id))
+      const duplicateWatchedWalletIds = existWallets
+        .filter(v => v.isHDWallet() && v.loadKeystore().isEmpty())
+        .map(v => v.id)
       this.importedWallet = wallet
       throw new DuplicateImportWallet(
         JSON.stringify({
-          extendedKey: props.extendedKey,
-          existWalletIsWatchOnly,
-          existingWalletId: existWallet.id,
+          duplicateWalletIds: existWallets.map(v => v.id),
+          duplicateWatchedWalletIds,
           id,
         })
       )

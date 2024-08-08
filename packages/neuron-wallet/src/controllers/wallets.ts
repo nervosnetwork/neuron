@@ -23,6 +23,7 @@ import {
   TestnetAddressRequired,
   UnsupportedCkbCliKeystore,
   DuplicateImportWallet,
+  AddressRequired,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import TransactionSender from '../services/transaction-sender'
@@ -620,6 +621,10 @@ export default class WalletsController {
   private checkAddresses = (addresses: string[]) => {
     const isMainnet = NetworksService.getInstance().isMainnet()
     addresses.forEach(address => {
+      if (!address) {
+        throw new AddressRequired()
+      }
+
       if (isMainnet && !address.startsWith('ckb')) {
         throw new MainnetAddressRequired(address)
       }

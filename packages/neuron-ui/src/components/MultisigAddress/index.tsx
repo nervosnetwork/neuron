@@ -123,10 +123,6 @@ const MultisigAddress = () => {
   const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  const showMainDialog = useMemo(
-    () => !(infoAction.isDialogOpen || sendAction.isDialogOpen || approveAction.isDialogOpen || isCreateDialogOpen),
-    [infoAction.isDialogOpen, sendAction.isDialogOpen, approveAction.isDialogOpen, isCreateDialogOpen]
-  )
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (e: React.SyntheticEvent<HTMLButtonElement>) => {
       const {
@@ -226,7 +222,7 @@ const MultisigAddress = () => {
   return (
     <div>
       <Dialog
-        show={showMainDialog}
+        show
         title={
           <div ref={titleRef} className={styles.title}>
             {t('multisig-address.window-title')}

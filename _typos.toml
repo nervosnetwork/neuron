@@ -3,6 +3,7 @@ thur = "thur"
 numer = "numer"
 HD = "HD"
 hd = "hd"
+passin = 'passin'
 
 # defined in database schema
 lastest = "lastest"

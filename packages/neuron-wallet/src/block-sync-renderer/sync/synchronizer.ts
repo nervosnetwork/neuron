@@ -69,7 +69,7 @@ export abstract class Synchronizer {
     await this.processNextBlockNumberQueue?.drain()
   }
 
-  protected async getTxHashesWithNextUnprocessedBlockNumber(): Promise<[string | undefined, string[]]> {
+  protected async getTxHashesWithNextUnprocessedBlockNumber(): Promise<[string | undefined, string[], string[]]> {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
       [...this.addressesByWalletId.keys()].map(async walletId =>
         IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
@@ -87,12 +87,15 @@ export abstract class Synchronizer {
     const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()].sort((a, b) => parseInt(a) - parseInt(b)).shift()
 
     if (!nextUnprocessedBlockNumber) {
-      return [undefined, []]
+      return [undefined, [], []]
     }
 
     const txHashCachesInNextUnprocessedBlockNumber = groupedTxHashCaches.get(nextUnprocessedBlockNumber)
-
-    return [nextUnprocessedBlockNumber, txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash)]
+    return [
+      nextUnprocessedBlockNumber,
+      txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash),
+      [...new Set(txHashCachesInNextUnprocessedBlockNumber!.map(({ walletId }) => walletId))],
+    ]
   }
 
   protected async notifyAndSyncNext(indexerTipNumber: number) {

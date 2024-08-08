@@ -395,7 +395,7 @@ export default class TransactionSender {
     return tx
   }
 
-  public static async signSingleMultiSignScript(
+  public static signSingleMultiSignScript(
     privateKeyOrPath: string,
     witnesses: (string | WitnessArgs)[],
     txHash: string,
