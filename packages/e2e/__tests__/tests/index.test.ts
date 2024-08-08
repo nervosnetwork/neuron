@@ -137,6 +137,7 @@ test.describe('overview page tests', () => {
     console.log('点击轻节点成功');
     //CI 环境轻节点需要从主网到测试网
     await page.locator('//*[@id="root"]/div/div/div[2]/div/div[3]/div[2]/div/div/div[2]/div/div/div/div/button/*[name()="svg"]').click();
+    console.log('轻节点主网切换到测试网成功');
     // await scheduler.wait(20_000)
     // await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
