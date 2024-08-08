@@ -127,29 +127,36 @@ test.describe('overview page tests', () => {
     //等待同步100%才能操作发送交易
     // await page.waitForTimeout(60000);
     //切换到轻节点，并确定同步到100%
+    await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByTitle('Settings').click();
+    console.log('点击设置成功');
     // await page.locator('dialog').filter({ hasText: /^Confirm$/ }).getByLabel('Confirm')
     //   .click();
     // page.setDefaultTimeout(360000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
+    console.log('点击轻节点成功');
     // await scheduler.wait(20_000)
     // await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     await page.waitForTimeout(10000);
-    await page.screenshot({path: "./test-results/send_transaction_1.png"});
+    await page.screenshot({path: "./test-results/send_transaction_2.png"});
     await page.getByText('Set start block number').click();
+    console.log('点击设置区块数成功');
     // await page.keyboard.press("Delete");
     await page.locator('id=startBlockNumber').fill('14066000');
     await page.getByRole('button', {name: 'Confirm'}).click();
+    console.log('区块设置成功');
     page.waitForTimeout(6000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
     page.waitForTimeout(240000);
-    await page.screenshot({path: "./test-results/send_transaction_2.png"});
+    await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
+    console.log('点击交易发送按钮成功');
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     await page.locator("id=amount").fill("103.5");
     await page.getByRole('button', {name: 'Send'}).click();
+    console.log('输入进入后发送成功');
     await page.locator("id=password").fill('Aa111111');
     await page.getByRole('button', {name: 'Confirm'}).click();
     await page.waitForTimeout(480000);
