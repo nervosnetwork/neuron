@@ -31,6 +31,7 @@ test.afterAll(async() => {
 
 let page: Page;
 
+
 test("Launch Neuron", async () => {
   const appName = await electronApp.evaluate(async ({app}) => {
     // This runs in Electron's main process, parameter here is always
@@ -127,12 +128,12 @@ test.describe('overview page tests', () => {
     //等待同步100%才能操作发送交易
     // await page.waitForTimeout(60000);
     //切换到轻节点，并确定同步到100%
+
     await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByTitle('Settings').click();
     console.log('点击设置成功');
     // await page.locator('dialog').filter({ hasText: /^Confirm$/ }).getByLabel('Confirm')
     //   .click();
-    // page.setDefaultTimeout(360000);
     await page.getByText('Light Client (http://127.0.0.1:9000)').click();
     console.log('点击轻节点成功');
     //CI 环境轻节点需要从主网到测试网
@@ -149,10 +150,10 @@ test.describe('overview page tests', () => {
     await page.locator('id=startBlockNumber').fill('14066000');
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('区块设置成功');
-    page.waitForTimeout(6000);
+    // page.waitForTimeout(6000);
+    page.setDefaultTimeout(480000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
-    page.waitForTimeout(480000);
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('点击交易发送按钮成功');
@@ -161,6 +162,7 @@ test.describe('overview page tests', () => {
     await page.locator("id=amount").fill("103.5");
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
+    page.waitForTimeout(480000);
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
