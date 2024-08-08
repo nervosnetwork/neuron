@@ -152,7 +152,7 @@ test.describe('overview page tests', () => {
     page.waitForTimeout(6000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
-    page.waitForTimeout(240000);
+    page.waitForTimeout(480000);
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('点击交易发送按钮成功');
