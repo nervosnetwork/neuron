@@ -154,11 +154,16 @@ test.describe('overview page tests', () => {
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('点击交易发送按钮成功');
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
+    console.log('输入地址成功');
     await page.locator("id=amount").fill("103.5");
+    console.log('输入金额成功');
+    await page.screenshot({path: "./test-results/send_transaction_4.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
+    console.log('输入密码成功');
     await page.getByRole('button', {name: 'Confirm'}).click();
+    console.log('点击确认成功');
     await page.waitForTimeout(480000);
     await expect(page.getByText('Success').first()).toBeVisible();
     console.log('发送交易成功！');
