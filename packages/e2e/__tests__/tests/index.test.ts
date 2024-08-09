@@ -167,7 +167,7 @@ test.describe('overview page tests', () => {
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
     test.setTimeout(480000);
-    await page.waitForTimeout(420000);
+    // await page.waitForTimeout(420000);
     await page.screenshot({path: "./test-results/7min-sync.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
