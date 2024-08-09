@@ -149,10 +149,12 @@ test.describe('overview page tests', () => {
     // await page.keyboard.press("Delete");
     await page.locator('id=startBlockNumber').fill('14175000');
     page.waitForTimeout(6000);
+    await page.screenshot({path: "./test-results/set_block_number.png"});
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('区块设置成功');
     await page.locator('.syncStatus_syncing__LiW3Q').click()
     console.log('查看设置的起始区块数是否成功');
+    page.waitForTimeout(60000);
     await page.screenshot({path: "./test-results/watch_block_number.png"});
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
@@ -165,6 +167,7 @@ test.describe('overview page tests', () => {
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
     page.waitForTimeout(480000);
+    await page.screenshot({path: "./test-results/7min-sync.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
