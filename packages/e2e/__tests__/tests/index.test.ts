@@ -147,11 +147,10 @@ test.describe('overview page tests', () => {
     await page.getByText('Set start block number').click();
     console.log('点击设置区块数成功');
     // await page.keyboard.press("Delete");
-    await page.locator('id=startBlockNumber').fill('14066000');
+    await page.locator('id=startBlockNumber').fill('14175000');
+    page.waitForTimeout(6000);
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('区块设置成功');
-    // page.waitForTimeout(6000);
-    page.setDefaultTimeout(480000);
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
