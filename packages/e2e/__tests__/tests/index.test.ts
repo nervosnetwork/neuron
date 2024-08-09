@@ -151,6 +151,9 @@ test.describe('overview page tests', () => {
     page.waitForTimeout(6000);
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('区块设置成功');
+    await page.locator('.syncStatus_syncing__LiW3Q').click()
+    console.log('查看设置的起始区块数是否成功');
+    await page.screenshot({path: "./test-results/watch_block_number.png"});
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
     await page.getByTitle('Overview').click();
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
