@@ -158,6 +158,8 @@ test.describe('overview page tests', () => {
     page.waitForTimeout(60000);
     await page.screenshot({path: "./test-results/watch_block_number.png"});
     // await page.waitForSelector('.syncStatus_synced__JM5ln');
+    await page.getByTitle('History').click();
+    await page.screenshot({path: "./test-results/history.png"});
     await page.getByTitle('Overview').click();
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
