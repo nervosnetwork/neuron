@@ -22,7 +22,7 @@ export default class LogEncryption {
    * @param adminPublicKey a PEM-formatted RSA public key
    */
   constructor(adminPublicKey: string) {
-    this.adminPublicKey = adminPublicKey
+    this.adminPublicKey = adminPublicKey.replace(/\\n/g, '\n')
   }
 
   /**

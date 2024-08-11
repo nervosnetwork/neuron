@@ -103,6 +103,11 @@ jobs:
         env:
           CI: false
 
+        # Inject LOG_ENCRYPTION_PUBLIC_KEY to encrypt sensitive log
+      - name: Inject environment variables
+        run: |
+          echo "LOG_ENCRYPTION_PUBLIC_KEY=${{ secrets.LOG_ENCRYPTION_PUBLIC_KEY }}" >> packages/neuron-wallet/.env
+
       - name: Package for MacOS
         if: matrix.os == 'macos-latest'
         run: |
