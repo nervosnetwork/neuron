@@ -3,11 +3,11 @@ export const calculateFee = (tx: any) => {
     return '0'
   }
   const inputCapacities = tx.inputs.reduce(
-    (result: bigint, input: { capacity: string }) => result + BigInt(input.capacity),
+    (result: bigint, input: { capacity: string }) => result + BigInt(input.capacity || '0'),
     BigInt(0)
   )
   const outputCapacities = tx.outputs.reduce(
-    (result: bigint, output: { capacity: string }) => result + BigInt(output.capacity),
+    (result: bigint, output: { capacity: string }) => result + BigInt(output.capacity || '0'),
     BigInt(0)
   )
 

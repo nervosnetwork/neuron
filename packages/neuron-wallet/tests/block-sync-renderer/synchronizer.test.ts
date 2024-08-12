@@ -1,8 +1,9 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
+import { type Cell, hd } from '@ckb-lumos/lumos'
+import { QueryOptions } from '@ckb-lumos/base'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { Synchronizer, type LumosCell, type LumosCellQuery } from '../../src/block-sync-renderer/sync/synchronizer'
+import { Synchronizer } from '../../src/block-sync-renderer/sync/synchronizer'
 import AddressMeta from '../../src/database/address/meta'
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache'
 import { ScriptHashType } from '../../src/models/chain/script'
@@ -39,7 +40,7 @@ const addressObj1: Address = {
   blake160: '0x',
   walletId: walletId1,
   path: '',
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
   txCount: 0,
   liveBalance: '',
@@ -53,7 +54,7 @@ const addressObj2: Address = {
   blake160: '0x',
   walletId: walletId2,
   path: '',
-  addressType: AddressType.Receiving,
+  addressType: hd.AddressType.Receiving,
   addressIndex: 0,
   txCount: 0,
   liveBalance: '',
@@ -110,22 +111,18 @@ describe('unit tests for IndexerConnector', () => {
   })
 
   describe('#constructor', () => {
-    const STUB_URI = 'stub_uri'
-
     it('inits lumos indexer with a node url and indexer folder path', () => {
       new TestSynchronizer({
         addresses: [],
         nodeUrl,
-        indexerUrl: STUB_URI,
       })
-      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl)
     })
 
     it('init with addresses', () => {
       const synchronizer = new TestSynchronizer({
         addresses: [addressObj1, addressObj2],
         nodeUrl,
-        indexerUrl: STUB_URI,
       })
       expect(synchronizer.getAddressesByWalletId().get(walletId1)?.[0]).toStrictEqual(
         AddressMeta.fromObject(addressObj1)
@@ -140,13 +137,12 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
     it('no cached tx', async () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
       // @ts-ignore private method
       const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
-      expect(result).toStrictEqual([undefined, []])
+      expect(result).toStrictEqual([undefined, [], []])
     })
     it('get cached tx and sort by block number', async () => {
       stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockImplementation(walletId =>
@@ -170,7 +166,7 @@ describe('unit tests for IndexerConnector', () => {
       )
       // @ts-ignore private method
       const result = await synchronizer.getTxHashesWithNextUnprocessedBlockNumber()
-      expect(result).toStrictEqual(['2', ['hash2']])
+      expect(result).toStrictEqual(['2', ['hash2'], [walletId2]])
     })
   })
 
@@ -178,7 +174,6 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
     synchronizer.blockTipsSubject.subscribe(stubbedBlockTipsSubscribe)
 
@@ -220,10 +215,11 @@ describe('unit tests for IndexerConnector', () => {
   })
 
   describe('#getLiveCellsByScript', () => {
-    let fakeCell1: LumosCell, fakeCell2: LumosCell
-    let cells: LumosCell[]
+    let fakeCell1: Cell, fakeCell2: Cell
+    let cells: Cell[]
 
     fakeCell1 = {
+      data: '0x',
       blockHash: '0x',
       outPoint: {
         txHash: '0x',
@@ -244,6 +240,7 @@ describe('unit tests for IndexerConnector', () => {
       },
     }
     fakeCell2 = {
+      data: '0x',
       blockHash: '0x',
       outPoint: {
         txHash: '0x',
@@ -257,7 +254,7 @@ describe('unit tests for IndexerConnector', () => {
           args: '0x2',
         },
         type: {
-          hashType: 'lock',
+          hashType: 'data',
           codeHash: '0xcode',
           args: '0x2',
         },
@@ -268,11 +265,10 @@ describe('unit tests for IndexerConnector', () => {
     const synchronizer = new TestSynchronizer({
       addresses: [addressObj1, addressObj2],
       nodeUrl,
-      indexerUrl: '',
     })
 
     describe('when success', () => {
-      const query: LumosCellQuery = {
+      const query = {
         lock: {
           hashType: ScriptHashType.Data,
           codeHash: '0xcode',
@@ -283,7 +279,6 @@ describe('unit tests for IndexerConnector', () => {
           codeHash: '0xcode',
           args: '0x',
         },
-        data: null,
       }
 
       beforeEach(async () => {
@@ -298,14 +293,14 @@ describe('unit tests for IndexerConnector', () => {
       it('transform the query parameter', () => {
         expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
           lock: {
-            hashType: query.lock!.hashType,
-            codeHash: query.lock!.codeHash,
-            args: query.lock!.args,
+            hashType: query.lock.hashType,
+            codeHash: query.lock.codeHash,
+            args: query.lock.args,
           },
           type: {
-            hashType: query.type!.hashType,
-            codeHash: query.type!.codeHash,
-            args: query.type!.args,
+            hashType: query.type.hashType,
+            codeHash: query.type.codeHash,
+            args: query.type.args,
           },
           data: 'any',
         })
@@ -316,7 +311,7 @@ describe('unit tests for IndexerConnector', () => {
       })
     })
     describe('when handling concurrent requests', () => {
-      const query1: LumosCellQuery = {
+      const query1: QueryOptions = {
         lock: {
           hashType: ScriptHashType.Data,
           codeHash: '0xcode',
@@ -327,9 +322,8 @@ describe('unit tests for IndexerConnector', () => {
           codeHash: '0xcode',
           args: '0x1',
         },
-        data: null,
       }
-      const query2: LumosCellQuery = {
+      const query2: QueryOptions = {
         lock: {
           hashType: ScriptHashType.Type,
           codeHash: '0xcode',
@@ -340,7 +334,6 @@ describe('unit tests for IndexerConnector', () => {
           codeHash: '0xcode',
           args: '0x2',
         },
-        data: null,
       }
 
       const results: unknown[] = []
@@ -401,7 +394,7 @@ describe('unit tests for IndexerConnector', () => {
         it('throws error', async () => {
           let err
           try {
-            await synchronizer.getLiveCellsByScript({ lock: null, type: null, data: null })
+            await synchronizer.getLiveCellsByScript({})
           } catch (error) {
             err = error
           }

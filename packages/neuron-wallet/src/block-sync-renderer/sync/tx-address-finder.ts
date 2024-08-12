@@ -6,10 +6,13 @@ import OutPoint from '../../models/chain/out-point'
 import Transaction from '../../models/chain/transaction'
 import SystemScriptInfo from '../../models/system-script-info'
 import { getConnection } from '../../database/chain/connection'
+import { UDTType } from '../../utils/const'
+import AssetAccountInfo from '../../models/asset-account-info'
 
 export interface AnyoneCanPayInfo {
   tokenID: string
   blake160: string
+  udtType?: UDTType
 }
 
 // Search for all addresses related to a transaction. These addresses include:
@@ -47,6 +50,7 @@ export default class TxAddressFinder {
     let shouldSync = false
     // const anyoneCanPayBlake160s: string[] = []
     const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
+    const assetAccountInfo = new AssetAccountInfo()
     const outputs: Output[] = this.tx
       .outputs!.map((output, index) => {
         if (SystemScriptInfo.isMultiSignScript(output.lock)) {
@@ -62,6 +66,11 @@ export default class TxAddressFinder {
           anyoneCanPayInfos.push({
             blake160: output.lock.args,
             tokenID: output.type?.args || 'CKBytes',
+            udtType: output.type
+              ? assetAccountInfo.isSudtScript(output.type)
+                ? UDTType.SUDT
+                : UDTType.XUDT
+              : undefined,
           })
         }
         if (this.lockHashes.has(output.lockHash!)) {
@@ -86,6 +95,7 @@ export default class TxAddressFinder {
     const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
     const isMainnet = NetworksService.getInstance().isMainnet()
+    const assetAccountInfo = new AssetAccountInfo()
 
     let shouldSync = false
     for (const input of inputs) {
@@ -100,6 +110,11 @@ export default class TxAddressFinder {
         anyoneCanPayInfos.push({
           blake160: output.lockArgs,
           tokenID: output.typeArgs || 'CKBytes',
+          udtType: output.typeScript()
+            ? assetAccountInfo.isSudtScript(output.typeScript()!)
+              ? UDTType.SUDT
+              : UDTType.XUDT
+            : undefined,
         })
       }
       if (output && this.lockHashes.has(output.lockHash)) {

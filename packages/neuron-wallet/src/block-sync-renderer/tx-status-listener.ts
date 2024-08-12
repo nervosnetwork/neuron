@@ -7,6 +7,7 @@ import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
 import { getConnection } from '../database/chain/connection'
 import { interval } from 'rxjs'
+import TxStatus from '../models/chain/tx-status'
 
 type TransactionDetail = {
   hash: string
@@ -18,7 +19,8 @@ type TransactionDetail = {
 const getTransactionStatus = async (hash: string) => {
   const network = NetworksService.getInstance().getCurrent()
   const rpcService = new RpcService(network.remote, network.type)
-  const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
+  const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
+    await rpcService.getTransaction(hash)
   if (!txWithStatus) {
     return {
       tx: txWithStatus,
@@ -33,6 +35,13 @@ const getTransactionStatus = async (hash: string) => {
       blockHash: txWithStatus.txStatus.blockHash,
     }
   }
+  if (txWithStatus.txStatus.isRejected()) {
+    return {
+      tx: null,
+      status: TransactionStatus.Rejected,
+      blockHash: null,
+    }
+  }
   return {
     tx: txWithStatus.transaction,
     status: TransactionStatus.Pending,
@@ -41,16 +50,16 @@ const getTransactionStatus = async (hash: string) => {
 }
 
 const trackingStatus = async () => {
-  const pendingTransactions = await FailedTransaction.pendings()
+  const pendingOrFailedTransactions = await FailedTransaction.pendingOrFaileds()
   await FailedTransaction.processAmendFailedTxs()
 
-  if (!pendingTransactions.length) {
+  if (!pendingOrFailedTransactions.length) {
     return
   }
 
-  const pendingHashes = pendingTransactions.map(tx => tx.hash)
+  const pendingOrFailedHashes = pendingOrFailedTransactions.map(tx => tx.hash)
   const txs = await Promise.all(
-    pendingHashes.map(async hash => {
+    pendingOrFailedHashes.map(async hash => {
       try {
         const txWithStatus = await getTransactionStatus(hash)
         return {
@@ -65,15 +74,16 @@ const trackingStatus = async () => {
     })
   )
 
-  const failedTxs = txs.filter(
-    (tx): tx is TransactionDetail & { status: TransactionStatus.Failed } => tx?.status === TransactionStatus.Failed
-  )
-  const successTxs = txs.filter(
-    (tx): tx is TransactionDetail & { status: TransactionStatus.Success } => tx?.status === TransactionStatus.Success
-  )
+  const failedTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Failed)
+  const successTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Success)
+  const rejectedTxs = txs.filter((tx): tx is TransactionDetail => tx?.status === TransactionStatus.Rejected)
 
   if (failedTxs.length) {
     await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
+  }
+
+  if (rejectedTxs.length) {
+    await FailedTransaction.deleteFailedTxs(rejectedTxs.map(tx => tx.hash))
   }
 
   if (successTxs.length > 0) {

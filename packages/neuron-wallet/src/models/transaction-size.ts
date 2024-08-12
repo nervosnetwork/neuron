@@ -5,7 +5,7 @@ import Transaction from './chain/transaction'
 import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from '../utils/buffer'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { bytes as byteUtils } from '@ckb-lumos/lumos/codec'
 
 export default class TransactionSize {
   // https://github.com/zhangsoledad/rfcs/blob/zhangsoledad/ckb2023-overview/rfcs/0008-serialization/0008-serialization.md#fixvec---fixed-vector

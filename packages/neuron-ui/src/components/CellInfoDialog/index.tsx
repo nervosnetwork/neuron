@@ -4,7 +4,7 @@ import { calculateUsedCapacity, getExplorerUrl, shannonToCKBFormatter, truncateM
 import { useTranslation } from 'react-i18next'
 import Tabs from 'widgets/Tabs'
 import { type TFunction } from 'i18next'
-import { Script } from '@ckb-lumos/base'
+import { Script } from '@ckb-lumos/lumos'
 import Switch from 'widgets/Switch'
 import { Copy, ExplorerIcon } from 'widgets/Icons/icon'
 import Alert from 'widgets/Alert'

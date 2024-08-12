@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import React, { useRef } from 'react'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import Dialog from 'widgets/Dialog'
 import { useCopy, useDialog, scriptToAddress } from 'utils'
 import { Copy } from 'widgets/Icons/icon'

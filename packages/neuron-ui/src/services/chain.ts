@@ -1,6 +1,6 @@
-import { CKBRPC } from '@ckb-lumos/rpc'
+import { RPC } from '@ckb-lumos/lumos'
 
-export const rpc = new CKBRPC('')
+export const rpc = new RPC('')
 
 export const { getHeader, getBlockchainInfo, getTipHeader, getHeaderByNumber, getFeeRateStatistics, getTransaction } =
   rpc

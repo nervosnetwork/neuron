@@ -13,6 +13,7 @@ const CommandSubject = new Subject<{
     | 'sign-verify'
     | 'multisig-address'
     | 'lock-window'
+    | 'import-exist-xpubkey'
   payload: string | null
   dispatchToUI: boolean
 }>()

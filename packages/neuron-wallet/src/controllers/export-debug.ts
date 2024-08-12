@@ -14,6 +14,7 @@ import { generateRPC } from '../utils/ckb-rpc'
 import { CKBLightRunner } from '../services/light-runner'
 import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from '../utils/const'
 import WalletsService from '../services/wallets'
+import LogEncryption from '../services/log-encryption'
 
 export default class ExportDebugController {
   #I18N_PATH = 'export-debug-info'
@@ -158,7 +159,12 @@ export default class ExportDebugController {
         csv += row
       }
       const csvFileName = 'hd_public_key_info.csv'
-      this.archive.append(csv, { name: csvFileName })
+      const encryption = LogEncryption.getInstance()
+      if (encryption.isEnabled) {
+        this.archive.append(encryption.encrypt(csv), { name: `encrypted_${csvFileName}` })
+      } else {
+        this.archive.append(csv, { name: csvFileName })
+      }
     } catch (error) {
       logger.error(`Export Debug:\t export public key info error: ${error}`)
     }

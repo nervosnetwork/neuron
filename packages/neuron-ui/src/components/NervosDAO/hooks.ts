@@ -1,14 +1,14 @@
 import { useEffect, useCallback, useState } from 'react'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
-import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
+import { updateNervosDaoData, clearNervosDaoData, showGlobalAlertDialog } from 'states/stateProvider/actionCreators'
 
 import { NavigateFunction } from 'react-router-dom'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { calculateAPC, CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
 
 import { rpc, getHeader } from 'services/chain'
 import { generateDaoWithdrawTx, generateDaoClaimTx } from 'services/remote'
-import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/common-scripts/lib/dao'
+import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/lumos/common-scripts/dao'
 
 const { MILLISECONDS_IN_YEAR, MEDIUM_FEE_RATE } = CONSTANTS
 
@@ -142,14 +142,11 @@ export const useOnWithdrawDialogSubmit = ({
           }
         })
         .catch((err: Error) => {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: err.message,
-            },
-          })
+          showGlobalAlertDialog({
+            type: 'failed',
+            message: err.message,
+            action: 'ok',
+          })(dispatch)
         })
     }
     setActiveRecord(null)
@@ -208,14 +205,11 @@ export const useOnActionClick = ({
               }
             })
             .catch((err: Error) => {
-              dispatch({
-                type: AppActions.AddNotification,
-                payload: {
-                  type: 'alert',
-                  timestamp: +new Date(),
-                  content: err.message,
-                },
-              })
+              showGlobalAlertDialog({
+                type: 'failed',
+                message: err.message,
+                action: 'ok',
+              })(dispatch)
             })
         } else {
           setActiveRecord(record)
@@ -337,7 +331,7 @@ export const useUpdateDepositEpochList = ({
   useEffect(() => {
     if (connectionStatus === 'online') {
       getBlockHashes(records.map(v => v.depositOutPoint?.txHash).filter(v => !!v) as string[]).then(
-        (depositBlockHashes: { txHash: string; blockHash: string | null }[]) => {
+        (depositBlockHashes: { txHash: string; blockHash: string | undefined }[]) => {
           const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
           records.forEach(record => {

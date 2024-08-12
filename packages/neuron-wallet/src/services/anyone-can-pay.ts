@@ -18,9 +18,11 @@ import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
 import SystemScriptInfo from '../models/system-script-info'
 import CellsService from './cells'
-import { MIN_SUDT_CAPACITY } from '../utils/const'
+import { MIN_SUDT_CAPACITY, UDTType } from '../utils/const'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
+import BufferUtils from '../utils/buffer'
+import { helpers } from '@ckb-lumos/lumos'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -57,7 +59,7 @@ export default class AnyoneCanPayService {
 
     const targetOutput = isCKB
       ? await AnyoneCanPayService.getCKBTargetOutput(targetLockScript)
-      : await AnyoneCanPayService.getSUDTTargetOutput(targetLockScript, tokenID)
+      : await AnyoneCanPayService.getSUDTTargetOutput(targetLockScript, tokenID, assetAccount.udtType!)
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeBlake160: string = (await wallet.getNextChangeAddress())!.blake160
@@ -112,18 +114,19 @@ export default class AnyoneCanPayService {
     throw new TargetLockError()
   }
 
-  private static async getSUDTTargetOutput(lockScript: Script, tokenID: string) {
+  private static async getSUDTTargetOutput(lockScript: Script, tokenID: string, udtType: UDTType) {
     if (SystemScriptInfo.isSecpScript(lockScript)) {
       return Output.fromObject({
-        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: lockScript,
-        type: new AssetAccountInfo().generateSudtScript(tokenID),
+        type: new AssetAccountInfo().generateUdtScript(tokenID, udtType),
+        // use amount 0 to place holder amount
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
       })
     }
     const liveCellService = LiveCellService.getInstance()
     const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
       lockScript,
-      new AssetAccountInfo().generateSudtScript(tokenID)
+      new AssetAccountInfo().generateUdtScript(tokenID, udtType)!
     )
     if (targetOutputLiveCell && new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
       return Output.fromObject({
@@ -136,29 +139,38 @@ export default class AnyoneCanPayService {
     }
 
     return Output.fromObject({
-      capacity: AnyoneCanPayService.getSUDTAddCapacity(lockScript.args),
       lock: lockScript,
-      type: new AssetAccountInfo().generateSudtScript(tokenID),
+      type: new AssetAccountInfo().generateUdtScript(tokenID, udtType),
+      // use amount 0 to place holder amount
+      data: BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
   }
 
-  private static getSUDTAddCapacity(args: string) {
-    const addArgsLength = BigInt(args.slice(2).length / 2 - 20) * BigInt(10 ** 8)
-    return (addArgsLength + BigInt(MIN_SUDT_CAPACITY)).toString()
-  }
-
-  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string) {
+  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string, udtType?: UDTType) {
     if (SystemScriptInfo.isSecpScript(lockScript) || tokenID === 'CKBytes') {
       return undefined
     }
     const liveCellService = LiveCellService.getInstance()
+    const typeScript = new AssetAccountInfo().generateUdtScript(tokenID, udtType)
+    if (!typeScript) {
+      return undefined
+    }
     const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
       lockScript,
-      new AssetAccountInfo().generateSudtScript(tokenID)
+      typeScript
     )
     if (targetOutputLiveCell && new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
       return undefined
     }
-    return AnyoneCanPayService.getSUDTAddCapacity(lockScript.args)
+    return helpers
+      .minimalCellCapacity({
+        cellOutput: {
+          capacity: MIN_SUDT_CAPACITY.toString(),
+          lock: lockScript,
+          type: typeScript,
+        },
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
+      })
+      .toString()
   }
 }

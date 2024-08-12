@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useState } from 'react'
 import Tabs, { VariantProps } from 'widgets/Tabs'
-import { type CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { clsx, localNumberFormatter, shannonToCKBFormatter, scriptToAddress, isMainnet as isMainnetUtils } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { onEnter } from 'utils/inputDevice'

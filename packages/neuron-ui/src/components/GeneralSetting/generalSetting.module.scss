@@ -9,7 +9,7 @@ $action-button-width: 11.25rem;
   gap: 16px;
 
   .content {
-    width: 176px;
+    min-width: 176px;
     padding: 16px;
     background: var(--input-disabled-color);
     border-radius: 8px;

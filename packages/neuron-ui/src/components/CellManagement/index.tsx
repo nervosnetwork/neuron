@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock } from 'widgets/Icons/icon'
+import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock, Consolidate } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
@@ -23,7 +23,7 @@ import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
 import { useSearchParams } from 'react-router-dom'
 import CellInfoDialog from 'components/CellInfoDialog'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 import Hardware from 'widgets/Icons/Hardware.png'
 import Button from 'widgets/Button'
 import Alert from 'widgets/Alert'
@@ -186,28 +186,36 @@ const getColumns = ({
         const { locked, lockedReason } = item
         return (
           <div className={styles.actions}>
-            <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            <Tooltip tip={t('history.detail')} showTriangle placement="top">
+              <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
+            </Tooltip>
             {locked ? (
-              <UnLock
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Unlock}
-                data-index={index}
-              />
+              <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
+                <UnLock
+                  data-disabled={!!lockedReason}
+                  onClick={lockedReason ? undefined : onAction}
+                  data-action={Actions.Unlock}
+                  data-index={index}
+                />
+              </Tooltip>
             ) : (
-              <LockCell
-                data-disabled={!!lockedReason}
-                onClick={onAction}
-                data-action={Actions.Lock}
+              <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
+                <LockCell
+                  data-disabled={!!lockedReason}
+                  onClick={lockedReason ? undefined : onAction}
+                  data-action={Actions.Lock}
+                  data-index={index}
+                />
+              </Tooltip>
+            )}
+            <Tooltip tip={t('cell-manage.consume')} showTriangle placement="top">
+              <Consume
+                data-disabled={!!locked}
+                onClick={locked ? undefined : onAction}
+                data-action={Actions.Consume}
                 data-index={index}
               />
-            )}
-            <Consume
-              data-disabled={!!locked}
-              onClick={locked ? undefined : onAction}
-              data-action={Actions.Consume}
-              data-index={index}
-            />
+            </Tooltip>
           </div>
         )
       },
@@ -265,6 +273,7 @@ const CellManagement = () => {
       resetPassword,
       password,
       verifyDeviceStatus,
+      wallet,
     })
   const columns = useMemo(
     () =>
@@ -330,6 +339,10 @@ const CellManagement = () => {
             <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consume}>
               <Consume />
               {t('cell-manage.consume')}
+            </button>
+            <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consolidate}>
+              <Consolidate />
+              {t('cell-manage.consolidate')}
             </button>
           </div>
         ) : null}
@@ -431,6 +444,15 @@ const CellManagement = () => {
         onConfirm={onActionConfirm}
       >
         <span className={styles.consumeNotice}>{t('cell-manage.cell-consume-dialog.warn-consume')}</span>
+      </Dialog>
+      <Dialog
+        show={action === Actions.Consolidate}
+        title={t('cell-manage.cell-consolidate-dialog.title')}
+        onCancel={onActionCancel}
+        onConfirm={onActionConfirm}
+        confirmText={t('cell-manage.consolidate')}
+      >
+        <span className={styles.consumeNotice}>{t('cell-manage.cell-consolidate-dialog.warn-consume')}</span>
       </Dialog>
     </PageContainer>
   )

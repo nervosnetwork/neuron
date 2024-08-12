@@ -17,10 +17,9 @@ import IndexerCacheService from './indexer-cache-service'
 import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import { ShouldInChildProcess } from '../../exceptions'
-import { AppendScript, BlockTips, Synchronizer } from './synchronizer'
+import { BlockTips, Synchronizer } from './synchronizer'
 import LightSynchronizer from './light-synchronizer'
 import { generateRPC } from '../../utils/ckb-rpc'
-import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 import { NetworkType } from '../../models/network'
 import WalletService from '../../services/wallets'
 
@@ -28,7 +27,6 @@ export default class Queue {
   #lockHashes: string[]
   #url: string // ckb node
   #nodeType: NetworkType
-  #indexerUrl: string
   #addresses: AddressInterface[]
   #rpcService: RpcService
   #indexerConnector: Synchronizer | undefined
@@ -38,15 +36,16 @@ export default class Queue {
   #multiSignBlake160s: string[]
   #anyoneCanPayLockHashes: string[]
   #assetAccountInfo: AssetAccountInfo
+  #syncMultisig: boolean
 
-  constructor(url: string, addresses: AddressInterface[], indexerUrl: string, nodeType: NetworkType) {
+  constructor(url: string, addresses: AddressInterface[], nodeType: NetworkType, syncMultisig: boolean) {
     this.#url = url
-    this.#indexerUrl = indexerUrl
     this.#addresses = addresses
     this.#rpcService = new RpcService(url, nodeType)
     this.#nodeType = nodeType
     this.#assetAccountInfo = new AssetAccountInfo()
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
+    this.#syncMultisig = syncMultisig
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
     this.#lockArgsSet = new Set(
@@ -67,12 +66,12 @@ export default class Queue {
   start = async () => {
     logger.info('Queue:\tstart')
     try {
-      if (this.#url === BUNDLED_LIGHT_CKB_URL) {
+      if (this.#nodeType === NetworkType.Light) {
         this.#indexerConnector = new LightSynchronizer(this.#addresses, this.#url)
       } else {
-        this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#indexerUrl, this.#nodeType)
+        this.#indexerConnector = new FullSynchronizer(this.#addresses, this.#url, this.#nodeType)
       }
-      await this.#indexerConnector!.connect()
+      await this.#indexerConnector!.connect(this.#syncMultisig)
     } catch (error) {
       logger.error('Restarting child process due to error', error.message)
       if (process.send) {
@@ -122,10 +121,6 @@ export default class Queue {
     }
   }
 
-  async appendLightScript(scripts: AppendScript[]) {
-    await this.#indexerConnector?.appendScript(scripts)
-  }
-
   private async fetchTxsWithStatus(txHashes: string[]) {
     const rpc = generateRPC(this.#url, this.#nodeType)
     const txsWithStatus = await rpc
@@ -138,8 +133,8 @@ export default class Queue {
     for (let index = 0; index < txsWithStatus.length; index++) {
       if (txsWithStatus[index]?.transaction) {
         const tx = Transaction.fromSDK(txsWithStatus[index].transaction)
-        tx.blockHash = txsWithStatus[index].txStatus.blockHash!
-        blockHashes.push(tx.blockHash)
+        tx.blockHash = txsWithStatus[index].txStatus.blockHash
+        blockHashes.push(tx.blockHash!)
         txs.push(tx)
       } else {
         if ((txsWithStatus[index].txStatus as any) === 'rejected') {
@@ -149,7 +144,7 @@ export default class Queue {
       }
     }
     const headers = await rpc
-      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v]))
+      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v!]))
       .exec()
     headers.forEach((blockHeader: CKBComponents.BlockHeader, idx: number) => {
       if (blockHeader) {
@@ -236,7 +231,7 @@ export default class Queue {
       }
       await TransactionPersistor.saveFetchTx(tx, this.#lockArgsSet)
       for (const info of anyoneCanPayInfos) {
-        await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
+        await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160, info.udtType)
       }
 
       await this.#checkAndGenerateAddressesByTx(tx)
@@ -272,6 +267,7 @@ export default class Queue {
           indexerTipNumber: tip.indexerTipNumber,
           cacheTipNumber: tip.cacheTipNumber,
           timestamp: Date.now(),
+          syncMultisig: this.#syncMultisig,
         },
       })
     } else {

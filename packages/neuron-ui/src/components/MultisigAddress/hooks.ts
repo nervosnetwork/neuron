@@ -15,7 +15,7 @@ import {
   OfflineSignJSON,
   getMultisigSyncProgress,
 } from 'services/remote'
-import { computeScriptHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
@@ -79,16 +79,21 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
       }
     })
   }, [setEntities])
-  const updateConfig = useCallback(
+  const onUpdateConfig = useCallback((values: Partial<MultisigEntity> & { id: number }) => {
+    return updateMultisigConfig(values).then(res => {
+      if (isSuccessResponse(res)) {
+        setEntities(v => v.map(config => (res.result && config.id === res.result?.id ? res.result : config)))
+      } else {
+        throw new Error(typeof res.message === 'string' ? res.message : res.message.content!)
+      }
+    })
+  }, [])
+  const onUpdateConfigAlias = useCallback(
     (id: number) => (e: React.SyntheticEvent<unknown>) => {
       const { value } = e.target as HTMLInputElement
-      updateMultisigConfig({ id, alias: value || '' }).then(res => {
-        if (isSuccessResponse(res)) {
-          setEntities(v => v.map(config => (res.result && config.id === res.result?.id ? res.result : config)))
-        }
-      })
+      onUpdateConfig({ id, alias: value || '' })
     },
-    [setEntities]
+    [onUpdateConfig]
   )
   const deleteConfigById = useCallback(
     (id: number) => {
@@ -141,7 +146,8 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
   return {
     saveConfig,
     allConfigs,
-    updateConfig,
+    onUpdateConfigAlias,
+    onUpdateConfig,
     deleteConfigById,
     onImportConfig,
     configs,
@@ -364,4 +370,62 @@ export const useSubscription = ({
     }
   }, [isLightClient, getAndSaveMultisigSyncProgress])
   return { multisigBanlances, multisigSyncProgress }
+}
+
+export const useCancelWithLightClient = () => {
+  const [isCloseWarningDialogShow, setIsCloseWarningDialogShow] = useState(false)
+  const onCancel = useCallback(() => {
+    setIsCloseWarningDialogShow(true)
+  }, [setIsCloseWarningDialogShow])
+  const onCancelCloseMultisigDialog = useCallback(() => {
+    setIsCloseWarningDialogShow(false)
+  }, [setIsCloseWarningDialogShow])
+  return {
+    isCloseWarningDialogShow,
+    onCancel,
+    onCancelCloseMultisigDialog,
+  }
+}
+
+export const useSetStartBlockNumber = ({
+  onUpdateConfig,
+}: {
+  onUpdateConfig: (v: Partial<MultisigEntity> & { id: number }) => Promise<void>
+}) => {
+  const [isSetStartBlockShown, setIsSetStartBlockShown] = useState(false)
+  const [editId, setEditId] = useState<number | undefined>()
+  const [address, setAddress] = useState<string | undefined>()
+  const [lastStartBlockNumber, setLastStartBlockNumber] = useState<number | undefined>()
+  const onConfirm = useCallback(
+    (startBlockNumber: number) => {
+      if (editId) {
+        return onUpdateConfig({
+          id: editId,
+          startBlockNumber,
+        }).then(() => {
+          setIsSetStartBlockShown(false)
+        })
+      }
+      return Promise.reject(new Error('The Edit multisig config is empty'))
+    },
+    [editId]
+  )
+  const openDialog = useCallback<React.MouseEventHandler<HTMLButtonElement>>(e => {
+    const { id, address: editAddress, startBlockNumber } = e.currentTarget.dataset
+    if (id) {
+      setEditId(+id)
+    }
+    setAddress(editAddress)
+    setLastStartBlockNumber(startBlockNumber ? +startBlockNumber : undefined)
+    setIsSetStartBlockShown(true)
+  }, [])
+  return {
+    openDialog,
+    closeDialog: useCallback(() => setIsSetStartBlockShown(false), []),
+    isSetStartBlockShown,
+    onConfirm,
+    address,
+    lastStartBlockNumber,
+    onCancel: useCallback(() => setIsSetStartBlockShown(false), []),
+  }
 }

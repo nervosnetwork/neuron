@@ -1,3 +1,12 @@
+jest.doMock('../../src/models/subjects/multisig-config-db-changed-subject', () => ({
+  getSubject() {
+    return {
+      next: jest.fn(),
+      subscribe: jest.fn(),
+    }
+  },
+}))
+
 import MultisigConfig from '../../src/database/chain/entities/multisig-config'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
@@ -6,9 +15,10 @@ import { OutputStatus } from '../../src/models/chain/output'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
+import { scheduler } from 'timers/promises'
 
 const [alice, bob, charlie] = keyInfos
 
@@ -30,6 +40,7 @@ jest.mock('../../src/services/networks', () => ({
     getCurrent: () => ({
       type: NetworkType.Normal,
     }),
+    isMainnet: jest.fn(),
   }),
 }))
 
@@ -45,6 +56,7 @@ describe('multisig service', () => {
   )
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
   defaultMultisigConfig.lastestBlockNumber = '0x0'
+  defaultMultisigConfig.startBlockNumber = 0
   const lock = {
     args: Multisig.hash(
       multisigConfigModel.blake160s,
@@ -82,13 +94,14 @@ describe('multisig service', () => {
     multisigConfigModel.id = res?.id
     await getConnection().manager.save(multisigOutput)
     rpcBatchRequestMock.mockResolvedValue([])
-  })
+  }, 20_000)
   afterEach(async () => {
     const connection = getConnection()
-    await connection.synchronize(true)
+    await connection.getRepository(MultisigConfig).clear()
+    await connection.getRepository(MultisigOutput).clear()
     rpcBatchRequestMock.mockReset()
     multisigOutputChangedSubjectNextMock.mockReset()
-  })
+  }, 20_000)
 
   describe('save multisig config', () => {
     it('has exist', async () => {
@@ -97,6 +110,7 @@ describe('multisig service', () => {
     it('save success', async () => {
       const anotherConfig = MultisigConfig.fromModel(multisigConfigModel)
       anotherConfig.lastestBlockNumber = '0x0'
+      anotherConfig.startBlockNumber = 0
       anotherConfig.r = 2
       const res = await multisigService.saveMultisigConfig(anotherConfig)
       const count = await getConnection()
@@ -132,6 +146,26 @@ describe('multisig service', () => {
         })
         .getOne()
       expect(config?.alias).toBe('newalisa')
+    })
+    it('only update startBlockNumber and original data should not be change', async () => {
+      await multisigService.updateMultisigConfig({
+        id: multisigConfigModel.id!,
+        startBlockNumber: 256,
+      })
+      await scheduler.wait(2_000)
+      const config = await getConnection()
+        .getRepository(MultisigConfig)
+        .createQueryBuilder()
+        .where({
+          id: multisigConfigModel.id,
+        })
+        .getOne()
+      expect(config?.alias).toBe('alias')
+      expect(config?.startBlockNumber).toBe(256)
+      expect(config?.walletId).toBe(multisigConfigModel.walletId)
+      expect(config?.blake160s).toStrictEqual(multisigConfigModel.blake160s)
+      expect(config?.r).toBe(multisigConfigModel.r)
+      expect(config?.m).toBe(multisigConfigModel.m)
     })
   })
 

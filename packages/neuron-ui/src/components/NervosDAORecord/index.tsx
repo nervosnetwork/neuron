@@ -38,7 +38,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
   depositEpoch: string // deposit epoch string
   currentEpoch: string // current epoch string
   withdrawCapacity: string | null // capacity that is available for withdraw
-  connectionStatus: 'online' | 'offline' | 'connecting' // connection status
+  connectionStatus: State.ConnectionStatus // connection status
   onClick: React.EventHandler<React.MouseEvent> // on action button click
   tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc

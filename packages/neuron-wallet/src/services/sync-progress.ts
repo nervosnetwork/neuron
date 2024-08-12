@@ -1,5 +1,5 @@
 import { In, LessThan, Not } from 'typeorm'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
 import { getConnection } from '../database/chain/connection'
@@ -19,6 +19,9 @@ export default class SyncProgressService {
       .getRepository(SyncProgress)
       .find({
         select: ['hash'],
+        where: {
+          delete: false,
+        },
       })
     const existHashes = new Set(existProgresses.map(v => v.hash))
     const newSyncProgreses = syncProgresses.filter(v => !existHashes.has(v.hash))
@@ -86,19 +89,33 @@ export default class SyncProgressService {
     return result
   }
 
-  static async getCurrentWalletMinSyncedBlockNumber() {
+  static async getCurrentWalletMinSyncedBlockNumber(addressType: SyncAddressType = SyncAddressType.Default) {
     const currentWallet = WalletService.getInstance().getCurrent()
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
       .where({
         delete: false,
-        addressType: SyncAddressType.Default,
-        ...(currentWallet ? { walletId: currentWallet.id } : {}),
+        addressType,
+        ...(currentWallet && addressType === SyncAddressType.Default ? { walletId: currentWallet.id } : {}),
       })
       .orderBy('syncedBlockNumber', 'ASC')
       .getOne()
     return item?.syncedBlockNumber || 0
+  }
+
+  static async getMinSyncedBlockNumberInWallets(walletIds: string[]) {
+    const item = await getConnection()
+      .getRepository(SyncProgress)
+      .createQueryBuilder()
+      .where({
+        delete: false,
+        addressType: SyncAddressType.Default,
+        walletId: In(walletIds),
+      })
+      .orderBy('syncedBlockNumber', 'ASC')
+      .getOne()
+    return item?.syncedBlockNumber
   }
 
   static async getWalletMinLocalSavedBlockNumber() {
@@ -143,5 +160,18 @@ export default class SyncProgressService {
       walletId,
       addressType: SyncAddressType.Default,
     })
+  }
+
+  static async resetMultisigSync(hash: string, startBlockNumber: number) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({
+        localSavedBlockNumber: startBlockNumber,
+        lightStartBlockNumber: startBlockNumber,
+        syncedBlockNumber: startBlockNumber,
+      })
+      .where({ hash })
+      .execute()
   }
 }

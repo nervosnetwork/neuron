@@ -1,4 +1,4 @@
-import { predefined } from '@ckb-lumos/config-manager'
+import { predefined } from '@ckb-lumos/lumos/config'
 
 const systemScriptsMainnet = predefined.LINA.SCRIPTS
 const systemScriptsTestnet = predefined.AGGRON4.SCRIPTS

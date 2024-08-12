@@ -78,14 +78,24 @@ describe(`SignMessage`, () => {
       it('not match wallet address', async () => {
         getAddressesByWalletIdMock.mockReturnValueOnce([])
         await expect(
-          SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+          SignMessage.sign({
+            walletID: 'walletId',
+            password: extendedKeyInfo.password,
+            message: signInfo.message,
+            address: signInfo.address,
+          })
         ).rejects.toThrow(new AddressNotFound())
       })
 
       it('with generate', async () => {
         getAddressesByWalletIdMock.mockReturnValueOnce([{ address: signInfo.address }])
         getPrivateKeyMock.mockReturnValueOnce(signInfo.privateKey)
-        const res = await SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+        const res = await SignMessage.sign({
+          walletID: 'walletId',
+          password: extendedKeyInfo.password,
+          message: signInfo.message,
+          address: signInfo.address,
+        })
         expect(res).toEqual(signInfo.signature)
       })
 
@@ -94,7 +104,12 @@ describe(`SignMessage`, () => {
         walletMock.mockReturnValueOnce({ isHardware: () => true })
         const signMessage = jest.fn()
         hardWalletMock.mockReturnValueOnce({ signMessage })
-        await SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+        await SignMessage.sign({
+          walletID: 'walletId',
+          password: extendedKeyInfo.password,
+          message: signInfo.message,
+          address: signInfo.address,
+        })
         expect(signMessage).toHaveBeenCalled()
       })
     })

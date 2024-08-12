@@ -20,9 +20,9 @@ const baseProps = {
 }
 const propsList: { [name: string]: SUDTCreateDialogProps } = {
   Basic: baseProps,
-  InsufficientForSUDT: { ...baseProps, insufficient: { ckb: false, sudt: true } },
-  InsufficientForCKB: { ...baseProps, insufficient: { ckb: true, sudt: false } },
-  InsufficientForCKBAndSUDT: { ...baseProps, insufficient: { ckb: true, sudt: true } },
+  InsufficientForSUDT: { ...baseProps, insufficient: { ckb: false, sudt: true, xudt: true } },
+  InsufficientForCKB: { ...baseProps, insufficient: { ckb: true, sudt: false, xudt: false } },
+  InsufficientForCKBAndSUDT: { ...baseProps, insufficient: { ckb: true, sudt: true, xudt: true } },
 }
 
 const meta: Meta<typeof SUDTCreateDialog> = {

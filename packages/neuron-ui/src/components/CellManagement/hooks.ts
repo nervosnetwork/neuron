@@ -18,7 +18,8 @@ import { ErrorCode, LockScriptCategory, RoutePath, TypeScriptCategory, isSuccess
 import { SortType } from 'widgets/Table'
 
 const cellTypeOrder: Record<string, number> = {
-  [TypeScriptCategory.SUDT]: 1,
+  [TypeScriptCategory.SUDT]: 0,
+  [TypeScriptCategory.XUDT]: 1,
   [TypeScriptCategory.NFT]: 2,
   [TypeScriptCategory.Spore]: 3,
   [TypeScriptCategory.Unknown]: 4,
@@ -46,6 +47,9 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
         break
       case TypeScriptCategory.DAO:
         lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'Nervos DAO' } }
+        break
+      case TypeScriptCategory.XUDT:
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'XUDT' } }
         break
       case TypeScriptCategory.Unknown:
         lockedReason = { key: 'cell-manage.locked-reason.Unknown' }
@@ -82,6 +86,7 @@ const getCellType = (item: State.LiveCellWithLocalInfo) => {
     switch (item.typeScriptType) {
       case TypeScriptCategory.NFT:
       case TypeScriptCategory.SUDT:
+      case TypeScriptCategory.XUDT:
       case TypeScriptCategory.Spore:
       case TypeScriptCategory.Unknown:
         return item.typeScriptType
@@ -202,6 +207,7 @@ export enum Actions {
   Lock = 'lock',
   Unlock = 'unlock',
   Consume = 'consume',
+  Consolidate = 'consolidate',
 }
 
 export const useAction = ({
@@ -213,6 +219,7 @@ export const useAction = ({
   setError,
   password,
   verifyDeviceStatus,
+  wallet,
 }: {
   liveCells: State.LiveCellWithLocalInfo[]
   currentPageLiveCells: State.LiveCellWithLocalInfo[]
@@ -222,6 +229,7 @@ export const useAction = ({
   setError: (error: string) => void
   password: string
   verifyDeviceStatus: () => Promise<boolean>
+  wallet: State.Wallet
 }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -253,10 +261,21 @@ export const useAction = ({
     },
     [liveCells, selectedOutPoints, setOperateCells, dispatch, navigate]
   )
+
+  const getConsolidateAddress = useCallback(() => {
+    const { addresses } = wallet
+    if (addresses.length === 1) {
+      return addresses[0].address
+    }
+    const unusedReceiveAddress = addresses.find(a => a.type === 0 && a.txCount === 0)?.address ?? ''
+
+    return unusedReceiveAddress
+  }, [wallet])
+
   const onActionConfirm = useCallback(async () => {
     switch (action) {
-      case 'lock':
-      case 'unlock':
+      case Actions.Lock:
+      case Actions.Unlock:
         if (!(await verifyDeviceStatus())) return
         setLoading(true)
         updateLiveCellsLockStatus({
@@ -276,17 +295,24 @@ export const useAction = ({
             setLoading(false)
           })
         break
-      case 'consume':
+      case Actions.Consume:
         dispatch({
           type: AppActions.UpdateConsumeCells,
           payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
         })
         navigate(`${RoutePath.Send}?isSendMax=true`)
         break
+      case Actions.Consolidate:
+        dispatch({
+          type: AppActions.UpdateConsumeCells,
+          payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
+        })
+        navigate(`${RoutePath.Send}?isSendMax=true&toAddress=${getConsolidateAddress()}`)
+        break
       default:
         break
     }
-  }, [action, operateCells, dispatch, navigate, password])
+  }, [action, operateCells, dispatch, navigate, password, getConsolidateAddress])
   const onActionCancel = useCallback(() => {
     setAction(undefined)
     setOperateCells([])
@@ -377,7 +403,7 @@ export const usePassword = () => {
 }
 
 export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: TFunction }) => {
-  const isWin32 = useMemo(() => {
+  const isWin32 = useMemo<boolean>(() => {
     return getPlatform() === 'win32'
   }, [])
   const [error, setError] = useState<ErrorCode | string | undefined>()

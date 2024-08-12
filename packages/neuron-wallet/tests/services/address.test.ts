@@ -1,7 +1,7 @@
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import { Address } from '../../src/models/address'
 import Transaction from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
@@ -9,6 +9,8 @@ import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
+
+const { AddressType, AccountExtendedPublicKey } = hd
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(

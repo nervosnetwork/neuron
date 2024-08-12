@@ -1,6 +1,6 @@
-import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/lumos'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { bytes } from '@ckb-lumos/codec'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import OutputEntity from '../../src/database/chain/entities/output'
 import InputEntity from '../../src/database/chain/entities/input'
 import { OutputStatus } from '../../src/models/chain/output'
@@ -1270,6 +1270,10 @@ describe('CellsService', () => {
           generateCell('666', OutputStatus.Live, true, typeScript, { lockScript: bobDefaultLock }),
           // sudt asset
           generateCell('777', OutputStatus.Live, true, sudtType, { lockScript: bobDefaultLock }),
+          // xudt asset
+          generateCell('888', OutputStatus.Live, true, assetAccountInfo.generateXudtScript('0x'), {
+            lockScript: bobDefaultLock,
+          }),
         ]
         await getConnection().manager.save(cells)
       })
@@ -1280,10 +1284,10 @@ describe('CellsService', () => {
             result = await CellsService.getCustomizedAssetCells([publicKeyHash], 1, 10)
           })
           it('returns all items', () => {
-            expect(result.totalCount).toEqual(7)
-            expect(result.items.length).toEqual(7)
+            expect(result.totalCount).toEqual(8)
+            expect(result.items.length).toEqual(8)
             const totalCapacity = result.items.reduce((total: number, cell: any) => total + parseInt(cell.capacity), 0)
-            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 + 777)
+            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 + 777 + 888)
           })
           it('attaches setCustomizedAssetInfo to single multisign cells', async () => {
             const singleMultiSignCells = result.items.filter(
@@ -1312,8 +1316,17 @@ describe('CellsService', () => {
             const cells = result.items.filter((item: any) => item.capacity === '777')
             expect(cells.length).toEqual(1)
             expect(cells[0].customizedAssetInfo).toEqual({
-              lock: CustomizedLock.SUDT,
+              lock: '',
               type: CustomizedType.SUDT,
+              data: '',
+            })
+          })
+          it('attaches setCustomizedAssetInfo to xudt cells', () => {
+            const cells = result.items.filter((item: any) => item.capacity === '888')
+            expect(cells.length).toEqual(1)
+            expect(cells[0].customizedAssetInfo).toEqual({
+              lock: '',
+              type: CustomizedType.XUDT,
               data: '',
             })
           })
@@ -1322,13 +1335,13 @@ describe('CellsService', () => {
           it('returns first page result', async () => {
             const page = 1
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(7)
+            expect(result.totalCount).toEqual(8)
             expect(result.items.length).toEqual(pageSize)
           })
           it('returns the remaining cells for the last page', async () => {
             const page = 2
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(7)
+            expect(result.totalCount).toEqual(8)
             expect(result.items.length).toEqual(2)
           })
         })
@@ -1336,7 +1349,7 @@ describe('CellsService', () => {
           it('returns empty result', async () => {
             const page = 8
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(7)
+            expect(result.totalCount).toEqual(8)
             expect(result.items.length).toEqual(0)
           })
         })
@@ -1676,7 +1689,7 @@ describe('CellsService', () => {
         '61',
         OutputStatus.Sent,
         false,
-        SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049'))
+        SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049'))
       )
       await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
@@ -1718,7 +1731,7 @@ describe('CellsService', () => {
     it('MULTI_LOCK_TIME', () => {
       const output = Output.fromObject({
         capacity: '1000',
-        lock: SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049')),
+        lock: SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049')),
       })
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTI_LOCK_TIME)
     })
@@ -1884,7 +1897,7 @@ describe('CellsService', () => {
     it('no input', async () => {
       const input = await saveTxAndInput()
       await expect(CellsService.getDaoWithdrawAndDeposit(input.transactionHash)).rejects.toThrow(
-        new Error(`No unlock transaction use ${input.transactionHash} as input`)
+        new Error(`This is not an unlock dao transaction ${input.transactionHash}`)
       )
     })
     it('can not find output', async () => {

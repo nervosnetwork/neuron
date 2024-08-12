@@ -1,6 +1,8 @@
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import SystemScriptInfo from '../../src/models/system-script-info'
+
+const AddressType = hd.AddressType
 
 const walletId1 = 'w1'
 const walletId2 = 'w2'

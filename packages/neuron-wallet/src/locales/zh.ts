@@ -130,6 +130,7 @@ export default {
       'no-exist-ckb-node-data': '{{path}} 目录下没有找到 CKB Node 配置和数据, 点击确认重新同步',
       'light-client-sudt-acp-error': '轻节点模式不支持发送资产给其他用户的资产账户',
       'could-not-connect-service': '无法连接到服务，请稍后再试。',
+      'address-required': '地址不可为空',
     },
     messageBox: {
       button: {

@@ -1,4 +1,4 @@
-import type { LumosCellQuery } from './sync/synchronizer'
+import { type QueryOptions } from '@ckb-lumos/base'
 import initConnection from '../database/chain/ormconfig'
 import { register as registerTxStatusListener } from './tx-status-listener'
 import SyncQueue from './sync/queue'
@@ -21,7 +21,6 @@ export interface WorkerMessage<T = any> {
     | 'address-created'
     | 'indexer-error'
     | 'check-and-save-wallet-address'
-    | 'append_scripts'
   message: T
 }
 
@@ -31,11 +30,11 @@ export interface StartParams {
   genesisHash: string
   url: SyncQueueParams[0]
   addressMetas: SyncQueueParams[1]
-  indexerUrl: SyncQueueParams[2]
-  nodeType: SyncQueueParams[3]
+  nodeType: SyncQueueParams[2]
+  syncMultisig: SyncQueueParams[3]
 }
 
-export type QueryIndexerParams = LumosCellQuery
+export type QueryIndexerParams = QueryOptions
 
 export const listener = async ({ type, id, channel, message }: WorkerMessage) => {
   if (type === 'kill') {
@@ -63,7 +62,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       try {
         await initConnection(message.genesisHash)
 
-        syncQueue = new SyncQueue(message.url, message.addressMetas, message.indexerUrl, message.nodeType)
+        syncQueue = new SyncQueue(message.url, message.addressMetas, message.nodeType, message.syncMultisig)
         syncQueue.start()
       } catch (err) {
         logger.error(`Block Sync Task:\t`, err)
@@ -90,12 +89,6 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
         res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
       } catch (error) {
         logger.error(`Block Sync Task: queryIndexer:\t`, error)
-      }
-      break
-    }
-    case 'append_scripts': {
-      if (Array.isArray(message)) {
-        await syncQueue?.appendLightScript(message)
       }
       break
     }

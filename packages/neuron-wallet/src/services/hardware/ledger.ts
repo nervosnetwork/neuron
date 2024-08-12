@@ -7,10 +7,11 @@ import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from '../../models/chain/transaction'
-import { AddressType, AccountExtendedPublicKey } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
 import logger from '../../utils/logger'
 import NetworksService from '../../services/networks'
 import { generateRPC } from '../../utils/ckb-rpc'
+import LogEncryption from '../log-encryption'
 
 const UNCOMPRESSED_KEY_LENGTH = 130
 const compressPublicKey = (key: string) => {
@@ -78,12 +79,30 @@ export default class Ledger extends Hardware {
       context = txs.map(i => rpc.paramsFormatter.toRawTransaction(i.transaction))
     }
 
-    const signature = await this.ledgerCKB!.signTransaction(
-      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
-      rawTx,
-      witnesses,
-      context,
-      this.defaultPath
+    const hdPath = path === hd.AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path
+    const signature = await this.ledgerCKB!.signTransaction(hdPath, rawTx, witnesses, context, this.defaultPath).catch(
+      error => {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        const encryption = LogEncryption.getInstance()
+        logger.error(
+          encryption.encrypt(
+            JSON.stringify([
+              'Ledger: failed to sign the transaction ',
+              errorMessage,
+              ' HD path:',
+              hdPath,
+              ' raw transaction:',
+              JSON.stringify(rawTx),
+              ' witnesses:',
+              JSON.stringify(witnesses),
+              ' context:',
+              JSON.stringify(context),
+            ])
+          )
+        )
+
+        return Promise.reject(error)
+      }
     )
 
     return signature
@@ -92,7 +111,7 @@ export default class Ledger extends Hardware {
   async signMessage(path: string, messageHex: string) {
     const message = this.removePrefix(messageHex)
     const signed = await this.ledgerCKB!.signMessage(
-      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
+      path === hd.AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
       message,
       false
     )
@@ -108,7 +127,7 @@ export default class Ledger extends Hardware {
     const networkService = NetworksService.getInstance()
     const isTestnet = !networkService.isMainnet()
     const result = await this.ledgerCKB!.getWalletPublicKey(
-      path === AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
+      path === hd.AccountExtendedPublicKey.pathForReceiving(0) ? this.defaultPath : path,
       isTestnet
     )
     return result
@@ -143,7 +162,7 @@ export default class Ledger extends Hardware {
                 manufacturer: e.device.manufacturer,
                 product: e.device.product,
                 addressIndex: 0,
-                addressType: AddressType.Receiving,
+                addressType: hd.AddressType.Receiving,
               },
             ]
           }, [])

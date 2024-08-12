@@ -1,9 +1,10 @@
-import { molecule } from '@ckb-lumos/codec'
-import { blockchain } from '@ckb-lumos/base'
-import { formatUnit, ckbDecimals } from '@ckb-lumos/bi'
+import { table, blockchain } from '@ckb-lumos/lumos/codec'
+import { formatUnit } from '@ckb-lumos/lumos/utils'
 import { TFunction } from 'i18next'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
+
+const CKB_DECIMALS = 8
 
 const base = 10e9
 const numberParser = (value: string, exchange: string) => {
@@ -112,7 +113,7 @@ export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolea
   return new Intl.NumberFormat('en-US', {
     useGrouping: showCommaSeparator,
     signDisplay: showPositiveSign && +shannon > 0 ? 'always' : 'auto',
-    maximumFractionDigits: ckbDecimals,
+    maximumFractionDigits: CKB_DECIMALS,
   }).format(formatUnit(BigInt(shannon ?? '0'), 'ckb') as any)
 }
 
@@ -259,7 +260,7 @@ type FormatterOptions = { args: string; data?: string; clusterName?: string; tru
 export const sporeFormatter = ({ args, data, clusterName, truncate }: FormatterOptions) => {
   let format = 'Spore'
 
-  const SporeData = molecule.table(
+  const SporeData = table(
     {
       contentType: blockchain.Bytes,
       content: blockchain.Bytes,

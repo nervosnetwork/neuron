@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20.11.1
+          - 20.15.1
         os:
           - macos-latest
           - ubuntu-20.04
@@ -35,7 +35,7 @@ jobs:
           cache: "yarn"
 
       - name: Restore
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules

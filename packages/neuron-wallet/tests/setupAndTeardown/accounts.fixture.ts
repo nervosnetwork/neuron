@@ -1,4 +1,5 @@
 import AssetAccount from '../../src/models/asset-account'
+import { UDTType } from '../../src/utils/const'
 import { DEPLOY_KEY } from './keys'
 
 const ASSET_ACCOUNT = {
@@ -9,6 +10,7 @@ const ASSET_ACCOUNT = {
   balance: '0',
   accountName: 'SUDT Account',
   blake160: DEPLOY_KEY.blake160,
+  udtType: UDTType.SUDT,
 }
 
 const CKB_ASSET_ACCOUNT = {

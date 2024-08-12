@@ -9,16 +9,41 @@ import { TransactionStatus } from '../../models/chain/transaction'
 import AmendTransactionEntity from '../../database/chain/entities/amend-transaction'
 
 export class FailedTransaction {
-  public static pendings = async (): Promise<TransactionEntity[]> => {
-    const pendingTransactions = await getConnection()
+  public static pendingOrFaileds = async (): Promise<TransactionEntity[]> => {
+    const transactions = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
       .where({
-        status: TransactionStatus.Pending,
+        status: In([TransactionStatus.Pending, TransactionStatus.Failed]),
       })
       .getMany()
 
-    return pendingTransactions
+    return transactions
+  }
+
+  public static deleteFailedTxs = async (hashes: string[]) => {
+    await getConnection().manager.transaction(async transactionalEntityManager => {
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where({ hash: In(hashes) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(OutputEntity)
+        .where({ outPointTxHash: In(hashes) })
+        .execute()
+
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(InputEntity)
+        .where({ outPointTxHash: In(hashes) })
+        .execute()
+    })
   }
 
   public static processAmendFailedTxs = async () => {
@@ -56,28 +81,7 @@ export class FailedTransaction {
       }
     })
 
-    await getConnection().manager.transaction(async transactionalEntityManager => {
-      await transactionalEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from(TransactionEntity)
-        .where({ hash: In(removeTxs) })
-        .execute()
-
-      await transactionalEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from(OutputEntity)
-        .where({ outPointTxHash: In(removeTxs) })
-        .execute()
-
-      await transactionalEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from(InputEntity)
-        .where({ outPointTxHash: In(removeTxs) })
-        .execute()
-    })
+    await FailedTransaction.deleteFailedTxs(removeTxs)
   }
 
   // update tx status to TransactionStatus.Failed

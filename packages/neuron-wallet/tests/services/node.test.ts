@@ -473,6 +473,7 @@ describe('NodeService', () => {
       nodeService.getNeuronCompatibilityCKB = () => ({
         '0.110': {
           full: ['0.110', '0.109'],
+          light: ['0.3', '0.2'],
         },
       })
       stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, readonly: true })
@@ -488,6 +489,12 @@ describe('NodeService', () => {
     })
     it('is compatible', () => {
       expect(nodeService.isCkbCompatibility('0.110.0', '0.109.0 (30e1255 2023-01-30)')).toBeTruthy()
+    })
+    it('is not compatible', () => {
+      expect(nodeService.isCkbCompatibility('0.110.0', '0.1', 'light')).toBeFalsy()
+    })
+    it('is compatible', () => {
+      expect(nodeService.isCkbCompatibility('0.110.0', '0.3', 'light')).toBeTruthy()
     })
   })
   describe('test should update', () => {

@@ -19,6 +19,7 @@ declare namespace State {
       data: string
     }
     assetAccountType?: 'CKB' | 'sUDT' | string
+    daoCapacity?: string
   }
 
   interface DetailedInput {
@@ -131,6 +132,11 @@ declare namespace State {
     amendHash?: string
   }
 
+  enum UDTType {
+    SUDT = 'sUDT',
+    XUDT = 'xUDT',
+  }
+
   interface SUDTAccount {
     accountId: string
     accountName?: string
@@ -140,6 +146,7 @@ declare namespace State {
     tokenId: string
     address: string
     decimal: string
+    udtType?: UDTType
   }
 
   type GlobalAlertDialog = {
@@ -238,7 +245,7 @@ declare namespace State {
     balance: string
     addresses: Address[]
   }
-  type ConnectionStatus = 'online' | 'offline' | 'connecting'
+  type ConnectionStatus = 'online' | 'offline' | 'connecting' | 'pause'
 
   type SyncState = Readonly<{
     cacheTipBlockNumber: number
@@ -363,6 +370,7 @@ declare namespace State {
     NFTClass = 'NFTClass',
     NFTIssuer = 'NFTIssuer',
     SUDT = 'SUDT',
+    XUDT = 'XUDT',
     Spore = 'Spore',
     Unknown = 'Unknown',
   }
@@ -381,7 +389,7 @@ declare namespace State {
   }
   interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
     lockedReason?: { key: string; params?: Record<string, any> }
-    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Spore' | 'Unknown'
+    cellType?: 'CKB' | 'SUDT' | 'XUDT' | 'NFT' | 'Spore' | 'Unknown'
   }
 
   interface UpdateLiveCellLocalInfo {

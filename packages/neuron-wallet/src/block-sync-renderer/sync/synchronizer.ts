@@ -1,10 +1,9 @@
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
+import { type QueryOptions } from '@ckb-lumos/base'
 import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
-import { QueryOptions } from '@ckb-lumos/base'
 import AddressMeta from '../../database/address/meta'
 import { Address } from '../../models/address'
-import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import IndexerCacheService from './indexer-cache-service'
 import logger from '../../utils/logger'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
@@ -12,41 +11,6 @@ import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-ca
 export interface BlockTips {
   cacheTipNumber: number
   indexerTipNumber: number | undefined
-}
-
-export interface LumosCellQuery {
-  lock: CKBComponents.Script | null
-  type: CKBComponents.Script | null
-  data: string | null
-}
-
-export interface LumosCell {
-  blockHash: string
-  outPoint: {
-    txHash: string
-    index: string
-  }
-  cellOutput: {
-    capacity: string
-    lock: {
-      codeHash: string
-      args: string
-      hashType: string
-    }
-    type?: {
-      codeHash: string
-      args: string
-      hashType: string
-    }
-  }
-  data?: string
-}
-
-export interface AppendScript {
-  walletId: string
-  script: CKBComponents.Script
-  addressType: SyncAddressType
-  scriptType: CKBRPC.ScriptType
 }
 
 export abstract class Synchronizer {
@@ -57,19 +21,16 @@ export abstract class Synchronizer {
   protected processingBlockNumber?: string
   protected addressesByWalletId: Map<string, AddressMeta[]> = new Map()
   protected pollingIndexer: boolean = false
-  private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
+  private indexerQueryQueue: QueueObject<QueryOptions> | undefined
   protected _needGenerateAddress: boolean = false
 
-  abstract connect(): Promise<void>
+  abstract connect(syncMultisig?: boolean): Promise<void>
   abstract processTxsInNextBlockNumber(): Promise<void>
   protected abstract upsertTxHashes(): Promise<unknown>
   public abstract notifyCurrentBlockNumberProcessed(blockNumber: string): Promise<void>
-  async appendScript(_scripts: AppendScript[]) {
-    // do nothing
-  }
 
-  constructor({ addresses, nodeUrl, indexerUrl }: { addresses: Address[]; nodeUrl: string; indexerUrl: string }) {
-    this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
+  constructor({ addresses, nodeUrl }: { addresses: Address[]; nodeUrl: string }) {
+    this.indexer = new CkbIndexer(nodeUrl)
     this.addressesByWalletId = addresses
       .map(address => AddressMeta.fromObject(address))
       .reduce((addressesByWalletId, addressMeta) => {
@@ -108,7 +69,7 @@ export abstract class Synchronizer {
     await this.processNextBlockNumberQueue?.drain()
   }
 
-  protected async getTxHashesWithNextUnprocessedBlockNumber(): Promise<[string | undefined, string[]]> {
+  protected async getTxHashesWithNextUnprocessedBlockNumber(): Promise<[string | undefined, string[], string[]]> {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
       [...this.addressesByWalletId.keys()].map(async walletId =>
         IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
@@ -126,12 +87,15 @@ export abstract class Synchronizer {
     const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()].sort((a, b) => parseInt(a) - parseInt(b)).shift()
 
     if (!nextUnprocessedBlockNumber) {
-      return [undefined, []]
+      return [undefined, [], []]
     }
 
     const txHashCachesInNextUnprocessedBlockNumber = groupedTxHashCaches.get(nextUnprocessedBlockNumber)
-
-    return [nextUnprocessedBlockNumber, txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash)]
+    return [
+      nextUnprocessedBlockNumber,
+      txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash),
+      [...new Set(txHashCachesInNextUnprocessedBlockNumber!.map(({ walletId }) => walletId))],
+    ]
   }
 
   protected async notifyAndSyncNext(indexerTipNumber: number) {
@@ -155,7 +119,7 @@ export abstract class Synchronizer {
     return false
   }
 
-  public async getLiveCellsByScript(query: LumosCellQuery) {
+  public async getLiveCellsByScript(query: QueryOptions) {
     return new Promise((resolve, reject) => {
       this.indexerQueryQueue!.push(query, (err: any, result: unknown) => {
         if (err) {
@@ -166,7 +130,7 @@ export abstract class Synchronizer {
     })
   }
 
-  private async collectLiveCellsByScript(query: LumosCellQuery) {
+  private async collectLiveCellsByScript(query: QueryOptions) {
     const { lock, type, data } = query
     if (!lock && !type) {
       throw new Error('at least one parameter is required')

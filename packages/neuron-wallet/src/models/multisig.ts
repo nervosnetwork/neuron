@@ -1,6 +1,8 @@
 import { MultisigPrefixError } from '../exceptions'
-import Blake2b from './blake2b'
 import SystemScriptInfo from './system-script-info'
+import { since } from '@ckb-lumos/lumos'
+import { bytes, Uint64LE } from '@ckb-lumos/lumos/codec'
+import Blake2b, { BLAKE160_HEX_LENGTH } from './blake2b'
 
 export interface MultisigPrefix {
   S: string
@@ -11,7 +13,7 @@ export interface MultisigPrefix {
 
 export default class Multisig {
   // 1 epoch = 4h = 240min
-  EPOCH_MINUTES = 240
+  static EPOCH_MINUTES = 240
 
   static defaultS: string = '00'
 
@@ -24,32 +26,22 @@ export default class Multisig {
 
   static hash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {
     const serializeResult = Multisig.serialize(blake160s, r, m, n)
-    return Blake2b.digest(serializeResult).slice(0, 42)
+    return Blake2b.digest(serializeResult).slice(0, BLAKE160_HEX_LENGTH)
   }
 
-  since(minutes: number, headerEpoch: string): string {
+  static since(minutes: number, headerEpoch: string): string {
     if (minutes < 0) {
       throw new Error("minutes to calculate since can't be less than 0")
     }
-    const currentEpochInfo = this.parseEpoch(BigInt(headerEpoch))
-    const totalMinutes =
-      minutes +
-      parseInt(
-        (
-          (parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString())) *
-          this.EPOCH_MINUTES
-        ).toString()
-      )
+    const currentEpoch = since.parseEpoch(headerEpoch)
+    const totalMinutes = minutes + Math.floor((currentEpoch.index / currentEpoch.length) * this.EPOCH_MINUTES)
     const leftMinutes = totalMinutes % this.EPOCH_MINUTES
-    const epochs: bigint =
-      BigInt(parseInt((totalMinutes / this.EPOCH_MINUTES).toString(), 10)) + currentEpochInfo.number
-    const result = this.epochSince(BigInt(this.EPOCH_MINUTES), BigInt(leftMinutes), epochs)
-    const buf = Buffer.alloc(8)
-    buf.writeBigUInt64LE(result)
-    return `0x${buf.toString('hex')}`
+    const epochs = Math.floor(totalMinutes / this.EPOCH_MINUTES) + currentEpoch.number
+    const result = this.epochSince(BigInt(this.EPOCH_MINUTES), BigInt(leftMinutes), BigInt(epochs))
+    return bytes.hexify(Uint64LE.pack(result))
   }
 
-  args(blake160: string, minutes: number, headerEpoch: string): string {
+  static args(blake160: string, minutes: number, headerEpoch: string): string {
     return Multisig.hash([blake160]) + this.since(minutes, headerEpoch).slice(2)
   }
 
@@ -57,23 +49,12 @@ export default class Multisig {
     return SystemScriptInfo.generateMultiSignScript(Multisig.hash(blake160s, r, m, n))
   }
 
-  parseSince(args: string): bigint {
-    const str = args.slice(42)
-    const buf = Buffer.from(str, 'hex')
-    const sin: bigint = buf.readBigUInt64LE()
-    return sin
+  static parseSince(args: string): bigint {
+    return Uint64LE.unpack(`0x${args.slice(BLAKE160_HEX_LENGTH)}`).toBigInt()
   }
 
-  private epochSince(length: bigint, index: bigint, number: bigint): bigint {
+  private static epochSince(length: bigint, index: bigint, number: bigint): bigint {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
-  }
-
-  private parseEpoch(epoch: bigint) {
-    return {
-      length: (epoch >> BigInt(40)) & BigInt(0xffff),
-      index: (epoch >> BigInt(24)) & BigInt(0xffff),
-      number: epoch & BigInt(0xffffff),
-    }
   }
 
   private static getMultisigParamsHex(v: number) {

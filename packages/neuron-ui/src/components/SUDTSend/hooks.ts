@@ -6,7 +6,7 @@ import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { generateChequeTransaction, generateSUDTTransaction, getHoldSUDTCellCapacity } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import { SendType } from 'utils/enums'
+import { SendType, UDTType } from 'utils/enums'
 
 export enum AddressLockType {
   secp256 = 'secp256',
@@ -37,11 +37,13 @@ export function useOptions({
   addressLockType,
   accountInfo,
   isAddressCorrect,
+  udtType,
 }: {
   address: string
   addressLockType: AddressLockType
   accountInfo: SUDTAccount | null
   isAddressCorrect: boolean
+  udtType?: UDTType
 }) {
   const [holdSUDTCellCapacity, setHoldSUDTCellCapacity] = useState<string | undefined | null>()
   useEffect(() => {
@@ -54,6 +56,7 @@ export function useOptions({
       getHoldSUDTCellCapacity({
         address,
         tokenID: accountInfo.tokenId,
+        udtType,
       })
         .then(res => {
           if (isSuccessResponse(res)) {

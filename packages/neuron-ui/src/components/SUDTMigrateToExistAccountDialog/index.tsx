@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
-import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
+import {
+  AnyoneCanPayLockInfoOnAggron,
+  getSUDTAmount,
+  getUdtType,
+  isSuccessResponse,
+  validateSpecificAddress,
+} from 'utils'
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, showGlobalAlertDialog, useDispatch } from 'states'
@@ -53,6 +59,7 @@ const SUDTMigrateToExistAccountDialog = ({
     [sUDTAccounts, tokenInfo]
   )
   const dispatch = useDispatch()
+  const udtType = getUdtType(cell.type)
   const onSubmit = useCallback(() => {
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
@@ -73,7 +80,7 @@ const SUDTMigrateToExistAccountDialog = ({
               walletID,
               actionType: 'transfer-to-sudt',
               onSuccess: () => {
-                onSuccess(t('special-assets.send-sudt-success'))
+                onSuccess(t('special-assets.send-sudt-success', { udtType }))
               },
             },
           })
@@ -92,7 +99,7 @@ const SUDTMigrateToExistAccountDialog = ({
     <Dialog
       className={styles.container}
       show
-      title={t('migrate-sudt.transfer-to-exist-account.title')}
+      title={t('migrate-sudt.transfer-to-exist-account.title', { udtType })}
       onCancel={onBack}
       cancelText={t('migrate-sudt.back')}
       confirmText={t('migrate-sudt.next')}

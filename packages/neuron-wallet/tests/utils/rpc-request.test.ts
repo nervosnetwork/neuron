@@ -1,10 +1,5 @@
 import { rpcBatchRequest, rpcRequest } from '../../src/utils/rpc-request'
 
-const requestMock = jest.fn()
-jest.mock('undici', () => ({
-  request: () => requestMock(),
-}))
-
 describe('rpc-batch-request', () => {
   const options = [
     {
@@ -17,15 +12,19 @@ describe('rpc-batch-request', () => {
     },
   ]
   it('fetch error', async () => {
-    requestMock.mockResolvedValueOnce({ statusCode: 500 })
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        status: 500,
+      })
+    ) as jest.Mock
     await expect(rpcBatchRequest('url', options)).rejects.toThrow(
       new Error(`indexer request failed with HTTP code 500`)
     )
   })
   it('result is order by id', async () => {
-    requestMock.mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        status: 200,
         json() {
           return Promise.resolve([
             {
@@ -38,8 +37,9 @@ describe('rpc-batch-request', () => {
             },
           ])
         },
-      },
-    })
+      })
+    ) as jest.Mock
+
     const res = await rpcBatchRequest('url', options)
     expect(res).toEqual([
       {
@@ -60,21 +60,25 @@ describe('rpc-request', () => {
     params: 1,
   }
   it('fetch error', async () => {
-    requestMock.mockResolvedValueOnce({ statusCode: 500 })
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        status: 500,
+      })
+    ) as jest.Mock
     await expect(rpcRequest('url', option)).rejects.toThrow(new Error(`indexer request failed with HTTP code 500`))
   })
   it('fetch success', async () => {
-    requestMock.mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        status: 200,
         json() {
           return Promise.resolve({
             id: 2,
             result: 2,
           })
         },
-      },
-    })
+      })
+    ) as jest.Mock
     const res = await rpcRequest('url', option)
     expect(res).toEqual(2)
   })

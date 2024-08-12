@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange, wakeScreen } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, wakeScreen } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -10,7 +10,7 @@ import RadioGroup from 'widgets/RadioGroup'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import { AddSimple } from 'widgets/Icons/icon'
 import DataPathDialog from 'widgets/DataPathDialog'
-import NoDiskSpaceWarn from 'widgets/Icons/NoDiskSpaceWarn.png'
+import NoDiskSpaceWarn from 'widgets/Icons/Attention.png'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
 import { keepScreenAwake } from 'services/localCache'
 import LockWindowDialog from 'components/GeneralSetting/LockWindowDialog'
@@ -28,7 +28,7 @@ const MainContent = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { networkID } = chain
-  const [t, i18n] = useTranslation()
+  const [t] = useTranslation()
 
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
 
@@ -64,6 +64,7 @@ const MainContent = () => {
     showSwitchNetwork,
     lockWindowInfo,
     setIsLockDialogShow,
+    t,
   })
 
   useOnCurrentWalletChange({
@@ -72,7 +73,6 @@ const MainContent = () => {
     navigate,
     dispatch,
   })
-  useOnLocaleChange(i18n)
   const onContextMenu = useOnDefaultContextMenu(t)
   const onCancelGlobalDialog = useCallback(() => {
     dismissGlobalAlertDialog()(dispatch)
@@ -98,47 +98,15 @@ const MainContent = () => {
     }
   }, [])
 
-  return (
-    <div onContextMenu={onContextMenu}>
-      <Outlet />
-      <AlertDialog
-        show={!!globalAlertDialog}
-        title={globalAlertDialog?.title}
-        message={globalAlertDialog?.message}
-        action={globalAlertDialog?.action}
-        type={globalAlertDialog?.type ?? 'success'}
-        onCancel={onCancelGlobalDialog}
-      />
-      <Dialog show={isMigrateDialogShow} onCancel={onCancel} title={t('messages.migrate-ckb-data')} showFooter={false}>
-        {t('messages.rebuild-sync')
-          .split('\n')
-          .map((s: string) => (
-            <p key={s}>{s}</p>
-          ))}
-        <div style={{ display: 'flex', justifyContent: 'end', columnGap: '24px' }}>
-          <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
-          <Button type="primary" label={t('common.backup')} onClick={onBackUp} />
-          <Button type="primary" label={t('messages.migrate')} onClick={onConfirm} />
-        </div>
-      </Dialog>
-      <Dialog
-        show={isSwitchNetworkShow}
-        onCancel={onCloseSwitchNetwork}
-        onConfirm={sameUrlNetworks.length ? onSwitchNetwork : onOpenEditorDialog}
-        confirmText={sameUrlNetworks.length ? undefined : t('main.external-node-detected-dialog.add-network')}
-        cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
-        title={t('main.external-node-detected-dialog.title')}
-        className={styles.networkDialog}
-      >
-        {sameUrlNetworks.length ? (
-          <span className={styles.chooseNetworkTip}>
-            {t('main.external-node-detected-dialog.body-tips-with-network')}
-          </span>
-        ) : (
-          t('main.external-node-detected-dialog.body-tips-without-network')
-        )}
-        {sameUrlNetworks.length ? (
+  const dialogProps = (function getDialogProps() {
+    if (sameUrlNetworks.length) {
+      return {
+        onConfirm: onSwitchNetwork,
+        children: (
           <>
+            <span className={styles.chooseNetworkTip}>
+              {t('main.external-node-detected-dialog.body-tips-with-network')}
+            </span>
             <div className={styles.networks}>
               <RadioGroup
                 onChange={onChangeSelected}
@@ -156,7 +124,56 @@ const MainContent = () => {
               </Button>
             </div>
           </>
-        ) : null}
+        ),
+      }
+    }
+    return {
+      onConfirm: onOpenEditorDialog,
+      confirmText: t('main.external-node-detected-dialog.add-network'),
+      children: (
+        <span className={styles.chooseNetworkTip}>
+          {t('main.external-node-detected-dialog.body-tips-without-network')}
+        </span>
+      ),
+    }
+  })()
+
+  return (
+    <div onContextMenu={onContextMenu}>
+      <Outlet />
+      <AlertDialog
+        show={!!globalAlertDialog}
+        title={globalAlertDialog?.title}
+        message={globalAlertDialog?.message}
+        action={globalAlertDialog?.action}
+        type={globalAlertDialog?.type ?? 'success'}
+        onCancel={onCancelGlobalDialog}
+        onOk={globalAlertDialog?.onOk}
+      />
+      <Dialog show={isMigrateDialogShow} onCancel={onCancel} title={t('messages.migrate-ckb-data')} showFooter={false}>
+        {t('messages.rebuild-sync')
+          .split('\n')
+          .map((s: string) => (
+            <p key={s}>{s}</p>
+          ))}
+        <div style={{ display: 'flex', justifyContent: 'end', columnGap: '24px' }}>
+          <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
+          <Button type="primary" label={t('common.backup')} onClick={onBackUp} />
+          <Button type="primary" label={t('messages.migrate')} onClick={onConfirm} />
+        </div>
+      </Dialog>
+      <Dialog
+        show={isSwitchNetworkShow}
+        onCancel={onCloseSwitchNetwork}
+        onConfirm={dialogProps.onConfirm}
+        confirmText={dialogProps.confirmText}
+        cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
+        title={t('main.external-node-detected-dialog.title')}
+        className={styles.networkDialog}
+        confirmProps={{ type: 'dashed' }}
+        cancelProps={{ type: 'dashed' }}
+      >
+        {dialogProps.children}
       </Dialog>
       {showEditorDialog ? (
         <NetworkEditorDialog

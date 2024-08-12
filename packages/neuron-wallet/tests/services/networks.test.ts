@@ -158,21 +158,27 @@ describe(`Unit tests of networks service`, () => {
   describe(`validation on parameters`, () => {
     describe(`validation on parameters`, () => {
       it(`service.create requires name, and remote`, async () => {
-        expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
-        expect(service.create('network name', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
+        await expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(
+          t(ERROR_MESSAGE.MISSING_ARG)
+        )
+        await expect(service.create('network name', undefined as any)).rejects.toThrowError(
+          t(ERROR_MESSAGE.MISSING_ARG)
+        )
       })
 
-      it(`service.update requires id, options`, () => {
-        expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
-        expect(service.update('', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
+      it(`service.update requires id, options`, async () => {
+        await expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(
+          t(ERROR_MESSAGE.MISSING_ARG)
+        )
+        await expect(service.update('', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
-      it(`service.delete requires id `, () => {
-        expect(service.delete(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
+      it(`service.delete requires id `, async () => {
+        await expect(service.delete(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
-      it(`service.activate requires id `, () => {
-        expect(service.activate(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
+      it(`service.activate requires id `, async () => {
+        await expect(service.activate(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
     })
   })
@@ -182,18 +188,18 @@ describe(`Unit tests of networks service`, () => {
       await service.create('Default', 'http://127.0.0.1:8114')
     })
 
-    it(`create network with existing name of Default`, () => {
-      expect(service.create('Default', 'http://127.0.0.1:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
+    it(`create network with existing name of Default`, async () => {
+      await expect(service.create('Default', 'http://127.0.0.1:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
     })
 
-    it(`update network which is not existing`, () => {
+    it(`update network which is not existing`, async () => {
       const id = `not-existing-id`
-      expect(service.update(id, {})).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
+      await expect(service.update(id, {})).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
 
-    it(`activate network which is not existing`, () => {
+    it(`activate network which is not existing`, async () => {
       const id = `not-existing-id`
-      expect(service.activate(id)).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
+      await expect(service.activate(id)).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
   })
 
@@ -223,6 +229,7 @@ describe(`Unit tests of networks service`, () => {
       service.readSync = readSyncMock
       service.writeSync = writeSyncMock
       service.updateAll = updateAllMock
+      service.activate = jest.fn()
     })
     afterEach(() => {
       readSyncMock.mockReset()

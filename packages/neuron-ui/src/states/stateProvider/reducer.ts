@@ -1,4 +1,4 @@
-import type { OutPoint } from '@ckb-lumos/base'
+import type { OutPoint } from '@ckb-lumos/lumos'
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
@@ -38,7 +38,6 @@ export enum AppActions {
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
   SetGlobalDialog = 'setGlobalDialog',
-  AddNotification = 'addNotification',
   DismissNotification = 'dismissNotification',
   ClearNotificationsOfCode = 'clearNotificationsOfCode',
   ClearNotifications = 'clearNotifications',
@@ -84,7 +83,6 @@ export type StateAction =
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
   | { type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }
-  | { type: AppActions.AddNotification; payload: State.Message }
   | { type: AppActions.DismissNotification; payload: number } // payload: timestamp
   | { type: AppActions.ClearNotificationsOfCode; payload: ErrorCode } // payload: code
   | { type: AppActions.ClearNotifications }
@@ -234,7 +232,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.sUDTAccounts = action.payload
         .filter(account => account.id !== undefined)
         .sort(sortAccounts)
-        .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal }) => ({
+        .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal, udtType }) => ({
           accountId: id!.toString(),
           accountName,
           tokenName,
@@ -243,6 +241,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
           address,
           decimal,
           tokenId: tokenID,
+          udtType,
         }))
       break
     }
@@ -317,18 +316,9 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.app.globalDialog = action.payload
       break
     }
-    case AppActions.AddNotification: {
-      /**
-       * payload: { type, content }
-       */
-      // NOTICE: for simplicity, only one notification will be displayed
-      state.app.notifications.push(action.payload)
-      state.app.showTopAlert = true
-      break
-    }
     case AppActions.DismissNotification: {
       /**
-       * payload: timstamp
+       * payload: timestamp
        */
       state.app.showTopAlert =
         state.app.notifications.findIndex(message => message.timestamp === action.payload) ===

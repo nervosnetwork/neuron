@@ -1,3 +1,45 @@
+# 0.117.0 (2024-08-12)
+
+### CKB Node & Light Client
+
+- [CKB@v0.117.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.117.0) was released on Jul. 29th, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.7](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.7) was released on Apr. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0xca44ae8f7bc12ba8eab3224cbe3156c913e2284693e36dc1d01e4d30f362f3c2`(at height `13,705,152`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3227)
+
+---
+
+[![Neuron@v0.117.0](https://github.com/user-attachments/assets/7d2eba67-e33e-4fca-a714-7ba1709d8bd3)](https://youtu.be/zf78Y094m60)
+
+YouTube: https://youtu.be/zf78Y094m60
+
+---
+
+## New features
+
+- #3206: Support XUDT asset management.(@yanguoyu)
+- #3207: Support connecting to an external light client.(@devchenyan)
+- #3167: Support cells consolidation.(@devchenyan)
+- #3199: Validate pending transactions periodically.(@devchenyan)
+- #3200: Optimize the process of generating a wallet.(@devchenyan)
+- #3176: Support setting start block numbers of multisig addresses.(@yanguoyu)
+- #3160: Optimize synchronization in light client mode for multiple wallets.(@yanguoyu)
+- #3169: Be compatible with multisig transaction JSON file exported from CKB CLI.(@devchenyan)
+- #3197: Support resetting pin code for window lock.(@yanguoyu)
+- #3194: Add a tip for multisig addresses.(@yanguoyu)
+
+## Bug fixes
+
+- #3195: Fix the synchronization status check.(@yanguoyu)
+
+## New Contributors
+
+- @tcpdumppy made their first contribution in https://github.com/nervosnetwork/neuron/pull/3182
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.116.2...v0.117.0
+
 # 0.116.2 (2024-05-29)
 
 ### CKB Node & Light Client
@@ -57,18 +99,18 @@ YouTube: https://youtu.be/QXv8by2C8zU
 
 ## New features
 
-- 3134: Support 'replace-by-fee' nervos dao transactions and sudt transactions.(@devchenyan)
-- 3144: Reduce size of light client log in debug information and reveal start-block-number in log.(@yanguoyu)
-- 3064: Support locking window by pin code.(@yanguoyu)
-- 3131: Add detailed result for nervos dao transaction.(@devchenyan)
+- #3134: Support 'replace-by-fee' nervos dao transactions and sudt transactions.(@devchenyan)
+- #3144: Reduce size of light client log in debug information and reveal start-block-number in log.(@yanguoyu)
+- #3064: Support locking window by pin code.(@yanguoyu)
+- #3131: Add detailed result for nervos dao transaction.(@devchenyan)
 
 ## Bug fixes
 
-- 3121: Locate the first transaction on Explorer directly when users want to set the start-block-number for light client.(@yanguoyu)
-- 3101: Show migration instruction properly.(@devchenyan)
-- 3062: Migrate legacy ACP to active ACP account(@yanguoyu)
-- 3141: Fix some issues about light client synchronizaiton.(@yanguoyu)
-- 3120: Remove all sync data when start-block-number is set less than before.(@yanguoyu)
+- #3121: Locate the first transaction on Explorer directly when users want to set the start-block-number for light client.(@yanguoyu)
+- #3101: Show migration instruction properly.(@devchenyan)
+- #3062: Migrate legacy ACP to active ACP account(@yanguoyu)
+- #3141: Fix some issues about light client synchronizaiton.(@yanguoyu)
+- #3120: Remove all sync data when start-block-number is set less than before.(@yanguoyu)
 
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.114.3...v0.116.0
 

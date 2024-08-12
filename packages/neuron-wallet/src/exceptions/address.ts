@@ -39,10 +39,18 @@ export class NoMatchAddressForSign extends Error {
   }
 }
 
+export class AddressRequired extends Error {
+  public code = 311
+  constructor() {
+    super(t('messages.address-required'))
+  }
+}
+
 export default {
   InvalidAddress,
   MainnetAddressRequired,
   TestnetAddressRequired,
   AddressNotFound,
   NoMatchAddressForSign,
+  AddressRequired,
 }

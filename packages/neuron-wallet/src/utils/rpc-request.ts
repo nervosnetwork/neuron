@@ -1,5 +1,3 @@
-import { request } from 'undici'
-
 export const rpcRequest = async <T = any>(
   url: string,
   options: {
@@ -7,7 +5,7 @@ export const rpcRequest = async <T = any>(
     params?: any
   }
 ): Promise<T> => {
-  const res = await request(url, {
+  const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({
       id: 0,
@@ -19,10 +17,10 @@ export const rpcRequest = async <T = any>(
       'content-type': 'application/json',
     },
   })
-  if (res.statusCode !== 200) {
-    throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
+  if (res.status !== 200) {
+    throw new Error(`indexer request failed with HTTP code ${res.status}`)
   }
-  const body = await res.body.json()
+  const body = await res.json()
   if (body !== null && typeof body === 'object' && 'result' in body) {
     return body?.result as T
   }
@@ -36,7 +34,7 @@ export const rpcBatchRequest = async (
     params?: any
   }[]
 ): Promise<any[]> => {
-  const res = await request(url, {
+  const res = await fetch(url, {
     headers: {
       'content-type': 'application/json',
     },
@@ -50,10 +48,10 @@ export const rpcBatchRequest = async (
       }))
     ),
   })
-  if (res.statusCode !== 200) {
-    throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
+  if (res.status !== 200) {
+    throw new Error(`indexer request failed with HTTP code ${res.status}`)
   }
-  const responseBody = await res.body.json()
+  const responseBody = await res.json()
   if (Array.isArray(responseBody) && responseBody.every(i => 'id' in i)) {
     return responseBody.sort((a, b) => a.id - b.id)
   }

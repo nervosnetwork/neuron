@@ -6,7 +6,6 @@ const STUB_START_MESSAGE = {
     genesisHash: 'stub_genesis_hash',
     url: 'stub_url',
     addressMetas: 'stub_address_metas',
-    indexerUrl: 'stub_indexer_url',
     nodeType: 2,
   },
 }
@@ -71,8 +70,8 @@ describe(`Block Sync Task`, () => {
       expect(stubbedSyncQueue).toHaveBeenCalledWith(
         STUB_START_MESSAGE.message.url,
         STUB_START_MESSAGE.message.addressMetas,
-        STUB_START_MESSAGE.message.indexerUrl,
-        STUB_START_MESSAGE.message.nodeType
+        STUB_START_MESSAGE.message.nodeType,
+        undefined
       )
       expect(stubbedSyncQueueStart).toHaveBeenCalled()
     })

@@ -1,4 +1,4 @@
-import type { OutPoint } from '@ckb-lumos/base'
+import type { OutPoint } from '@ckb-lumos/lumos'
 import CellLocalInfoService from '../../src/services/cell-local-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'

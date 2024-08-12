@@ -122,6 +122,7 @@ export default {
       'connect-device-failed': 'The device cannot be connected, please check your connection.',
       'unsupported-manufacturer': 'Devices from {{manufacturer}} are not yet supported.',
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
+      'unsupported-ckb-cli-keystore': "Neuron does not support importing ckb-cli's keystore file.",
       'invalid-transaction-file': 'Invalid transaction file.',
       'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
       'multisig-script-prefix-error': 'The multisig config is error',
@@ -140,6 +141,7 @@ export default {
         '{{path}} has no CKB Node config and storage, press confirm to synchronize from scratch',
       'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account",
       'could-not-connect-service': 'Could not connect to the service, please try again later.',
+      'address-required': 'The address cannot be empty.',
     },
     messageBox: {
       button: {

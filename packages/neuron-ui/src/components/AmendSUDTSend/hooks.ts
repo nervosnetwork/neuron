@@ -46,11 +46,10 @@ export const useInitialize = ({
 
   const fetchInitData = useCallback(async () => {
     const {
-      // @ts-expect-error Replace-By-Fee (RBF)
-      min_replace_fee: minFee,
+      minReplaceFee,
       transaction: { outputsData },
     } = await getOnChainTransaction(hash)
-    if (!minFee) {
+    if (!minReplaceFee) {
       setIsConfirmedAlertShown(true)
     }
 
@@ -76,8 +75,8 @@ export const useInitialize = ({
       setTransaction({ ...tx, outputsData })
 
       setSize(tx.size)
-      if (minFee) {
-        const mPrice = ((BigInt(minFee) * BigInt(FEE_RATIO)) / BigInt(tx.size)).toString()
+      if (minReplaceFee) {
+        const mPrice = ((BigInt(minReplaceFee) * BigInt(FEE_RATIO)) / BigInt(tx.size)).toString()
         setMinPrice(mPrice)
         setPrice(mPrice)
       }
@@ -98,9 +97,8 @@ export const useInitialize = ({
         return
       }
       try {
-        // @ts-expect-error Replace-By-Fee (RBF)
-        const { min_replace_fee: minFee } = await getOnChainTransaction(hash)
-        if (!minFee) {
+        const { minReplaceFee } = await getOnChainTransaction(hash)
+        if (!minReplaceFee) {
           setIsConfirmedAlertShown(true)
           return
         }

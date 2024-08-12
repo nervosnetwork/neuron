@@ -1,4 +1,4 @@
-import { BI } from '@ckb-lumos/bi'
+import { BI } from '@ckb-lumos/lumos'
 import TypeChecker from '../../utils/type-checker'
 
 export default class OutPoint {

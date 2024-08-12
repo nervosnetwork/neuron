@@ -1,4 +1,6 @@
-import { AddressType } from '@ckb-lumos/hd'
+import { hd } from '@ckb-lumos/lumos'
+
+type AddressType = hd.AddressType
 
 export enum Manufacturer {
   Ledger = 'Ledger',

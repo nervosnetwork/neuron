@@ -2,9 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/lumos/utils'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import { ResponseCode } from '../utils/const'
+import { parseMultisigTxJsonFromCkbCli } from '../utils/multisig'
 import MultisigConfig from '../database/chain/entities/multisig-config'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigService from '../services/multisig'
@@ -14,6 +15,10 @@ import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
+import { NetworkType } from '../models/network'
+import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-db-changed-subject'
+import { LightRPC } from '../utils/ckb-rpc'
+import SyncProgressService from '../services/sync-progress'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -55,6 +60,23 @@ export default class MultisigController {
     }
   }
 
+  async resetMultisigSync(config: MultisigConfig, startBlockNumber: number) {
+    const network = NetworksService.getInstance().getCurrent()
+    const lightRpc = new LightRPC(network.remote)
+    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+    await lightRpc.setScripts(
+      [
+        {
+          script,
+          blockNumber: `0x${startBlockNumber.toString(16)}`,
+          scriptType: 'lock' as CKBRPC.ScriptType,
+        },
+      ],
+      'partial'
+    )
+    SyncProgressService.resetMultisigSync(scriptToHash(script), startBlockNumber)
+  }
+
   async updateConfig(params: {
     id: number
     walletId?: string
@@ -63,8 +85,19 @@ export default class MultisigController {
     n?: number
     addresses?: string[]
     alias?: string
+    startBlockNumber?: number
   }) {
+    const config = await this.#multisigService.getMultisigConfigById(params.id)
     const result = await this.#multisigService.updateMultisigConfig(params)
+    const network = NetworksService.getInstance().getCurrent()
+    if (params.startBlockNumber && network.type === NetworkType.Light) {
+      if (config?.startBlockNumber !== undefined && config.startBlockNumber > params.startBlockNumber) {
+        // if set small than last, reset by set_script
+        this.resetMultisigSync(config, params.startBlockNumber)
+      }
+      // if it's light client, restart queue task
+      MultisigConfigDbChangedSubject.getSubject().next('UpdateStartBlockNumber')
+    }
     return {
       status: ResponseCode.Success,
       result,
@@ -214,7 +247,12 @@ export default class MultisigController {
     }
     const tx = result.json
     const lockHash = scriptToHash(addressToScript(fullPayload))
-    if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
+
+    if (tx.transaction) {
+      tx.transaction = parseMultisigTxJsonFromCkbCli(tx)
+    }
+
+    if (tx.transaction.inputs.every(v => v.lockHash && v.lockHash !== lockHash)) {
       ShowGlobalDialogSubject.next({
         type: 'failed',
         title: t('common.error'),
@@ -226,7 +264,7 @@ export default class MultisigController {
     }
     return {
       status: ResponseCode.Success,
-      result: result?.json,
+      result: tx,
     }
   }
 }

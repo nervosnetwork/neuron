@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { useState as useGlobalState, useDispatch, AppActions, showGlobalAlertDialog } from 'states'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Pagination from 'widgets/Pagination'
@@ -195,14 +195,11 @@ const SpecialAssetList = () => {
             setCells(items)
             setTotalCount(+count)
           } else {
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'alert',
-                timestamp: +new Date(),
-                content: typeof res.message === 'string' ? res.message : res.message.content!,
-              },
-            })
+            showGlobalAlertDialog({
+              type: 'failed',
+              message: typeof res.message === 'string' ? res.message : res.message.content!,
+              action: 'ok',
+            })(dispatch)
           }
         })
         .then(() => {
@@ -238,6 +235,7 @@ const SpecialAssetList = () => {
         symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
         decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
         isCKB: false,
+        udtType: accountToClaim.account.udtType,
         onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
           const params: any = accountToClaim?.account || {}
           Object.keys(info).forEach(key => {
@@ -279,10 +277,11 @@ const SpecialAssetList = () => {
       } = e.target
       const cell = cells.find(c => c.outPoint.txHash === txHash && c.outPoint.index === idx)
       if (!cell) {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: { type: 'alert', timestamp: +new Date(), content: 'Cannot find the cell' },
-        })
+        showGlobalAlertDialog({
+          type: 'failed',
+          message: 'Cannot find the cell',
+          action: 'ok',
+        })(dispatch)
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
@@ -321,14 +320,11 @@ const SpecialAssetList = () => {
               },
             })
           } else {
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'alert',
-                timestamp: +new Date(),
-                content: typeof res.message === 'string' ? res.message : res.message.content!,
-              },
-            })
+            showGlobalAlertDialog({
+              type: 'failed',
+              message: typeof res.message === 'string' ? res.message : res.message.content!,
+              action: 'ok',
+            })(dispatch)
           }
         }
       switch (cell.customizedAssetInfo.lock) {
@@ -354,14 +350,11 @@ const SpecialAssetList = () => {
                   })
                 }
               } else {
-                dispatch({
-                  type: AppActions.AddNotification,
-                  payload: {
-                    type: 'alert',
-                    timestamp: +new Date(),
-                    content: typeof res.message === 'string' ? res.message : res.message.content!,
-                  },
-                })
+                showGlobalAlertDialog({
+                  type: 'failed',
+                  message: typeof res.message === 'string' ? res.message : res.message.content!,
+                  action: 'ok',
+                })(dispatch)
               }
             })
           } else {
@@ -371,6 +364,12 @@ const SpecialAssetList = () => {
           }
           break
         }
+        default: {
+          // ignore
+        }
+      }
+      switch (cell.customizedAssetInfo.type) {
+        case PresetScript.XUDT:
         case PresetScript.SUDT: {
           setMigrateCell(cell)
           const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
@@ -379,9 +378,8 @@ const SpecialAssetList = () => {
           setIsMigrateDialogOpen(true)
           break
         }
-        default: {
-          // ignore
-        }
+        default:
+          break
       }
     },
     [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList, handleActionSuccess]
@@ -437,8 +435,15 @@ const SpecialAssetList = () => {
                   customizedAssetInfo,
                 } = item
 
-                const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
-                  handleGetSpecialAssetColumnInfo(item)
+                const {
+                  status,
+                  targetTime,
+                  isLockedCheque,
+                  isNFTTransferable,
+                  isNFTClassOrIssuer,
+                  epochsInfo,
+                  udtType,
+                } = handleGetSpecialAssetColumnInfo(item)
 
                 if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
                   return (
@@ -458,22 +463,15 @@ const SpecialAssetList = () => {
                   ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) || isLockedCheque
 
                 if (showTip) {
-                  if (customizedAssetInfo.lock !== PresetScript.Cheque || isLockedCheque) {
-                    tip = t(`special-assets.${status}-tooltip`, {
-                      epochs: epochsInfo?.target.toFixed(2),
-                      year: targetTime ? new Date(targetTime).getFullYear() : '',
-                      month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-                      day: targetTime ? new Date(targetTime).getDate() : '',
-                      hour: targetTime ? new Date(targetTime).getHours() : '',
-                      minute: targetTime ? new Date(targetTime).getMinutes() : '',
-                    })
-                  }
-                  if (status === 'user-defined-token') {
-                    tip = t('special-assets.user-defined-asset-tooltip')
-                  }
-                  if (status === 'user-defined-token') {
-                    tip = t('special-assets.user-defined-token-tooltip')
-                  }
+                  tip = t(`special-assets.${status}-tooltip`, {
+                    udtType,
+                    epochs: epochsInfo?.target.toFixed(2),
+                    year: targetTime ? new Date(targetTime).getFullYear() : '',
+                    month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                    day: targetTime ? new Date(targetTime).getDate() : '',
+                    hour: targetTime ? new Date(targetTime).getHours() : '',
+                    minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                  })
                 }
 
                 const btnDisabled =
@@ -490,10 +488,10 @@ const SpecialAssetList = () => {
                           data-idx={index}
                           data-status={status}
                           type="primary"
-                          label={t(`special-assets.${status}`)}
+                          label={t(`special-assets.${status}`, { udtType })}
                           className={styles.actionBtn}
                           onClick={handleAction}
-                          disabled={btnDisabled}
+                          disabled={!!btnDisabled}
                         />
                       </Tooltip>
                     ) : (
@@ -505,7 +503,7 @@ const SpecialAssetList = () => {
                         label={t(`special-assets.${status}`)}
                         className={styles.actionBtn}
                         onClick={handleAction}
-                        disabled={btnDisabled}
+                        disabled={!!btnDisabled}
                       />
                     )}
                     <Button

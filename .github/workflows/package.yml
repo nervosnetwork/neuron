@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.12.0
+          - 20.15.1
         os:
           - macos-latest
           - ubuntu-20.04
@@ -42,7 +42,7 @@ jobs:
           cache: "yarn"
 
       - name: Restore
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -51,7 +51,7 @@ jobs:
 
       - name: Add msbuild to PATH
         if: matrix.os == 'windows-2019'
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
@@ -102,6 +102,11 @@ jobs:
           yarn
         env:
           CI: false
+
+        # Inject LOG_ENCRYPTION_PUBLIC_KEY to encrypt sensitive log
+      - name: Inject environment variables
+        run: |
+          echo "LOG_ENCRYPTION_PUBLIC_KEY=${{ secrets.LOG_ENCRYPTION_PUBLIC_KEY }}" >> packages/neuron-wallet/.env
 
       - name: Package for MacOS
         if: matrix.os == 'macos-latest'
