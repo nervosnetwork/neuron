@@ -157,8 +157,6 @@ test.describe('overview page tests', () => {
     console.log('查看设置的起始区块数是否成功');
     page.waitForTimeout(60000);
     await page.screenshot({path: "./test-results/watch_block_number.png"});
-    await page.getByTitle('History').click();
-    await page.screenshot({path: "./test-results/history.png"});
     await page.getByTitle('Overview').click();
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
@@ -171,6 +169,8 @@ test.describe('overview page tests', () => {
     test.setTimeout(480000);
     await page.waitForTimeout(420000);
     await page.screenshot({path: "./test-results/7min-sync.png"});
+    await page.getByTitle('History').click();
+    await page.screenshot({path: "./test-results/history.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
