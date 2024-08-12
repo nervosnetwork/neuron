@@ -17,6 +17,10 @@ export default class LogEncryption {
    */
   private readonly adminPublicKey: string
 
+  public get isEnabled(): boolean {
+    return !!this.adminPublicKey
+  }
+
   /**
    *
    * @param adminPublicKey a PEM-formatted RSA public key
