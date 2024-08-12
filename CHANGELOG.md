@@ -11,9 +11,9 @@ Block before `0xca44ae8f7bc12ba8eab3224cbe3156c913e2284693e36dc1d01e4d30f362f3c2
 
 ---
 
-<!-- [![Neuron@v0.117.0](https://github.com/Magickbase/neuron-public-issues/assets/7271329/ec10aa01-47fe-47a3-9636-3d4e86fc6c9b)](https://youtu.be/QXv8by2C8zU) -->
+[![Neuron@v0.117.0](https://github.com/user-attachments/assets/7d2eba67-e33e-4fca-a714-7ba1709d8bd3)](https://youtu.be/zf78Y094m60)
 
-<!-- YouTube: https://youtu.be/QXv8by2C8zU -->
+YouTube: https://youtu.be/zf78Y094m60
 
 ---
 
