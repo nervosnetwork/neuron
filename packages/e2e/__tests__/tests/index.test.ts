@@ -168,6 +168,7 @@ test.describe('overview page tests', () => {
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
     test.setTimeout(480000);
     await page.waitForTimeout(420000);
+    await page.screenshot({path: "./test-results/after-timeout.png"});
     await page.screenshot({path: "./test-results/7min-sync.png"});
     await page.getByTitle('History').click();
     await page.screenshot({path: "./test-results/history.png"});
