@@ -169,7 +169,7 @@ test.describe('overview page tests', () => {
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
     test.setTimeout(480000);
-    await page.waitForTimeout(20_000);
+    await page.waitForTimeout(240000);
     await page.locator("id=amount").fill("103.4");
     await page.screenshot({path: "./test-results/7min-sync.png"});
     await page.getByTitle('History').click();
