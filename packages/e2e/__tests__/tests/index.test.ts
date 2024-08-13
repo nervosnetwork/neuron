@@ -92,7 +92,7 @@ test("Create Wallet", async () => {
     await page.getByPlaceholder("Repeat Password").click();
     await page.getByPlaceholder("Repeat Password").fill("Aa111111");
     await page.getByLabel("Finish Creating").click();
-    await page.getByRole('button', {name: 'Start Sync'}).click();
+    await page.getByRole('button', {name: 'Start Sync'}).click({ delay: 1_000 });
     console.log('主网环境已进入！');
 
     // await page.waitForTimeout(20000);
@@ -135,9 +135,10 @@ test.describe('overview page tests', () => {
     console.log('点击设置成功');
     // await page.locator('dialog').filter({ hasText: /^Confirm$/ }).getByLabel('Confirm')
     //   .click();
-    await page.getByText('Light Client (http://127.0.0.1:9000)').click();
+    await page.getByText('Light Client (http://127.0.0.1:9000)').click({ delay: 2_000 });
     console.log('点击轻节点成功');
     //CI 环境轻节点需要从主网到测试网
+    await page.getByText('Light Client (http://127.0.0.1:9000)').hover({ timeout: 2_000 });
     await page.locator('//*[@id="root"]/div/div/div[2]/div/div[3]/div[2]/div/div/div[2]/div/div/div/div/button/*[name()="svg"]').click();
     console.log('轻节点主网切换到测试网成功');
     // await scheduler.wait(20_000)
@@ -161,16 +162,18 @@ test.describe('overview page tests', () => {
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('点击交易发送按钮成功');
-    test.setTimeout(600000);
-    await page.waitForTimeout(540000);
-    await page.screenshot({path: "./test-results/9min-sync.png"});
+
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     console.log('输入地址成功');
     await page.locator("id=amount").fill("103.5");
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
-    // await page.getByTitle('History').click();
-    // await page.screenshot({path: "./test-results/history.png"});
+    test.setTimeout(480000);
+    await page.waitForTimeout(20_000);
+    await page.locator("id=amount").fill("103.4");
+    await page.screenshot({path: "./test-results/7min-sync.png"});
+    await page.getByTitle('History').click();
+    await page.screenshot({path: "./test-results/history.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');

@@ -33,7 +33,7 @@
     "package:e2e": "yarn build && ./scripts/copy-ui-files.sh",
     "package:test": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package-for-test.sh",
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel --load-env-files=false test",
-    "test:e2e": "cd packages/e2e && yarn test:e2e",
+    "test:e2e": "./scripts/reset-e2e-data.sh && yarn build:main && cd packages/e2e && yarn test:e2e",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
     "postinstall": "husky install",
