@@ -129,7 +129,7 @@ test.describe('overview page tests', () => {
     //等待同步100%才能操作发送交易
     // await page.waitForTimeout(60000);
     //切换到轻节点，并确定同步到100%
-
+    test.setTimeout(480000);
     await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByTitle('Settings').click();
     console.log('点击设置成功');
@@ -168,7 +168,6 @@ test.describe('overview page tests', () => {
     await page.locator("id=amount").fill("103.5");
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
-    test.setTimeout(480000);
     await page.waitForTimeout(240000);
     await page.locator("id=amount").fill("103.4");
     await page.screenshot({path: "./test-results/7min-sync.png"});
