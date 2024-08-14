@@ -179,7 +179,10 @@ test.describe('overview page tests', () => {
     console.log('输入密码成功');
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('点击确认成功');
+    await page.screenshot({path: "./test-results/after_confirm.png"});
+
     await page.waitForTimeout(480000);
+    await page.screenshot({path: "./test-results/after_8min.png"});
     await expect(page.getByText('Success').first()).toBeVisible();
     console.log('发送交易成功！');
   });
