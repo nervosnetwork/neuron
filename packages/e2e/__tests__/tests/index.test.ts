@@ -250,7 +250,7 @@ test("check transaction history", async () => {
   let EnterKey = "Enter";
   await page.keyboard.press(EnterKey);
   await page.screenshot({path: "./test-results/0814history_record.png"});
-  // await expect(page.getByText('1 - 15 of 20')).toBeVisible();
+  // await expect(page.getByText('1 - 7 of 7')).toBeVisible();
 /*await page.getByRole('button', {name: '导出交易历史'}).click();
   await ClickSystemMenu.clickMenu('./__tests__/script/', 'dialogClick.scpt');
   await page.waitForSelector('//!*[@id="root"]/div/dialog[1]/div/button');
@@ -302,10 +302,16 @@ test.describe('实验性功能', () => {
   test("send ", async () => {
     //上笔记录为完成状态
     await page.getByRole('button', {name: 'Send'}).first().click();
+    console.log('account 点击发送成功');
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqggcska5fafwdlfw9g0cttk5uzdcvuqj4qqz5d7q");
+    console.log('account 填写地址成功');
     await page.locator("id=amount").fill("0.001");
+    console.log('account 填写数量成功');
+    await page.screenshot({path: "./test-results/account_send.png"});
     await page.getByRole('button', {name: 'Submit'}).click();
+    console.log('accout submit成功');
     await page.locator("id=password").fill('Aa111111');
+    console.log('account 填写密码成功');
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('sudt账号发送交易成功！');
   });
