@@ -288,6 +288,7 @@ test.describe('实验性功能', () => {
 
   test("receive ", async () => {
     await page.getByRole('button', {name: 'Receive'}).first().click();
+    await page.screenshot({path: "./test-results/account_receive.png"});
     console.log('点击收款成功！');
     await page.locator('//*[@id="root"]/div/div/div[2]/div/dialog/div[2]/div/div[2]/div[2]/div').click();
     console.log('点击地址成功！');
