@@ -67,6 +67,18 @@ $ yarn start:ui
 $ yarn start:wallet
 ```
 
+If you want to develop with devnet, replace the testnet script with the dev script in the `packages/neuron-wallet/.env` file.
+
+Here is a script env example, it is constructed by network、script name and filed name.
+
+```
+TESTNET_SUDT_DEP_TXHASH=0xe12877ebd2c3c364dc46c5c992bcfaf4fee33fa13eebdf82c591fc9825aab769
+TESTNET_SUDT_DEP_INDEX=0
+TESTNET_SUDT_DEP_TYPE=code
+TESTNET_SUDT_SCRIPT_CODEHASH=0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4
+TESTNET_SUDT_SCRIPT_HASHTYPE=type
+```
+
 ### Test
 
 ```shell
