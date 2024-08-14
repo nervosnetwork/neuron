@@ -120,8 +120,8 @@ export default class SettingsService extends Store {
       '',
       'settings.json',
       JSON.stringify({
-        // locale: app.getLocale(),
-        locale: 'en',
+        locale: app.getLocale(),
+        // locale: 'en',
         ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet'),
         isFirstSync: true,
         [settingKeys.lockWindow]: {
