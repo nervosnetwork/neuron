@@ -129,7 +129,7 @@ test.describe('overview page tests', () => {
     //等待同步100%才能操作发送交易
     // await page.waitForTimeout(60000);
     //切换到轻节点，并确定同步到100%
-    test.setTimeout(480000);
+    test.setTimeout(480*1000);
     await page.screenshot({path: "./test-results/send_transaction_1.png"});
     await page.getByTitle('Settings').click();
     console.log('点击设置成功');
@@ -141,10 +141,10 @@ test.describe('overview page tests', () => {
     await page.getByText('Light Client (http://127.0.0.1:9000)').hover({ timeout: 2_000 });
     await page.locator('//*[@id="root"]/div/div/div[2]/div/div[3]/div[2]/div/div/div[2]/div/div/div/div/button/*[name()="svg"]').click();
     console.log('轻节点主网切换到测试网成功');
-    // await scheduler.wait(20_000)
+    await page.waitForTimeout(20000);
     // await page.screenshot({path: "./test-results/send_transaction.png"});
     await page.locator('.syncStatus_syncing__LiW3Q').click()
-    await page.waitForTimeout(10000);
+    // await page.waitForTimeout(10000);
     await page.screenshot({path: "./test-results/send_transaction_2.png"});
     await page.getByText('Set start block number').click();
     console.log('点击设置区块数成功');
@@ -162,17 +162,17 @@ test.describe('overview page tests', () => {
     await page.screenshot({path: "./test-results/send_transaction_3.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('点击交易发送按钮成功');
-
+    await page.waitForTimeout(120000);
     await page.locator("id=address").fill("ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2glcd40rclyg8zmv6a9uzun0stz5rzp9q4jzxqs");
     console.log('输入地址成功');
     await page.locator("id=amount").fill("103.5");
     console.log('输入金额成功');
     await page.screenshot({path: "./test-results/send_transaction_4.png"});
-    await page.waitForTimeout(240000);
-    await page.locator("id=amount").fill("103.4");
-    await page.screenshot({path: "./test-results/7min-sync.png"});
-    await page.getByTitle('History').click();
-    await page.screenshot({path: "./test-results/history.png"});
+    // await page.waitForTimeout(120000);
+    // await page.locator("id=amount").fill("103.4");
+    await page.screenshot({path: "./test-results/2min-sync.png"});
+    // await page.getByTitle('History').click();
+    // await page.screenshot({path: "./test-results/history.png"});
     await page.getByRole('button', {name: 'Send'}).click();
     console.log('输入金额后发送成功');
     await page.locator("id=password").fill('Aa111111');
