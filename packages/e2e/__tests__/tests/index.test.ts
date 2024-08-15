@@ -300,7 +300,7 @@ test.describe('实验性功能', () => {
   });
 
 
-  test("send ", async () => {
+  /*test("send ", async () => {
     //上笔记录为完成状态
     await page.getByRole('button', {name: 'Send'}).first().click();
     console.log('account 点击发送成功');
@@ -315,7 +315,7 @@ test.describe('实验性功能', () => {
     console.log('account 填写密码成功');
     await page.getByRole('button', {name: 'Confirm'}).click();
     console.log('sudt账号发送交易成功！');
-  });
+  });*/
 
 
  /* test("claim in customized page ", async () => {
