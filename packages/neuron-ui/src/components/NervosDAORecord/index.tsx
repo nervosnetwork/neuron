@@ -91,7 +91,7 @@ export const DAORecord = ({
     epochParser(withdrawEpoch || currentEpoch)
   )
 
-  const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
+  const leftEpochs = Math.max((compensationEndEpochValue || 0) - currentEpochValue, 0)
 
   let leftHours = ''
   let leftDays = ''
