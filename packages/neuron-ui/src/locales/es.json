@@ -767,7 +767,8 @@
           "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{days}} días",
           "compensation-cycle-will-end-hours": "El ciclo de compensación termina en aproximadamente {{hours}} horas",
           "compensation-cycle-has-ended": "El ciclo ha terminado, CKB está listo para ser desbloqueado",
-          "unlocking": "Desbloqueando..."
+          "unlocking": "Desbloqueando...",
+          "calculating-the-compensation-cycle": "Calculando el ciclo de compensación"
         }
       }
     },
