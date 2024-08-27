@@ -174,9 +174,16 @@ jobs:
           name: Neuron-Win
           path: release/Neuron-*-setup.exe
 
-      - name: Upload Neuron Linux
+      - name: Upload Neuron Linux(x64)
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v4
         with:
-          name: Neuron-Linux
-          path: release/Neuron-*.AppImage
+          name: Neuron-Linux-x64
+          path: release/Neuron-*-x86_64.AppImage
+
+      - name: Upload Neuron Linux(arm64)
+        if: matrix.os == 'ubuntu-20.04'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Neuron-Linux-arm64
+          path: release/Neuron-*-arm64.AppImage
