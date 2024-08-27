@@ -777,7 +777,8 @@
           "compensation-cycle-will-end": "补偿周期约在 {{days}} 天后结束",
           "compensation-cycle-will-end-hours": "补偿周期约在 {{hours}} 小时后结束",
           "compensation-cycle-has-ended": "补偿周期已结束, 可以解锁 CKB",
-          "unlocking": "解锁中..."
+          "unlocking": "解锁中...",
+          "calculating-the-compensation-cycle": "正在计算补偿周期"
         }
       }
     },

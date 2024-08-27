@@ -774,7 +774,8 @@
           "compensation-cycle-will-end": "La période de compensation se termine dans environ {{days}} jours",
           "compensation-cycle-will-end-hours": "La période de compensation se termine dans environ {{hours}} heures",
           "compensation-cycle-has-ended": "Le cycle est terminé, les CKB sont prêts à être déverrouillés",
-          "unlocking": "Déverrouillage en cours..."
+          "unlocking": "Déverrouillage en cours...",
+          "calculating-the-compensation-cycle": "Calculer le cycle de compensation"
         }
       }
     },

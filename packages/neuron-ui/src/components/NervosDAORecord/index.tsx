@@ -137,7 +137,9 @@ export const DAORecord = ({
         break
       }
       case CellStatus.Deposited: {
-        if (leftHours) {
+        if (!compensationEndEpochValue) {
+          message = t('nervos-dao.compensation-period.stage-messages.calculating-the-compensation-cycle')
+        } else if (leftHours) {
           message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle-hours', {
             hours: leftHours || '--',
           })
@@ -149,7 +151,9 @@ export const DAORecord = ({
         break
       }
       case CellStatus.Locked: {
-        if (leftHours) {
+        if (!compensationEndEpochValue) {
+          message = t('nervos-dao.compensation-period.stage-messages.calculating-the-compensation-cycle')
+        } else if (leftHours) {
           message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end-hours', {
             hours: leftHours || '--',
           })
