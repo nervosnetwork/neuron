@@ -18,8 +18,8 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
   const handleGetFeeRateStatis = useCallback(() => {
     getFeeRateStatistics()
       .then(res => {
-        const { mean, median } = res ?? {}
-        const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
+        const { median } = res ?? {}
+        const suggested = median ? Math.max(1000, Number(median)) : MEDIUM_FEE_RATE
 
         setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
       })
