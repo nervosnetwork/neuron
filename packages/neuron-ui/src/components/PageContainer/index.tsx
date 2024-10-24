@@ -132,22 +132,24 @@ const PageContainer: React.FC<ComponentProps> = props => {
         </div>
         {notice && <PageHeadNotice notice={notice} />}
       </div>
-      {showWaitForFullySynced && (
-        <Alert status="warn" className={styles.syncNotification}>
-          {t(`messages.codes.${ErrorCode.WaitForFullySynced}`)}
-          <Close className={styles.close} onClick={closeSyncNotice} />
-        </Alert>
-      )}
-      <div className={styles.body}>{children}</div>
-      <SetStartBlockNumberDialog
-        show={isSetStartBlockShown}
-        headerTipNumber={bestKnownBlockNumber}
-        initStartBlockNumber={walletStartBlockNumber ? Number(walletStartBlockNumber) : undefined}
-        isMainnet={isMainnet}
-        address={addresses[0]?.address}
-        onUpdateStartBlockNumber={onConfirm}
-        onCancel={closeDialog}
-      />
+      <div className={styles.content}>
+        {showWaitForFullySynced && (
+          <Alert status="warn" className={styles.syncNotification}>
+            {t(`messages.codes.${ErrorCode.WaitForFullySynced}`)}
+            <Close className={styles.close} onClick={closeSyncNotice} />
+          </Alert>
+        )}
+        <div className={styles.body}>{children}</div>
+        <SetStartBlockNumberDialog
+          show={isSetStartBlockShown}
+          headerTipNumber={bestKnownBlockNumber}
+          initStartBlockNumber={walletStartBlockNumber ? Number(walletStartBlockNumber) : undefined}
+          isMainnet={isMainnet}
+          address={addresses[0]?.address}
+          onUpdateStartBlockNumber={onConfirm}
+          onCancel={closeDialog}
+        />
+      </div>
     </div>
   )
 }
