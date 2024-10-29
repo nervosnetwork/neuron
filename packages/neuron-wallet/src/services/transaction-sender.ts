@@ -755,13 +755,13 @@ export default class TransactionSender {
 
     const withdrawFraction = withdrawEpoch.index * depositEpoch.length
     const depositFraction = depositEpoch.index * withdrawEpoch.length
-    let depositedEpoches = withdrawEpoch.number - depositEpoch.number
+    let depositedEpochs = withdrawEpoch.number - depositEpoch.number
     if (withdrawFraction > depositFraction) {
-      depositedEpoches += BigInt(1)
+      depositedEpochs += BigInt(1)
     }
-    const lockEpoches =
-      ((depositedEpoches + (DAO_LOCK_PERIOD_EPOCHS - BigInt(1))) / DAO_LOCK_PERIOD_EPOCHS) * DAO_LOCK_PERIOD_EPOCHS
-    const minimalSinceEpochNumber = depositEpoch.number + lockEpoches
+    const lockEpochs =
+      ((depositedEpochs + (DAO_LOCK_PERIOD_EPOCHS - BigInt(1))) / DAO_LOCK_PERIOD_EPOCHS) * DAO_LOCK_PERIOD_EPOCHS
+    const minimalSinceEpochNumber = depositEpoch.number + lockEpochs
     const minimalSinceEpochIndex = depositEpoch.index
     const minimalSinceEpochLength = depositEpoch.length
 
