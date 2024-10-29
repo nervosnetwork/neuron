@@ -46,9 +46,6 @@
   "jest": {
     "displayName": "UI Tests"
   },
-  "browserslist": [
-    "last 2 chrome versions"
-  ],
   "dependencies": {
     "@ckb-lumos/lumos": "0.23.0",
     "@ckb-lumos/bi": "0.23.0",
