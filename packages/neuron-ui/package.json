@@ -108,7 +108,7 @@
     "react-test-renderer": "18.2.0",
     "storybook": "7.6.6",
     "storybook-addon-react-router-v6": "2.0.10",
-    "webpack": "5.89.0"
+    "webpack": "5.94.0"
   },
   "resolutions": {
     "react-i18next": "14.0.0"
