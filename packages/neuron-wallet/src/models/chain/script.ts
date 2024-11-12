@@ -6,6 +6,7 @@ export enum ScriptHashType {
   Data = 'data',
   Type = 'type',
   Data1 = 'data1',
+  Data2 = 'data2',
 }
 
 export default class Script {
