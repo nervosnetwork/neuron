@@ -6,6 +6,7 @@ const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,
   data1: ScriptHashType.Data1,
   data: ScriptHashType.Data,
+  data2: ScriptHashType.Data2,
 }
 
 export type CellWithOutPoint = Cell & { outPoint: IOutPoint }
