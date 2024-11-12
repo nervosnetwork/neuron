@@ -13,9 +13,6 @@ export const scriptToAddress = (
   { isMainnet = true, deprecated = false }: { isMainnet?: boolean; deprecated?: boolean }
 ) => {
   const config = { config: isMainnet ? MAINNET : TESTNET }
-  if (['data1', 'data2'].includes(script.hashType)) {
-    return encodeToAddress(script, config)
-  }
   return deprecated ? generateAddress(script, config) : encodeToAddress(script, config)
 }
 
