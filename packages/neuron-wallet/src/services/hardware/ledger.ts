@@ -1,7 +1,7 @@
 import { DeviceInfo, ExtendedPublicKey } from './common'
 import { Hardware } from './hardware'
 import HID from '@ledgerhq/hw-transport-node-hid'
-import LedgerCKB from 'hw-app-ckb'
+import LedgerCKB from '@magickbase/hw-app-ckb'
 import type { DescriptorEvent, Subscription, Observer } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'

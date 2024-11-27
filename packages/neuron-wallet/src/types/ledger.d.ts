@@ -1,7 +1,7 @@
 // Until there's a @types/hw-app-ckb
 // import type Transport from '@ledgerhq/hw-transport'
 declare module '@ledgerhq/hw-transport-node-ble'
-declare module 'hw-app-ckb' {
+declare module '@magickbase/hw-app-ckb' {
   export interface WalletPublicKey {
     publicKey: string
     lockArg: string
