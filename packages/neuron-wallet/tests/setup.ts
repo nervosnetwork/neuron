@@ -112,6 +112,6 @@ jest.mock('@ledgerhq/hw-transport-node-hid', () => {
   return LedgerHID
 })
 
-jest.mock('hw-app-ckb', () => {
+jest.mock('@magickbase/hw-app-ckb', () => {
   return LedgerCkbApp
 })
