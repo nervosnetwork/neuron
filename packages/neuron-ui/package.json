@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.117.0",
+  "version": "0.119.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -47,15 +47,15 @@
     "displayName": "UI Tests"
   },
   "dependencies": {
-    "@ckb-lumos/lumos": "0.23.0",
-    "@ckb-lumos/bi": "0.23.0",
-    "@ckb-lumos/rpc": "0.23.0",
     "@ckb-lumos/base": "0.23.0",
+    "@ckb-lumos/bi": "0.23.0",
     "@ckb-lumos/codec": "0.23.0",
+    "@ckb-lumos/common-scripts": "0.23.0",
+    "@ckb-lumos/config-manager": "0.23.0",
     "@ckb-lumos/hd": "0.23.0",
     "@ckb-lumos/helpers": "0.23.0",
-    "@ckb-lumos/config-manager": "0.23.0",
-    "@ckb-lumos/common-scripts": "0.23.0",
+    "@ckb-lumos/lumos": "0.23.0",
+    "@ckb-lumos/rpc": "0.23.0",
     "canvg": "2.0.0",
     "i18next": "23.7.11",
     "immer": "9.0.21",
