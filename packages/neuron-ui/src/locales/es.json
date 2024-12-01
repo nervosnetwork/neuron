@@ -456,7 +456,10 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
+        "ar":"العربية",
         "fr": "Français",
+        "fr-CA": "Français(Canadiens)",
+        "fr-BE": "Français(Belge)",
         "es": "Español"
       },
       "data": {

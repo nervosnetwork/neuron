@@ -73,7 +73,7 @@ mac:
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
   entitlementsInherit: assets/entitlements.plist
-  electronLanguages: ["en", "zh", "zh_CN", "zh_TW"]
+  electronLanguages: ["en", "zh", "zh_CN", "zh_TW", "fr"]
   target:
     - target: default
       arch:
