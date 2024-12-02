@@ -778,7 +778,8 @@
           "compensation-cycle-will-end": "補償週期約在 {{days}} 天后結束",
           "compensation-cycle-will-end-hours": "補償週期約在 {{hours}} 小時后結束",
           "compensation-cycle-has-ended": "補償週期已結束, 可以解鎖 CKB",
-          "unlocking": "解鎖中..."
+          "unlocking": "解鎖中...",
+          "calculating-the-compensation-cycle": "正在計算補償週期"
         }
       }
     },

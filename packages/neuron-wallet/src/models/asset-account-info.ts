@@ -1,5 +1,4 @@
 import { bytes, struct, createFixedBytesCodec } from '@ckb-lumos/lumos/codec'
-import { predefined } from '@ckb-lumos/config-manager'
 import CellDep, { DepType } from './chain/cell-dep'
 import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
@@ -9,6 +8,7 @@ import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 import { UDTType } from '../utils/const'
 import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
+import { AGGRON4, LINA } from '../utils/systemScripts'
 
 const createFixedHexBytesCodec = (byteLength: number) =>
   createFixedBytesCodec({ byteLength, pack: bytes.bytify, unpack: bytes.hexify })
@@ -48,7 +48,7 @@ export default class AssetAccountInfo {
 
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     const isMainnet = genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH
-    const { XUDT, SUDT, ANYONE_CAN_PAY } = isMainnet ? predefined.LINA.SCRIPTS : predefined.AGGRON4.SCRIPTS
+    const { XUDT, SUDT, ANYONE_CAN_PAY } = isMainnet ? LINA.SCRIPTS : AGGRON4.SCRIPTS
     this.xudt = {
       cellDep: new CellDep(new OutPoint(XUDT.TX_HASH, XUDT.INDEX), XUDT.DEP_TYPE as DepType),
       codeHash: XUDT.CODE_HASH,
