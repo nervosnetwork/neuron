@@ -1,3 +1,25 @@
+# 0.119.0 (2024-12-02)
+
+### CKB Node & Light Client
+
+- [CKB@v0.119.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.119.0) was released on Oct. 25th, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.4.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.4.1) was released on Nov. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x7488acf2280ebf5b83c805a517f766eab77f45cd51f61476811d1ce96a60ea71`(at height `14,687,217`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3268)
+
+---
+
+## Bug fixes
+
+- #3239: Fix abnormal display of remaining time of Nervos DAO.(@devchenyan)
+- #3246: Use the median fee rate instead of the average as a more appropriate reference for fee rate.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.117.0...v0.119.0
+
+
 # 0.117.0 (2024-08-12)
 
 ### CKB Node & Light Client
