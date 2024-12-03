@@ -111,6 +111,11 @@ describe('Get Local Month Short Names', () => {
     expect(getLocalMonthShortNames('fr')).toEqual(names)
   })
 
+  it('Arabic', () => {
+    const names = ['ينا.', 'فبر.', 'مارس.', 'أبر.', 'مايو.', 'يون.', 'يول.', 'أغس.', 'سبت.', 'أكت.', 'نوف.', 'ديس.']
+    expect(getLocalMonthShortNames('ar')).toEqual(names)
+  })
+
   it('Spanish', () => {
     const names = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic']
     expect(getLocalMonthShortNames('es')).toEqual(names)
@@ -157,6 +162,24 @@ describe('Get Local Month Names', () => {
     expect(getLocalMonthNames('fr')).toEqual(names)
   })
 
+  it('Arabic', () => {
+    const names = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
+    ]
+    expect(getLocalMonthNames('ar')).toEqual(names)
+  })
+
   it('Spanish', () => {
     const names = [
       'enero',
@@ -195,6 +218,11 @@ describe('Get Local Week Names', () => {
   it('French', () => {
     const names = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
     expect(getLocalWeekNames('fr')).toEqual(names)
+  })
+
+  it('Arabic', () => {
+    const names = ['ح', 'إ', 'ث', 'أ', 'خ', 'ج', 'س']
+    expect(getLocalWeekNames('ar')).toEqual(names)
   })
 
   it('Traditional Chinese', () => {

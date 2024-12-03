@@ -1,5 +1,5 @@
 const sendSyncValues = {
-  'get-locale': ('zh', 'fr', 'es'),
+  'get-locale': ('zh', 'fr', 'es', 'ar'),
   'get-version': '0.103.1',
 }
 

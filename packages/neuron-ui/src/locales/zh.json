@@ -463,10 +463,13 @@
       },
       "locale": {
         "en": "English",
-        "en-US": "English(United States)",
-        "zh": "中文(简体)",
-        "zh-TW": "中文(繁體)",
+        "en-US": "English (United States)",
+        "zh": "中文 (简体)",
+        "zh-TW": "中文 (繁體)",
+        "ar": "العربية",
         "fr": "Français",
+        "fr-CA": "Français (Canada)",
+        "fr-BE": "Français (Belgique)",
         "es": "Español"
       },
       "data": {

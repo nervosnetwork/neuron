@@ -7,14 +7,18 @@ import en from 'locales/en.json'
 import zhTW from 'locales/zh-tw.json'
 import fr from 'locales/fr.json'
 import es from 'locales/es.json'
+import ar from 'locales/ar.json'
 
 i18n.use(initReactI18next).init({
   resources: {
     en,
     fr,
+    ar,
     es,
     zh,
     'zh-TW': zhTW,
+    'fr-CA': fr,
+    'fr-BE': fr,
   },
   lng: getLocale(),
   fallbackLng: {
