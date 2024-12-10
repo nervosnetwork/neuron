@@ -76,6 +76,7 @@ const initState: WithWizardState = {
   password: '',
   confirmPassword: '',
   name: '',
+  isHardware: false,
 }
 
 const submissionInputs = [
@@ -182,6 +183,8 @@ const Welcome = ({ rootPath = '/wizard/', wallets = [], dispatch }: WizardElemen
 
 Welcome.displayName = 'Welcome'
 
+const LEDGER_WORDS_COUNT = 24
+
 const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: WizardElementProps) => {
   const { generated, imported } = state
   const navigate = useNavigate()
@@ -193,8 +196,9 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
     [MnemonicAction.Verify]: 'wizard.replenish-your-seed',
     [MnemonicAction.Import]: 'wizard.input-your-seed',
   }[type]
-  const { inputsWords, onChangeInput, setInputsWords } = useInputWords()
   const [searchParams] = useSearchParams()
+  const isHardware = searchParams.get('isHardware') === 'true'
+  const { inputsWords, onChangeInput, setInputsWords } = useInputWords(isHardware ? LEDGER_WORDS_COUNT : undefined)
   const disableNext =
     (type === MnemonicAction.Import && inputsWords.some(v => !v)) ||
     (type === MnemonicAction.Verify && generated !== inputsWords.join(' '))
@@ -228,6 +232,14 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
       })
     }
   }, [dispatch, type, navigate, setBlankIndexes])
+  useEffect(() => {
+    if (isHardware) {
+      dispatch({
+        type: 'isHardware',
+        payload: true,
+      })
+    }
+  }, [dispatch, isHardware])
 
   const globalDispatch = useDispatch()
 
@@ -317,6 +329,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
         inputsWords={inputsWords}
         onChangeInputWord={onChangeInput}
         blankIndexes={MnemonicAction.Import ? undefined : blankIndexes}
+        wordsCount={isHardware ? LEDGER_WORDS_COUNT : undefined}
       />
       {type === MnemonicAction.Import && <div className={styles.tips}>{t('wizard.input-seed-first-empty-space')}</div>}
       <div className={styles.actions}>
@@ -337,7 +350,7 @@ export const getAlertStatus = (fieldInit: boolean, success: boolean) => {
 }
 
 const Submission = ({ state = initState, wallets = [], dispatch }: WizardElementProps) => {
-  const { name, password, confirmPassword, imported } = state
+  const { name, password, confirmPassword, imported, isHardware } = state
   const navigate = useNavigate()
   const { type = MnemonicAction.Create } = useParams<{ type: MnemonicAction }>()
   const [t] = useTranslation()
@@ -396,6 +409,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
         name,
         password,
         mnemonic: imported,
+        isHardware,
       }
       openDialog()
       setTimeout(() => {
