@@ -368,9 +368,12 @@ export default class ApiController {
       return this.#walletsController.activate(id)
     })
 
-    handle('import-mnemonic', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return this.#walletsController.importMnemonic(params)
-    })
+    handle(
+      'import-mnemonic',
+      async (_, params: { name: string; password: string; mnemonic: string; isHardware?: boolean }) => {
+        return this.#walletsController.importMnemonic(params)
+      }
+    )
 
     handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
       return this.#walletsController.importKeystore(params)
