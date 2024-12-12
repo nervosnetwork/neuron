@@ -231,6 +231,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               importHardware(URL.ImportHardware)
             },
           },
+          {
+            id: 'import-hardware-seed',
+            label: t('application-menu.wallet.import-hardware-mnemonic'),
+            click: () => {
+              importHardware(`${URL.ImportMnemonic}?isHardware=true`)
+            },
+          },
         ],
       },
       separator,
