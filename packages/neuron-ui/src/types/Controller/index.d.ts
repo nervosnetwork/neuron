@@ -215,7 +215,7 @@ declare namespace Controller {
     interface Response {
       cellDep: any
       codeHash: string
-      hashType: 'data' | 'type'
+      hashType: 'data' | 'type' | 'data1' | 'data2'
     }
   }
   interface SUDTAccount {

@@ -401,6 +401,7 @@ function toScriptInfo(sporeConfig: SporeScript): ScriptCellInfo {
     if (sporeScriptHashType === 'type') return ScriptHashType.Type
     if (sporeScriptHashType === 'data') return ScriptHashType.Data
     if (sporeScriptHashType === 'data1') return ScriptHashType.Data1
+    if (sporeScriptHashType === 'data2') return ScriptHashType.Data2
 
     throw new Error(`Invalid hash type: ${sporeScriptHashType}`)
   })()

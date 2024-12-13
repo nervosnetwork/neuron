@@ -30,7 +30,7 @@ export interface SpecialAssetCell {
   lock: {
     args: string
     codeHash: string
-    hashType: 'type' | 'data'
+    hashType: 'type' | 'data' | 'data1' | 'data2'
   }
   lockHash: string
   multiSignBlake160: string
