@@ -1,3 +1,27 @@
+# 0.120.0 (2024-12-13)
+
+### CKB Node & Light Client
+
+- [CKB@v0.120.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.120.0) was released on Dec. 12th, 2024. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.4.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.4.1) was released on Nov. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0xe1085c7ce8f4e8461ea75afe63ef21d2c1ce6a5d0bf0f0170042bebdd2fbde04`(at height `14,817,366`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3282)
+
+---
+
+## New features
+
+- #3271: Support Arabic, FrCanadian/Belgian in User Interface.(@Natixe)
+
+## New Contributors
+
+- @Natixe made their first contribution in https://github.com/nervosnetwork/neuron/pull/3271
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.119.0...v0.120.0
+
+
 # 0.119.0 (2024-12-02)
 
 ### CKB Node & Light Client
