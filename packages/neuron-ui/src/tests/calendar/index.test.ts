@@ -112,7 +112,20 @@ describe('Get Local Month Short Names', () => {
   })
 
   it('Arabic', () => {
-    const names = ['ينا.', 'فبر.', 'مارس.', 'أبر.', 'مايو.', 'يون.', 'يول.', 'أغس.', 'سبت.', 'أكت.', 'نوف.', 'ديس.']
+    const names = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
+    ]
     expect(getLocalMonthShortNames('ar')).toEqual(names)
   })
 
@@ -221,7 +234,7 @@ describe('Get Local Week Names', () => {
   })
 
   it('Arabic', () => {
-    const names = ['ح', 'إ', 'ث', 'أ', 'خ', 'ج', 'س']
+    const names = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']
     expect(getLocalWeekNames('ar')).toEqual(names)
   })
 
