@@ -2,7 +2,7 @@ import Ledger from '../../../src/services/hardware/ledger'
 
 const getWalletExtendedPublicKeyMock = jest.fn()
 
-jest.mock('hw-app-ckb', () => {
+jest.mock('@magickbase/hw-app-ckb', () => {
   return function () {
     return {
       getWalletExtendedPublicKey: getWalletExtendedPublicKeyMock,
