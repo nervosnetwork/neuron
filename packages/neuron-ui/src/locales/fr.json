@@ -382,7 +382,10 @@
       "request-payment": "Demander un paiement",
       "view-on-explorer": "Voir sur l'explorateur",
       "default-description": "Aucun",
-      "all-address": "Toutes"
+      "all-address": "Toutes",
+      "view-private-key": "Voir la clé privée",
+      "private-key": "Clé privée",
+      "view-private-key-tip": "Si vous perdez votre clé privée, vos actifs seront perdus. (Voir dans un environnement sécurisé)"
     },
     "settings": {
       "title": {
