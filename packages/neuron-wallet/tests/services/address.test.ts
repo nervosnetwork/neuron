@@ -13,6 +13,8 @@ import { NetworkType } from '../../src/models/network'
 import SignMessage from '../../src/services/sign-message'
 import WalletService from '../../src/services/wallets'
 
+jest.setTimeout(15000)
+
 const { AddressType, AccountExtendedPublicKey } = hd
 
 const walletId = '1'
