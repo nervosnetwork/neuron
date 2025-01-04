@@ -123,7 +123,7 @@ const SUDTAccountList = () => {
           break
         }
         setReceiveData({
-          acccountId: account.accountId,
+          acccountID: account.acccountID,
           address: account.address,
           accountName: account.accountName ?? DEFAULT_SUDT_FIELDS.accountName,
           tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
