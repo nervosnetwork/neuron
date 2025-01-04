@@ -13,7 +13,7 @@ const { DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 export interface DataProps {
   address: string
-  acccountID: string
+  accountId: string
   accountName: string
   tokenName: string
   symbol: string
@@ -22,7 +22,7 @@ export interface DataProps {
 const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () => void }) => {
   const [t] = useTranslation()
   const [isInShortFormat, setIsInShortFormat] = useState(false)
-  const { address, acccountID, accountName, tokenName, symbol } = data
+  const { address, accountId, accountName, tokenName, symbol } = data
 
   const displayedAddr = isInShortFormat ? addressToAddress(address, { deprecated: true }) : address
 
@@ -53,7 +53,7 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
 
         <AddressQrCodeWithCopyZone
           showAddress={displayedAddr}
-          assetAccountId={acccountID}
+          assetAccountId={accountId}
           isInShortFormat={isInShortFormat}
           onClick={() => setIsInShortFormat(is => !is)}
         />
