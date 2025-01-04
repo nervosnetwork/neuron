@@ -35,7 +35,7 @@ const ViewPrivateKey = ({ onClose, address }: { onClose?: () => void; address?: 
   )
 
   const onSubmit = useCallback(
-    async (e?: React.FormEvent) => {
+    (e?: React.FormEvent) => {
       if (e) {
         e.preventDefault()
       }
@@ -43,23 +43,21 @@ const ViewPrivateKey = ({ onClose, address }: { onClose?: () => void; address?: 
         return
       }
       setIsLoading(true)
-      try {
-        const res = await getPrivateKeyByAddress({
-          walletID,
-          address,
-          password,
+      getPrivateKeyByAddress({
+        walletID,
+        address,
+        password,
+      })
+        .then(res => {
+          if (!isSuccessResponse(res)) {
+            setError(errorFormatter(res.message, t))
+            return
+          }
+          setPrivateKey(res.result)
         })
-
-        setIsLoading(false)
-
-        if (!isSuccessResponse(res)) {
-          setError(errorFormatter(res.message, t))
-          return
-        }
-        setPrivateKey(res.result)
-      } catch (err) {
-        setIsLoading(false)
-      }
+        .finally(() => {
+          setIsLoading(false)
+        })
     },
     [walletID, password, setError, t]
   )

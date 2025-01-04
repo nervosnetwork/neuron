@@ -748,7 +748,9 @@ describe('integration tests for AddressService', () => {
         const addresses = await wallet.checkAndGenerateAddresses(false, 5, 5)
 
         if (addresses) {
-          const obj = addresses[Math.floor(Math.random() * addresses.length)]
+          const crypto = require('crypto')
+          const randomIndex = crypto.randomInt(addresses.length)
+          const obj = addresses[randomIndex]
           address = obj.address
         }
 
