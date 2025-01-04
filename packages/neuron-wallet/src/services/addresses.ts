@@ -452,21 +452,25 @@ export default class AddressService {
 
   public static async getPrivateKeyByAddress({
     walletID,
+    assetAccountId,
     password,
     address,
   }: {
     walletID: string
+    assetAccountId?: string
     password: string
     address?: string
   }): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
-
     const addresses = await AddressService.getAddressesByWalletId(walletID)
     let addr = address ? addresses.find(addr => addr.address === address) : addresses[0]
 
-    if (!addr) {
-      const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
-      addr = addresses.find(a => !usedBlake160s.has(a.blake160))!
+    if (assetAccountId) {
+      const assetAccount = await AssetAccountService.getAccount({ walletID, id: Number(assetAccountId) })
+      if (!assetAccount) {
+        throw new AddressNotFound()
+      }
+      addr = addresses.find(a => a.blake160 === assetAccount.blake160)
     }
 
     if (!addr) {

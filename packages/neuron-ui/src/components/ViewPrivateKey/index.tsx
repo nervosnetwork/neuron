@@ -9,7 +9,15 @@ import { Attention, Copy } from 'widgets/Icons/icon'
 import { getPrivateKeyByAddress } from 'services/remote'
 import styles from './viewPrivateKey.module.scss'
 
-const ViewPrivateKey = ({ onClose, address }: { onClose?: () => void; address?: string }) => {
+const ViewPrivateKey = ({
+  onClose,
+  address,
+  assetAccountId,
+}: {
+  onClose?: () => void
+  address?: string
+  assetAccountId?: string
+}) => {
   const [t] = useTranslation()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -45,6 +53,7 @@ const ViewPrivateKey = ({ onClose, address }: { onClose?: () => void; address?: 
       setIsLoading(true)
       getPrivateKeyByAddress({
         walletID,
+        assetAccountId,
         address,
         password,
       })

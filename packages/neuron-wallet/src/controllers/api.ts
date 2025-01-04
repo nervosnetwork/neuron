@@ -440,9 +440,10 @@ export default class ApiController {
       return this.#walletsController.getAllAddresses(id)
     })
 
-    handle('get-private-key-by-address', async (_, { walletID, password, address }) => {
+    handle('get-private-key-by-address', async (_, { walletID, assetAccountId, password, address }) => {
       return this.#walletsController.getPrivateKeyByAddress({
         walletID,
+        assetAccountId,
         password,
         address,
       })

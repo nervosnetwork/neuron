@@ -15,12 +15,14 @@ import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 
 type AddressTransformWithCopyZoneProps = {
   showAddress: string
+  assetAccountId?: string
   isInShortFormat: boolean
   onClick: () => void
 }
 
 export const AddressQrCodeWithCopyZone = ({
   showAddress,
+  assetAccountId,
   isInShortFormat,
   onClick,
 }: AddressTransformWithCopyZoneProps) => {
@@ -92,7 +94,13 @@ export const AddressQrCodeWithCopyZone = ({
         </div>
       </div>
 
-      {showViewPrivateKey && <ViewPrivateKey address={showAddress} onClose={() => setShowViewPrivateKey(false)} />}
+      {showViewPrivateKey && (
+        <ViewPrivateKey
+          address={showAddress}
+          assetAccountId={assetAccountId}
+          onClose={() => setShowViewPrivateKey(false)}
+        />
+      )}
     </div>
   )
 }

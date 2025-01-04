@@ -4,6 +4,7 @@ import OutputEntity from '../../src/database/chain/entities/output'
 import { bytes } from '@ckb-lumos/lumos/codec'
 import { hd } from '@ckb-lumos/lumos'
 import { Address } from '../../src/models/address'
+import AssetAccount from '../../src/models/asset-account'
 import Transaction from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
 import { when } from 'jest-when'
@@ -12,8 +13,7 @@ import { closeConnection, getConnection, initConnection } from '../setupAndTeard
 import { NetworkType } from '../../src/models/network'
 import SignMessage from '../../src/services/sign-message'
 import WalletService from '../../src/services/wallets'
-
-jest.setTimeout(15000)
+import AssetAccountService from '../../src/services/asset-account-service'
 
 const { AddressType, AccountExtendedPublicKey } = hd
 
@@ -720,11 +720,13 @@ describe('integration tests for AddressService', () => {
       const message = 'Hello World'
       let address = 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqwe5xyvcxv95l22x8c5ra8tkc0jgxhvrqsda3p3k'
 
-      beforeEach(() => {
-        walletService.clearAll()
-      })
+      let walletID = ''
 
-      it('return private key', async () => {
+      beforeAll(() => {
+        jest.setTimeout(15000)
+
+        walletService.clearAll()
+
         const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)
         const masterKeychain = hd.Keychain.fromSeed(seed)
         const extendedKey = new hd.ExtendedPrivateKey(
@@ -746,9 +748,11 @@ describe('integration tests for AddressService', () => {
           extendedKey: accountExtendedPublicKey.serialize(),
           keystore,
         })
+        walletID = wallet.id
+      })
 
-        const addresses = await wallet.checkAndGenerateAddresses(false, 5, 5)
-
+      it('hdWallet address', async () => {
+        const addresses = await walletService.get(walletID).checkAndGenerateAddresses(false, 5, 5)
         if (addresses) {
           const crypto = require('crypto')
           const randomIndex = crypto.randomInt(addresses.length)
@@ -757,21 +761,57 @@ describe('integration tests for AddressService', () => {
         }
 
         const privateKey = await AddressService.getPrivateKeyByAddress({
-          walletID: wallet.id,
-          password: password,
+          walletID,
+          password,
           address,
         })
 
         // @ts-ignore: Private method
         const sig = SignMessage.signByPrivateKey(privateKey, message)
         const signature = await SignMessage.sign({
-          walletID: wallet.id,
-          password: password,
-          message: message,
+          walletID,
+          password,
+          message,
           address,
         })
 
         expect(sig).toEqual(signature)
+      })
+
+      it('asset account address', async () => {
+        const addresses = await walletService.get(walletID).getNextReceivingAddresses()
+        const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
+        const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))
+
+        if (addrObj) {
+          const assetAccount = AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160: addrObj.blake160,
+          })
+
+          const privateKey = await AddressService.getPrivateKeyByAddress({
+            walletID,
+            accountId: assetAccount.id,
+            password,
+            address,
+          })
+
+          // @ts-ignore: Private method
+          const sig = SignMessage.signByPrivateKey(privateKey, message)
+          const signature = await SignMessage.sign({
+            walletID,
+            password,
+            message,
+            address,
+          })
+
+          expect(sig).toEqual(signature)
+        }
       })
     })
   })
