@@ -1,6 +1,7 @@
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import { hd } from '@ckb-lumos/lumos'
 import { Address } from '../../src/models/address'
 import Transaction from '../../src/database/chain/entities/transaction'
@@ -9,6 +10,8 @@ import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
+import SignMessage from '../../src/services/sign-message'
+import WalletService from '../../src/services/wallets'
 
 const { AddressType, AccountExtendedPublicKey } = hd
 
@@ -705,6 +708,66 @@ describe('integration tests for AddressService', () => {
           addresses: [...receiving, ...change],
         })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('getPrivateKeyByAddress', () => {
+      const walletService = WalletService.getInstance()
+      const mnemonic = 'tank planet champion pottery together intact quick police asset flower sudden question'
+      const password = '1234abc~'
+      const message = 'Hello World'
+      let address = 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqwe5xyvcxv95l22x8c5ra8tkc0jgxhvrqsda3p3k'
+
+      beforeEach(() => {
+        walletService.clearAll()
+      })
+
+      it('return private key', async () => {
+        const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)
+        const masterKeychain = hd.Keychain.fromSeed(seed)
+        const extendedKey = new hd.ExtendedPrivateKey(
+          bytes.hexify(masterKeychain.privateKey),
+          bytes.hexify(masterKeychain.chainCode)
+        )
+
+        const keystore = hd.Keystore.create(extendedKey, password)
+
+        const accountKeychain = masterKeychain.derivePath(hd.AccountExtendedPublicKey.ckbAccountPath)
+        const accountExtendedPublicKey = new hd.AccountExtendedPublicKey(
+          bytes.hexify(accountKeychain.publicKey),
+          bytes.hexify(accountKeychain.chainCode)
+        )
+
+        const wallet = walletService.create({
+          id: '',
+          name: 'Test Wallet',
+          extendedKey: accountExtendedPublicKey.serialize(),
+          keystore,
+        })
+
+        const addresses = await wallet.checkAndGenerateAddresses(false, 5, 5)
+
+        if (addresses) {
+          const obj = addresses[Math.floor(Math.random() * addresses.length)]
+          address = obj.address
+        }
+
+        const privateKey = await AddressService.getPrivateKeyByAddress({
+          walletID: wallet.id,
+          password: password,
+          address,
+        })
+
+        // @ts-ignore: Private method
+        const sig = SignMessage.signByPrivateKey(privateKey, message)
+        const signature = await SignMessage.sign({
+          walletID: wallet.id,
+          password: password,
+          message: message,
+          address,
+        })
+
+        expect(sig).toEqual(signature)
       })
     })
   })
