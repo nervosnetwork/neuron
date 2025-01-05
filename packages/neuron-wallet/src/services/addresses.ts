@@ -2,8 +2,7 @@ import { hd } from '@ckb-lumos/lumos'
 import { bytes } from '@ckb-lumos/lumos/codec'
 import WalletService from './wallets'
 import { AddressNotFound } from '../exceptions'
-import { publicKeyToAddress, DefaultAddressNumber } from '../utils/scriptAndAddress'
-import AssetAccountService from './asset-account-service'
+import { publicKeyToAddress, DefaultAddressNumber, addressToScript } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import NetworksService from '../services/networks'
@@ -452,12 +451,10 @@ export default class AddressService {
 
   public static async getPrivateKeyByAddress({
     walletID,
-    assetAccountId,
     password,
     address,
   }: {
     walletID: string
-    assetAccountId?: string
     password: string
     address?: string
   }): Promise<string> {
@@ -465,12 +462,9 @@ export default class AddressService {
     const addresses = await AddressService.getAddressesByWalletId(walletID)
     let addr = address ? addresses.find(addr => addr.address === address) : addresses[0]
 
-    if (assetAccountId) {
-      const assetAccount = await AssetAccountService.getAccount({ walletID, id: Number(assetAccountId) })
-      if (!assetAccount) {
-        throw new AddressNotFound()
-      }
-      addr = addresses.find(a => a.blake160 === assetAccount.blake160)
+    if (!addr && address) {
+      const lock = addressToScript(address)
+      addr = addresses.find(a => a.blake160 === lock.args)
     }
 
     if (!addr) {

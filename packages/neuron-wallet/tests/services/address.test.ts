@@ -4,16 +4,13 @@ import OutputEntity from '../../src/database/chain/entities/output'
 import { bytes } from '@ckb-lumos/lumos/codec'
 import { hd } from '@ckb-lumos/lumos'
 import { Address } from '../../src/models/address'
-import AssetAccount from '../../src/models/asset-account'
 import Transaction from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
 import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
-import SignMessage from '../../src/services/sign-message'
 import WalletService from '../../src/services/wallets'
-import AssetAccountService from '../../src/services/asset-account-service'
 
 const { AddressType, AccountExtendedPublicKey } = hd
 
@@ -717,8 +714,20 @@ describe('integration tests for AddressService', () => {
       const walletService = WalletService.getInstance()
       const mnemonic = 'tank planet champion pottery together intact quick police asset flower sudden question'
       const password = '1234abc~'
-      const message = 'Hello World'
-      let address = 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqwe5xyvcxv95l22x8c5ra8tkc0jgxhvrqsda3p3k'
+
+      const addressObj = {
+        walletId: '5af2473e-78f5-4799-a193-d2b1c2989838',
+        address: 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqvfewjgc69nj783sh03nuckxjacwr55vwgngf9dr',
+        path: "m/44'/309'/0'/0/0",
+        addressType: 0,
+        addressIndex: 0,
+        blake160: '0x89cba48c68b3978f185df19f31634bb870e94639',
+      }
+
+      const privateKey = '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
+
+      const AddressService = require('../../src/services/addresses').default
+      const getAddressesByWalletIdMock = jest.spyOn(AddressService, 'getAddressesByWalletId')
 
       let walletID = ''
 
@@ -751,67 +760,16 @@ describe('integration tests for AddressService', () => {
         walletID = wallet.id
       })
 
-      it('hdWallet address', async () => {
-        const addresses = await walletService.get(walletID).checkAndGenerateAddresses(false, 5, 5)
-        if (addresses) {
-          const crypto = require('crypto')
-          const randomIndex = crypto.randomInt(addresses.length)
-          const obj = addresses[randomIndex]
-          address = obj.address
-        }
+      it('getPrivateKeyByAddress', async () => {
+        getAddressesByWalletIdMock.mockReturnValueOnce([addressObj])
 
-        const privateKey = await AddressService.getPrivateKeyByAddress({
+        const pk = await AddressService.getPrivateKeyByAddress({
           walletID,
           password,
-          address,
+          address: addressObj.address,
         })
 
-        // @ts-ignore: Private method
-        const sig = SignMessage.signByPrivateKey(privateKey, message)
-        const signature = await SignMessage.sign({
-          walletID,
-          password,
-          message,
-          address,
-        })
-
-        expect(sig).toEqual(signature)
-      })
-
-      it('asset account address', async () => {
-        const addresses = await walletService.get(walletID).getNextReceivingAddresses()
-        const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
-        const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))
-
-        if (addrObj) {
-          const assetAccount = AssetAccount.fromObject({
-            tokenID: 'CKBytes',
-            symbol: 'ckb',
-            tokenName: 'ckb',
-            decimal: '0',
-            balance: '0',
-            accountName: 'ckb',
-            blake160: addrObj.blake160,
-          })
-
-          const privateKey = await AddressService.getPrivateKeyByAddress({
-            walletID,
-            accountId: assetAccount.id,
-            password,
-            address,
-          })
-
-          // @ts-ignore: Private method
-          const sig = SignMessage.signByPrivateKey(privateKey, message)
-          const signature = await SignMessage.sign({
-            walletID,
-            password,
-            message,
-            address,
-          })
-
-          expect(sig).toEqual(signature)
-        }
+        expect(pk).toEqual(privateKey)
       })
     })
   })

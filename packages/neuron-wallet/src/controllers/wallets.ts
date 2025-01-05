@@ -702,18 +702,15 @@ export default class WalletsController {
 
   public async getPrivateKeyByAddress({
     walletID,
-    assetAccountId,
     password,
     address,
   }: {
     walletID: string
-    assetAccountId?: string
     password: string
     address?: string
   }) {
     const privateKey = await AddressService.getPrivateKeyByAddress({
       walletID,
-      assetAccountId,
       password,
       address,
     })

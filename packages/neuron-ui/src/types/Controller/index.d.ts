@@ -186,7 +186,6 @@ declare namespace Controller {
 
   interface GetPrivateKeyParams {
     walletID: string
-    assetAccountId?: string
     address?: string
     password: string
   }
