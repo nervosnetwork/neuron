@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+import { dialog } from 'electron'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
 import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
@@ -330,6 +332,19 @@ export default class TransactionSender {
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       if (!multisigConfig) {
+        const res = await dialog.showMessageBox({
+          type: 'warning',
+          message: t('messageBox.unrecognized-lock-script.message'),
+          buttons: [
+            t('messageBox.unrecognized-lock-script.buttons.cancel'),
+            t('messageBox.unrecognized-lock-script.buttons.ignore'),
+          ],
+          defaultId: 0,
+          cancelId: 1,
+        })
+        if (res.response === 1) {
+          continue
+        }
         throw new MultisigConfigNeedError()
       }
       const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigConfig.blake160s, tx.signatures?.[lockHash])
