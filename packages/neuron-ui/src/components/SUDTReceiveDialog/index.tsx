@@ -13,7 +13,6 @@ const { DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 export interface DataProps {
   address: string
-  accountId: string
   accountName: string
   tokenName: string
   symbol: string

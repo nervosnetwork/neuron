@@ -14,7 +14,6 @@ type Story = StoryObj<typeof SUDTReceiveDialog>
 export const Default: Story = {
   args: {
     data: {
-      accountId: '1',
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j1',
       accountName: 'account name',
       tokenName: 'token name',
