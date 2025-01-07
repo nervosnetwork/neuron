@@ -139,7 +139,6 @@ const SignAndVerify = () => {
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
-  // const [addressError, setAddressError] = useState('')
   const {
     chain: { networkID },
     settings: { networks },
