@@ -15,7 +15,7 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
     suggestFeeRate: number
   }>({ suggestFeeRate: MEDIUM_FEE_RATE })
 
-  const handleGetFeeRateStatis = useCallback(() => {
+  const handleGetFeeRateStatistics = useCallback(() => {
     getFeeRateStatistics()
       .then(res => {
         const { median } = res ?? {}
@@ -50,7 +50,7 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
 
   useEffect(() => {
     if (countDown === seconds) {
-      handleGetFeeRateStatis()
+      handleGetFeeRateStatistics()
     }
   }, [countDown, seconds])
 
