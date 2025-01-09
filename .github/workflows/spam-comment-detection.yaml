@@ -46,4 +46,4 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO_OWNER: ${{github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-          SPAM_WORDS: ${{ github.secrets.SPAM_WORDS }}
+          SPAM_WORDS: ${{ secrets.SPAM_WORDS }}
