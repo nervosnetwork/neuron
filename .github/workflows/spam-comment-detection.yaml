@@ -24,7 +24,7 @@ jobs:
             const issue_number = process.env.ISSUE_NUMBER
             const owner = process.env.REPO_OWNER
             const repo = process.env.REPO_NAME
-            const EXTERNAL_LINK_REGEXT = /https:\/\/(?!((\w+\.)?github\.com|github\.com|(\w+\.)?magickbase\.com|(\w+\.)?nervos\.org))/gi
+            const EXTERNAL_LINK_REGEXT = /https?:\/\/(?!((\w+\.)?github\.com|github\.com|(\w+\.)?magickbase\.com|(\w+\.)?nervos\.org))/gi
             if (spam_words.some(w => comment.includes(w))) {
               console.info(`Spam comment: ${comment}`)
               github.rest.issues.deleteComment({ owner, repo, comment_id })
