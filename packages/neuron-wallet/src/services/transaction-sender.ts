@@ -332,6 +332,8 @@ export default class TransactionSender {
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       if (!multisigConfig) {
+        const BLOCK_UNRECOGNIZED = 0
+        const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
         const res = await dialog.showMessageBox({
           type: 'warning',
           message: t('messageBox.unrecognized-lock-script.message'),
@@ -339,10 +341,10 @@ export default class TransactionSender {
             t('messageBox.unrecognized-lock-script.buttons.cancel'),
             t('messageBox.unrecognized-lock-script.buttons.ignore'),
           ],
-          defaultId: 0,
-          cancelId: 1,
+          defaultId: BLOCK_UNRECOGNIZED,
+          cancelId: IGNORE_UNRECOGNIZED_AND_CONTINUE,
         })
-        if (res.response === 1) {
+        if (res.response === IGNORE_UNRECOGNIZED_AND_CONTINUE) {
           continue
         }
         throw new MultisigConfigNeedError()
