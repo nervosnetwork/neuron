@@ -251,8 +251,11 @@ const SignAndVerify = () => {
         return t(err.message, err.i18n)
       }
     }
+    if (wallet?.addresses && !wallet.addresses.find(item => item.address === address)) {
+      return t('sign-and-verify.address-not-found')
+    }
     return undefined
-  }, [t, address, isMainnet])
+  }, [t, address, isMainnet, wallet.addresses])
 
   return (
     <div>
