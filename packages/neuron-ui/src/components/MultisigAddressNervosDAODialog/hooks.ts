@@ -1,13 +1,17 @@
-import { useEffect, useCallback, useMemo } from 'react'
+import { useEffect, useCallback } from 'react'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
-import { updateNervosDaoData, clearNervosDaoData, showGlobalAlertDialog } from 'states/stateProvider/actionCreators'
+import { showGlobalAlertDialog } from 'states/stateProvider/actionCreators'
 
-import { NavigateFunction } from 'react-router-dom'
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
-import { CONSTANTS, isSuccessResponse, RoutePath } from 'utils'
+import { CONSTANTS, isSuccessResponse, getExplorerUrl } from 'utils'
 
-import { rpc, getHeader } from 'services/chain'
-import { generateDaoWithdrawTx, generateDaoClaimTx, MultisigConfig } from 'services/remote'
+import { rpc } from 'services/chain'
+import {
+  MultisigConfig,
+  generateMultisigDaoWithdrawTx,
+  generateMultisigDaoClaimTx,
+  openExternal,
+} from 'services/remote'
 import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/lumos/common-scripts/dao'
 
 const { MEDIUM_FEE_RATE } = CONSTANTS
@@ -15,37 +19,6 @@ const { MEDIUM_FEE_RATE } = CONSTANTS
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
   return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
 }
-
-export const useInitData = ({
-  clearGeneratedTx,
-  dispatch,
-  wallet,
-  setGenesisBlockTimestamp,
-  genesisBlockHash,
-}: {
-  clearGeneratedTx: () => void
-  dispatch: React.Dispatch<StateAction>
-  wallet: State.Wallet
-  setGenesisBlockTimestamp: React.Dispatch<React.SetStateAction<number | undefined>>
-  genesisBlockHash?: string
-}) =>
-  useEffect(() => {
-    updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    const intervalId = setInterval(() => {
-      updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    }, 10000)
-    if (genesisBlockHash) {
-      getHeader(genesisBlockHash)
-        .then(header => setGenesisBlockTimestamp(+header.timestamp))
-        .catch(err => console.error(err))
-    }
-    return () => {
-      clearInterval(intervalId)
-      clearNervosDaoData()(dispatch)
-      clearGeneratedTx()
-    }
-    // eslint-disable-next-line
-  }, [])
 
 export const useOnWithdrawDialogDismiss = (setActiveRecord: React.Dispatch<null>) =>
   useCallback(() => {
@@ -59,6 +32,7 @@ export const useOnWithdrawDialogSubmit = ({
   walletID,
   dispatch,
   suggestFeeRate,
+  multisigConfig,
 }: {
   activeRecord: State.NervosDAORecord | null
   setActiveRecord: React.Dispatch<null>
@@ -66,13 +40,14 @@ export const useOnWithdrawDialogSubmit = ({
   walletID: string
   dispatch: React.Dispatch<StateAction>
   suggestFeeRate: number | string
+  multisigConfig: MultisigConfig
 }) =>
   useCallback(() => {
     if (activeRecord) {
-      generateDaoWithdrawTx({
-        walletID,
+      generateMultisigDaoWithdrawTx({
         outPoint: activeRecord.outPoint,
         feeRate: `${suggestFeeRate}`,
+        multisigConfig,
       })
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -84,8 +59,10 @@ export const useOnWithdrawDialogSubmit = ({
               type: AppActions.RequestPassword,
               payload: {
                 walletID,
-                actionType: 'send',
+                actionType: multisigConfig.m === 1 ? 'send-from-multisig-need-one' : 'send-from-multisig',
+                multisigConfig,
                 onSuccess: () => {},
+                title: 'password-request.verify-password',
               },
             })
           } else {
@@ -110,14 +87,16 @@ export const useOnActionClick = ({
   dispatch,
   walletID,
   setActiveRecord,
-  navigate,
+  isMainnet,
+  multisigConfig,
 }: {
   records: Readonly<State.NervosDAORecord[]>
   clearGeneratedTx: () => void
   dispatch: React.Dispatch<StateAction>
   walletID: string
   setActiveRecord: React.Dispatch<State.NervosDAORecord>
-  navigate: NavigateFunction
+  isMainnet: boolean
+  multisigConfig: MultisigConfig
 }) =>
   useCallback(
     (e: any) => {
@@ -129,13 +108,13 @@ export const useOnActionClick = ({
       const record = records.find(r => r.outPoint.txHash === outPoint.txHash && r.outPoint.index === outPoint.index)
       if (record) {
         if (record.status === 'sent') {
-          navigate(`${RoutePath.History}/${record.depositInfo?.txHash}`)
+          openExternal(`${getExplorerUrl(isMainnet)}/transaction/${record?.depositInfo?.txHash}`)
         } else if (record.depositOutPoint) {
-          generateDaoClaimTx({
-            walletID,
+          generateMultisigDaoClaimTx({
             withdrawingOutPoint: record.outPoint,
             depositOutPoint: record.depositOutPoint,
             feeRate: `${MEDIUM_FEE_RATE}`,
+            multisigConfig,
           })
             .then(res => {
               if (isSuccessResponse(res)) {
@@ -147,8 +126,10 @@ export const useOnActionClick = ({
                   type: AppActions.RequestPassword,
                   payload: {
                     walletID,
-                    actionType: 'send',
+                    actionType: multisigConfig.m === 1 ? 'send-from-multisig-need-one' : 'send-from-multisig',
+                    multisigConfig,
                     onSuccess: () => {},
+                    title: 'password-request.verify-password',
                   },
                 })
               } else {
@@ -317,23 +298,10 @@ export const useUpdateDepositEpochList = ({
     }
   }, [records, setDepositEpochList, connectionStatus])
 
-export const useCanSign = ({
-  addresses,
-  multisigConfig,
-}: {
-  addresses: State.Address[]
-  multisigConfig: MultisigConfig
-}) => {
-  const addressList = useMemo(() => addresses.map(v => v.address), [addresses])
-  return useMemo(() => multisigConfig.addresses.some(v => addressList.includes(v)), [multisigConfig, addressList])
-}
-
 export default {
-  useInitData,
   useOnWithdrawDialogDismiss,
   useOnWithdrawDialogSubmit,
   useOnActionClick,
   useUpdateWithdrawList,
   useUpdateDepositEpochList,
-  useCanSign,
 }

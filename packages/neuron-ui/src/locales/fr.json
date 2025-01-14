@@ -494,6 +494,7 @@
     },
     "password-request": {
       "wallet-not-found": "Le Wallet n'a pas été trouvé",
+      "verify-password": "Vérifier le mot de passe",
       "password": "Entrez le mot de passe",
       "placeholder": "Veuillez entrer le mot de passe du Wallet",
       "send": {

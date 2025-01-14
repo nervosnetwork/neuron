@@ -1,15 +1,16 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { MultisigConfig } from 'services/remote'
-import { clsx, useClearGeneratedTx } from 'utils'
+import { MultisigConfig, getMultisigDaoData } from 'services/remote'
+import { clsx, useClearGeneratedTx, isSuccessResponse, isMainnet as isMainnetUtil } from 'utils'
 import Dialog from 'widgets/Dialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 import TableNoData from 'widgets/Icons/TableNoData.png'
+import { getHeader } from 'services/chain'
 
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
+import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import hooks from './hooks'
 import styles from './multisigAddressNervosDAODialog.module.scss'
 
@@ -24,32 +25,25 @@ const MultisigAddressNervosDAODialog = ({
   const {
     app: { tipDao, tipBlockTimestamp, epoch },
     wallet,
-    nervosDAO: { records },
     chain: { connectionStatus, networkID },
     settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [t] = useTranslation()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
+  const [records, setRecords] = useState<State.NervosDAORecord[]>([])
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
   const [withdrawList, setWithdrawList] = useState<Map<string, string | null>>(new Map())
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const clearGeneratedTx = useClearGeneratedTx()
 
-  const canSign = hooks.useCanSign({ addresses: wallet.addresses, multisigConfig })
+  const { canSign } = getMultisigSignStatus({ multisigConfig, addresses: wallet.addresses })
 
   const onWithdrawDialogDismiss = hooks.useOnWithdrawDialogDismiss(setActiveRecord)
 
   const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
-  hooks.useInitData({
-    clearGeneratedTx,
-    dispatch,
-    wallet,
-    setGenesisBlockTimestamp,
-    genesisBlockHash,
-  })
+
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
     activeRecord,
     setActiveRecord,
@@ -57,7 +51,10 @@ const MultisigAddressNervosDAODialog = ({
     walletID: wallet.id,
     dispatch,
     suggestFeeRate,
+    multisigConfig,
   })
+
+  const isMainnet = isMainnetUtil(networks, networkID)
 
   const onActionClick = hooks.useOnActionClick({
     records,
@@ -65,10 +62,35 @@ const MultisigAddressNervosDAODialog = ({
     dispatch,
     walletID: wallet.id,
     setActiveRecord,
-    navigate,
+    isMainnet,
+    multisigConfig,
   })
 
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
+
+  useEffect(() => {
+    getMultisigDaoData({ multisigConfig }).then(res => {
+      if (isSuccessResponse(res)) {
+        setRecords(res.result)
+      }
+    })
+    const intervalId = setInterval(() => {
+      getMultisigDaoData({ multisigConfig }).then(res => {
+        if (isSuccessResponse(res)) {
+          setRecords(res.result)
+        }
+      })
+    }, 10000)
+    if (genesisBlockHash) {
+      getHeader(genesisBlockHash)
+        .then(header => setGenesisBlockTimestamp(+header.timestamp))
+        .catch(err => console.error(err))
+    }
+    return () => {
+      clearInterval(intervalId)
+      clearGeneratedTx()
+    }
+  }, [multisigConfig])
 
   hooks.useUpdateWithdrawList({
     records,
@@ -148,6 +170,8 @@ const MultisigAddressNervosDAODialog = ({
                 genesisBlockTimestamp,
                 connectionStatus,
                 hasCkbBalance: +wallet.balance > 0,
+                showDetailInExplorer: true,
+                isMainnet,
               }
               return (
                 <div className={styles.recordWrap}>

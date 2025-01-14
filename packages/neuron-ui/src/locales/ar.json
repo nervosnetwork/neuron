@@ -504,6 +504,7 @@
     },
     "password-request": {
       "wallet-not-found": "لم يتم العثور على المحفظة",
+      "verify-password": "تحقق من كلمة المرور",
       "password": "أدخل كلمة المرور",
       "placeholder": "يرجى إدخال كلمة مرور المحفظة",
       "send": {

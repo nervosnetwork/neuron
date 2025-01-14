@@ -3,8 +3,11 @@ import { TFunction } from 'i18next'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  MultisigConfig,
   generateDaoDepositAllTx as generateDaoDepositAllTxAPI,
   generateDaoDepositTx as generateDaoDepositTxAPI,
+  generateMultisigDaoDepositTx as generateMultisigDaoDepositTxAPI,
+  generateMultisigDaoDepositAllTx as generateMultisigDaoDepositAllTxAPI,
 } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import {
@@ -45,17 +48,26 @@ function generateDaoDepositTx({
   capacity,
   suggestFeeRate,
   t,
+  multisigConfig,
 }: {
   walletID: string
   capacity: string
   suggestFeeRate: number
   t: TFunction
+  multisigConfig?: MultisigConfig
 }): Promise<State.GeneratedTx | null> {
-  return generateDaoDepositTxAPI({
-    feeRate: `${suggestFeeRate}`,
-    capacity,
-    walletID,
-  }).then(res => {
+  const generateCall = multisigConfig
+    ? generateMultisigDaoDepositTxAPI({
+        feeRate: `${suggestFeeRate}`,
+        capacity,
+        multisigConfig,
+      })
+    : generateDaoDepositTxAPI({
+        walletID,
+        feeRate: `${suggestFeeRate}`,
+        capacity,
+      })
+  return generateCall.then(res => {
     if (isSuccessResponse(res)) {
       return res.result
     }
@@ -73,16 +85,25 @@ function generateDaoDepositAllTx({
   suggestFeeRate,
   isBalanceReserved,
   walletID,
+  multisigConfig,
 }: {
   suggestFeeRate: number
   isBalanceReserved: boolean
   walletID: string
+  multisigConfig?: MultisigConfig
 }): Promise<State.GeneratedTx | null> {
-  return generateDaoDepositAllTxAPI({
-    walletID,
-    feeRate: `${suggestFeeRate}`,
-    isBalanceReserved,
-  }).then(res => {
+  const generateAllCall = multisigConfig
+    ? generateMultisigDaoDepositAllTxAPI({
+        feeRate: `${suggestFeeRate}`,
+        isBalanceReserved,
+        multisigConfig,
+      })
+    : generateDaoDepositAllTxAPI({
+        walletID,
+        feeRate: `${suggestFeeRate}`,
+        isBalanceReserved,
+      })
+  return generateAllCall.then(res => {
     if (isSuccessResponse(res)) {
       return res.result
     }
@@ -97,6 +118,7 @@ export const useGenerateDaoDepositTx = ({
   suggestFeeRate,
   showDepositDialog,
   slidePercent,
+  multisigConfig,
 }: {
   walletID: string
   isBalanceReserved: boolean
@@ -104,6 +126,7 @@ export const useGenerateDaoDepositTx = ({
   suggestFeeRate: number
   showDepositDialog: boolean
   slidePercent: number
+  multisigConfig?: MultisigConfig
 }) => {
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const [errorMessage, setErrorMessage] = useState('')
@@ -127,8 +150,14 @@ export const useGenerateDaoDepositTx = ({
       }
 
       const generateDaoDepositResult: Promise<State.GeneratedTx | null> = isDepositAll
-        ? generateDaoDepositAllTx({ walletID, isBalanceReserved, suggestFeeRate })
-        : generateDaoDepositTx({ walletID, capacity: CKBToShannonFormatter(depositValue), suggestFeeRate, t })
+        ? generateDaoDepositAllTx({ walletID, isBalanceReserved, suggestFeeRate, multisigConfig })
+        : generateDaoDepositTx({
+            walletID,
+            capacity: CKBToShannonFormatter(depositValue),
+            suggestFeeRate,
+            t,
+            multisigConfig,
+          })
       generateDaoDepositResult
         .then(res => {
           dispatch({
@@ -239,22 +268,37 @@ export const useBalanceReserved = () => {
 
 export const useOnDepositDialogSubmit = ({
   onDepositSuccess,
-  walletID,
+  wallet,
+  multisigConfig,
 }: {
   onDepositSuccess: () => void
-  walletID: string
+  wallet: State.Wallet
+  multisigConfig?: MultisigConfig
 }) => {
   const dispatch = useDispatch()
   return useCallback(() => {
-    dispatch({
-      type: AppActions.RequestPassword,
-      payload: {
-        walletID,
-        actionType: 'send',
-        onSuccess: onDepositSuccess,
-      },
-    })
-  }, [dispatch, walletID, onDepositSuccess])
+    if (multisigConfig) {
+      dispatch({
+        type: AppActions.RequestPassword,
+        payload: {
+          walletID: wallet.id,
+          actionType: multisigConfig.m === 1 ? 'send-from-multisig-need-one' : 'send-from-multisig',
+          multisigConfig,
+          onSuccess: onDepositSuccess,
+          title: 'password-request.verify-password',
+        },
+      })
+    } else {
+      dispatch({
+        type: AppActions.RequestPassword,
+        payload: {
+          walletID: wallet.id,
+          actionType: 'send',
+          onSuccess: onDepositSuccess,
+        },
+      })
+    }
+  }, [dispatch, wallet.id, onDepositSuccess, multisigConfig])
 }
 
 export const useOnDepositDialogCancel = ({

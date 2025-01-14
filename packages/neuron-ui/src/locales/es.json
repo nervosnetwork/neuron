@@ -487,6 +487,7 @@
     },
     "password-request": {
       "wallet-not-found": "No se encontró la billetera",
+      "verify-password": "Verificar Contraseña",
       "password": "Ingresar Contraseña",
       "placeholder": "Por favor ingrese la contraseña de la billetera",
       "send": {

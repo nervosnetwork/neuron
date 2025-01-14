@@ -40,6 +40,7 @@ import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import CellLocalInfoService from './cell-local-info'
 import CellLocalInfo from '../database/chain/entities/cell-local-info'
 import { helpers } from '@ckb-lumos/lumos'
+import logger from '../utils/logger'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -250,6 +251,75 @@ export default class CellsService {
         )`,
         {
           walletId,
+          liveStatus: OutputStatus.Live,
+          sentStatus: OutputStatus.Sent,
+          failedStatus: TransactionStatus.Failed,
+          deadStatus: OutputStatus.Dead,
+          pendingStatus: OutputStatus.Pending,
+        }
+      )
+      .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
+      .addOrderBy('tx.timestamp', 'ASC')
+      .getMany()
+
+    const cells: Cell[] = outputs.map(output => {
+      const cell = output.toModel()
+      if (!output.depositTxHash) {
+        // if deposit cell, set depositInfo
+        cell.setDepositInfo({
+          txHash: output.transaction!.hash,
+          timestamp: output.transaction!.timestamp!,
+        })
+      } else {
+        // if not deposit cell, set withdrawInfo
+        const withdrawTx = output.transaction
+        cell.setWithdrawInfo({
+          txHash: withdrawTx!.hash,
+          timestamp: withdrawTx!.timestamp!,
+        })
+      }
+      return cell
+    })
+
+    await Promise.all([CellsService.addDepositInfo(cells), CellsService.addUnlockInfo(cells)])
+
+    return cells
+  }
+
+  public static async getMultisigDaoCells(multisigConfig: MultisigConfigModel): Promise<Cell[]> {
+    const script = Multisig.getMultisigScript(
+      multisigConfig.blake160s,
+      multisigConfig.r,
+      multisigConfig.m,
+      multisigConfig.n
+    )
+
+    const multiSignBlake160 = script.args.slice(0, 42)
+
+    logger.info('getMultisigDaoCells---multiSignBlake160----', multiSignBlake160)
+
+    const outputs: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where(
+        `
+        output.daoData IS NOT NULL AND
+        output.lockArgs = :multiSignBlake160 AND
+        (
+          output.status = :liveStatus OR
+          output.status = :sentStatus OR
+          tx.status = :failedStatus OR
+          (
+            (
+              output.status = :deadStatus OR
+              output.status = :pendingStatus
+            ) AND
+            output.depositTxHash is not null
+          )
+        )`,
+        {
+          multiSignBlake160,
           liveStatus: OutputStatus.Live,
           sentStatus: OutputStatus.Sent,
           failedStatus: TransactionStatus.Failed,

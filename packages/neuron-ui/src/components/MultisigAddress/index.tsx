@@ -116,7 +116,7 @@ const MultisigAddress = () => {
     },
     settings: { networks = [] },
   } = useGlobalState()
-  const { id: walletId, addresses, balance } = wallet
+  const { id: walletId, addresses } = wallet
   const isMainnet = isMainnetUtil(networks, networkID)
   const isLightClient = useMemo(
     () => networks.find(n => n.id === networkID)?.type === NetworkType.Light,
@@ -272,23 +272,6 @@ const MultisigAddress = () => {
     daoDepositAction.closeDialog()
     showPageNotice('nervos-dao.deposit-submitted')(dispatch)
   }, [dispatch, daoDepositAction.closeDialog])
-
-  const MemoizedDepositDialog = useMemo(() => {
-    return (
-      <DepositDialog
-        balance={balance}
-        walletID={walletId}
-        show={daoDepositAction.isDialogOpen}
-        fee={fee}
-        onCloseDepositDialog={daoDepositAction.closeDialog}
-        isDepositing={sending}
-        isTxGenerated={!!send.generatedTx}
-        suggestFeeRate={suggestFeeRate}
-        globalAPC={globalAPC}
-        onDepositSuccess={onDepositSuccess}
-      />
-    )
-  }, [balance, walletId, fee, sending, send.generatedTx, suggestFeeRate, globalAPC, daoDepositAction])
 
   return (
     <div>
@@ -594,7 +577,21 @@ const MultisigAddress = () => {
         />
       ) : null}
 
-      {MemoizedDepositDialog}
+      {daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen ? (
+        <DepositDialog
+          balance={multisigBanlances[daoDepositAction.depositFromMultisig.fullPayload]}
+          wallet={wallet}
+          show
+          fee={fee}
+          onCloseDepositDialog={daoDepositAction.closeDialog}
+          isDepositing={sending}
+          isTxGenerated={!!send.generatedTx}
+          suggestFeeRate={suggestFeeRate}
+          globalAPC={globalAPC}
+          onDepositSuccess={onDepositSuccess}
+          multisigConfig={daoDepositAction.depositFromMultisig}
+        />
+      ) : null}
 
       {daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen ? (
         <MultisigAddressNervosDAODialog

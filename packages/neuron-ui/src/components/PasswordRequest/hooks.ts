@@ -45,7 +45,7 @@ export default ({
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { walletID = '', actionType = null, amendHash, multisigConfig, onSuccess } = passwordRequest
+  const { walletID = '', actionType = null, title, amendHash, multisigConfig, onSuccess } = passwordRequest
 
   useEffect(() => {
     setPassword('')
@@ -362,6 +362,7 @@ export default ({
     isLoading,
     signType,
     actionType,
+    title,
     disabled,
     password,
     onSubmit,
