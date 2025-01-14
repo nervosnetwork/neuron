@@ -300,44 +300,44 @@ const useApproveAction = () => {
 
 const useDaoDepositAction = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
-  const onOpenSendDialog = useCallback(
+  const [depositFromMultisig, setDepositFromMultisig] = useState<MultisigConfig | undefined>()
+  const onOpenDialog = useCallback(
     (option: MultisigConfig) => {
       setIsDialogOpen(true)
-      setSendFromMultisig(option)
+      setDepositFromMultisig(option)
     },
-    [setIsDialogOpen, setSendFromMultisig]
+    [setIsDialogOpen, setDepositFromMultisig]
   )
   const closeDialog = useCallback(() => {
     setIsDialogOpen(false)
   }, [setIsDialogOpen])
 
   return {
-    action: onOpenSendDialog,
+    action: onOpenDialog,
     closeDialog,
-    sendFromMultisig,
+    depositFromMultisig,
     isDialogOpen,
   }
 }
 
 const useDaoWithdrawAction = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
-  const onOpenSendDialog = useCallback(
+  const [withdrawFromMultisig, setWithdrawFromMultisig] = useState<MultisigConfig | undefined>()
+  const onOpenDialog = useCallback(
     (option: MultisigConfig) => {
       setIsDialogOpen(true)
-      setSendFromMultisig(option)
+      setWithdrawFromMultisig(option)
     },
-    [setIsDialogOpen, setSendFromMultisig]
+    [setIsDialogOpen, setWithdrawFromMultisig]
   )
   const closeDialog = useCallback(() => {
     setIsDialogOpen(false)
   }, [setIsDialogOpen])
 
   return {
-    action: onOpenSendDialog,
+    action: onOpenDialog,
     closeDialog,
-    sendFromMultisig,
+    withdrawFromMultisig,
     isDialogOpen,
   }
 }

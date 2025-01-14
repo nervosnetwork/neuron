@@ -803,7 +803,8 @@
       "amount": "数量",
       "cell-from-cellbase": "来自 Cellbase",
       "cancel": "取消",
-      "next": "下一步"
+      "next": "下一步",
+      "export": "导出交易"
     },
     "deposit-rules": {
       "minimum-deposit": "最低存入额",

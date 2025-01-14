@@ -793,7 +793,8 @@
       "amount": "Cantidad",
       "cell-from-cellbase": "Desde cellbase",
       "cancel": "Cancelar",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "export": "Exportar Tx"
     },
     "deposit-rules": {
       "minimum-deposit": "Depósito mínimo",

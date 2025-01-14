@@ -810,7 +810,8 @@
       "amount": "Amount",
       "cell-from-cellbase": "From cellbase",
       "cancel": "Cancel",
-      "next": "Next"
+      "next": "Next",
+      "export": "Export Tx"
     },
     "deposit-rules": {
       "minimum-deposit": "Minimum Deposit",

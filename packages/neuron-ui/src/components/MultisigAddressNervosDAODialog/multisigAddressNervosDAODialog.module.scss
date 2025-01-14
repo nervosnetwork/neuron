@@ -1,0 +1,118 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  width: 900px;
+}
+
+.tabContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .sortBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--secondary-background-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 100%;
+    min-width: 0;
+    cursor: pointer;
+    &[data-desc='false'] {
+      svg {
+        transform: rotateX(-180deg);
+      }
+    }
+    &:hover {
+      svg {
+        g,
+        path {
+          stroke: var(--primary-color);
+        }
+      }
+    }
+  }
+}
+
+.recordTab {
+  // To achieve animation on switching the selected target with pure CSS, a layout with fixed width is required.
+  $itemWidth: 96px;
+  $itemOverlapping: 8px;
+  $padding: 4px;
+
+  --selected-tab: 0;
+
+  position: relative;
+  width: max-content;
+  margin: 0;
+  padding: $padding;
+  background: var(--fourth-background-color);
+  border-radius: 40px;
+
+  button {
+    @include bold-text;
+    position: relative;
+    appearance: none;
+    width: $itemWidth;
+    height: 40px;
+    font-weight: 500;
+    font-size: 14px;
+    background-color: transparent;
+    color: var(--primary-color);
+    padding: 0;
+    border: none;
+    margin-left: -$itemOverlapping;
+    cursor: pointer;
+
+    &:first-of-type {
+      margin-left: 0;
+    }
+
+    &.tab {
+      color: var(--secondary-text-color);
+    }
+
+    &.active {
+      cursor: default;
+      color: var(--primary-color);
+    }
+  }
+
+  .underline {
+    display: block;
+    position: absolute;
+    top: $padding;
+    left: $padding;
+    height: 40px;
+    width: $itemWidth;
+    background: var(--third-background-color);
+    border-radius: 40px;
+    transition: transform 0.1s ease-in-out;
+    transform: translateX(calc(var(--selected-tab) * ($itemWidth - $itemOverlapping)));
+  }
+}
+
+.records {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+
+  .recordWrap {
+    border: 1px solid var(--divide-line-color);
+    border-radius: 16px;
+  }
+}
+
+.noRecords {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 22px 0 44px 0;
+  background: var(--secondary-background-color);
+  border-radius: 16px;
+  font-size: 14px;
+}

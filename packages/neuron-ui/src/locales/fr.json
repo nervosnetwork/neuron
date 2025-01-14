@@ -800,7 +800,8 @@
       "amount": "Montant",
       "cell-from-cellbase": "De cellbase",
       "cancel": "Annuler",
-      "next": "Suivant"
+      "next": "Suivant",
+      "export": "Exporter Tx"
     },
     "deposit-rules": {
       "minimum-deposit": "Dépôt minimum",
