@@ -168,6 +168,20 @@
   }
 }
 
+.privateKey {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    svg {
+      g,
+      path {
+        stroke: var(--primary-color);
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 1330px) {
   .container {
     .balance {

@@ -375,7 +375,10 @@
       "request-payment": "Solicitar Pago",
       "view-on-explorer": "Ver en el Explorador",
       "default-description": "Ninguna",
-      "all-address": "Todas"
+      "all-address": "Todas",
+      "view-private-key": "Ver clave privada",
+      "private-key": "Clave privada",
+      "view-private-key-tip": "Si pierdes tu clave privada, tus activos desaparecerán. (Ver en un entorno seguro)"
     },
     "settings": {
       "title": {

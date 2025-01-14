@@ -62,6 +62,7 @@ import { ReactComponent as QuestionSvg } from './Question.svg'
 import { ReactComponent as DetailsSvg } from './Details.svg'
 import { ReactComponent as ConfirmSvg } from './Confirm.svg'
 import { ReactComponent as UploadSvg } from './Upload.svg'
+import { ReactComponent as PrivateKeySvg } from './PrivateKey.svg'
 import { ReactComponent as DAODepositSvg } from './DAODeposit.svg'
 import { ReactComponent as DAOWithdrawalSvg } from './DAOWithdrawal.svg'
 
@@ -142,5 +143,6 @@ export const Question = WrapSvg(QuestionSvg)
 export const Details = WrapSvg(DetailsSvg)
 export const Confirm = WrapSvg(ConfirmSvg)
 export const Upload = WrapSvg(UploadSvg)
+export const PrivateKey = WrapSvg(PrivateKeySvg)
 export const DAODeposit = WrapSvg(DAODepositSvg)
 export const DAOWithdrawal = WrapSvg(DAOWithdrawalSvg)

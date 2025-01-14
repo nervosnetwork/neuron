@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import { ErrorCode, isSuccessResponse, shannonToCKBFormatter, useExitOnWalletChange, useGoBack } from 'utils'
+import {
+  ErrorCode,
+  isSuccessResponse,
+  shannonToCKBFormatter,
+  useExitOnWalletChange,
+  useGoBack,
+  validateAddress,
+  isMainnet as isMainnetUtil,
+} from 'utils'
+import { isErrorWithI18n } from 'exceptions'
 import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
@@ -130,8 +139,13 @@ const SignAndVerify = () => {
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
-  const { wallet } = useGlobalState()
+  const {
+    chain: { networkID },
+    settings: { networks },
+    wallet,
+  } = useGlobalState()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const isMainnet = isMainnetUtil(networks, networkID)
   useExitOnWalletChange()
 
   const handlePasswordDialogOpen = useCallback(() => {
@@ -226,12 +240,29 @@ const SignAndVerify = () => {
 
   const onBack = useGoBack()
 
+  const addressError = useMemo(() => {
+    if (!address) {
+      return undefined
+    }
+    try {
+      validateAddress(address, isMainnet)
+    } catch (err) {
+      if (isErrorWithI18n(err)) {
+        return t(err.message, err.i18n)
+      }
+    }
+    if (wallet?.addresses && !wallet.addresses.find(item => item.address === address)) {
+      return t('sign-and-verify.address-not-found')
+    }
+    return undefined
+  }, [t, address, isMainnet, wallet.addresses])
+
   return (
     <div>
       <Dialog
         show={showDialog}
         title={t('sign-and-verify.sign-or-verify-message')}
-        disabled={!message || !signature || !address}
+        disabled={!message || !signature || !address || !!addressError}
         onCancel={onBack}
         confirmText={t('sign-and-verify.verify')}
         onConfirm={handleVerifyMessage}
@@ -270,6 +301,7 @@ const SignAndVerify = () => {
                     </div>
                   }
                   width="100%"
+                  error={addressError}
                 />
               </div>
               {isDropdownOpen && wallet?.addresses ? (
@@ -311,7 +343,7 @@ const SignAndVerify = () => {
 
           {wallet?.isWatchOnly || (
             <div className={styles.signWrap}>
-              <Button type="text" disabled={!message || !address} onClick={handlePasswordDialogOpen}>
+              <Button type="text" disabled={!message || !address || !!addressError} onClick={handlePasswordDialogOpen}>
                 <Sign />
                 {t('sign-and-verify.sign')}
               </Button>

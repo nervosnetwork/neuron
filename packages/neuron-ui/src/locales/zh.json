@@ -376,7 +376,10 @@
       "request-payment": "请求支付",
       "view-on-explorer": "在浏览器中查看",
       "default-description": "无",
-      "all-address": "全部地址"
+      "all-address": "全部地址",
+      "view-private-key": "查看私钥",
+      "private-key": "私钥",
+      "view-private-key-tip": "如果您丢失了私钥，您的资产将无法找回。（请在安全环境中查看）"
     },
     "settings": {
       "title": {
