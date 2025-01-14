@@ -298,12 +298,58 @@ const useApproveAction = () => {
   }
 }
 
+const useDaoDepositAction = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
+  const onOpenSendDialog = useCallback(
+    (option: MultisigConfig) => {
+      setIsDialogOpen(true)
+      setSendFromMultisig(option)
+    },
+    [setIsDialogOpen, setSendFromMultisig]
+  )
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
+
+  return {
+    action: onOpenSendDialog,
+    closeDialog,
+    sendFromMultisig,
+    isDialogOpen,
+  }
+}
+
+const useDaoWithdrawAction = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
+  const onOpenSendDialog = useCallback(
+    (option: MultisigConfig) => {
+      setIsDialogOpen(true)
+      setSendFromMultisig(option)
+    },
+    [setIsDialogOpen, setSendFromMultisig]
+  )
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
+
+  return {
+    action: onOpenSendDialog,
+    closeDialog,
+    sendFromMultisig,
+    isDialogOpen,
+  }
+}
+
 export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
   return {
     deleteAction: useDeleteAction(deleteConfigById),
     infoAction: useInfoAction(),
     sendAction: useSendAction(),
     approveAction: useApproveAction(),
+    daoDepositAction: useDaoDepositAction(),
+    daoWithdrawAction: useDaoWithdrawAction(),
   }
 }
 

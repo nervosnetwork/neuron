@@ -30,6 +30,8 @@ import {
   Confirming,
   Question,
   LineDownArrow,
+  DAODeposit,
+  DAOWithdrawal,
 } from 'widgets/Icons/icon'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
@@ -67,6 +69,14 @@ const tableActions = [
   {
     key: ApproveKey,
     icon: <Confirm />,
+  },
+  {
+    key: 'daoDeposit',
+    icon: <DAODeposit />,
+  },
+  {
+    key: 'daoWithdraw',
+    icon: <DAOWithdrawal />,
   },
 ]
 
@@ -120,7 +130,9 @@ const MultisigAddress = () => {
     configs: allConfigs,
     isLightClient,
   })
-  const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
+  const { deleteAction, infoAction, sendAction, approveAction, daoDepositAction, daoWithdrawAction } = useActions({
+    deleteConfigById,
+  })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const onClickItem = useCallback(
@@ -141,6 +153,12 @@ const MultisigAddress = () => {
           break
         case 'approve':
           approveAction.action(multisigConfig)
+          break
+        case 'daoDeposit':
+          daoDepositAction.action(multisigConfig)
+          break
+        case 'daoWithdraw':
+          daoWithdrawAction.action(multisigConfig)
           break
         default:
           break
@@ -520,6 +538,22 @@ const MultisigAddress = () => {
           address={address}
           onUpdateStartBlockNumber={onConfirm}
           onCancel={onCancel}
+        />
+      ) : null}
+
+      {daoDepositAction.sendFromMultisig && daoDepositAction.isDialogOpen ? (
+        <SendFromMultisigDialog
+          closeDialog={daoDepositAction.closeDialog}
+          multisigConfig={daoDepositAction.sendFromMultisig}
+          balance={sendTotalBalance}
+        />
+      ) : null}
+
+      {daoWithdrawAction.sendFromMultisig && daoWithdrawAction.isDialogOpen ? (
+        <SendFromMultisigDialog
+          closeDialog={daoWithdrawAction.closeDialog}
+          multisigConfig={daoWithdrawAction.sendFromMultisig}
+          balance={sendTotalBalance}
         />
       ) : null}
     </div>

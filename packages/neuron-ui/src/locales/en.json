@@ -1128,7 +1128,9 @@
           "info": "Info",
           "send": "Send",
           "approve": "Approve",
-          "delete": "Delete"
+          "delete": "Delete",
+          "daoDeposit": "DAO Deposit",
+          "daoWithdraw": "DAO Withdraw"
         }
       },
       "import-dialog": {
