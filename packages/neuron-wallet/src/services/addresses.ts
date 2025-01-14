@@ -1,5 +1,8 @@
 import { hd } from '@ckb-lumos/lumos'
-import { publicKeyToAddress, DefaultAddressNumber } from '../utils/scriptAndAddress'
+import { bytes } from '@ckb-lumos/lumos/codec'
+import WalletService from './wallets'
+import { AddressNotFound } from '../exceptions'
+import { publicKeyToAddress, DefaultAddressNumber, addressToScript } from '../utils/scriptAndAddress'
 import { Address as AddressInterface } from '../models/address'
 import AddressCreatedSubject from '../models/subjects/address-created-subject'
 import NetworksService from '../services/networks'
@@ -444,5 +447,36 @@ export default class AddressService {
 
   public static async deleteByWalletId(walletId: string): Promise<void> {
     await getConnection().createQueryBuilder().delete().from(HdPublicKeyInfo).where({ walletId }).execute()
+  }
+
+  public static async getPrivateKeyByAddress({
+    walletID,
+    password,
+    address,
+  }: {
+    walletID: string
+    password: string
+    address?: string
+  }): Promise<string> {
+    const wallet = WalletService.getInstance().get(walletID)
+    const addresses = await AddressService.getAddressesByWalletId(walletID)
+    let addr = address ? addresses.find(addr => addr.address === address) : addresses[0]
+
+    if (!addr && address) {
+      const lock = addressToScript(address)
+      addr = addresses.find(a => a.blake160 === lock.args)
+    }
+
+    if (!addr) {
+      throw new AddressNotFound()
+    }
+
+    const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
+    const masterKeychain = new hd.Keychain(
+      Buffer.from(bytes.bytify(masterPrivateKey.privateKey)),
+      Buffer.from(bytes.bytify(masterPrivateKey.chainCode))
+    )
+
+    return `0x${masterKeychain.derivePath(addr.path).privateKey.toString('hex')}`
   }
 }

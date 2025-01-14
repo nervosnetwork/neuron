@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch } from 'states'
 import Dialog from 'widgets/Dialog'
 import CopyZone from 'widgets/CopyZone'
-import { Copy } from 'widgets/Icons/icon'
+import ViewPrivateKey from 'components/ViewPrivateKey'
+import { Copy, PrivateKey } from 'widgets/Icons/icon'
 import Table, { TableProps, SortType } from 'widgets/Table'
 import { shannonToCKBFormatter, useLocalDescription } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
@@ -44,6 +45,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
 
   const dispatch = useDispatch()
   const { onChangeEditStatus, onSubmitDescription } = useLocalDescription('address', walletId, dispatch)
+  const [viewPrivateKeyAddress, setViewPrivateKeyAddress] = useState('')
 
   const columns = useMemo<TableProps<State.Address>['columns']>(
     () => [
@@ -149,6 +151,21 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
           return 0
         },
       },
+      {
+        title: '',
+        dataIndex: 'key',
+        align: 'left',
+        width: '40px',
+        render(_, __, { address }) {
+          return (
+            <Tooltip tip={t('addresses.view-private-key')} placement="left">
+              <button type="button" className={styles.privateKey} onClick={() => setViewPrivateKeyAddress(address)}>
+                <PrivateKey />
+              </button>
+            </Tooltip>
+          )
+        },
+      },
     ],
     [t]
   )
@@ -179,6 +196,10 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
             }
           />
         </div>
+
+        {!!viewPrivateKeyAddress && (
+          <ViewPrivateKey address={viewPrivateKeyAddress} onClose={() => setViewPrivateKeyAddress('')} />
+        )}
       </div>
     </Dialog>
   )

@@ -62,6 +62,7 @@ import { ReactComponent as QuestionSvg } from './Question.svg'
 import { ReactComponent as DetailsSvg } from './Details.svg'
 import { ReactComponent as ConfirmSvg } from './Confirm.svg'
 import { ReactComponent as UploadSvg } from './Upload.svg'
+import { ReactComponent as PrivateKeySvg } from './PrivateKey.svg'
 
 import styles from './icon.module.scss'
 
@@ -140,3 +141,4 @@ export const Question = WrapSvg(QuestionSvg)
 export const Details = WrapSvg(DetailsSvg)
 export const Confirm = WrapSvg(ConfirmSvg)
 export const Upload = WrapSvg(UploadSvg)
+export const PrivateKey = WrapSvg(PrivateKeySvg)

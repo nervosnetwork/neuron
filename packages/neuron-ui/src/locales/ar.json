@@ -383,7 +383,10 @@
       "request-payment": "طلب الدفع",
       "view-on-explorer": "عرض على المستكشف",
       "default-description": "لا شيء",
-      "all-address": "كل العناوين"
+      "all-address": "كل العناوين",
+      "view-private-key": "عرض المفتاح الخاص",
+      "private-key": "المفتاح الخاص",
+      "view-private-key-tip": "إذا فقدت مفتاحك الخاص، فستفقد أصولك. (عرضه في بيئة آمنة)"
     },
     "settings": {
       "title": {
@@ -822,7 +825,7 @@
     "lock-info-dialog": {
       "address-info": "معلومات العنوان",
       "deprecated-address": "عنوان مهمل"
-    },  
+    },
     "updates": {
       "check-updates": "تحقق من التحديثات",
       "checking-updates": "جارٍ التحقق...",
@@ -1327,4 +1330,4 @@
       "verify-wallet": "تحقق"
     }
   }
-}  
+}

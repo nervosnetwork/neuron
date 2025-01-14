@@ -378,7 +378,10 @@
       "request-payment": "請求支付",
       "view-on-explorer": "在瀏覽器中查看",
       "default-description": "無",
-      "all-address": "全部地址"
+      "all-address": "全部地址",
+      "view-private-key": "查看私鑰",
+      "private-key": "私鑰",
+      "view-private-key-tip": "如果您丟失了私鑰，您的資產將無法找回。（請在安全環境中查看）"
     },
     "settings": {
       "title": {
