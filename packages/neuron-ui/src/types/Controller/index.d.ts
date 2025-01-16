@@ -27,6 +27,7 @@ declare namespace Controller {
     name: string
     mnemonic: string
     password: string
+    isHardware?: boolean
   }
 
   interface ImportKeystoreParams {

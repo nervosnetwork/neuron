@@ -25,6 +25,7 @@ export default {
         'import-keystore': '導入 Keystore 檔案',
         'import-xpubkey': '導入 Extended Public Key',
         'import-hardware': '導入硬體錢包',
+        'import-hardware-mnemonic': '導入硬體錢包助記詞',
       },
       edit: {
         label: '編輯',
