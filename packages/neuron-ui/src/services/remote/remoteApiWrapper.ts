@@ -69,6 +69,7 @@ type Action =
   | 'backup-wallet'
   | 'update-wallet-start-block-number'
   | 'get-all-addresses'
+  | 'get-private-key-by-address'
   | 'update-address-description'
   | 'request-password'
   | 'send-tx'

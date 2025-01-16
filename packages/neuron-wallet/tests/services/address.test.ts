@@ -1,6 +1,7 @@
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
+import { bytes } from '@ckb-lumos/lumos/codec'
 import { hd } from '@ckb-lumos/lumos'
 import { Address } from '../../src/models/address'
 import Transaction from '../../src/database/chain/entities/transaction'
@@ -9,6 +10,7 @@ import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import { NetworkType } from '../../src/models/network'
+import WalletService from '../../src/services/wallets'
 
 const { AddressType, AccountExtendedPublicKey } = hd
 
@@ -705,6 +707,69 @@ describe('integration tests for AddressService', () => {
           addresses: [...receiving, ...change],
         })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('getPrivateKeyByAddress', () => {
+      const walletService = WalletService.getInstance()
+      const mnemonic = 'tank planet champion pottery together intact quick police asset flower sudden question'
+      const password = '1234abc~'
+
+      const addressObj = {
+        walletId: '5af2473e-78f5-4799-a193-d2b1c2989838',
+        address: 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqvfewjgc69nj783sh03nuckxjacwr55vwgngf9dr',
+        path: "m/44'/309'/0'/0/0",
+        addressType: 0,
+        addressIndex: 0,
+        blake160: '0x89cba48c68b3978f185df19f31634bb870e94639',
+      }
+
+      const privateKey = '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
+
+      const AddressService = require('../../src/services/addresses').default
+      const getAddressesByWalletIdMock = jest.spyOn(AddressService, 'getAddressesByWalletId')
+
+      let walletID = ''
+
+      beforeAll(() => {
+        jest.setTimeout(15000)
+
+        walletService.clearAll()
+
+        const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)
+        const masterKeychain = hd.Keychain.fromSeed(seed)
+        const extendedKey = new hd.ExtendedPrivateKey(
+          bytes.hexify(masterKeychain.privateKey),
+          bytes.hexify(masterKeychain.chainCode)
+        )
+
+        const keystore = hd.Keystore.create(extendedKey, password)
+
+        const accountKeychain = masterKeychain.derivePath(hd.AccountExtendedPublicKey.ckbAccountPath)
+        const accountExtendedPublicKey = new hd.AccountExtendedPublicKey(
+          bytes.hexify(accountKeychain.publicKey),
+          bytes.hexify(accountKeychain.chainCode)
+        )
+
+        const wallet = walletService.create({
+          id: '',
+          name: 'Test Wallet',
+          extendedKey: accountExtendedPublicKey.serialize(),
+          keystore,
+        })
+        walletID = wallet.id
+      })
+
+      it('getPrivateKeyByAddress', async () => {
+        getAddressesByWalletIdMock.mockReturnValueOnce([addressObj])
+
+        const pk = await AddressService.getPrivateKeyByAddress({
+          walletID,
+          password,
+          address: addressObj.address,
+        })
+
+        expect(pk).toEqual(privateKey)
       })
     })
   })

@@ -7,7 +7,8 @@ import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import QRCode from 'widgets/QRCode'
 import Tooltip from 'widgets/Tooltip'
-import { AddressTransform, Download, Copy, Attention, SuccessNoBorder } from 'widgets/Icons/icon'
+import ViewPrivateKey from 'components/ViewPrivateKey'
+import { AddressTransform, Download, Copy, Attention, SuccessNoBorder, PrivateKey } from 'widgets/Icons/icon'
 import VerifyHardwareAddress from './VerifyHardwareAddress'
 import styles from './receive.module.scss'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
@@ -29,6 +30,7 @@ export const AddressQrCodeWithCopyZone = ({
   )
 
   const [isCopySuccess, setIsCopySuccess] = useState(false)
+  const [showViewPrivateKey, setShowViewPrivateKey] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const { ref, onCopyQrCode, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
 
@@ -70,19 +72,27 @@ export const AddressQrCodeWithCopyZone = ({
         <CopyZone content={showAddress} className={styles.showAddress}>
           {showAddress}
         </CopyZone>
-        <button
-          type="button"
-          className={styles.addressToggle}
-          onClick={onClick}
-          title={transformLabel}
-          onFocus={stopPropagation}
-          onMouseOver={stopPropagation}
-          onMouseUp={stopPropagation}
-        >
-          <AddressTransform />
-          {transformLabel}
-        </button>
+        <div className={styles.actionWrap}>
+          <button
+            type="button"
+            className={styles.addressToggle}
+            onClick={onClick}
+            title={transformLabel}
+            onFocus={stopPropagation}
+            onMouseOver={stopPropagation}
+            onMouseUp={stopPropagation}
+          >
+            <AddressTransform />
+            {transformLabel}
+          </button>
+          <button type="button" className={styles.privateKey} onClick={() => setShowViewPrivateKey(true)}>
+            <PrivateKey />
+            {t('addresses.view-private-key')}
+          </button>
+        </div>
       </div>
+
+      {showViewPrivateKey && <ViewPrivateKey address={showAddress} onClose={() => setShowViewPrivateKey(false)} />}
     </div>
   )
 }

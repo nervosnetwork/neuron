@@ -184,6 +184,12 @@ declare namespace Controller {
     message: string
   }
 
+  interface GetPrivateKeyParams {
+    walletID: string
+    address?: string
+    password: string
+  }
+
   interface VerifyMessageParams {
     address: string
     signature: string

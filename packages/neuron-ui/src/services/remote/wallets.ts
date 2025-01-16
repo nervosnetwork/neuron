@@ -14,6 +14,7 @@ export const updateWalletStartBlockNumber = remoteApi<Controller.UpdateWalletSta
   'update-wallet-start-block-number'
 )
 export const getAddressesByWalletID = remoteApi<Controller.GetAddressesByWalletIDParams>('get-all-addresses')
+export const getPrivateKeyByAddress = remoteApi<Controller.GetPrivateKeyParams>('get-private-key-by-address')
 export const updateAddressDescription =
   remoteApi<Controller.UpdateAddressDescriptionParams>('update-address-description')
 export const requestPassword = remoteApi<Controller.RequestPasswordParams>('request-password')

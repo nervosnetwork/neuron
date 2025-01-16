@@ -132,8 +132,7 @@ const TextField = React.forwardRef(
               {...rest}
             />
           )}
-          {suffix && (typeof suffix === 'string' ? <span className={styles.suffix}>{suffix}</span> : suffix)}
-          {!suffix && type === 'password' && (
+          {type === 'password' && (
             <span
               className={`${styles.suffix} ${styles.password}`}
               onClick={changePasswordHide}
@@ -144,6 +143,7 @@ const TextField = React.forwardRef(
               {isPasswordHidden ? <EyesClose /> : <EyesOpen />}
             </span>
           )}
+          {suffix && (typeof suffix === 'string' ? <span className={styles.suffix}>{suffix}</span> : suffix)}
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (
