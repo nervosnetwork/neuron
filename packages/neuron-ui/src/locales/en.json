@@ -383,7 +383,10 @@
       "request-payment": "Request Payment",
       "view-on-explorer": "View on Explorer",
       "default-description": "None",
-      "all-address": "All"
+      "all-address": "All",
+      "view-private-key": "View Private Key",
+      "private-key": "Private Key",
+      "view-private-key-tip": "If you lose your private key, your assets will be gone. (View in secure environment)"
     },
     "settings": {
       "title": {

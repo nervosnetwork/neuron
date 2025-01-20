@@ -125,26 +125,42 @@
   color: var(--main-text-color);
 }
 
-.addressToggle {
-  width: 100%;
+.actionWrap {
   margin-top: 8px;
-  appearance: none;
-  border: none;
-  background: none;
   display: flex;
   justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  font-family: PingFang SC;
-  font-style: normal;
-  font-weight: 500;
-  color: var(--primary-color);
-  line-height: normal;
-  cursor: pointer;
+  gap: 32px;
 
-  svg {
-    pointer-events: none;
-    margin-right: 5px;
+  button {
+    appearance: none;
+    border: none;
+    background: none;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--primary-color);
+    line-height: normal;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .addressToggle {
+    svg {
+      pointer-events: none;
+      margin-right: 5px;
+    }
+  }
+
+  .privateKey {
+    svg {
+      width: 16px;
+      margin-right: 3px;
+      g,
+      path {
+        stroke: var(--primary-color);
+      }
+    }
   }
 }
 

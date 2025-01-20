@@ -440,6 +440,14 @@ export default class ApiController {
       return this.#walletsController.getAllAddresses(id)
     })
 
+    handle('get-private-key-by-address', async (_, { walletID, password, address }) => {
+      return this.#walletsController.getPrivateKeyByAddress({
+        walletID,
+        password,
+        address,
+      })
+    })
+
     handle(
       'update-address-description',
       async (_, params: { walletID: string; address: string; description: string }) => {
