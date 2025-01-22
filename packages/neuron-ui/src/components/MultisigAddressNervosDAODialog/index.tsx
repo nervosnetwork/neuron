@@ -44,7 +44,7 @@ const MultisigAddressNervosDAODialog = ({
 
   const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
 
-  const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
+  const onWithdrawDialogSubmit = hooks.useGenerateDaoWithdrawTx({
     activeRecord,
     setActiveRecord,
     clearGeneratedTx,
@@ -64,6 +64,7 @@ const MultisigAddressNervosDAODialog = ({
     setActiveRecord,
     isMainnet,
     multisigConfig,
+    suggestFeeRate,
   })
 
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })

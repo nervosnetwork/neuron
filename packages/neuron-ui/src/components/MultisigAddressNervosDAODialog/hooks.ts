@@ -3,7 +3,7 @@ import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { showGlobalAlertDialog } from 'states/stateProvider/actionCreators'
 
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
-import { CONSTANTS, isSuccessResponse, getExplorerUrl } from 'utils'
+import { isSuccessResponse, getExplorerUrl } from 'utils'
 
 import { rpc } from 'services/chain'
 import {
@@ -14,8 +14,6 @@ import {
 } from 'services/remote'
 import { calculateMaximumWithdrawCompatible } from '@ckb-lumos/lumos/common-scripts/dao'
 
-const { MEDIUM_FEE_RATE } = CONSTANTS
-
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
   return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
 }
@@ -25,7 +23,7 @@ export const useOnWithdrawDialogDismiss = (setActiveRecord: React.Dispatch<null>
     setActiveRecord(null)
   }, [setActiveRecord])
 
-export const useOnWithdrawDialogSubmit = ({
+export const useGenerateDaoWithdrawTx = ({
   activeRecord,
   setActiveRecord,
   clearGeneratedTx,
@@ -89,6 +87,7 @@ export const useOnActionClick = ({
   setActiveRecord,
   isMainnet,
   multisigConfig,
+  suggestFeeRate,
 }: {
   records: Readonly<State.NervosDAORecord[]>
   clearGeneratedTx: () => void
@@ -97,6 +96,7 @@ export const useOnActionClick = ({
   setActiveRecord: React.Dispatch<State.NervosDAORecord>
   isMainnet: boolean
   multisigConfig: MultisigConfig
+  suggestFeeRate: number | string
 }) =>
   useCallback(
     (e: any) => {
@@ -113,7 +113,7 @@ export const useOnActionClick = ({
           generateMultisigDaoClaimTx({
             withdrawingOutPoint: record.outPoint,
             depositOutPoint: record.depositOutPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
+            feeRate: `${suggestFeeRate}`,
             multisigConfig,
           })
             .then(res => {
@@ -300,7 +300,7 @@ export const useUpdateDepositEpochList = ({
 
 export default {
   useOnWithdrawDialogDismiss,
-  useOnWithdrawDialogSubmit,
+  useGenerateDaoWithdrawTx,
   useOnActionClick,
   useUpdateWithdrawList,
   useUpdateDepositEpochList,
