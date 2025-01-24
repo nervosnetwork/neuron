@@ -40,7 +40,6 @@ import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import CellLocalInfoService from './cell-local-info'
 import CellLocalInfo from '../database/chain/entities/cell-local-info'
 import { helpers } from '@ckb-lumos/lumos'
-import logger from '../utils/logger'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -287,16 +286,12 @@ export default class CellsService {
   }
 
   public static async getMultisigDaoCells(multisigConfig: MultisigConfigModel): Promise<Cell[]> {
-    const script = Multisig.getMultisigScript(
+    const multiSignBlake160 = Multisig.hash(
       multisigConfig.blake160s,
       multisigConfig.r,
       multisigConfig.m,
       multisigConfig.n
     )
-
-    const multiSignBlake160 = script.args.slice(0, 42)
-
-    logger.info('getMultisigDaoCells---multiSignBlake160----', multiSignBlake160)
 
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
