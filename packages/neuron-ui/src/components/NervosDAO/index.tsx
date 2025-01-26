@@ -256,7 +256,7 @@ const NervosDAO = () => {
     return (
       <DepositDialog
         balance={wallet.balance}
-        walletID={wallet.id}
+        wallet={wallet}
         show={showDepositDialog}
         fee={fee}
         onCloseDepositDialog={onCloseDepositDialog}
@@ -287,6 +287,7 @@ const NervosDAO = () => {
         onSubmit={onWithdrawDialogSubmit}
         tipDao={tipDao}
         currentEpoch={epoch}
+        canSign
       />
     ) : null
   }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipDao, epoch])

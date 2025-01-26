@@ -223,13 +223,29 @@ export default class CellsService {
     return cells
   }
 
-  public static async getDaoCells(walletId: string): Promise<Cell[]> {
+  public static async getDaoCells(walletId: string, lockArgs?: string): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(
-        `
+        lockArgs
+          ? `
+        output.daoData IS NOT NULL AND
+        output.lockArgs = :lockArgs AND
+        (
+          output.status = :liveStatus OR
+          output.status = :sentStatus OR
+          tx.status = :failedStatus OR
+          (
+            (
+              output.status = :deadStatus OR
+              output.status = :pendingStatus
+            ) AND
+            output.depositTxHash is not null
+          )
+        )`
+          : `
         output.daoData IS NOT NULL AND
         (
           output.status = :liveStatus OR
@@ -250,6 +266,7 @@ export default class CellsService {
         )`,
         {
           walletId,
+          lockArgs,
           liveStatus: OutputStatus.Live,
           sentStatus: OutputStatus.Sent,
           failedStatus: TransactionStatus.Failed,

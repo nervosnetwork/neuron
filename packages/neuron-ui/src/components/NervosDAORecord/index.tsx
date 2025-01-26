@@ -13,6 +13,7 @@ import {
   epochParser,
   clsx,
   RoutePath,
+  getExplorerUrl,
 } from 'utils'
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 import { Clock } from 'widgets/Icons/icon'
@@ -20,6 +21,7 @@ import { Link } from 'react-router-dom'
 import { HIDE_BALANCE } from 'utils/const'
 import Spinner from 'widgets/Spinner'
 import Tooltip from 'widgets/Tooltip'
+import { openExternal } from 'services/remote'
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
 
@@ -44,6 +46,8 @@ export interface DAORecordProps extends State.NervosDAORecord {
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
   isPrivacyMode?: boolean
   hasCkbBalance?: boolean
+  showDetailInExplorer?: boolean
+  isMainnet?: boolean
 }
 
 export const DAORecord = ({
@@ -65,6 +69,8 @@ export const DAORecord = ({
   unlockInfo,
   isPrivacyMode,
   hasCkbBalance,
+  showDetailInExplorer,
+  isMainnet,
 }: DAORecordProps) => {
   const [t] = useTranslation()
   const [withdrawEpoch, setWithdrawEpoch] = useState('')
@@ -207,9 +213,24 @@ export const DAORecord = ({
             </>
           )}
         </div>
-        <Link className={styles.send} to={`${RoutePath.NervosDAO}/${depositOutPointKey}`}>
-          <Button className={styles.txRecordBtn} type="default" label={t('nervos-dao.deposit-record.view-tx-detail')} />
-        </Link>
+        {showDetailInExplorer ? (
+          <Button
+            className={styles.txRecordBtn}
+            onClick={() => {
+              openExternal(`${getExplorerUrl(isMainnet)}/transaction/${depositOutPoint?.txHash}`)
+            }}
+            type="default"
+            label={t('nervos-dao.deposit-record.view-tx-detail')}
+          />
+        ) : (
+          <Link className={styles.send} to={`${RoutePath.NervosDAO}/${depositOutPointKey}`}>
+            <Button
+              className={styles.txRecordBtn}
+              type="default"
+              label={t('nervos-dao.deposit-record.view-tx-detail')}
+            />
+          </Link>
+        )}
       </div>
     </div>
   )

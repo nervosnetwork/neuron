@@ -130,6 +130,7 @@ declare namespace State {
     onSuccess?: () => void
     showType?: 'Global' | ''
     amendHash?: string
+    title?: string
   }
 
   enum UDTType {

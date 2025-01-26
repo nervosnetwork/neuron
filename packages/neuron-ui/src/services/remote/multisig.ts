@@ -54,3 +54,42 @@ export const getMultisigSyncProgress = remoteApi<string[], { hash: string; local
   'get-sync-progress-by-addresses'
 )
 export const changeMultisigSyncStatus = remoteApi<boolean, void>('change-multisig-sync-status')
+
+export const getMultisigDaoData = remoteApi<{ multisigConfig: MultisigConfig }>('get-multisig-dao-data')
+
+export const generateMultisigDaoDepositTx = remoteApi<
+  {
+    capacity: string
+    feeRate: string
+    multisigConfig: MultisigConfig
+  },
+  State.GeneratedTx
+>('generate-multisig-dao-deposit-tx')
+export const generateMultisigDaoDepositAllTx = remoteApi<
+  {
+    isBalanceReserved: boolean
+    feeRate: string
+    multisigConfig: MultisigConfig
+  },
+  State.GeneratedTx
+>('generate-multisig-dao-deposit-all-tx')
+export const generateMultisigDaoWithdrawTx = remoteApi<{
+  outPoint: {
+    txHash: string
+    index: string
+  }
+  feeRate: string
+  multisigConfig: MultisigConfig
+}>('start-withdraw-from-multisig-dao')
+export const generateMultisigDaoClaimTx = remoteApi<{
+  depositOutPoint: {
+    txHash: string
+    index: string
+  }
+  withdrawingOutPoint: {
+    txHash: string
+    index: string
+  }
+  feeRate: string
+  multisigConfig: MultisigConfig
+}>('withdraw-from-multisig-dao')

@@ -86,10 +86,15 @@ type Action =
   | 'export-transactions'
   // Dao
   | 'get-dao-data'
+  | 'get-multisig-dao-data'
   | 'generate-dao-deposit-tx'
+  | 'generate-multisig-dao-deposit-tx'
   | 'generate-dao-deposit-all-tx'
+  | 'generate-multisig-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
+  | 'start-withdraw-from-multisig-dao'
   | 'withdraw-from-dao'
+  | 'withdraw-from-multisig-dao'
   | 'calculate-unlock-dao-maximum-withdraw'
   // Special Assets
   | 'get-customized-asset-cells'

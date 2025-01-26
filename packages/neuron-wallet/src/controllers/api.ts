@@ -572,10 +572,28 @@ export default class ApiController {
       return this.#daoController.getDaoCells(params)
     })
 
+    handle('get-multisig-dao-data', async (_, params: { multisigConfig: MultisigConfigModel }) => {
+      return this.#daoController.getMultisigDaoCells({
+        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
+      })
+    })
+
     handle(
       'generate-dao-deposit-tx',
       async (_, params: { walletID: string; capacity: string; fee: string; feeRate: string }) => {
         return this.#daoController.generateDepositTx(params)
+      }
+    )
+
+    handle(
+      'generate-multisig-dao-deposit-tx',
+      async (_, params: { capacity: string; fee: string; feeRate: string; multisigConfig: MultisigConfigModel }) => {
+        return this.#daoController.generateMultisigDepositTx({
+          capacity: params.capacity,
+          fee: params.fee,
+          feeRate: params.feeRate,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
+        })
       }
     )
 
@@ -587,9 +605,36 @@ export default class ApiController {
     )
 
     handle(
+      'generate-multisig-dao-deposit-all-tx',
+      async (
+        _,
+        params: { isBalanceReserved: boolean; fee: string; feeRate: string; multisigConfig: MultisigConfigModel }
+      ) => {
+        return this.#daoController.generateMultisigDepositAllTx({
+          isBalanceReserved: params.isBalanceReserved,
+          fee: params.fee,
+          feeRate: params.feeRate,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
+        })
+      }
+    )
+
+    handle(
       'start-withdraw-from-dao',
       async (_, params: { walletID: string; outPoint: OutPoint; fee: string; feeRate: string }) => {
         return this.#daoController.startWithdrawFromDao(params)
+      }
+    )
+
+    handle(
+      'start-withdraw-from-multisig-dao',
+      async (_, params: { outPoint: OutPoint; fee: string; feeRate: string; multisigConfig: MultisigConfigModel }) => {
+        return this.#daoController.startWithdrawFromMultisigDao({
+          outPoint: params.outPoint,
+          fee: params.fee,
+          feeRate: params.feeRate,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
+        })
       }
     )
 
@@ -606,6 +651,28 @@ export default class ApiController {
         }
       ) => {
         return this.#daoController.withdrawFromDao(params)
+      }
+    )
+
+    handle(
+      'withdraw-from-multisig-dao',
+      async (
+        _,
+        params: {
+          depositOutPoint: OutPoint
+          withdrawingOutPoint: OutPoint
+          fee: string
+          feeRate: string
+          multisigConfig: MultisigConfigModel
+        }
+      ) => {
+        return this.#daoController.withdrawFromMultisigDao({
+          depositOutPoint: params.depositOutPoint,
+          withdrawingOutPoint: params.withdrawingOutPoint,
+          fee: params.fee,
+          feeRate: params.feeRate,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
+        })
       }
     )
 
