@@ -227,7 +227,7 @@ export default {
         message: 'An unrecognized lock script was found in this transaction, please check it.',
         buttons: {
           cancel: 'Cancel',
-          ignore: 'Ignpre and continue',
+          ignore: 'Ignore and continue',
         },
       },
     },
