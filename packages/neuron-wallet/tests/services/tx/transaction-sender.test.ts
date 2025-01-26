@@ -1,3 +1,4 @@
+import { dialog } from 'electron'
 import { CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { bytes } from '@ckb-lumos/lumos/codec'
 import 'dotenv/config'
@@ -179,6 +180,12 @@ jest.doMock('utils/ckb-rpc.ts', () => ({
 
 jest.doMock('services/cells', () => ({
   getLiveCell: stubbedGetLiveCell,
+}))
+
+jest.mock('electron', () => ({
+  dialog: {
+    showMessageBox: jest.fn(),
+  },
 }))
 
 import Transaction from '../../../src/models/chain/transaction'
@@ -1001,13 +1008,28 @@ describe('TransactionSender Test', () => {
         })
       })
 
-      it('throw exception no matched multisig config', async () => {
+      it('no matched multisig config, ignore and continue', async () => {
+        const showMessageBoxMock = jest
+          .spyOn(dialog, 'showMessageBox')
+          .mockImplementation(() => Promise.resolve({ response: 1, checkboxChecked: true }))
+        mockGAI.mockReturnValueOnce([{ path: '' }])
+        transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+        const tx = Transaction.fromObject(transactionObject)
+        await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).resolves.not.toThrow()
+        expect(showMessageBoxMock).toHaveBeenCalled()
+      })
+
+      it('no matched multisig config, throw exception', async () => {
+        const showMessageBoxMock = jest
+          .spyOn(dialog, 'showMessageBox')
+          .mockImplementation(() => Promise.resolve({ response: 0, checkboxChecked: false }))
         mockGAI.mockReturnValueOnce([{ path: '' }])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
         const tx = Transaction.fromObject(transactionObject)
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).rejects.toThrowError(
           new MultisigConfigNeedError()
         )
+        expect(showMessageBoxMock).toHaveBeenCalled()
       })
 
       it('throw exception no matched multisig config addresses', async () => {

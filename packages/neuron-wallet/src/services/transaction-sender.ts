@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+import { dialog } from 'electron'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
 import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
@@ -198,7 +200,27 @@ export default class TransactionSender {
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.setEmptyLock()
 
-      const privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
+      let privateKey = ''
+      try {
+        privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
+      } catch (error) {
+        const BLOCK_UNRECOGNIZED = 0
+        const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
+        const res = await dialog.showMessageBox({
+          type: 'warning',
+          message: t('messageBox.unrecognized-lock-script.message'),
+          buttons: [
+            t('messageBox.unrecognized-lock-script.buttons.cancel'),
+            t('messageBox.unrecognized-lock-script.buttons.ignore'),
+          ],
+          defaultId: BLOCK_UNRECOGNIZED,
+          cancelId: IGNORE_UNRECOGNIZED_AND_CONTINUE,
+        })
+        if (res.response === IGNORE_UNRECOGNIZED_AND_CONTINUE) {
+          continue
+        }
+        throw error
+      }
 
       const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
         const args = value.witnessArgs
@@ -330,6 +352,21 @@ export default class TransactionSender {
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       if (!multisigConfig) {
+        const BLOCK_UNRECOGNIZED = 0
+        const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
+        const res = await dialog.showMessageBox({
+          type: 'warning',
+          message: t('messageBox.unrecognized-lock-script.message'),
+          buttons: [
+            t('messageBox.unrecognized-lock-script.buttons.cancel'),
+            t('messageBox.unrecognized-lock-script.buttons.ignore'),
+          ],
+          defaultId: BLOCK_UNRECOGNIZED,
+          cancelId: IGNORE_UNRECOGNIZED_AND_CONTINUE,
+        })
+        if (res.response === IGNORE_UNRECOGNIZED_AND_CONTINUE) {
+          continue
+        }
         throw new MultisigConfigNeedError()
       }
       const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigConfig.blake160s, tx.signatures?.[lockHash])
