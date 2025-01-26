@@ -34,7 +34,7 @@ export default class DaoController {
       multisigConfig.m,
       multisigConfig.n
     )
-    const cells = await CellsService.getDaoCells({ walletId: '', lockArgs: multiSignBlake160 })
+    const cells = await CellsService.getDaoCells('', multiSignBlake160)
 
     if (!cells) {
       throw new ServiceHasNoResponse('DaoCells')

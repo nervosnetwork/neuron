@@ -223,7 +223,7 @@ export default class CellsService {
     return cells
   }
 
-  public static async getDaoCells({ walletId, lockArgs }: { walletId: string; lockArgs?: string }): Promise<Cell[]> {
+  public static async getDaoCells(walletId: string, lockArgs?: string): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
