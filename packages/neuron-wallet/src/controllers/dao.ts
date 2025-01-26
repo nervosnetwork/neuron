@@ -7,6 +7,7 @@ import OutPoint from '../models/chain/out-point'
 import Cell from '../models/chain/output'
 import Transaction from '../models/chain/transaction'
 import MultisigConfigModel from '../models/multisig-config'
+import Multisig from '../models/multisig'
 
 export default class DaoController {
   public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
@@ -27,7 +28,13 @@ export default class DaoController {
     multisigConfig: MultisigConfigModel
   }): Promise<Controller.Response<Cell[]>> {
     const { multisigConfig } = params
-    const cells = await CellsService.getMultisigDaoCells(multisigConfig)
+    const multiSignBlake160 = Multisig.hash(
+      multisigConfig.blake160s,
+      multisigConfig.r,
+      multisigConfig.m,
+      multisigConfig.n
+    )
+    const cells = await CellsService.getDaoCells({ walletId: '', lockArgs: multiSignBlake160 })
 
     if (!cells) {
       throw new ServiceHasNoResponse('DaoCells')
@@ -206,7 +213,8 @@ export default class DaoController {
       throw new IsRequired('Parameters')
     }
 
-    const tx = await new TransactionSender().withdrawFromMultisigDao(
+    const tx = await new TransactionSender().withdrawFromDao(
+      '',
       OutPoint.fromSDK(params.depositOutPoint),
       OutPoint.fromSDK(params.withdrawingOutPoint),
       params.fee,

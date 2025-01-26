@@ -20,6 +20,7 @@ import {
   useClearGeneratedTx,
   validateAmount,
 } from 'utils'
+import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import { MAX_DECIMAL_DIGITS, MIN_DEPOSIT_AMOUNT, SHANNON_CKB_RATIO } from 'utils/const'
 
 const PERCENT_100 = 100
@@ -278,11 +279,12 @@ export const useOnDepositDialogSubmit = ({
   const dispatch = useDispatch()
   return useCallback(() => {
     if (multisigConfig) {
+      const { canBroadcastAfterSign } = getMultisigSignStatus({ multisigConfig, addresses: wallet.addresses })
       dispatch({
         type: AppActions.RequestPassword,
         payload: {
           walletID: wallet.id,
-          actionType: multisigConfig.m === 1 ? 'send-from-multisig-need-one' : 'send-from-multisig',
+          actionType: canBroadcastAfterSign ? 'send-from-multisig-need-one' : 'send-from-multisig',
           multisigConfig,
           onSuccess: onDepositSuccess,
           title: 'password-request.verify-password',

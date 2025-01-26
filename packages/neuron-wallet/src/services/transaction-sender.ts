@@ -788,118 +788,8 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
     fee: string = '0',
-    feeRate: string = '0'
-  ): Promise<Transaction> => {
-    const DAO_LOCK_PERIOD_EPOCHS = BigInt(180)
-
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
-
-    const currentNetwork = NetworksService.getInstance().getCurrent()
-    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
-
-    const withdrawOutput = await CellsService.getLiveCell(withdrawingOutPoint)
-    if (!withdrawOutput) {
-      throw new CellIsNotYetLive()
-    }
-    const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
-    if (!prevTx.txStatus.isCommitted()) {
-      throw new TransactionIsNotCommittedYet()
-    }
-
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-    const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
-
-    const content = withdrawOutput.daoData
-    if (!content) {
-      throw new Error(`Withdraw output cell is not a dao cell, ${withdrawOutput.outPoint?.txHash}`)
-    }
-    if (!withdrawOutput.depositOutPoint) {
-      throw new Error('DAO has not finish step first withdraw')
-    }
-    const depositTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
-    if (!depositTx?.txStatus.blockHash) {
-      throw new Error(`Get deposit block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
-    }
-    const depositBlockHeader = await rpcService.getHeader(depositTx.txStatus.blockHash)
-    if (!depositBlockHeader) {
-      throw new Error(`Get Header failed with blockHash ${depositTx.txStatus.blockHash}`)
-    }
-    const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
-    const depositCapacity: bigint = BigInt(withdrawOutput.capacity)
-
-    const withdrawBlockHeader = (await rpcService.getHeader(prevTx.txStatus.blockHash!))!
-    const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
-
-    const withdrawFraction = withdrawEpoch.index * depositEpoch.length
-    const depositFraction = depositEpoch.index * withdrawEpoch.length
-    let depositedEpochs = withdrawEpoch.number - depositEpoch.number
-    if (withdrawFraction > depositFraction) {
-      depositedEpochs += BigInt(1)
-    }
-    const lockEpochs =
-      ((depositedEpochs + (DAO_LOCK_PERIOD_EPOCHS - BigInt(1))) / DAO_LOCK_PERIOD_EPOCHS) * DAO_LOCK_PERIOD_EPOCHS
-    const minimalSinceEpochNumber = depositEpoch.number + lockEpochs
-    const minimalSinceEpochIndex = depositEpoch.index
-    const minimalSinceEpochLength = depositEpoch.length
-
-    const minimalSince = this.epochSince(minimalSinceEpochLength, minimalSinceEpochIndex, minimalSinceEpochNumber)
-
-    const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
-
-    const wallet = WalletService.getInstance().get(walletID)
-    const address = await wallet.getNextAddress()
-    const blake160 = AddressParser.toBlake160(address!.address)
-
-    const output: Output = new Output(
-      outputCapacity.toString(),
-      new Script(SystemScriptInfo.SECP_CODE_HASH, blake160, SystemScriptInfo.SECP_HASH_TYPE),
-      undefined,
-      '0x'
-    )
-
-    const outputs: Output[] = [output]
-
-    const input: Input = new Input(
-      withdrawingOutPoint,
-      minimalSince.toString(),
-      withdrawOutput.capacity,
-      withdrawOutput.lock
-    )
-
-    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(WitnessArgs.EMPTY_LOCK, '0x0000000000000000')
-    const tx: Transaction = Transaction.fromObject({
-      version: '0',
-      cellDeps: [secpCellDep, daoCellDep],
-      headerDeps: [depositBlockHeader.hash, withdrawBlockHeader.hash],
-      inputs: [input],
-      outputs,
-      outputsData: outputs.map(o => o.data || '0x'),
-      witnesses: [withdrawWitnessArgs],
-      interest: (BigInt(outputCapacity) - depositCapacity).toString(),
-    })
-    if (mode.isFeeRateMode()) {
-      const txSize: number = TransactionSize.tx(tx)
-      const txFee: bigint = TransactionFee.fee(txSize, BigInt(feeRate))
-      tx.fee = txFee.toString()
-      tx.outputs[0].capacity = (outputCapacity - txFee).toString()
-    } else {
-      tx.fee = fee
-      tx.outputs[0].capacity = (outputCapacity - feeInt).toString()
-    }
-
-    logger.debug('withdrawFromDao fee:', tx.fee)
-
-    return tx
-  }
-
-  public withdrawFromMultisigDao = async (
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string = '0',
     feeRate: string = '0',
-    multisigConfig: MultisigConfigModel
+    multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
     const DAO_LOCK_PERIOD_EPOCHS = BigInt(180)
 
@@ -919,7 +809,9 @@ export default class TransactionSender {
       throw new TransactionIsNotCommittedYet()
     }
 
-    const cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    const cellDep = multisigConfig
+      ? await SystemScriptInfo.getInstance().getMultiSignCellDep()
+      : await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
 
     const content = withdrawOutput.daoData
@@ -959,20 +851,27 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const lockScript = Multisig.getMultisigScript(
-      multisigConfig.blake160s,
-      multisigConfig.r,
-      multisigConfig.m,
-      multisigConfig.n
-    )
-    const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
-
-    const output: Output = new Output(
-      outputCapacity.toString(),
-      AddressParser.parse(multisigAddresses),
-      undefined,
-      '0x'
-    )
+    let output: Output
+    if (multisigConfig) {
+      const lockScript = Multisig.getMultisigScript(
+        multisigConfig.blake160s,
+        multisigConfig.r,
+        multisigConfig.m,
+        multisigConfig.n
+      )
+      const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
+      output = new Output(outputCapacity.toString(), AddressParser.parse(multisigAddresses), undefined, '0x')
+    } else {
+      const wallet = WalletService.getInstance().get(walletID)
+      const address = await wallet.getNextAddress()
+      const blake160 = AddressParser.toBlake160(address!.address)
+      output = new Output(
+        outputCapacity.toString(),
+        new Script(SystemScriptInfo.SECP_CODE_HASH, blake160, SystemScriptInfo.SECP_HASH_TYPE),
+        undefined,
+        '0x'
+      )
+    }
 
     const outputs: Output[] = [output]
 

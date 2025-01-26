@@ -505,9 +505,7 @@ export class TransactionGenerator {
     const allInputs: Input[] = await CellsService.gatherAllInputs(
       walletId,
       multisigConfig
-        ? Script.fromSDK(
-            Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
-          )
+        ? Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
         : undefined
     )
     if (allInputs.length === 0) {
