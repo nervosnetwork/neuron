@@ -226,6 +226,13 @@ export default {
           cancel: 'Cancelar',
         },
       },
+      'unrecognized-lock-script': {
+        message: 'Se encontró un script de bloqueo no reconocido en esta transacción, por favor verifíquelo.',
+        buttons: {
+          cancel: 'Cancelar',
+          ignore: 'Ignorar y continuar',
+        },
+      },
     },
     prompt: {
       password: {

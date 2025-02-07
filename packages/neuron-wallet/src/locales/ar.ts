@@ -221,6 +221,13 @@ export default {
           cancel: 'إلغاء',
         },
       },
+      'unrecognized-lock-script': {
+        message: 'تم العثور على نص قفل غير معرّف في هذه المعاملة، يرجى التحقق.',
+        buttons: {
+          cancel: 'إلغاء',
+          ignore: 'تجاهل واستمرار',
+        },
+      },
     },
     prompt: {
       password: {
