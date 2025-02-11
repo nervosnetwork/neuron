@@ -152,7 +152,11 @@ export default ({
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
               (res: { result?: string; status: number; message: string | { content: string } }) => {
                 if (isSuccessResponse(res)) {
-                  requestOpenInExplorer({ type: 'transaction', key: res.result })
+                  if (onSuccess) {
+                    onSuccess()
+                  } else {
+                    requestOpenInExplorer({ type: 'transaction', key: res.result })
+                  }
                 } else if (res.status === ErrorCode.PasswordIncorrect) {
                   throw new PasswordIncorrectException()
                 } else {

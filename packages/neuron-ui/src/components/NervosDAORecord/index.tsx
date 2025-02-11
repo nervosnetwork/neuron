@@ -217,7 +217,7 @@ export const DAORecord = ({
           <Button
             className={styles.txRecordBtn}
             onClick={() => {
-              openExternal(`${getExplorerUrl(isMainnet)}/transaction/${depositOutPoint?.txHash}`)
+              openExternal(`${getExplorerUrl(isMainnet)}/transaction/${txHash}`)
             }}
             type="default"
             label={t('nervos-dao.deposit-record.view-tx-detail')}

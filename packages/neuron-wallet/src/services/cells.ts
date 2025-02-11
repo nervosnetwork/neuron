@@ -229,10 +229,7 @@ export default class CellsService {
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(
-        lockArgs
-          ? `
-        output.daoData IS NOT NULL AND
-        output.lockArgs = :lockArgs AND
+        `output.daoData IS NOT NULL AND
         (
           output.status = :liveStatus OR
           output.status = :sentStatus OR
@@ -244,26 +241,14 @@ export default class CellsService {
             ) AND
             output.depositTxHash is not null
           )
-        )`
-          : `
-        output.daoData IS NOT NULL AND
-        (
-          output.status = :liveStatus OR
-          output.status = :sentStatus OR
-          tx.status = :failedStatus OR
-          (
-            (
-              output.status = :deadStatus OR
-              output.status = :pendingStatus
-            ) AND
-            output.depositTxHash is not null
-          )
-        ) AND
-        output.lockArgs in (
+        ) AND ${
+          lockArgs
+            ? `output.lockArgs = :lockArgs`
+            : `output.lockArgs in (
           SELECT publicKeyInBlake160
           FROM hd_public_key_info
-          WHERE walletId = :walletId
-        )`,
+          WHERE walletId = :walletId)`
+        }`,
         {
           walletId,
           lockArgs,

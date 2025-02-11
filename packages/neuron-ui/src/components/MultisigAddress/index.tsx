@@ -10,7 +10,7 @@ import {
   useClearGeneratedTx,
 } from 'utils'
 import appState from 'states/init/app'
-import { useState as useGlobalState, useDispatch, showPageNotice } from 'states'
+import { useState as useGlobalState, useDispatch } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
@@ -21,6 +21,7 @@ import MultisigAddressNervosDAODialog from 'components/MultisigAddressNervosDAOD
 import Dialog from 'widgets/Dialog'
 import Table from 'widgets/Table'
 import Tooltip from 'widgets/Tooltip'
+import Toast from 'widgets/Toast'
 import AlertDialog from 'widgets/AlertDialog'
 import {
   Download,
@@ -151,6 +152,7 @@ const MultisigAddress = () => {
   const dispatch = useDispatch()
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
+  const [notice, setNotice] = useState('')
 
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (e: React.SyntheticEvent<HTMLButtonElement>) => {
@@ -270,8 +272,11 @@ const MultisigAddress = () => {
 
   const onDepositSuccess = useCallback(() => {
     daoDepositAction.closeDialog()
-    showPageNotice('nervos-dao.deposit-submitted')(dispatch)
-  }, [dispatch, daoDepositAction.closeDialog])
+    setNotice(t('nervos-dao.deposit-submitted'))
+    if (daoDepositAction.depositFromMultisig) {
+      daoWithdrawAction.action(daoDepositAction.depositFromMultisig)
+    }
+  }, [t, setNotice, daoDepositAction, daoWithdrawAction])
 
   return (
     <div>
@@ -488,6 +493,8 @@ const MultisigAddress = () => {
               noDataContent={t('multisig-address.no-data')}
             />
           </div>
+
+          <Toast content={notice} onDismiss={() => setNotice('')} />
         </div>
       </Dialog>
 
