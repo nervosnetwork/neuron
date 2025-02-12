@@ -36,6 +36,7 @@ const PasswordRequest = () => {
     isLoading,
     signType,
     actionType,
+    title,
     disabled,
     password,
     onSubmit,
@@ -62,7 +63,7 @@ const PasswordRequest = () => {
   return (
     <Dialog
       show={!!actionType}
-      title={t(`password-request.${actionType}.title`)}
+      title={t(title || `password-request.${actionType}.title`)}
       contentClassName={styles.content}
       onCancel={onDismiss}
       onConfirm={onSubmit}

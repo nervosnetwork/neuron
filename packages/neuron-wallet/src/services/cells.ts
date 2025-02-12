@@ -223,14 +223,13 @@ export default class CellsService {
     return cells
   }
 
-  public static async getDaoCells(walletId: string): Promise<Cell[]> {
+  public static async getDaoCells(walletId: string, lockArgs?: string): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(
-        `
-        output.daoData IS NOT NULL AND
+        `output.daoData IS NOT NULL AND
         (
           output.status = :liveStatus OR
           output.status = :sentStatus OR
@@ -242,14 +241,17 @@ export default class CellsService {
             ) AND
             output.depositTxHash is not null
           )
-        ) AND
-        output.lockArgs in (
+        ) AND ${
+          lockArgs
+            ? `output.lockArgs = :lockArgs`
+            : `output.lockArgs in (
           SELECT publicKeyInBlake160
           FROM hd_public_key_info
-          WHERE walletId = :walletId
-        )`,
+          WHERE walletId = :walletId)`
+        }`,
         {
           walletId,
+          lockArgs,
           liveStatus: OutputStatus.Live,
           sentStatus: OutputStatus.Sent,
           failedStatus: TransactionStatus.Failed,
@@ -1319,6 +1321,15 @@ export default class CellsService {
       return {}
     }
     const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
+
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where('output.lockHash IN (:...lockHashes)', { lockHashes })
+      .andWhere('output.hasData = :hasData', { hasData: true })
+      .andWhere('output.typeHash IS NOT NULL')
+      .getMany()
+
     const connection = await getConnection()
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `
@@ -1356,6 +1367,18 @@ export default class CellsService {
           isMainnet
         )
       ] = c.balance
+    })
+
+    outputs.forEach(item => {
+      const key = scriptToAddress(
+        {
+          args: item.lockArgs,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+        },
+        isMainnet
+      )
+      balances[key] = (BigInt(balances[key]) - BigInt(item.capacity)).toString()
     })
 
     return balances

@@ -6,16 +6,22 @@ import {
   useExitOnWalletChange,
   useGoBack,
   useOnWindowResize,
+  calculateFee,
+  useClearGeneratedTx,
 } from 'utils'
-import { useState as useGlobalState } from 'states'
+import appState from 'states/init/app'
+import { useState as useGlobalState, useDispatch } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
 import { MultisigConfig, changeMultisigSyncStatus, openExternal } from 'services/remote'
 import ApproveMultisigTxDialog from 'components/ApproveMultisigTxDialog'
+import DepositDialog from 'components/DepositDialog'
+import MultisigAddressNervosDAODialog from 'components/MultisigAddressNervosDAODialog'
 import Dialog from 'widgets/Dialog'
 import Table from 'widgets/Table'
 import Tooltip from 'widgets/Tooltip'
+import Toast from 'widgets/Toast'
 import AlertDialog from 'widgets/AlertDialog'
 import {
   Download,
@@ -30,14 +36,18 @@ import {
   Confirming,
   Question,
   LineDownArrow,
+  DAODeposit,
+  DAOWithdrawal,
 } from 'widgets/Icons/icon'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
 import getMultisigSignStatus from 'utils/getMultisigSignStatus'
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import Button from 'widgets/Button'
 import SetStartBlockNumberDialog from 'components/SetStartBlockNumberDialog'
 import { type TFunction } from 'i18next'
+import hooks from 'components/NervosDAO/hooks'
 import {
   useSearch,
   useConfigManage,
@@ -68,6 +78,14 @@ const tableActions = [
     key: ApproveKey,
     icon: <Confirm />,
   },
+  {
+    key: 'daoDeposit',
+    icon: <DAODeposit />,
+  },
+  {
+    key: 'daoWithdraw',
+    icon: <DAOWithdrawal />,
+  },
 ]
 
 const LearnMore = React.memo(({ t }: { t: TFunction }) => (
@@ -87,14 +105,19 @@ const MultisigAddress = () => {
   const [t] = useTranslation()
   useExitOnWalletChange()
   const {
-    wallet: { id: walletId, addresses },
+    app: {
+      send = appState.send,
+      loadings: { sending = false },
+    },
+    wallet,
     chain: {
-      syncState: { bestKnownBlockNumber },
+      syncState: { bestKnownBlockNumber, bestKnownBlockTimestamp },
       networkID,
       connectionStatus,
     },
     settings: { networks = [] },
   } = useGlobalState()
+  const { id: walletId, addresses } = wallet
   const isMainnet = isMainnetUtil(networks, networkID)
   const isLightClient = useMemo(
     () => networks.find(n => n.id === networkID)?.type === NetworkType.Light,
@@ -120,8 +143,16 @@ const MultisigAddress = () => {
     configs: allConfigs,
     isLightClient,
   })
-  const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
+  const { deleteAction, infoAction, sendAction, approveAction, daoDepositAction, daoWithdrawAction } = useActions({
+    deleteConfigById,
+  })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
+  const clearGeneratedTx = useClearGeneratedTx()
+  const dispatch = useDispatch()
+  const [globalAPC, setGlobalAPC] = useState(0)
+  const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
+  const [notice, setNotice] = useState('')
 
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (e: React.SyntheticEvent<HTMLButtonElement>) => {
@@ -141,6 +172,12 @@ const MultisigAddress = () => {
           break
         case 'approve':
           approveAction.action(multisigConfig)
+          break
+        case 'daoDeposit':
+          daoDepositAction.action(multisigConfig)
+          break
+        case 'daoWithdraw':
+          daoWithdrawAction.action(multisigConfig)
           break
         default:
           break
@@ -218,6 +255,28 @@ const MultisigAddress = () => {
     updateTipPosition()
   }, [updateTipPosition])
   useOnWindowResize(updateTipPosition)
+
+  const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
+  hooks.useInitData({
+    clearGeneratedTx,
+    dispatch,
+    wallet,
+    setGenesisBlockTimestamp,
+    genesisBlockHash,
+  })
+  hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
+
+  const fee = `${shannonToCKBFormatter(
+    send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
+  )} CKB`
+
+  const onDepositSuccess = useCallback(() => {
+    daoDepositAction.closeDialog()
+    setNotice(t('nervos-dao.deposit-submitted'))
+    if (daoDepositAction.depositFromMultisig) {
+      daoWithdrawAction.action(daoDepositAction.depositFromMultisig)
+    }
+  }, [t, setNotice, daoDepositAction, daoWithdrawAction])
 
   return (
     <div>
@@ -434,6 +493,8 @@ const MultisigAddress = () => {
               noDataContent={t('multisig-address.no-data')}
             />
           </div>
+
+          <Toast content={notice} onDismiss={() => setNotice('')} />
         </div>
       </Dialog>
 
@@ -520,6 +581,29 @@ const MultisigAddress = () => {
           address={address}
           onUpdateStartBlockNumber={onConfirm}
           onCancel={onCancel}
+        />
+      ) : null}
+
+      {daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen ? (
+        <DepositDialog
+          balance={multisigBanlances[daoDepositAction.depositFromMultisig.fullPayload]}
+          wallet={wallet}
+          show
+          fee={fee}
+          onCloseDepositDialog={daoDepositAction.closeDialog}
+          isDepositing={sending}
+          isTxGenerated={!!send.generatedTx}
+          suggestFeeRate={suggestFeeRate}
+          globalAPC={globalAPC}
+          onDepositSuccess={onDepositSuccess}
+          multisigConfig={daoDepositAction.depositFromMultisig}
+        />
+      ) : null}
+
+      {daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen ? (
+        <MultisigAddressNervosDAODialog
+          closeDialog={daoWithdrawAction.closeDialog}
+          multisigConfig={daoWithdrawAction.withdrawFromMultisig}
         />
       ) : null}
     </div>

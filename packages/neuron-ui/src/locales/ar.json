@@ -504,6 +504,7 @@
     },
     "password-request": {
       "wallet-not-found": "لم يتم العثور على المحفظة",
+      "verify-password": "تحقق من كلمة المرور",
       "password": "أدخل كلمة المرور",
       "placeholder": "يرجى إدخال كلمة مرور المحفظة",
       "send": {
@@ -810,7 +811,8 @@
       "amount": "المبلغ",
       "cell-from-cellbase": "من خلية الأساس",
       "cancel": "إلغاء",
-      "next": "التالي"
+      "next": "التالي",
+      "export": "تصدير المعاملة"
     },
     "deposit-rules": {
       "minimum-deposit": "الحد الأدنى للإيداع",

@@ -45,7 +45,7 @@ export default ({
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { walletID = '', actionType = null, amendHash, multisigConfig, onSuccess } = passwordRequest
+  const { walletID = '', actionType = null, title, amendHash, multisigConfig, onSuccess } = passwordRequest
 
   useEffect(() => {
     setPassword('')
@@ -152,7 +152,11 @@ export default ({
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
               (res: { result?: string; status: number; message: string | { content: string } }) => {
                 if (isSuccessResponse(res)) {
-                  requestOpenInExplorer({ type: 'transaction', key: res.result })
+                  if (onSuccess) {
+                    onSuccess()
+                  } else {
+                    requestOpenInExplorer({ type: 'transaction', key: res.result })
+                  }
                 } else if (res.status === ErrorCode.PasswordIncorrect) {
                   throw new PasswordIncorrectException()
                 } else {
@@ -362,6 +366,7 @@ export default ({
     isLoading,
     signType,
     actionType,
+    title,
     disabled,
     password,
     onSubmit,
