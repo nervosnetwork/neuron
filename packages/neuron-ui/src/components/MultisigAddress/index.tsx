@@ -7,10 +7,9 @@ import {
   useGoBack,
   useOnWindowResize,
   calculateFee,
-  useClearGeneratedTx,
 } from 'utils'
 import appState from 'states/init/app'
-import { useState as useGlobalState, useDispatch } from 'states'
+import { useState as useGlobalState } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
@@ -39,6 +38,7 @@ import {
   DAODeposit,
   DAOWithdrawal,
 } from 'widgets/Icons/icon'
+import { getHeader } from 'services/chain'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
@@ -148,8 +148,6 @@ const MultisigAddress = () => {
   })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
-  const clearGeneratedTx = useClearGeneratedTx()
-  const dispatch = useDispatch()
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
   const [notice, setNotice] = useState('')
@@ -257,13 +255,15 @@ const MultisigAddress = () => {
   useOnWindowResize(updateTipPosition)
 
   const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
-  hooks.useInitData({
-    clearGeneratedTx,
-    dispatch,
-    wallet,
-    setGenesisBlockTimestamp,
-    genesisBlockHash,
-  })
+
+  useEffect(() => {
+    if (genesisBlockHash) {
+      getHeader(genesisBlockHash)
+        .then(header => setGenesisBlockTimestamp(+header.timestamp))
+        .catch(err => console.error(err))
+    }
+  }, [])
+
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
 
   const fee = `${shannonToCKBFormatter(
