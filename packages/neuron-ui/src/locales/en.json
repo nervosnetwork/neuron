@@ -504,6 +504,7 @@
     },
     "password-request": {
       "wallet-not-found": "The wallet is not found",
+      "verify-password": "Verify Password",
       "password": "Enter Password",
       "placeholder": "Please input wallet password",
       "send": {
@@ -810,7 +811,8 @@
       "amount": "Amount",
       "cell-from-cellbase": "From cellbase",
       "cancel": "Cancel",
-      "next": "Next"
+      "next": "Next",
+      "export": "Export Tx"
     },
     "deposit-rules": {
       "minimum-deposit": "Minimum Deposit",
@@ -1131,7 +1133,9 @@
           "info": "Info",
           "send": "Send",
           "approve": "Approve",
-          "delete": "Delete"
+          "delete": "Delete",
+          "daoDeposit": "DAO Deposit",
+          "daoWithdraw": "DAO Withdraw"
         }
       },
       "import-dialog": {

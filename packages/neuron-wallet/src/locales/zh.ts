@@ -210,6 +210,13 @@ export default {
           cancel: '取消',
         },
       },
+      'unrecognized-lock-script': {
+        message: '在此交易中发现了一个未识别的lock script，请检查。',
+        buttons: {
+          cancel: '取消',
+          ignore: '忽略并继续',
+        },
+      },
     },
     prompt: {
       password: {

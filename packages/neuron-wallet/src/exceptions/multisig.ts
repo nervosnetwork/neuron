@@ -25,6 +25,7 @@ export class MultisigConfigAddressError extends Error {
 }
 
 export class MultisigConfigNeedError extends Error {
+  public code = 502
   constructor() {
     super(t('messages.multisig-config-need-error'))
   }

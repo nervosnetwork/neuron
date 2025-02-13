@@ -487,6 +487,7 @@
     },
     "password-request": {
       "wallet-not-found": "No se encontró la billetera",
+      "verify-password": "Verificar Contraseña",
       "password": "Ingresar Contraseña",
       "placeholder": "Por favor ingrese la contraseña de la billetera",
       "send": {
@@ -793,7 +794,8 @@
       "amount": "Cantidad",
       "cell-from-cellbase": "Desde cellbase",
       "cancel": "Cancelar",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "export": "Exportar Tx"
     },
     "deposit-rules": {
       "minimum-deposit": "Depósito mínimo",
@@ -1114,7 +1116,9 @@
           "info": "Información",
           "send": "Enviar",
           "approve": "Aprobar",
-          "delete": "Eliminar"
+          "delete": "Eliminar",
+          "daoDeposit": "Depositar en DAO",
+          "daoWithdraw": "Retirar de DAO"
         }
       },
       "import-dialog": {
