@@ -1125,7 +1125,9 @@
           "info": "详情",
           "send": "转账",
           "approve": "确认",
-          "delete": "删除"
+          "delete": "删除",
+          "daoDeposit": "存入 DAO",
+          "daoWithdraw": "从 DAO 取出"
         }
       },
       "import-dialog": {

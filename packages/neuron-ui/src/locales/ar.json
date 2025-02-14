@@ -1133,7 +1133,9 @@
           "info": "معلومات",
           "send": "إرسال",
           "approve": "الموافقة",
-          "delete": "حذف"
+          "delete": "حذف",
+          "daoDeposit": "إيداع في DAO",
+          "daoWithdraw": "سحب من DAO"
         }
       },
       "import-dialog": {

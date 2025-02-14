@@ -1123,7 +1123,9 @@
           "info": "Info",
           "send": "Envoyer",
           "approve": "Approuver",
-          "delete": "Supprimer"
+          "delete": "Supprimer",
+          "daoDeposit": "Déposer dans DAO",
+          "daoWithdraw": "Retirer de DAO"
         }
       },
       "import-dialog": {

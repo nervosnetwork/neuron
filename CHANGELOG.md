@@ -1,3 +1,25 @@
+# 0.121.1 (2025-02-13)
+
+### CKB Node & Light Client
+
+- [CKB@v0.121.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.121.0) was released on Jan. 23rd, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.4.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.4.1) was released on Nov. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x53dd03a0420b68e082d660cb2e86f167aa8f1bd95c637228285bf36f5caa9e1d`(at height `15,361,857`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3310)
+
+---
+
+## New features
+
+- #3291: Support complex transaction with multisig account.(@devchenyan)
+- #3298: Support Nervos DAO with multisig account.(@devchenyan)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.121.0...v0.121.1
+
+
 # 0.121.0 (2025-01-16)
 
 ### CKB Node & Light Client
