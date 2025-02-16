@@ -59,7 +59,7 @@
     "electron-log": "4.4.8",
     "electron-updater": "6.3.0",
     "electron-window-state": "5.0.3",
-    "elliptic": "6.6.0",
+    "elliptic": "6.6.1",
     "i18next": "21.10.0",
     "leveldown": "6.1.1",
     "levelup": "4.4.0",
