@@ -25,6 +25,7 @@ export const AddressQrCodeWithCopyZone = ({
   onClick,
 }: AddressTransformWithCopyZoneProps) => {
   const [t] = useTranslation()
+  const { wallet } = useGlobalState()
   const transformLabel = t(
     isInShortFormat ? 'receive.turn-into-full-version-format' : 'receive.turn-into-deprecated-format'
   )
@@ -85,10 +86,12 @@ export const AddressQrCodeWithCopyZone = ({
             <AddressTransform />
             {transformLabel}
           </button>
-          <button type="button" className={styles.privateKey} onClick={() => setShowViewPrivateKey(true)}>
-            <PrivateKey />
-            {t('addresses.view-private-key')}
-          </button>
+          {!wallet.device && (
+            <button type="button" className={styles.privateKey} onClick={() => setShowViewPrivateKey(true)}>
+              <PrivateKey />
+              {t('addresses.view-private-key')}
+            </button>
+          )}
         </div>
       </div>
 
