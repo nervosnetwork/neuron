@@ -209,6 +209,13 @@ export default {
           cancel: '取消',
         },
       },
+      'unrecognized-lock-script': {
+        message: '在此交易中發現了一個未識別的lock script，請檢查。',
+        buttons: {
+          cancel: '取消',
+          ignore: '忽略並繼續',
+        },
+      },
     },
     prompt: {
       password: {

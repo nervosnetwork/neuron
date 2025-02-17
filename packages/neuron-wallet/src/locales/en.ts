@@ -223,6 +223,13 @@ export default {
           cancel: 'Cancel',
         },
       },
+      'unrecognized-lock-script': {
+        message: 'An unrecognized lock script was found in this transaction, please check it.',
+        buttons: {
+          cancel: 'Cancel',
+          ignore: 'Ignore and continue',
+        },
+      },
     },
     prompt: {
       password: {

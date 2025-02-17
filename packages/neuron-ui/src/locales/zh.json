@@ -497,6 +497,7 @@
     },
     "password-request": {
       "wallet-not-found": "找不到该钱包",
+      "verify-password": "验证密码",
       "password": "输入密码",
       "placeholder": "请输入钱包密码",
       "send": {
@@ -803,7 +804,8 @@
       "amount": "数量",
       "cell-from-cellbase": "来自 Cellbase",
       "cancel": "取消",
-      "next": "下一步"
+      "next": "下一步",
+      "export": "导出交易"
     },
     "deposit-rules": {
       "minimum-deposit": "最低存入额",
@@ -1123,7 +1125,9 @@
           "info": "详情",
           "send": "转账",
           "approve": "确认",
-          "delete": "删除"
+          "delete": "删除",
+          "daoDeposit": "存入 DAO",
+          "daoWithdraw": "从 DAO 取出"
         }
       },
       "import-dialog": {
