@@ -124,6 +124,7 @@ export const useOnSubmit = ({
       options: {
         name,
         remote,
+        type: networkType,
       },
     })(dispatch, callback).then(() => setIsUpdating(false))
   }, [id, name, remote, networks, callback, dispatch, disabled, setIsUpdating])
