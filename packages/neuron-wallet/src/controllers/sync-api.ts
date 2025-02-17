@@ -133,6 +133,7 @@ export default class SyncApiController {
     const currentTimestamp = Date.now()
     const network = NetworksService.getInstance().getCurrent()
     const tipHeader = await new RpcService(network.remote, network.type).getTipHeader()
+    const syncState = await new RpcService(network.remote, network.type).getSyncState()
 
     const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.#fetchBestKnownBlockInfo()
     const foundBestKnownBlockNumber = this.#foundBestKnownBlockNumber(bestKnownBlockNumber)
@@ -146,9 +147,7 @@ export default class SyncApiController {
         ? +process.env.CKB_NODE_ASSUME_VALID_TARGET_BLOCK_NUMBER
         : undefined
     const isLookingValidTarget =
-      network.type === NetworkType.Default &&
-      !!setAssumeValidTargetBlockNumber &&
-      bestKnownBlockNumber < setAssumeValidTargetBlockNumber
+      network.type === NetworkType.Default && !!setAssumeValidTargetBlockNumber && !syncState.assumeValidTargetReached
 
     const newSyncState: SyncState = {
       nodeUrl: network.remote,
