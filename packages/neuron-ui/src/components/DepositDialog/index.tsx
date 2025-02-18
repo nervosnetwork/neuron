@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Slider } from 'office-ui-fabric-react'
 import { Trans, useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
@@ -66,6 +66,7 @@ const DepositDialog = ({
 }: DepositDialogProps) => {
   const [t, { language }] = useTranslation()
   const disabled = !isTxGenerated
+  const [isTyping, setIsTyping] = useState(false)
   const { isBalanceReserved, onIsBalanceReservedChange, setIsBalanceReserved } = useBalanceReserved()
   const { depositValue, onChangeDepositValue, slidePercent, onSliderChange, resetDepositValue } = useDepositValue(
     balance,
@@ -107,6 +108,14 @@ const DepositDialog = ({
   })
 
   const isChinese = language === 'zh' || language.startsWith('zh-')
+
+  const handleBlur = useCallback(() => {
+    setIsTyping(false)
+  }, [setIsTyping])
+
+  const handleFocus = useCallback(() => {
+    setIsTyping(true)
+  }, [setIsTyping])
 
   return (
     <Dialog
@@ -151,8 +160,10 @@ const DepositDialog = ({
             className={styles.depositValue}
             width="100%"
             field="depositValue"
-            value={localNumberFormatter(maxDepositValue ?? depositValue)}
+            value={isTyping ? maxDepositValue ?? depositValue : localNumberFormatter(maxDepositValue ?? depositValue)}
             onChange={onChangeDepositValue}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
             suffix="CKB"
             required
             error={errorMessage}
