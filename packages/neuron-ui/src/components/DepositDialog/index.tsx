@@ -117,6 +117,8 @@ const DepositDialog = ({
     setIsTyping(true)
   }, [setIsTyping])
 
+  const inputValue = useMemo(() => maxDepositValue ?? depositValue, [maxDepositValue, depositValue])
+
   return (
     <Dialog
       show={show}
@@ -160,7 +162,7 @@ const DepositDialog = ({
             className={styles.depositValue}
             width="100%"
             field="depositValue"
-            value={isTyping ? maxDepositValue ?? depositValue : localNumberFormatter(maxDepositValue ?? depositValue)}
+            value={isTyping ? inputValue : localNumberFormatter(inputValue)}
             onChange={onChangeDepositValue}
             onBlur={handleBlur}
             onFocus={handleFocus}
