@@ -13,6 +13,7 @@ import {
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
+import { RPC } from '@ckb-lumos/rpc/lib/types/rpc'
 
 export interface LightScriptFilter {
   script: Script
@@ -21,6 +22,11 @@ export interface LightScriptFilter {
 }
 
 export type LightScriptSyncStatus = LightScriptFilter
+
+interface ExtendedSyncState extends RPC.SyncState {
+  assume_valid_target: string
+  assume_valid_target_reached: boolean
+}
 
 const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0], 'name'>> = {
   setScripts: {
@@ -133,18 +139,7 @@ export class FullCKBRPC extends CKBRPC {
       name: 'getSyncState',
       method: 'sync_state',
       paramsFormatters: [],
-      resultFormatters: (state: {
-        assume_valid_target: string
-        assume_valid_target_reached: boolean
-        best_known_block_number: any
-        best_known_block_timestamp: any
-        fast_time: any
-        ibd: any
-        inflight_blocks_count: any
-        low_time: any
-        normal_time: any
-        orphan_blocks_count: any
-      }) => {
+      resultFormatters: (state: ExtendedSyncState) => {
         if (!state) {
           return state
         }
