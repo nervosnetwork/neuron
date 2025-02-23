@@ -1,0 +1,96 @@
+@import '../../styles/mixin.scss';
+
+.passwordInput {
+  margin-top: 16px;
+}
+
+.dialog {
+  width: 700px;
+}
+
+.tip {
+  color: var(--warn-text-color);
+  background: var(--warn-background-color);
+  margin: -20px -16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 12px;
+  gap: 4px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--warn-border-color);
+}
+
+.label {
+  font-weight: 500;
+  color: var(--main-text-color);
+  font-size: 14px;
+}
+
+.copy {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.notice {
+  @include dialog-copy-animation;
+}
+
+.modifyTip {
+  max-width: 450px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--main-text-color);
+}
+
+.footer {
+  background: var(--secondary-background-color);
+  padding: 24px 0 20px;
+  @include dialog-footer;
+
+  button {
+    padding: 0 20px;
+  }
+
+  button:nth-child(2) {
+    margin-left: 24px;
+  }
+}
+
+.pathItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 488px;
+  height: 40px;
+  margin: 24px auto 0;
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+  button {
+    height: 100%;
+    border-radius: 0 8px 8px 0;
+    min-width: 60px;
+    border: none;
+    border-left: 1px solid var(--divide-line-color);
+    background: var(--input-disabled-color);
+    cursor: pointer;
+    color: var(--secondary-text-color);
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+  p {
+    padding: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 0 16px;
+    color: var(--input-hint-color);
+  }
+}

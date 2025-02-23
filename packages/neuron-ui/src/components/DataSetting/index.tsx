@@ -5,8 +5,8 @@ import { useDispatch, useState as useGlobalState } from 'states'
 import { shell } from 'electron'
 import Tooltip from 'widgets/Tooltip'
 import { NetworkType } from 'utils/const'
-import { Attention } from 'widgets/Icons/icon'
-import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
+import { Attention, More } from 'widgets/Icons/icon'
+import ModifyPathDialog from 'components/ModifyPathDialog'
 import { useDataPath } from './hooks'
 
 import styles from './dataSetting.module.scss'
@@ -28,9 +28,33 @@ const PathItem = ({
       <button className={styles.itemPath} type="button" onClick={openPath}>
         {path}
       </button>
-      <button className={styles.itemBtn} type="button" onClick={handleClick} disabled={disabled}>
-        {t('settings.data.set-path')}
-      </button>
+      <Tooltip
+        className={styles.moreTooltip}
+        tipClassName={styles.moreTip}
+        tip={
+          <div className={styles.actions}>
+            {[
+              {
+                label: 'settings.data.browse-local-files',
+                onClick: openPath,
+              },
+              {
+                label: 'settings.data.modify-path',
+                onClick: handleClick,
+              },
+            ].map(({ label, onClick }) => (
+              <button type="button" key={label} onClick={onClick}>
+                <span>{t(label)}</span>
+              </button>
+            ))}
+          </div>
+        }
+        trigger="click"
+      >
+        <button className={styles.itemBtn} type="button" disabled={disabled}>
+          <More />
+        </button>
+      </Tooltip>
     </div>
   )
 }
@@ -43,7 +67,7 @@ const DataSetting = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const network = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
-  const { onSetting, prevPath, currentPath, isDialogOpen, onCancel, onConfirm } = useDataPath(network)
+  const { isDialogOpen, openDialog, onSetting, prevPath, currentPath, onCancel, onConfirm } = useDataPath(network)
 
   const openPath = useCallback(() => {
     if (prevPath) {
@@ -52,6 +76,7 @@ const DataSetting = () => {
   }, [prevPath])
   const isLightClient = network?.type === NetworkType.Light
   const hiddenDataPath = isLightClient || !network?.readonly
+
   return (
     <>
       <div className={styles.root}>
@@ -82,17 +107,20 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          {hiddenDataPath ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} />}
+          {hiddenDataPath ? null : <PathItem path={prevPath} openPath={openPath} handleClick={openDialog} />}
           <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} />
         </div>
       </div>
-      <MigrateCkbDataDialog
-        show={isDialogOpen}
-        prevPath={prevPath}
-        currentPath={currentPath}
-        onCancel={onCancel}
-        onConfirm={onConfirm}
-      />
+
+      {isDialogOpen && (
+        <ModifyPathDialog
+          prevPath={prevPath}
+          currentPath={currentPath}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          onSetting={onSetting}
+        />
+      )}
     </>
   )
 }

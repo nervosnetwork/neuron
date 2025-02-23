@@ -18,21 +18,27 @@ export const useDataPath = (network?: State.Network) => {
       }
     })
   }, [network?.id])
-  const onSetting = useCallback(() => {
-    invokeShowOpenDialog({
-      buttonLabel: t('settings.data.set', { lng: navigator.language }),
-      properties: ['openDirectory', 'createDirectory', 'promptToCreate', 'treatPackageAsDirectory'],
-    }).then(res => {
-      if (isSuccessResponse(res) && !res.result?.canceled && res.result?.filePaths?.length) {
-        setCurrentPath(res.result?.filePaths?.[0])
-        stopProcessMonitor(type).then(stopRes => {
-          if (isSuccessResponse(stopRes)) {
-            setIsDialogOpen(true)
-          }
-        })
-      }
-    })
-  }, [t, type])
+
+  const onSetting = useCallback(
+    (onSuccess?: (path: string) => void) => {
+      invokeShowOpenDialog({
+        buttonLabel: t('settings.data.set', { lng: navigator.language }),
+        properties: ['openDirectory', 'createDirectory', 'promptToCreate', 'treatPackageAsDirectory'],
+      }).then(res => {
+        if (isSuccessResponse(res) && !res.result?.canceled && res.result?.filePaths?.length) {
+          const path = res.result?.filePaths?.[0]
+          setCurrentPath(path)
+          stopProcessMonitor(type).then(stopRes => {
+            if (isSuccessResponse(stopRes)) {
+              onSuccess?.(path)
+            }
+          })
+        }
+      })
+    },
+    [t, type]
+  )
+
   const onCancel = useCallback(() => {
     startProcessMonitor(type).then(res => {
       if (isSuccessResponse(res)) {
@@ -40,6 +46,7 @@ export const useDataPath = (network?: State.Network) => {
       }
     })
   }, [setIsDialogOpen, type])
+
   const onConfirm = useCallback(
     (dataPath: string) => {
       setPrevPath(dataPath)
@@ -47,6 +54,12 @@ export const useDataPath = (network?: State.Network) => {
     },
     [setIsDialogOpen, setPrevPath]
   )
+
+  const openDialog = useCallback(() => {
+    setCurrentPath('')
+    setIsDialogOpen(true)
+  }, [setIsDialogOpen, setCurrentPath])
+
   return {
     prevPath,
     currentPath,
@@ -54,6 +67,7 @@ export const useDataPath = (network?: State.Network) => {
     onCancel,
     onConfirm,
     isDialogOpen,
+    openDialog,
   }
 }
 

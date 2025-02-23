@@ -482,7 +482,23 @@
         "move-data-finish": "Se han movido los datos",
         "re-sync": "Sincronizar desde cero",
         "disabled-set-path": "Cuando el nodo CKB se inicia manualmente, la configuración de la ruta de configuración y el almacenamiento del nodo CKB no tienen efecto",
-        "ckb-node-storage": "Almacenamiento del Nodo CKB"
+        "ckb-node-storage": "Almacenamiento de Nodo CKB",
+        "browse-local-files": "Explorar archivos locales",
+        "modify-path": "Modificar ruta",
+        "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{requiredDiskSpace}} GB para almacenar los datos del Nodo CKB.",
+        "modify-path-content": "Puedes elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores para continuar la sincronización.",
+        "resynchronize": "Volver a sincronizar",
+        "retain-previous-data": "Conservar datos anteriores",
+        "set-a-new-path": "Establecer una nueva ruta",
+        "browse": "Explorar",
+        "migrate-previous-ckb-node-data": "Migrar datos anteriores del Nodo CKB",
+        "migrate-previous-ckb-node-data-notice": "Antes de hacer clic en el botón Confirmar, complete lo siguiente:",
+        "migrate-confirm": "Confirmar ({{seconds}}s)",
+        "migrate-step-1": "Abrir la ruta de almacenamiento de los datos anteriores del Nodo CKB.",
+        "migrate-step-2": "Abrir la nueva ruta establecida.",
+        "migrate-step-3": "Copiar todos los archivos de datos del Nodo CKB a la nueva ruta.",
+        "click-here": "Haz clic aquí",
+        "migrate-data-successful": "Migración de datos exitosa"
       }
     },
     "password-request": {

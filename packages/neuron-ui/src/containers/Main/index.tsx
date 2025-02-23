@@ -195,13 +195,14 @@ const MainContent = () => {
         onConfirm={needConfirm ? onMigrate : onContinueSync}
         onChangeDataPath={setNewCkbDataPath}
       />
-      <MigrateCkbDataDialog
-        show={isMigrateDataDialogShow}
-        prevPath={oldCkbDataPath}
-        currentPath={newCkbDataPath}
-        onCancel={onCloseMigrateDialog}
-        onConfirm={onConfirmMigrate}
-      />
+      {isMigrateDataDialogShow && (
+        <MigrateCkbDataDialog
+          prevPath={oldCkbDataPath}
+          currentPath={newCkbDataPath}
+          onCancel={onCloseMigrateDialog}
+          onConfirm={onConfirmMigrate}
+        />
+      )}
       <LockWindowDialog
         show={isLockDialogShow}
         encryptedPassword={lockWindowInfo?.encryptedPassword}

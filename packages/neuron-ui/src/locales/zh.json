@@ -492,7 +492,23 @@
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
         "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
-        "ckb-node-storage": "CKB节点数据"
+        "ckb-node-storage": "CKB节点数据",
+        "browse-local-files": "浏览本地文件",
+        "modify-path": "修改路径",
+        "modify-path-notice": "请确保剩余的磁盘空间大于 {{requiredDiskSpace}} GB 以存储 CKB 节点数据。",
+        "modify-path-content": "您可以选择一个新路径重新同步或迁移以前的数据以继续同步。",
+        "resynchronize": "重新同步",
+        "retain-previous-data": "保留以前的数据",
+        "set-a-new-path": "设置新路径",
+        "browse": "浏览",
+        "migrate-previous-ckb-node-data": "迁移以前的 CKB 节点数据",
+        "migrate-previous-ckb-node-data-notice": "在点击确认按钮之前，请完成以下操作：",
+        "migrate-confirm": "确认 ({{seconds}}秒)",
+        "migrate-step-1": "打开以前 CKB 节点数据的存储路径。",
+        "migrate-step-2": "打开新设置的路径。",
+        "migrate-step-3": "将所有 CKB 节点数据文件复制到新路径。",
+        "click-here": "点击这里",
+        "migrate-data-successful": "数据迁移成功"
       }
     },
     "password-request": {
