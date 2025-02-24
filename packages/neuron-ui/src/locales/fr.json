@@ -492,7 +492,7 @@
         "ckb-node-storage": "Stockage du noeud CKB",
         "browse-local-files": "Parcourir les fichiers locaux",
         "modify-path": "Modifier le chemin",
-        "modify-path-notice": "Veuillez vous assurer que l'espace disque restant est supérieur à {{requiredDiskSpace}} Go pour stocker les données du nœud CKB.",
+        "modify-path-notice": "Veuillez vous assurer que l'espace disque restant est supérieur à {{needSize}} Go pour stocker les données du nœud CKB.",
         "modify-path-content": "Vous pouvez choisir un nouveau chemin pour resynchroniser ou migrer les données précédentes afin de continuer la synchronisation.",
         "resynchronize": "Resynchroniser",
         "retain-previous-data": "Conserver les données précédentes",

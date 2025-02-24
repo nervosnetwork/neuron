@@ -781,6 +781,13 @@ export default class ApiController {
       }
     })
 
+    handle('get-ckb-node-data-need-size', () => {
+      return {
+        status: ResponseCode.Success,
+        result: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+      }
+    })
+
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,

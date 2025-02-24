@@ -485,7 +485,7 @@
         "ckb-node-storage": "Almacenamiento de Nodo CKB",
         "browse-local-files": "Explorar archivos locales",
         "modify-path": "Modificar ruta",
-        "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{requiredDiskSpace}} GB para almacenar los datos del Nodo CKB.",
+        "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{needSize}} GB para almacenar los datos del Nodo CKB.",
         "modify-path-content": "Puedes elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores para continuar la sincronización.",
         "resynchronize": "Volver a sincronizar",
         "retain-previous-data": "Conservar datos anteriores",

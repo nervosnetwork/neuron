@@ -16,6 +16,7 @@ export const openInWindow = remoteApi<Controller.OpenInWindowParams>('open-in-wi
 export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerParams, void>('request-open-in-explorer')
 export const handleViewError = remoteApi<string>('handle-view-error')
 export const setLocale = remoteApi<(typeof LOCALES)[number]>('set-locale')
+export const getCkbNodeDataNeedSize = remoteApi<void, number>('get-ckb-node-data-need-size')
 export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-path')
 export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean; onlySetPath?: boolean }, string>(
   'set-ckb-node-data-path'

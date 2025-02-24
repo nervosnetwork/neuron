@@ -42,6 +42,7 @@ type Action =
   | 'open-context-menu'
   | 'get-all-displays-size'
   | 'show-message-box'
+  | 'get-ckb-node-data-need-size'
   | 'get-ckb-node-data-path'
   | 'set-ckb-node-data-path'
   | 'stop-process-monitor'

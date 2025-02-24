@@ -1,15 +1,13 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
 import AlertDialog from 'widgets/AlertDialog'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
-import { setCkbNodeDataPath } from 'services/remote'
+import { setCkbNodeDataPath, getCkbNodeDataNeedSize } from 'services/remote'
 import { Attention } from 'widgets/Icons/icon'
 import { isSuccessResponse } from 'utils'
 import styles from './modifyPathDialog.module.scss'
-
-const requiredDiskSpace = '158'
 
 const ModifyPathDialog = ({
   prevPath,
@@ -28,6 +26,15 @@ const ModifyPathDialog = ({
   const [isMigrateOpen, setIsMigrateOpen] = useState(false)
   const [failureMessage, setFailureMessage] = useState('')
   const [isRetainPreviousData, setIsRetainPreviousData] = useState(false)
+  const [needSize, setNeedSize] = useState(0)
+
+  useEffect(() => {
+    getCkbNodeDataNeedSize().then(res => {
+      if (isSuccessResponse(res)) {
+        setNeedSize(res.result!)
+      }
+    })
+  }, [])
 
   const handleResynchronize = useCallback(async () => {
     setFailureMessage('')
@@ -71,7 +78,7 @@ const ModifyPathDialog = ({
         <div>
           <div className={styles.tip}>
             <Attention />
-            {t('settings.data.modify-path-notice', { requiredDiskSpace })}
+            {t('settings.data.modify-path-notice', { needSize })}
           </div>
 
           <div className={styles.pathItem}>
@@ -97,7 +104,7 @@ const ModifyPathDialog = ({
         <div>
           <div className={styles.tip}>
             <Attention />
-            {t('settings.data.modify-path-notice', { requiredDiskSpace })}
+            {t('settings.data.modify-path-notice', { needSize })}
           </div>
           <p className={styles.modifyTip}>{t('settings.data.modify-path-content')}</p>
 

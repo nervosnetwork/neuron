@@ -496,7 +496,7 @@
         "ckb-node-storage": "CKB節點數據",
         "browse-local-files": "瀏覽本地檔案",
         "modify-path": "修改路徑",
-        "modify-path-notice": "請確保剩餘的磁碟空間大於 {{requiredDiskSpace}} GB 以存儲 CKB 節點資料。",
+        "modify-path-notice": "請確保剩餘的磁碟空間大於 {{needSize}} GB 以存儲 CKB 節點資料。",
         "modify-path-content": "您可以選擇一個新路徑重新同步或遷移以前的資料以繼續同步。",
         "resynchronize": "重新同步",
         "retain-previous-data": "保留先前的資料",

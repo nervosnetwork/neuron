@@ -502,7 +502,7 @@
         "ckb-node-storage": "CKB Node Storage",
         "browse-local-files": "Browse Local Files",
         "modify-path": "Modify Path",
-        "modify-path-notice": "Please ensure the remaining disk space is greater than {{requiredDiskSpace}} G for storing CKB Node Data.",
+        "modify-path-notice": "Please ensure the remaining disk space is greater than {{needSize}} G for storing CKB Node Data.",
         "modify-path-content": "You can choose a new path to resynchronize or migrate previous data to continue synchronization.",
         "resynchronize": "Resynchronize",
         "retain-previous-data": "Retain previous data",
