@@ -28,10 +28,11 @@ const MigrateCkbDataDialog = ({
   const [seconds, setSeconds] = useState(5)
 
   const openPath = (e: React.SyntheticEvent<HTMLButtonElement>) => {
-    const btn = (e.target as HTMLButtonElement)?.closest('button')
-    if (btn?.dataset?.path) {
-      shell.openPath(btn?.dataset?.path)
-    }
+    const elm = e.target
+    if (!(elm instanceof HTMLButtonElement)) return
+    const { path } = elm.dataset
+    if (!path) return
+    shell.openPath(path)
   }
 
   useEffect(() => {

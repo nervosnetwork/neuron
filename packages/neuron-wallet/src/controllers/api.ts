@@ -19,6 +19,7 @@ import fs from 'fs'
 import env from '../env'
 import { showWindow } from './app/show-window'
 import CommonUtils from '../utils/common'
+import { CKB_NODE_DATA_SIZE_BUFFER_RATIO } from '../utils/const'
 import { NetworkType, Network } from '../models/network'
 import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
@@ -767,7 +768,7 @@ export default class ApiController {
         status: ResponseCode.Success,
         result: {
           isFirstSync: SettingsService.getInstance().isFirstSync && currentNetwork.type === NetworkType.Default,
-          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * CKB_NODE_DATA_SIZE_BUFFER_RATIO),
           ckbNodeDataPath: SettingsService.getInstance().getNodeDataPath(),
         },
       }
@@ -784,7 +785,7 @@ export default class ApiController {
     handle('get-ckb-node-data-need-size', () => {
       return {
         status: ResponseCode.Success,
-        result: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+        result: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * CKB_NODE_DATA_SIZE_BUFFER_RATIO),
       }
     })
 

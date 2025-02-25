@@ -18,6 +18,7 @@ export const START_WITHOUT_INDEXER = -4
 export const DEFAULT_ARGS_LENGTH = 42
 export const LOCKTIME_ARGS_LENGTH = 58
 export const CHEQUE_ARGS_LENGTH = 82
+export const CKB_NODE_DATA_SIZE_BUFFER_RATIO = 1.2
 
 export enum ResponseCode {
   Fail,
