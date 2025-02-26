@@ -507,7 +507,7 @@
         "migrate-confirm": "確認 ({{seconds}}秒)",
         "migrate-step-1": "打開先前 CKB 節點資料的儲存路徑。",
         "migrate-step-2": "打開新設置的路徑。",
-        "migrate-step-3": "將所有 CKB 節點資料檔案複製到新路徑。",
+        "migrate-step-3": "將所有檔案複製到新路徑。",
         "click-here": "點擊這裡",
         "migrate-data-successful": "資料遷移成功"
       }

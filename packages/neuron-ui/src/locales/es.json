@@ -496,7 +496,7 @@
         "migrate-confirm": "Confirmar ({{seconds}}s)",
         "migrate-step-1": "Abrir la ruta de almacenamiento de los datos anteriores del Nodo CKB.",
         "migrate-step-2": "Abrir la nueva ruta establecida.",
-        "migrate-step-3": "Copiar todos los archivos de datos del Nodo CKB a la nueva ruta.",
+        "migrate-step-3": "Copiar todos los archivos al nuevo camino.",
         "click-here": "Haz clic aquí",
         "migrate-data-successful": "Migración de datos exitosa"
       }

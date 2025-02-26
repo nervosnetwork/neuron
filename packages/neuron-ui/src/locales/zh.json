@@ -506,7 +506,7 @@
         "migrate-confirm": "确认 ({{seconds}}秒)",
         "migrate-step-1": "打开以前 CKB 节点数据的存储路径。",
         "migrate-step-2": "打开新设置的路径。",
-        "migrate-step-3": "将所有 CKB 节点数据文件复制到新路径。",
+        "migrate-step-3": "将所有文件复制到新路径。",
         "click-here": "点击这里",
         "migrate-data-successful": "数据迁移成功"
       }
