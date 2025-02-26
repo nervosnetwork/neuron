@@ -513,7 +513,7 @@
         "migrate-confirm": "Confirm ({{seconds}}s)",
         "migrate-step-1": "Open the storage path of the previous CKB node data.",
         "migrate-step-2": "Open the newly set path.",
-        "migrate-step-3": "Copies all files to the new path.",
+        "migrate-step-3": "Copy all files to the new path.",
         "click-here": "Click Here",
         "migrate-data-successful": "Migrate data successful"
       }
