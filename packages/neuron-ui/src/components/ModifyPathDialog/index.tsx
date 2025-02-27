@@ -86,7 +86,7 @@ const ModifyPathDialog = ({
           </div>
 
           <div className={styles.pathItem}>
-            <p>{currentPath || 'path/to/ckb_node_data'}</p>
+            <p className={currentPath ? styles.path : ''}>{currentPath || 'path/to/ckb_node_data'}</p>
             <button type="button" onClick={() => onSetting()}>
               {t('settings.data.browse')}
             </button>

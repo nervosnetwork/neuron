@@ -71,12 +71,15 @@
       color: var(--primary-color);
     }
   }
+  .path {
+    color: var(--input-hint-color);
+  }
   p {
     padding: 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     padding: 0 16px;
-    color: var(--input-hint-color);
+    color: var(--disable-button-text-color);
   }
 }
