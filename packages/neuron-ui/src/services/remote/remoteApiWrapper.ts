@@ -127,9 +127,11 @@ type Action =
   | 'get-token-info-list'
   | 'migrate-acp'
   | 'get-sudt-token-info'
+  | 'get-sudt-token-info-and-balance'
   | 'generate-destroy-asset-account-tx'
   | 'get-sudt-type-script-hash'
   | 'generate-sudt-migrate-acp-tx'
+  | 'generate-recycle-udt-cell-tx'
   // Cheque
   | 'generate-create-cheque-tx'
   | 'generate-withdraw-cheque-tx'

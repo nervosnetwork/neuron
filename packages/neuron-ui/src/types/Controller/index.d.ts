@@ -355,6 +355,35 @@ declare namespace Controller {
     }
   }
 
+  namespace GetUDTTokenInfoAndBalance {
+    interface Params {
+      tokenID: string
+      holder: string
+      udtType: UDTType
+    }
+    interface Response {
+      tokenID: string
+      symbol: string
+      tokenName: string
+      decimal: string
+      balance: string
+      capacity: string
+    }
+  }
+
+  namespace GenerateRecycleUDTCellTransaction {
+    type Tx = any
+    interface Params {
+      walletId: string
+      holder: string
+      tokenID: string
+      receiver: string
+      udtType: UDTType
+    }
+
+    type Response = Tx
+  }
+
   namespace CreateChequeTransaction {
     type Tx = any
     interface Params {

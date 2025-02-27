@@ -73,6 +73,11 @@ const SUDTAccountPile = ({
           </div>
         </div>
 
+        <button type="button" data-id={accountId} data-role="recycle" onClick={onClick} disabled={disabled}>
+          <Send />
+          {t('s-udt.account-list.send')}
+        </button>
+
         <div className={styles.footer}>
           {accountName ? (
             <div className={styles.actions}>

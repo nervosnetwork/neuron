@@ -835,14 +835,17 @@ export class TransactionGenerator {
     walletId: string,
     assetAccountInputs: Input[],
     changeBlake160: string,
-    isCKBAccount: boolean
+    isCKBAccount: boolean,
+    forceDestroy?: boolean
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
 
     const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
     if (assetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
-      throw new SudtAcpHaveDataError()
+      if (!forceDestroy) {
+        throw new SudtAcpHaveDataError()
+      }
     }
     if (!isCKBAccount) {
       cellDeps.push(assetAccountInfo.sudtCellDep, assetAccountInfo.xudtCellDep)

@@ -145,12 +145,17 @@ export const useLiveCells = ({
     }
     return liveCells
   }, [sortInfo, liveCells])
-  useEffect(() => {
+
+  const fetchLiveCells = useCallback(() => {
     getLiveCells().then(res => {
       if (isSuccessResponse(res) && res.result) {
         setLiveCells(res.result.map(v => ({ ...v, ...getLockStatusAndReason(v), cellType: getCellType(v) })))
       }
     })
+  }, [setLiveCells])
+
+  useEffect(() => {
+    fetchLiveCells()
   }, [])
 
   const updateLiveCell = useCallback((params: State.UpdateLiveCellLocalInfo) => {
@@ -199,6 +204,7 @@ export const useLiveCells = ({
     onSorted,
     updateLiveCellsLockStatus,
     sortInfo,
+    fetchLiveCells,
   }
 }
 
@@ -208,6 +214,7 @@ export enum Actions {
   Unlock = 'unlock',
   Consume = 'consume',
   Consolidate = 'consolidate',
+  Recycle = 'recycle',
 }
 
 export const useAction = ({

@@ -65,6 +65,7 @@ import { ReactComponent as UploadSvg } from './Upload.svg'
 import { ReactComponent as PrivateKeySvg } from './PrivateKey.svg'
 import { ReactComponent as DAODepositSvg } from './DAODeposit.svg'
 import { ReactComponent as DAOWithdrawalSvg } from './DAOWithdrawal.svg'
+import { ReactComponent as RecycleSvg } from './Recycle.svg'
 
 import styles from './icon.module.scss'
 
@@ -146,3 +147,4 @@ export const Upload = WrapSvg(UploadSvg)
 export const PrivateKey = WrapSvg(PrivateKeySvg)
 export const DAODeposit = WrapSvg(DAODepositSvg)
 export const DAOWithdrawal = WrapSvg(DAOWithdrawalSvg)
+export const Recycle = WrapSvg(RecycleSvg)

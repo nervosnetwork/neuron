@@ -110,6 +110,20 @@ export default class AssetAccountController {
     }
   }
 
+  public async generateRecycleUDTCellTx(params: {
+    walletId: string
+    holder: string
+    tokenID: string
+    receiver: string
+    udtType: UDTType
+  }) {
+    const tx = await AssetAccountService.generateRecycleUDTCellTx(params)
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public async getAccount(params: {
     walletID: string
     id: number

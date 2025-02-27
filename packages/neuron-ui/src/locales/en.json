@@ -1100,6 +1100,19 @@
         "decimal": "Decimal",
         "confirm": "Confirm",
         "cancel": "Cancel"
+      },
+      "recycle-dialog": {
+        "title": "Recycle UDT Cell",
+        "notation": "Please note that recycling the cells will destroy the UDT and release the locked CKB",
+        "destroy": "Destroy",
+        "release": "Release",
+        "current-wallet": "Current Wallet",
+        "receive-address": "Receive Address",
+        "receive-address-placeholder": "Please input receive address",
+        "submitted-tips": "Recycling of the UDT cell transaction has been submitted",
+        "connect-wallet": "Connect Wallet",
+        "verifying": "Verifying",
+        "view-details": "View Details"
       }
     },
     "multisig-address": {
@@ -1311,7 +1324,8 @@
       "unlock": "Unlock",
       "consume": "Consume",
       "verify": "Verify",
-      "consolidate": "Consolidate"
+      "consolidate": "Consolidate",
+      "recycle": "Recycle"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

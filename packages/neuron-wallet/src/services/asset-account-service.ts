@@ -36,7 +36,7 @@ export default class AssetAccountService {
     return outputs
   }
 
-  private static async calculateAvailableCKBBalance(publicKeyHash: string) {
+  public static async calculateAvailableCKBBalance(publicKeyHash: string) {
     const outputs = await this.getACPCells(publicKeyHash)
 
     const totalBalance = outputs
@@ -52,7 +52,7 @@ export default class AssetAccountService {
     return availableBalance >= 0 ? availableBalance.toString() : BigInt(0)
   }
 
-  private static async calculateUDTAccountBalance(publicKeyHash: string, tokenId: string, udtType?: UDTType) {
+  public static async calculateUDTAccountBalance(publicKeyHash: string, tokenId: string, udtType?: UDTType) {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
     const typeHash =
@@ -110,6 +110,44 @@ export default class AssetAccountService {
       assetAccount,
       tx,
     }
+  }
+
+  public static async generateRecycleUDTCellTx(params: {
+    walletId: string
+    holder: string
+    tokenID: string
+    receiver: string
+    udtType: UDTType
+  }) {
+    const { walletId, holder, tokenID, udtType, receiver } = params
+    const cells = await AssetAccountService.getACPCells(holder, tokenID, udtType)
+
+    if (!cells.length) {
+      throw new Error(`No cells found!`)
+    }
+
+    const inputs = cells.map(cell => {
+      return Input.fromObject({
+        previousOutput: cell.outPoint(),
+        capacity: cell.capacity,
+        lock: cell.lockScript(),
+        type: cell.typeScript(),
+        lockHash: cell.lockHash,
+        typeHash: cell.typeHash,
+        data: cell.data,
+        since: '0',
+      })
+    })
+
+    const tx = await TransactionGenerator.generateDestroyAssetAccountTx(
+      walletId,
+      inputs,
+      receiver,
+      tokenID === 'CKBytes',
+      true
+    )
+
+    return tx
   }
 
   public static async getAll(walletId: string): Promise<AssetAccount[]> {

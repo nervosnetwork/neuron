@@ -1093,6 +1093,19 @@
         "decimal": "小數位",
         "confirm": "確認",
         "cancel": "取消"
+      },
+      "recycle-dialog": {
+        "title": "回收 UDT Cell",
+        "notation": "請注意，回收 Cell 將摧毀 UDT 並釋放鎖定的 CKB",
+        "destroy": "摧毀",
+        "release": "釋放",
+        "current-wallet": "當前錢包",
+        "receive-address": "接收地址",
+        "receive-address-placeholder": "請輸入接收地址",
+        "submitted-tips": "UDT Cell 回收交易已提交",
+        "connect-wallet": "連接錢包",
+        "verifying": "正在驗證",
+        "view-details": "查看詳情"
       }
     },
     "multisig-address": {
@@ -1300,7 +1313,8 @@
       "unlock": "解鎖",
       "consume": "花費",
       "verify": "驗證",
-      "consolidate": "合並"
+      "consolidate": "合並",
+      "recycle": "回收"
     },
     "send-tx-detail": {
       "page-title": "交易詳情",
