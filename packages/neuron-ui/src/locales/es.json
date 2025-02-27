@@ -487,7 +487,6 @@
         "modify-path": "Modificar ruta",
         "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{needSize}} GB para almacenar los datos del Nodo CKB.",
         "modify-path-content": "Puedes elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores para continuar la sincronización.",
-        "resynchronize": "Volver a sincronizar",
         "retain-previous-data": "Conservar datos anteriores",
         "set-a-new-path": "Establecer una nueva ruta",
         "browse": "Explorar",
@@ -498,7 +497,11 @@
         "migrate-step-2": "Abrir la nueva ruta establecida.",
         "migrate-step-3": "Copiar todos los archivos al nuevo camino.",
         "click-here": "Haz clic aquí",
-        "migrate-data-successful": "Migración de datos exitosa"
+        "migrate-data-successful": "Migración de datos exitosa",
+        "resync": "Reiniciar sincronización",
+        "retry": "Reintentar",
+        "sync-file-lost": "Archivo de sincronización perdido",
+        "sync-file-lost-notice": "Por favor, recupere el archivo e intente de nuevo, o reinicie la sincronización."
       }
     },
     "password-request": {

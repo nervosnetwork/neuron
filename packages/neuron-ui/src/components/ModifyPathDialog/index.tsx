@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import Dialog from 'widgets/Dialog'
-import Button from 'widgets/Button'
 import AlertDialog from 'widgets/AlertDialog'
 import MigrateCkbDataDialog from 'widgets/MigrateCkbDataDialog'
 import { setCkbNodeDataPath, getCkbNodeDataNeedSize } from 'services/remote'
@@ -15,12 +14,14 @@ const ModifyPathDialog = ({
   onCancel,
   onConfirm,
   onSetting,
+  setNotice,
 }: {
   onCancel?: () => void
   prevPath: string
   currentPath: string
   onConfirm: (dataPath: string) => void
   onSetting: (onSuccess?: (path: string) => void) => void
+  setNotice: (notice: string) => void
 }) => {
   const [t] = useTranslation()
   const [isMigrateOpen, setIsMigrateOpen] = useState(false)
@@ -36,7 +37,7 @@ const ModifyPathDialog = ({
     })
   }, [])
 
-  const handleResynchronize = useCallback(async () => {
+  const handleResync = useCallback(async () => {
     setFailureMessage('')
     onSetting(path => {
       setCkbNodeDataPath({
@@ -50,7 +51,7 @@ const ModifyPathDialog = ({
         }
       })
     })
-  }, [onSetting, onConfirm])
+  }, [onSetting, onConfirm, setFailureMessage])
 
   if (isMigrateOpen) {
     return (
@@ -59,6 +60,8 @@ const ModifyPathDialog = ({
         currentPath={currentPath}
         onCancel={() => setIsMigrateOpen(false)}
         onConfirm={onConfirm}
+        onClose={onCancel}
+        setNotice={setNotice}
       />
     )
   }
@@ -74,6 +77,7 @@ const ModifyPathDialog = ({
         confirmText={t('wizard.next')}
         className={styles.dialog}
         disabled={!currentPath}
+        onClose={onCancel}
       >
         <div>
           <div className={styles.tip}>
@@ -82,7 +86,7 @@ const ModifyPathDialog = ({
           </div>
 
           <div className={styles.pathItem}>
-            <p>{currentPath}</p>
+            <p>{currentPath || 'path/to/ckb_node_data'}</p>
             <button type="button" onClick={() => onSetting()}>
               {t('settings.data.browse')}
             </button>
@@ -97,9 +101,14 @@ const ModifyPathDialog = ({
       <Dialog
         show={!failureMessage}
         title={t('settings.data.modify-path')}
-        showFooter={false}
-        onCancel={onCancel}
         className={styles.dialog}
+        onClose={onCancel}
+        confirmText={t('settings.data.retain-previous-data')}
+        onConfirm={() => setIsRetainPreviousData(true)}
+        confirmProps={{ type: 'dashed' }}
+        cancelText={t('settings.data.resync')}
+        onCancel={handleResync}
+        cancelProps={{ type: 'dashed' }}
       >
         <div>
           <div className={styles.tip}>
@@ -107,15 +116,6 @@ const ModifyPathDialog = ({
             {t('settings.data.modify-path-notice', { needSize })}
           </div>
           <p className={styles.modifyTip}>{t('settings.data.modify-path-content')}</p>
-
-          <div className={styles.footer}>
-            <Button type="dashed" label={t('settings.data.resynchronize')} onClick={handleResynchronize} />
-            <Button
-              type="dashed"
-              label={t('settings.data.retain-previous-data')}
-              onClick={() => setIsRetainPreviousData(true)}
-            />
-          </div>
         </div>
       </Dialog>
       <AlertDialog

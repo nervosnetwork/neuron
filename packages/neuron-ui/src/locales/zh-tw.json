@@ -498,7 +498,6 @@
         "modify-path": "修改路徑",
         "modify-path-notice": "請確保剩餘的磁碟空間大於 {{needSize}} GB 以存儲 CKB 節點資料。",
         "modify-path-content": "您可以選擇一個新路徑重新同步或遷移以前的資料以繼續同步。",
-        "resynchronize": "重新同步",
         "retain-previous-data": "保留先前的資料",
         "set-a-new-path": "設置新路徑",
         "browse": "瀏覽",
@@ -509,7 +508,11 @@
         "migrate-step-2": "打開新設置的路徑。",
         "migrate-step-3": "將所有檔案複製到新路徑。",
         "click-here": "點擊這裡",
-        "migrate-data-successful": "資料遷移成功"
+        "migrate-data-successful": "資料遷移成功",
+        "resync": "重新同步",
+        "retry": "重試",
+        "sync-file-lost": "同步文件遺失",
+        "sync-file-lost-notice": "請恢復文件並重試，或重新同步。"
       }
     },
     "password-request": {

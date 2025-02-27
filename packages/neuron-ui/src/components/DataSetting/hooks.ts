@@ -47,6 +47,11 @@ export const useDataPath = (network?: State.Network) => {
     })
   }, [setIsDialogOpen, type])
 
+  const onResync = useCallback(async () => {
+    await stopProcessMonitor(type)
+    return startProcessMonitor(type)
+  }, [type])
+
   const onConfirm = useCallback(
     (dataPath: string) => {
       setPrevPath(dataPath)
@@ -68,6 +73,7 @@ export const useDataPath = (network?: State.Network) => {
     onConfirm,
     isDialogOpen,
     openDialog,
+    onResync,
   }
 }
 

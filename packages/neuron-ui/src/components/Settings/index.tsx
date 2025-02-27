@@ -116,7 +116,7 @@ const Settings = () => {
 
   useOnLocalStorageChange(onChange)
   return (
-    <PageContainer head={t('navbar.settings')} notice={globalState.app.pageNotice}>
+    <PageContainer head={t('navbar.settings')}>
       <div className={styles.container}>
         {items.map(([title, marginTop, ItemCmp]) => (
           <div className={styles.item} key={title}>

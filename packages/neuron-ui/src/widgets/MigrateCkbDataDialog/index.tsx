@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { showPageNotice, useDispatch } from 'states'
 import Dialog from 'widgets/Dialog'
 import { shell } from 'electron'
 import { useTranslation } from 'react-i18next'
@@ -14,14 +13,17 @@ const MigrateCkbDataDialog = ({
   currentPath,
   onCancel,
   onConfirm,
+  onClose,
+  setNotice,
 }: {
   prevPath: string
   currentPath: string
   onCancel: () => void
   onConfirm: (dataPath: string) => void
+  onClose?: () => void
+  setNotice?: (notice: string) => void
 }) => {
   const [t] = useTranslation()
-  const dispatch = useDispatch()
   const [failureMessage, setFailureMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -58,8 +60,8 @@ const MigrateCkbDataDialog = ({
     })
       .then(res => {
         if (isSuccessResponse(res)) {
-          showPageNotice(t('settings.data.migrate-data-successful'))(dispatch)
           onConfirm(currentPath)
+          setNotice?.(t('settings.data.migrate-data-successful'))
         } else {
           setFailureMessage(typeof res.message === 'string' ? res.message : res.message.content!)
         }
@@ -67,7 +69,7 @@ const MigrateCkbDataDialog = ({
       .finally(() => {
         setIsSaving(false)
       })
-  }, [currentPath, onConfirm, dispatch])
+  }, [currentPath, onConfirm, setNotice])
 
   return (
     <>
@@ -79,6 +81,7 @@ const MigrateCkbDataDialog = ({
         onCancel={onCancel}
         onConfirm={handleMigrate}
         disabled={isSaving || !!seconds}
+        onClose={onClose}
       >
         <div className={styles.dialogContainer}>
           <p className={styles.title}>{t('settings.data.migrate-previous-ckb-node-data-notice')}</p>

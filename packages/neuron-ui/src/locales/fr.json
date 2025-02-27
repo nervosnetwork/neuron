@@ -494,7 +494,6 @@
         "modify-path": "Modifier le chemin",
         "modify-path-notice": "Veuillez vous assurer que l'espace disque restant est supérieur à {{needSize}} Go pour stocker les données du nœud CKB.",
         "modify-path-content": "Vous pouvez choisir un nouveau chemin pour resynchroniser ou migrer les données précédentes afin de continuer la synchronisation.",
-        "resynchronize": "Resynchroniser",
         "retain-previous-data": "Conserver les données précédentes",
         "set-a-new-path": "Définir un nouveau chemin",
         "browse": "Parcourir",
@@ -505,7 +504,11 @@
         "migrate-step-2": "Ouvrir le nouveau chemin défini.",
         "migrate-step-3": "Copier tous les fichiers vers le nouveau chemin.",
         "click-here": "Cliquez ici",
-        "migrate-data-successful": "Migration des données réussie"
+        "migrate-data-successful": "Migration des données réussie",
+        "resync": "Resynchroniser",
+        "retry": "Réessayer",
+        "sync-file-lost": "Fichier de synchronisation perdu",
+        "sync-file-lost-notice": "Veuillez récupérer le fichier et réessayer, ou resynchroniser."
       }
     },
     "password-request": {
