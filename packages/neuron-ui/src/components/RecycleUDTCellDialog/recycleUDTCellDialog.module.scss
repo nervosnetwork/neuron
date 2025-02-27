@@ -49,3 +49,45 @@
 .notice {
   @include dialog-copy-animation;
 }
+
+.verifyDialog {
+  width: 648px;
+  text-align: center;
+
+  .passwordInput {
+    margin-top: 12px;
+  }
+
+  .canNotUse {
+    display: inline-flex;
+    align-items: center;
+    background: color-mix(in srgb, #fc8800 5%, var(--warn-background-color));
+    border: 1px solid #fc880033;
+    border-radius: 4px;
+    color: var(--warn-text-color);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px 36px;
+
+    & > svg {
+      margin-right: 4px;
+    }
+  }
+
+  .hardWalletImg {
+    width: 88px;
+    height: 88px;
+  }
+
+  .lockActions {
+    margin: 16px 0;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hardwalletErr {
+    justify-content: center;
+    margin-top: 12px;
+  }
+}

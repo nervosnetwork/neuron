@@ -4,9 +4,20 @@ import { useState as useGlobalState } from 'states'
 import { sudtValueToAmount, shannonToCKBFormatter } from 'utils/formatters'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
+import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { isErrorWithI18n } from 'exceptions'
-import { getUDTTokenInfoAndBalance, generateRecycleUDTCellTx, openExternal, sendTx } from 'services/remote'
+import Hardware from 'widgets/Icons/Hardware.png'
+import Alert from 'widgets/Alert'
+import { useHardWallet, usePassword } from 'components/CellManagement/hooks'
+import {
+  getUDTTokenInfoAndBalance,
+  generateRecycleUDTCellTx,
+  openExternal,
+  signAndBroadcastTransaction,
+  OfflineSignStatus,
+  OfflineSignType,
+} from 'services/remote'
 import {
   UDTType,
   addressToScript,
@@ -24,7 +35,7 @@ export interface DataProps {
   udtType: UDTType
 }
 
-type DialogType = 'ready' | 'inProgress' | 'success'
+type DialogType = 'ready' | 'inProgress' | 'verify' | 'success'
 
 const RecycleUDTCellDialog = ({
   data,
@@ -36,19 +47,30 @@ const RecycleUDTCellDialog = ({
   onConfirm?: () => void
 }) => {
   const {
-    wallet: { id: walletID = '', addresses },
+    wallet,
     settings: { networks },
     chain: { networkID },
   } = useGlobalState()
   const [t] = useTranslation()
-  const [password, setPassword] = useState('')
-  const [passwordError, setPasswordError] = useState('')
   const [receiver, setReceiver] = useState('')
   const [isCurrentWallet, setIsCurrentWallet] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [dialogType, setDialogType] = useState<DialogType>('ready')
   const [txHash, setTxHash] = useState('')
   const [info, setInfo] = useState<Controller.GetUDTTokenInfoAndBalance.Response | null>(null)
+  const { id: walletID = '', addresses, device } = wallet
+  const { password, error, onPasswordChange, setError } = usePassword()
+  const {
+    isReconnecting,
+    isNotAvailable,
+    reconnect,
+    verifyDeviceStatus,
+    errorMessage: hardwalletError,
+    setError: setHardwalletError,
+  } = useHardWallet({
+    wallet,
+    t,
+  })
 
   const { address: holder, tokenID, udtType } = data
 
@@ -80,15 +102,6 @@ const RecycleUDTCellDialog = ({
     })
   }, [])
 
-  const onPasswordChange = useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
-      setPassword(value)
-      setPasswordError('')
-    },
-    [setPassword, setPasswordError]
-  )
-
   const onAddressChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
@@ -119,45 +132,53 @@ const RecycleUDTCellDialog = ({
     openExternal(`${explorerUrl}/transaction/${txHash}`)
   }, [isMainnet, txHash])
 
+  const handleVerify = useCallback(async () => {
+    await verifyDeviceStatus()
+    setDialogType('verify')
+  }, [setDialogType])
+
   const onSubmit = useCallback(
-    (e?: React.FormEvent) => {
+    async (e?: React.FormEvent) => {
       if (e) {
         e.preventDefault()
       }
-      if (!password) {
-        return
-      }
       setIsLoading(true)
-      generateRecycleUDTCellTx({
+
+      const errFunc = wallet.device ? setHardwalletError : setError
+
+      const txRes = await generateRecycleUDTCellTx({
         walletId: walletID,
         tokenID,
         holder,
         receiver: addressToScript(receiver, { isMainnet }).args,
         udtType,
-      }).then(txRes => {
-        if (!isSuccessResponse(txRes)) {
-          setPasswordError(errorFormatter(txRes.message, t))
-          setIsLoading(false)
-          return
-        }
-        sendTx({
-          walletID,
-          tx: txRes.result,
-          password,
-        }).then(res => {
-          if (!isSuccessResponse(res)) {
-            setPasswordError(errorFormatter(res.message, t))
-            setIsLoading(false)
-            return
-          }
-          setIsLoading(false)
-          onConfirm?.()
-          setTxHash(res.result)
-          setDialogType('success')
-        })
       })
+      if (!isSuccessResponse(txRes)) {
+        errFunc(errorFormatter(txRes.message, t))
+        setIsLoading(false)
+        return
+      }
+      const tx = txRes.result
+
+      const res = await signAndBroadcastTransaction({
+        transaction: tx,
+        status: OfflineSignStatus.Unsigned,
+        type: OfflineSignType.Regular,
+        walletID,
+        password,
+      })
+      if (!isSuccessResponse(res)) {
+        errFunc(errorFormatter(res.message, t))
+        setIsLoading(false)
+        return
+      }
+
+      setIsLoading(false)
+      setTxHash(res.result)
+      onConfirm?.()
+      setDialogType('success')
     },
-    [walletID, password, setPasswordError, setTxHash, holder, t]
+    [walletID, password, setError, setTxHash, holder, t, receiver]
   )
 
   if (dialogType === 'ready' || !info) {
@@ -189,15 +210,44 @@ const RecycleUDTCellDialog = ({
     )
   }
 
+  if (dialogType === 'verify') {
+    return (
+      <Dialog
+        show
+        title={t('s-udt.recycle-dialog.title')}
+        onCancel={onClose}
+        showFooter={false}
+        className={styles.verifyDialog}
+      >
+        <div>
+          <img src={Hardware} alt="hard-wallet" className={styles.hardWalletImg} />
+        </div>
+        <div className={styles.lockActions}>
+          <Button onClick={onClose} type="cancel">
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={isNotAvailable ? reconnect : onSubmit} loading={isLoading || isReconnecting} type="primary">
+            {isNotAvailable || isReconnecting ? t('s-udt.recycle-dialog.connect-wallet') : t('cell-manage.verify')}
+          </Button>
+        </div>
+        {hardwalletError ? (
+          <Alert status="error" className={styles.hardwalletErr}>
+            {hardwalletError}
+          </Alert>
+        ) : null}
+      </Dialog>
+    )
+  }
+
   return (
     <Dialog
       show
       title={t('s-udt.recycle-dialog.title')}
       onCancel={onClose}
-      onConfirm={onSubmit}
+      onConfirm={device ? handleVerify : onSubmit}
       confirmText={t('wizard.next')}
       isLoading={isLoading}
-      disabled={!password || !receiver || !!receiveAddressError || isLoading}
+      disabled={(!password && !device) || !receiver || !!receiveAddressError}
       className={styles.dialog}
     >
       <div>
@@ -228,18 +278,20 @@ const RecycleUDTCellDialog = ({
           />
         </div>
 
-        <TextField
-          className={styles.inputField}
-          placeholder={t('password-request.placeholder')}
-          width="100%"
-          label={t('wizard.password')}
-          value={password}
-          field="password"
-          type="password"
-          onChange={onPasswordChange}
-          autoFocus
-          error={passwordError}
-        />
+        {!device && (
+          <TextField
+            className={styles.inputField}
+            placeholder={t('password-request.placeholder')}
+            width="100%"
+            label={t('wizard.password')}
+            value={password}
+            field="password"
+            type="password"
+            onChange={onPasswordChange}
+            autoFocus
+            error={error}
+          />
+        )}
       </div>
     </Dialog>
   )
