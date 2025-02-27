@@ -14,6 +14,7 @@ import {
   getUDTTokenInfoAndBalance,
   generateRecycleUDTCellTx,
   openExternal,
+  sendTx,
   signAndBroadcastTransaction,
   OfflineSignStatus,
   OfflineSignType,
@@ -160,13 +161,19 @@ const RecycleUDTCellDialog = ({
       }
       const tx = txRes.result
 
-      const res = await signAndBroadcastTransaction({
-        transaction: tx,
-        status: OfflineSignStatus.Unsigned,
-        type: OfflineSignType.Regular,
-        walletID,
-        password,
-      })
+      const res = await (device
+        ? signAndBroadcastTransaction({
+            transaction: tx,
+            status: OfflineSignStatus.Unsigned,
+            type: OfflineSignType.Regular,
+            walletID,
+            password,
+          })
+        : sendTx({
+            walletID,
+            tx: txRes.result,
+            password,
+          }))
       if (!isSuccessResponse(res)) {
         errFunc(errorFormatter(res.message, t))
         setIsLoading(false)
