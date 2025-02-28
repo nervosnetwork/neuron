@@ -514,6 +514,7 @@
         "migrate-step-2": "Open the newly set path.",
         "migrate-step-3": "Copy all files to the new path.",
         "click-here": "Click Here",
+        "migrate-data-successful": "Migrate data successful",
         "resync": "Resync",
         "retry": "Retry",
         "sync-file-lost": "Sync file lost",
