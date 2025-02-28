@@ -916,9 +916,12 @@ export default class ApiController {
       }
     )
 
-    handle('generate-recycle-udt-cell-tx', async (_, params) => {
-      return this.#assetAccountController.generateRecycleUDTCellTx(params)
-    })
+    handle(
+      'generate-recycle-udt-cell-tx',
+      async (_, params: { walletId: string; holder: string; tokenID: string; receiver: string; udtType: UDTType }) => {
+        return this.#assetAccountController.generateRecycleUDTCellTx(params)
+      }
+    )
 
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.destroyAssetAccount(params)

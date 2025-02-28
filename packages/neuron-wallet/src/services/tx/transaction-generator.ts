@@ -836,14 +836,14 @@ export class TransactionGenerator {
     assetAccountInputs: Input[],
     changeBlake160: string,
     isCKBAccount: boolean,
-    forceDestroy?: boolean
+    isForceDestroy?: boolean
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
 
     const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
     if (assetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
-      if (!forceDestroy) {
+      if (!isForceDestroy) {
         throw new SudtAcpHaveDataError()
       }
     }

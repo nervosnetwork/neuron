@@ -19,7 +19,7 @@ import { MIN_CELL_CAPACITY, UDTType } from '../utils/const'
 import SudtTokenInfoService from './sudt-token-info'
 
 export default class AssetAccountService {
-  private static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes', udtType?: UDTType) {
+  public static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes', udtType?: UDTType) {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
     const outputs = await getConnection()
@@ -36,7 +36,7 @@ export default class AssetAccountService {
     return outputs
   }
 
-  public static async calculateAvailableCKBBalance(publicKeyHash: string) {
+  private static async calculateAvailableCKBBalance(publicKeyHash: string) {
     const outputs = await this.getACPCells(publicKeyHash)
 
     const totalBalance = outputs

@@ -2,7 +2,7 @@ import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
 import Script, { ScriptHashType } from '../models/chain/script'
 import parseSUDTTokenInfo from '../utils/parse_sudt_token_info'
-import { ResponseCode, UDTType, MIN_SUDT_CAPACITY } from '../utils/const'
+import { ResponseCode, UDTType } from '../utils/const'
 import { SudtTokenInfo } from '../models/chain/transaction'
 import SudtTokenInfoService from '../services/sudt-token-info'
 import AssetAccountService from '../services/asset-account-service'
@@ -49,9 +49,11 @@ export default class SUDTController {
       }
     }
     const balance = await AssetAccountService.calculateUDTAccountBalance(holder, tokenID, udtType)
-    const ckbBalance = await AssetAccountService.calculateAvailableCKBBalance(holder)
+    const cells = await AssetAccountService.getACPCells(holder, tokenID, udtType)
 
-    const capacity = BigInt(MIN_SUDT_CAPACITY) + BigInt(ckbBalance)
+    let capacity = cells.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
 
     return {
       status: ResponseCode.Success,

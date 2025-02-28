@@ -10,7 +10,6 @@ export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
   static DAO_CODE_HASH = process.env.DAO_CODE_HASH!
   static MULTI_SIGN_CODE_HASH = process.env.MULTISIG_CODE_HASH!
-  static SUDT_SCRIPT_CODEHASH = process.env.MAINNET_SUDT_SCRIPT_CODEHASH!
 
   static SECP_HASH_TYPE = ScriptHashType.Type
   static DAO_HASH_TYPE = ScriptHashType.Type
