@@ -18,6 +18,10 @@ const AlertDialog = ({
   onOk,
   onCancel,
   action,
+  cancelText,
+  okText,
+  cancelProps,
+  okProps,
 }: {
   show?: boolean
   title?: string
@@ -26,6 +30,10 @@ const AlertDialog = ({
   onOk?: () => void
   onCancel?: () => void
   action?: Action
+  cancelText?: string
+  okText?: string
+  cancelProps?: object
+  okProps?: object
 }) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
@@ -47,9 +55,9 @@ const AlertDialog = ({
       <div className={styles.actions}>
         {actions.map(v =>
           v === 'cancel' ? (
-            <Button type="cancel" onClick={onCancel} label={t('common.cancel')} />
+            <Button type="cancel" onClick={onCancel} label={cancelText || t('common.cancel')} {...cancelProps} />
           ) : (
-            <Button type="confirm" onClick={onOk || onCancel} label={t('common.confirm')} />
+            <Button type="confirm" onClick={onOk || onCancel} label={okText || t('common.confirm')} {...okProps} />
           )
         )}
       </div>

@@ -36,7 +36,6 @@ const Button = React.forwardRef(
         data-type={type}
         onClick={onClick}
         aria-label={label}
-        title={label}
         disabled={disabled || loading}
         {...rest}
       >

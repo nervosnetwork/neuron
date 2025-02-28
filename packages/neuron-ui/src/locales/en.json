@@ -499,7 +499,26 @@
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
         "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
-        "ckb-node-storage": "CKB Node Storage"
+        "ckb-node-storage": "CKB Node Storage",
+        "browse-local-files": "Browse Local Files",
+        "modify-path": "Modify Path",
+        "modify-path-notice": "Please ensure the remaining disk space is greater than {{needSize}} G for storing CKB Node Data.",
+        "modify-path-content": "You can choose a new path to resynchronize or migrate previous data to continue synchronization.",
+        "retain-previous-data": "Retain previous data",
+        "set-a-new-path": "Set a new path",
+        "browse": "Browse",
+        "migrate-previous-ckb-node-data": "Migrate previous CKB Node Data",
+        "migrate-previous-ckb-node-data-notice": "Before clicking the Confirm button, complete the following:",
+        "migrate-confirm": "Confirm ({{seconds}}s)",
+        "migrate-step-1": "Open the storage path of the previous CKB node data.",
+        "migrate-step-2": "Open the newly set path.",
+        "migrate-step-3": "Copy all files to the new path.",
+        "click-here": "Click Here",
+        "migrate-data-successful": "Migrate data successful",
+        "resync": "Resync",
+        "retry": "Retry",
+        "sync-file-lost": "Sync file lost",
+        "sync-file-lost-notice": "Please recover and retry, or resync."
       }
     },
     "password-request": {

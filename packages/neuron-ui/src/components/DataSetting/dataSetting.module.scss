@@ -50,14 +50,16 @@
 
       .itemBtn {
         color: var(--secondary-text-color);
-        padding: 0 16px;
-        flex-shrink: 0;
+        padding: 0 8px;
         border-radius: 8px;
         height: 100%;
         background: var(--input-disabled-color);
         border: 1px solid var(--divide-line-color);
         &:hover:not([disabled]) {
-          color: var(--primary-color);
+          g,
+          path {
+            stroke: var(--primary-color);
+          }
         }
         &[disabled] {
           cursor: not-allowed;
@@ -159,4 +161,30 @@
   width: 250px;
   word-break: normal;
   white-space: normal;
+}
+
+.moreTooltip {
+  height: 100%;
+}
+
+.moreTip {
+  margin-top: 4px;
+  margin-left: 60px;
+}
+
+.actions {
+  button {
+    background: none;
+    font-size: 14px;
+    line-height: 30px;
+    color: var(--main-text-color);
+    border: none;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
 }
