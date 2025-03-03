@@ -4,7 +4,7 @@ import Block from '../models/chain/block'
 import BlockHeader from '../models/chain/block-header'
 import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
-import { generateRPC } from '../utils/ckb-rpc'
+import { FullCKBRPC, generateRPC } from '../utils/ckb-rpc'
 import { NetworkType } from '../models/network'
 import TxStatus, { TxStatusType } from '../models/chain/tx-status'
 
@@ -71,6 +71,9 @@ export default class RpcService {
 
   public async getSyncState(): Promise<CKBComponents.SyncState> {
     const syncState = await this.retry(async () => {
+      if (this.rpc instanceof FullCKBRPC) {
+        return await this.rpc.getSyncState()
+      }
       return await this.rpc.syncState()
     })
     return syncState
