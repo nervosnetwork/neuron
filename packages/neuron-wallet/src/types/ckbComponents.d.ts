@@ -76,7 +76,10 @@ declare namespace CKBComponents {
   type BannedAddress = api.BannedAddr
   type WitnessArgs = api.WitnessArgs
   type BlockEconomicState = api.BlockEconomicState
-  type SyncState = api.SyncState
+  type SyncState = api.SyncState & {
+    assumeValidTarget: string
+    assumeValidTargetReached: boolean
+  }
   type TransactionProof = api.TransactionProof
   type TxVerbosity = api.TxVerbosity
   type TxPoolVerbosity = api.TxPoolVerbosity

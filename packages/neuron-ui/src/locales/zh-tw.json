@@ -493,7 +493,26 @@
         "move-data-finish": "數據轉移完成",
         "re-sync": "重新同步",
         "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效",
-        "ckb-node-storage": "CKB節點數據"
+        "ckb-node-storage": "CKB節點數據",
+        "browse-local-files": "瀏覽本地檔案",
+        "modify-path": "修改路徑",
+        "modify-path-notice": "請確保剩餘的磁碟空間大於 {{needSize}} GB 以存儲 CKB 節點資料。",
+        "modify-path-content": "您可以選擇一個新路徑重新同步或遷移以前的資料以繼續同步。",
+        "retain-previous-data": "保留先前的資料",
+        "set-a-new-path": "設置新路徑",
+        "browse": "瀏覽",
+        "migrate-previous-ckb-node-data": "遷移先前的 CKB 節點資料",
+        "migrate-previous-ckb-node-data-notice": "在點擊確認按鈕之前，請完成以下操作：",
+        "migrate-confirm": "確認 ({{seconds}}秒)",
+        "migrate-step-1": "打開先前 CKB 節點資料的儲存路徑。",
+        "migrate-step-2": "打開新設置的路徑。",
+        "migrate-step-3": "將所有檔案複製到新路徑。",
+        "click-here": "點擊這裡",
+        "migrate-data-successful": "資料遷移成功",
+        "resync": "重新同步",
+        "retry": "重試",
+        "sync-file-lost": "同步文件遺失",
+        "sync-file-lost-notice": "請恢復文件並重試，或重新同步。"
       }
     },
     "password-request": {

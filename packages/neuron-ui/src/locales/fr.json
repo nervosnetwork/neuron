@@ -489,7 +489,26 @@
         "move-data-finish": "Les données ont été déplacées",
         "re-sync": "Synchroniser depuis le début",
         "disabled-set-path": "Lorsque le noeud CKB est démarré manuellement, la configuration du chemin du noeud CKB ne prend pas effet.",
-        "ckb-node-storage": "Stockage du noeud CKB"
+        "ckb-node-storage": "Stockage du noeud CKB",
+        "browse-local-files": "Parcourir les fichiers locaux",
+        "modify-path": "Modifier le chemin",
+        "modify-path-notice": "Veuillez vous assurer que l'espace disque restant est supérieur à {{needSize}} Go pour stocker les données du nœud CKB.",
+        "modify-path-content": "Vous pouvez choisir un nouveau chemin pour resynchroniser ou migrer les données précédentes afin de continuer la synchronisation.",
+        "retain-previous-data": "Conserver les données précédentes",
+        "set-a-new-path": "Définir un nouveau chemin",
+        "browse": "Parcourir",
+        "migrate-previous-ckb-node-data": "Migrer les données précédentes du nœud CKB",
+        "migrate-previous-ckb-node-data-notice": "Avant de cliquer sur le bouton Confirmer, veuillez compléter ce qui suit :",
+        "migrate-confirm": "Confirmer ({{seconds}}s)",
+        "migrate-step-1": "Ouvrir le chemin de stockage des données précédentes du nœud CKB.",
+        "migrate-step-2": "Ouvrir le nouveau chemin défini.",
+        "migrate-step-3": "Copier tous les fichiers vers le nouveau chemin.",
+        "click-here": "Cliquez ici",
+        "migrate-data-successful": "Migration des données réussie",
+        "resync": "Resynchroniser",
+        "retry": "Réessayer",
+        "sync-file-lost": "Fichier de synchronisation perdu",
+        "sync-file-lost-notice": "Veuillez récupérer le fichier et réessayer, ou resynchroniser."
       }
     },
     "password-request": {
