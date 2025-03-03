@@ -32,24 +32,26 @@ export default class SUDTController {
     const { decimal, name, symbol } = parseSUDTTokenInfo(liveCell.data)
     return {
       status: ResponseCode.Success,
-      result: { tokenID: params.tokenID, symbol: symbol, tokenName: name, decimal: decimal },
+      result: { tokenID: params.tokenID, symbol: symbol, tokenName: name, decimal: decimal, udtType: UDTType.SUDT },
     }
   }
 
+  // outpoint
   public async getUDTTokenInfoAndBalance(params: {
     tokenID: string
     holder: string
-    udtType: UDTType
+    outpoint?: CKBComponents.OutPoint
   }): Promise<Controller.Response<SudtTokenInfo & { balance: string; capacity: string }>> {
-    const { tokenID, holder, udtType } = params
+    const { tokenID, holder, outpoint } = params
     const info = await this.getSUDTTokenInfo({ tokenID })
     if (!info.result) {
       return {
         status: ResponseCode.Fail,
       }
     }
-    const balance = await AssetAccountService.calculateUDTAccountBalance(holder, tokenID, udtType)
-    const cells = await AssetAccountService.getACPCells(holder, tokenID, udtType)
+
+    const balance = await AssetAccountService.calculateUDTAccountBalance(holder, tokenID, info.result.udtType, outpoint)
+    const cells = await AssetAccountService.getACPCells(holder, tokenID, info.result.udtType, outpoint)
 
     let capacity = cells.reduce((a, b) => {
       return a + BigInt(b.capacity as string)

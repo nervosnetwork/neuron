@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
+import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import { sudtValueToAmount, shannonToCKBFormatter } from 'utils/formatters'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
@@ -20,7 +21,6 @@ import {
   OfflineSignType,
 } from 'services/remote'
 import {
-  UDTType,
   addressToScript,
   isSuccessResponse,
   isMainnet as isMainnetUtil,
@@ -33,7 +33,7 @@ import styles from './recycleUDTCellDialog.module.scss'
 export interface DataProps {
   address: string
   tokenID: string
-  udtType: UDTType
+  outpoint?: CKBComponents.OutPoint
 }
 
 type DialogType = 'ready' | 'inProgress' | 'verify' | 'success'
@@ -73,7 +73,7 @@ const RecycleUDTCellDialog = ({
     t,
   })
 
-  const { address: holder, tokenID, udtType } = data
+  const { address: holder, tokenID, outpoint } = data
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
@@ -95,7 +95,7 @@ const RecycleUDTCellDialog = ({
     getUDTTokenInfoAndBalance({
       tokenID,
       holder,
-      udtType,
+      outpoint,
     }).then(res => {
       if (isSuccessResponse(res)) {
         setInfo(res.result)
@@ -152,7 +152,7 @@ const RecycleUDTCellDialog = ({
         tokenID,
         holder,
         receiver: addressToScript(receiver, { isMainnet }).args,
-        udtType,
+        outpoint,
       })
       if (!isSuccessResponse(txRes)) {
         errFunc(errorFormatter(txRes.message, t))

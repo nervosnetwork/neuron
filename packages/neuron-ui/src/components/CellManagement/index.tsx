@@ -25,7 +25,6 @@ import {
   getLockTimestamp,
   isMainnet as isMainnetUtil,
   TypeScriptCategory,
-  UDTType,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -395,7 +394,7 @@ const CellManagement = () => {
           data={{
             tokenID: operateCells[0].type.args,
             address: operateCells[0].lock.args,
-            udtType: operateCells[0].typeScriptType === TypeScriptCategory.SUDT ? UDTType.SUDT : UDTType.XUDT,
+            outpoint: operateCells[0].outPoint,
           }}
           onClose={onActionCancel}
           onConfirm={fetchLiveCells}

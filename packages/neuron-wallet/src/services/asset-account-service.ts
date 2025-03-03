@@ -19,9 +19,15 @@ import { MIN_CELL_CAPACITY, UDTType } from '../utils/const'
 import SudtTokenInfoService from './sudt-token-info'
 
 export default class AssetAccountService {
-  public static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes', udtType?: UDTType) {
+  public static async getACPCells(
+    publicKeyHash: string,
+    tokenId: string = 'CKBytes',
+    udtType?: UDTType,
+    outpoint?: OutPoint
+  ) {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
+
     const outputs = await getConnection()
       .getRepository(OutputEntity)
       .findBy({
@@ -31,6 +37,12 @@ export default class AssetAccountService {
           tokenId !== 'CKBytes'
             ? assetAccountInfo.generateUdtScript(tokenId, udtType ?? UDTType.SUDT)!.computeHash()
             : IsNull(),
+        ...(outpoint
+          ? {
+              outPointTxHash: outpoint.txHash,
+              outPointIndex: outpoint.index,
+            }
+          : {}),
       })
 
     return outputs
@@ -52,7 +64,12 @@ export default class AssetAccountService {
     return availableBalance >= 0 ? availableBalance.toString() : BigInt(0)
   }
 
-  public static async calculateUDTAccountBalance(publicKeyHash: string, tokenId: string, udtType?: UDTType) {
+  public static async calculateUDTAccountBalance(
+    publicKeyHash: string,
+    tokenId: string,
+    udtType?: UDTType,
+    outpoint?: OutPoint
+  ) {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
     const typeHash =
@@ -66,6 +83,12 @@ export default class AssetAccountService {
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
         typeHash,
+        ...(outpoint
+          ? {
+              outPointTxHash: outpoint.txHash,
+              outPointIndex: outpoint.index,
+            }
+          : {}),
       })
       .getMany()
 
@@ -117,10 +140,11 @@ export default class AssetAccountService {
     holder: string
     tokenID: string
     receiver: string
-    udtType: UDTType
+    udtType?: UDTType
+    outpoint?: CKBComponents.OutPoint
   }) {
-    const { walletId, holder, tokenID, udtType, receiver } = params
-    const cells = await AssetAccountService.getACPCells(holder, tokenID, udtType)
+    const { walletId, holder, tokenID, receiver, udtType, outpoint } = params
+    const cells = await AssetAccountService.getACPCells(holder, tokenID, udtType, outpoint)
 
     if (!cells.length) {
       throw new Error(`No cells found!`)

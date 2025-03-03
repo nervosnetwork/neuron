@@ -139,7 +139,6 @@ const SUDTAccountList = () => {
         setRecycleData({
           address: addressToScript(account.address, { isMainnet }).args,
           tokenID: account.tokenId,
-          udtType: account.udtType!,
         })
         break
       }

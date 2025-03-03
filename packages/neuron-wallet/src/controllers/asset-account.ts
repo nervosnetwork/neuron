@@ -115,9 +115,18 @@ export default class AssetAccountController {
     holder: string
     tokenID: string
     receiver: string
-    udtType: UDTType
+    outpoint?: CKBComponents.OutPoint
   }) {
-    const tx = await AssetAccountService.generateRecycleUDTCellTx(params)
+    const tokens = await SudtTokenInfoService.findSudtTokenInfoByArgs([params.tokenID])
+    if (!tokens || !tokens.length) {
+      throw new ServiceHasNoResponse('UDT Cell')
+    }
+
+    const { udtType } = tokens[0]
+    const tx = await AssetAccountService.generateRecycleUDTCellTx({
+      ...params,
+      udtType,
+    })
     return {
       status: ResponseCode.Success,
       result: tx,

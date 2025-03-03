@@ -919,14 +919,23 @@ export default class ApiController {
 
     handle(
       'get-sudt-token-info-and-balance',
-      async (_, params: { tokenID: string; holder: string; udtType: UDTType }) => {
+      async (_, params: { tokenID: string; holder: string; outpoint?: CKBComponents.OutPoint }) => {
         return this.#sudtController.getUDTTokenInfoAndBalance(params)
       }
     )
 
     handle(
       'generate-recycle-udt-cell-tx',
-      async (_, params: { walletId: string; holder: string; tokenID: string; receiver: string; udtType: UDTType }) => {
+      async (
+        _,
+        params: {
+          walletId: string
+          holder: string
+          tokenID: string
+          receiver: string
+          outpoint?: CKBComponents.OutPoint
+        }
+      ) => {
         return this.#assetAccountController.generateRecycleUDTCellTx(params)
       }
     )

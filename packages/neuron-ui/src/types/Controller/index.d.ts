@@ -359,7 +359,7 @@ declare namespace Controller {
     interface Params {
       tokenID: string
       holder: string
-      udtType: UDTType
+      outpoint?: CKBComponents.OutPoint
     }
     interface Response {
       tokenID: string
@@ -378,7 +378,7 @@ declare namespace Controller {
       holder: string
       tokenID: string
       receiver: string
-      udtType: UDTType
+      outpoint?: CKBComponents.OutPoint
     }
 
     type Response = Tx
