@@ -31,7 +31,7 @@ import {
 import styles from './recycleUDTCellDialog.module.scss'
 
 export interface DataProps {
-  address: string
+  lockArgs: string
   tokenID: string
   outpoint?: CKBComponents.OutPoint
 }
@@ -73,7 +73,7 @@ const RecycleUDTCellDialog = ({
     t,
   })
 
-  const { address: holder, tokenID, outpoint } = data
+  const { lockArgs: holder, tokenID, outpoint } = data
 
   const isMainnet = isMainnetUtil(networks, networkID)
 

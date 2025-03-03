@@ -393,7 +393,7 @@ const CellManagement = () => {
         <RecycleUDTCellDialog
           data={{
             tokenID: operateCells[0].type.args,
-            address: operateCells[0].lock.args,
+            lockArgs: operateCells[0].lock.args,
             outpoint: operateCells[0].outPoint,
           }}
           onClose={onActionCancel}
