@@ -58,7 +58,7 @@ export const FormattedTokenAmount = ({ item, show, symbolClassName }: FormattedT
       if (item.sudtInfo.sUDT.decimal) {
         sudtAmount = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
         copyText = `${sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal)} ${item.sudtInfo.sUDT.symbol}`
-        if (!sudtAmount.includes('-') && item.type === 'destroy') {
+        if (!sudtAmount.includes('-') && ['destroy', 'send'].includes(item.type)) {
           sudtAmount = `-${sudtAmount}`
         }
         isReceive = !sudtAmount.includes('-')
