@@ -1102,6 +1102,19 @@
         "decimal": "Decimal",
         "confirm": "Confirmar",
         "cancel": "Cancelar"
+      },
+      "recycle-dialog": {
+        "title": "Reciclar Celda UDT",
+        "notation": "Tenga en cuenta que reciclar las celdas destruirá el UDT y liberará el CKB bloqueado",
+        "destroy": "Destruir",
+        "release": "Liberar",
+        "current-wallet": "Billetera Actual",
+        "receive-address": "Dirección de Recepción",
+        "receive-address-placeholder": "Por favor ingrese la dirección de recepción",
+        "submitted-tips": "La transacción de reciclaje de la celda UDT ha sido enviada",
+        "connect-wallet": "Conectar Billetera",
+        "verifying": "Verificando",
+        "view-details": "Ver Detalles"
       }
     },
     "multisig-address": {
@@ -1310,7 +1323,8 @@
       "unlock": "Desbloquear",
       "consume": "Consumir",
       "verify": "Verificar",
-      "consolidate": "Consolidar"
+      "consolidate": "Consolidar",
+      "recycle": "Reciclar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

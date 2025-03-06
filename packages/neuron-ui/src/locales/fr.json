@@ -1109,6 +1109,19 @@
         "decimal": "Décimal",
         "confirm": "Confirmer",
         "cancel": "Annuler"
+      },
+      "recycle-dialog": {
+        "title": "Recycler la UDT Cell",
+        "notation": "Veuillez noter que recycler les cellules détruira l'UDT et libérera le CKB verrouillé",
+        "destroy": "Détruire",
+        "release": "Libérer",
+        "current-wallet": "Portefeuille actuel",
+        "receive-address": "Adresse de réception",
+        "receive-address-placeholder": "Veuillez entrer l'adresse de réception",
+        "submitted-tips": "La transaction de recyclage de la UDT Cell a été soumise",
+        "connect-wallet": "Connecter le portefeuille",
+        "verifying": "Vérification en cours",
+        "view-details": "Voir les détails"
       }
     },
     "multisig-address": {
@@ -1320,7 +1333,8 @@
       "unlock": "Déverrouiller",
       "consume": "Consommer",
       "verify": "Vérifier",
-      "consolidate": "Consolider"
+      "consolidate": "Consolider",
+      "recycle": "Recycler"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

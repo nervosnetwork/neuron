@@ -35,4 +35,14 @@ export const getSUDTTokenInfo = remoteApi<Controller.GetSUDTTokenInfo.Params, Co
   'get-sudt-token-info'
 )
 
+export const getUDTTokenInfoAndBalance = remoteApi<
+  Controller.GetUDTTokenInfoAndBalance.Params,
+  Controller.GetUDTTokenInfoAndBalance.Response
+>('get-sudt-token-info-and-balance')
+
 export const generateSudtMigrateAcpTx = remoteApi('generate-sudt-migrate-acp-tx')
+
+export const generateRecycleUDTCellTx = remoteApi<
+  Controller.GenerateRecycleUDTCellTransaction.Params,
+  Controller.GenerateRecycleUDTCellTransaction.Response
+>('generate-recycle-udt-cell-tx')

@@ -1119,6 +1119,19 @@
         "decimal": "العشرية",
         "confirm": "تأكيد",
         "cancel": "إلغاء"
+      },
+      "recycle-dialog": {
+        "title": "إعادة تدوير خلية UDT",
+        "notation": "يرجى ملاحظة أن إعادة تدوير الخلايا سيدمر UDT ويحرر CKB المقفل",
+        "destroy": "تدمير",
+        "release": "إطلاق",
+        "current-wallet": "المحفظة الحالية",
+        "receive-address": "عنوان الاستلام",
+        "receive-address-placeholder": "يرجى إدخال عنوان الاستلام",
+        "submitted-tips": "تم إرسال معاملة إعادة تدوير خلية UDT",
+        "connect-wallet": "ربط المحفظة",
+        "verifying": "جاري التحقق",
+        "view-details": "عرض التفاصيل"
       }
     },
     "multisig-address": {
@@ -1330,7 +1343,8 @@
       "unlock": "فتح",
       "consume": "استهلاك",
       "verify": "تحقق",
-      "consolidate": "تجميع"
+      "consolidate": "تجميع",
+      "recycle": "إعادة التدوير"
     },
     "send-tx-detail": {
       "page-title": "تفاصيل المعاملة",

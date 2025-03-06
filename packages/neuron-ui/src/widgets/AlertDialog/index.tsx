@@ -18,8 +18,9 @@ const AlertDialog = ({
   onOk,
   onCancel,
   action,
-  cancelText,
   okText,
+  disabled,
+  cancelText,
   cancelProps,
   okProps,
 }: {
@@ -30,8 +31,9 @@ const AlertDialog = ({
   onOk?: () => void
   onCancel?: () => void
   action?: Action
-  cancelText?: string
   okText?: string
+  disabled?: boolean
+  cancelText?: string
   cancelProps?: object
   okProps?: object
 }) => {
@@ -42,8 +44,8 @@ const AlertDialog = ({
     if (action) {
       return action === 'all' ? ['cancel', 'ok'] : [action]
     }
-    return type === 'warning' ? ['cancel', 'ok'] : ['ok']
-  }, [action, type])
+    return type === 'warning' || onCancel ? ['cancel', 'ok'] : ['ok']
+  }, [action, type, onCancel])
 
   return (
     <dialog ref={dialogRef} className={styles.alertDialog}>
@@ -57,7 +59,13 @@ const AlertDialog = ({
           v === 'cancel' ? (
             <Button type="cancel" onClick={onCancel} label={cancelText || t('common.cancel')} {...cancelProps} />
           ) : (
-            <Button type="confirm" onClick={onOk || onCancel} label={okText || t('common.confirm')} {...okProps} />
+            <Button
+              type="confirm"
+              onClick={onOk || onCancel}
+              label={okText || t('common.confirm')}
+              disabled={disabled}
+              {...okProps}
+            />
           )
         )}
       </div>

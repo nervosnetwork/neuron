@@ -1,0 +1,93 @@
+@import '../../styles/mixin.scss';
+
+.inputField {
+  margin-top: 16px;
+}
+
+.dialog {
+  width: 700px;
+  @include checkbox;
+}
+
+.addressWrap {
+  position: relative;
+  .checkboxWrap {
+    position: absolute;
+    right: 0;
+    top: 4px;
+    font-size: 14px;
+    color: var(--secondary-text-color);
+  }
+}
+
+.tip {
+  color: var(--warn-text-color);
+  background: var(--warn-background-color);
+  margin: -20px -16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 13px;
+  gap: 100px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--warn-border-color);
+}
+
+.label {
+  font-weight: 500;
+  color: var(--main-text-color);
+  font-size: 14px;
+}
+
+.copy {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.notice {
+  @include dialog-copy-animation;
+}
+
+.verifyDialog {
+  width: 648px;
+  text-align: center;
+
+  .passwordInput {
+    margin-top: 12px;
+  }
+
+  .canNotUse {
+    display: inline-flex;
+    align-items: center;
+    background: color-mix(in srgb, #fc8800 5%, var(--warn-background-color));
+    border: 1px solid #fc880033;
+    border-radius: 4px;
+    color: var(--warn-text-color);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px 36px;
+
+    & > svg {
+      margin-right: 4px;
+    }
+  }
+
+  .hardWalletImg {
+    width: 88px;
+    height: 88px;
+  }
+
+  .lockActions {
+    margin: 16px 0;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hardwalletErr {
+    justify-content: center;
+    margin-top: 12px;
+  }
+}

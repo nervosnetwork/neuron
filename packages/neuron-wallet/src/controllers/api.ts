@@ -917,6 +917,29 @@ export default class ApiController {
       return this.#sudtController.getSUDTTokenInfo(params)
     })
 
+    handle(
+      'get-sudt-token-info-and-balance',
+      async (_, params: { tokenID: string; holder: string; outpoint?: CKBComponents.OutPoint }) => {
+        return this.#sudtController.getUDTTokenInfoAndBalance(params)
+      }
+    )
+
+    handle(
+      'generate-recycle-udt-cell-tx',
+      async (
+        _,
+        params: {
+          walletId: string
+          holder: string
+          tokenID: string
+          receiver: string
+          outpoint?: CKBComponents.OutPoint
+        }
+      ) => {
+        return this.#assetAccountController.generateRecycleUDTCellTx(params)
+      }
+    )
+
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.destroyAssetAccount(params)
     })
