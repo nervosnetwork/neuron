@@ -35,3 +35,13 @@ export class MultiDeviceException extends Error {
     super(`${I18N_PATH}${ErrorCode.MultiDevice}`)
   }
 }
+
+export class DeviceNotMatchWalletException extends Error {
+  public code = ErrorCode.DeviceNotMatchWallet
+
+  static message = `${I18N_PATH}${ErrorCode.DeviceNotMatchWallet}`
+
+  constructor() {
+    super(DeviceNotMatchWalletException.message)
+  }
+}

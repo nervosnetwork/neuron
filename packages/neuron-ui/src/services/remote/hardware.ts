@@ -34,7 +34,7 @@ export const getDevices = remoteApi<Model | null, DeviceInfo[]>('detect-device')
 export const getDeviceCkbAppVersion = remoteApi<Descriptor, Version>('get-device-ckb-app-version')
 export const getDeviceExtendedPublickey = remoteApi<void, ExtendedPublicKey>('get-device-extended-public-key')
 export const getDevicePublicKey = remoteApi<void, PublicKey>('get-device-public-key')
-export const connectDevice = remoteApi<DeviceInfo, void>('connect-device')
+export const connectDevice = remoteApi<DeviceInfo & { walletID?: string }, void>('connect-device')
 export const createHardwareWallet = remoteApi<ExtendedPublicKey & { walletName: string }, State.Wallet>(
   'create-hardware-wallet'
 )

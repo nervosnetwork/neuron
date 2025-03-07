@@ -12,7 +12,7 @@ import {
   getPlatform,
 } from 'services/remote'
 import { ErrorCode, clsx, errorFormatter, isSuccessResponse, addressToAddress, useDidMount } from 'utils'
-import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
+import { CkbAppNotFoundException, DeviceNotFoundException, DeviceNotMatchWalletException } from 'exceptions'
 import Alert from 'widgets/Alert'
 import styles from './receive.module.scss'
 
@@ -42,9 +42,14 @@ const VerifyHardwareAddress = ({ address, wallet, onClose = () => {} }: VerifyHa
   const userInputStatus = t('hardware-verify-address.status.user-input')
   const disconnectStatus = t('hardware-verify-address.status.disconnect')
   const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
+  const deviceNotMatchWalletStatus = t(DeviceNotMatchWalletException.message)
   const isNotAvailableToVerify = useMemo(() => {
-    return status?.message === disconnectStatus || status?.message === ckbAppNotFoundStatus
-  }, [status, disconnectStatus, ckbAppNotFoundStatus])
+    return (
+      status?.message === disconnectStatus ||
+      status?.message === ckbAppNotFoundStatus ||
+      status?.message === deviceNotMatchWalletStatus
+    )
+  }, [status, disconnectStatus, ckbAppNotFoundStatus, deviceNotMatchWalletStatus])
 
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
@@ -55,14 +60,16 @@ const VerifyHardwareAddress = ({ address, wallet, onClose = () => {} }: VerifyHa
   const ensureDeviceAvailable = useCallback(
     async (device: DeviceInfo) => {
       try {
-        const connectionRes = await connectDevice(device)
+        const connectionRes = await connectDevice({ ...device, walletID: wallet.id })
         let { descriptor } = device
         if (!isSuccessResponse(connectionRes)) {
           // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
           // so if we can't connect to the device, we need to re-search device automatically.
           // for unix, the descriptor never changes unless user plugs the device into another USB port,
           // in that case, mannauly re-search device one time will do.
-          if (isWin32) {
+          if (connectionRes.status === ErrorCode.DeviceNotMatchWallet) {
+            throw new DeviceNotMatchWalletException()
+          } else if (isWin32) {
             setIsReconnecting(true)
             const devicesRes = await getDevices(device)
             setIsReconnecting(false)
@@ -99,12 +106,14 @@ const VerifyHardwareAddress = ({ address, wallet, onClose = () => {} }: VerifyHa
       } catch (err) {
         if (err instanceof CkbAppNotFoundException) {
           setStatus({ type: 'error', message: ckbAppNotFoundStatus })
+        } else if (err instanceof DeviceNotMatchWalletException) {
+          setStatus({ type: 'error', message: deviceNotMatchWalletStatus })
         } else {
           setStatus({ type: 'error', message: disconnectStatus })
         }
       }
     },
-    [disconnectStatus, ckbAppNotFoundStatus, isWin32]
+    [disconnectStatus, ckbAppNotFoundStatus, isWin32, wallet]
   )
 
   const reconnect = useCallback(async () => {
