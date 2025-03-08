@@ -48,7 +48,7 @@ export default defineConfig({
   },
   build: {
     target: 'modules',
-    minify: 'terser',
+    minify: 'esbuild',
     manifest: false,
     sourcemap: false,
     outDir: 'build',
