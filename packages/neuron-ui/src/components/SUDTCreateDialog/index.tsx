@@ -4,7 +4,7 @@ import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Dialog from 'widgets/Dialog'
-import { ReactComponent as ExplorerIcon } from 'widgets/Icons/ExplorerIcon.svg'
+import ExplorerIcon from 'widgets/Icons/ExplorerIcon.svg?react'
 import {
   validateTokenId,
   isSuccessResponse,

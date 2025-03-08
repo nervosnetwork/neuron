@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect } from 'vitest'
 import { isErrorWithI18n } from 'exceptions'
 import { validateAssetAccountAmount } from 'utils/validators'
 

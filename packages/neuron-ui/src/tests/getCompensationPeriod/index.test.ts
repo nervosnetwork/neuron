@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect } from 'vitest'
 import getCompensationPeriod from 'utils/getCompensationPeriod'
 import fixtures from './fixtures.json'
 

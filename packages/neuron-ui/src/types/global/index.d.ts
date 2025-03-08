@@ -13,7 +13,7 @@ declare module '*.json' {
   export default value
 }
 
-declare module '*.svg' {
+declare module '*.svg?react' {
   const value: string
   export const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>
   export default value

@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { listParams, epochParser, toUint128Le } from 'utils/parsers'
 
 describe('listParams', () => {

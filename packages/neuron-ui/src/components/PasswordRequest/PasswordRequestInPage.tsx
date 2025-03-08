@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
+import Attention from 'widgets/Icons/ExperimentalAttention.svg?react'
 import HardwareSignOnPage from 'components/HardwareSign/HardwareSignOnPage'
 import { Export, Sign } from 'widgets/Icons/icon'
 import { useState as useGlobalState } from 'states'

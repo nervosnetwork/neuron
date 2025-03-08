@@ -57,9 +57,16 @@ const AlertDialog = ({
       <div className={styles.actions}>
         {actions.map(v =>
           v === 'cancel' ? (
-            <Button type="cancel" onClick={onCancel} label={cancelText || t('common.cancel')} {...cancelProps} />
+            <Button
+              key={v}
+              type="cancel"
+              onClick={onCancel}
+              label={cancelText || t('common.cancel')}
+              {...cancelProps}
+            />
           ) : (
             <Button
+              key={v}
               type="confirm"
               onClick={onOk || onCancel}
               label={okText || t('common.confirm')}

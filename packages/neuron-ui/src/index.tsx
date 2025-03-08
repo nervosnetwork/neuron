@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import { HashRouter as Router, useRoutes, RouteObject } from 'react-router-dom'
 
 import 'theme'
@@ -31,6 +31,8 @@ const App = withProvider(() => {
 Object.defineProperty(App, 'displayName', {
   value: 'App',
 })
-ReactDOM.render(<App />, document.getElementById('root'))
+
+const root = ReactDOM.createRoot(document.getElementById('root')!)
+root.render(<App />)
 
 export default undefined

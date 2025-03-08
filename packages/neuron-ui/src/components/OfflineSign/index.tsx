@@ -5,7 +5,7 @@ import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useState as useGlobalState } from 'states'
 import { getCurrentWallet, OfflineSignStatus } from 'services/remote'
-import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
+import HardWalletIcon from 'widgets/Icons/HardWallet.svg?react'
 import OfflineSignDialog from '../OfflineSignDialog'
 
 import styles from './offlineSign.module.scss'

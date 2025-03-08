@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { ReactComponent as CompleteIcon } from 'widgets/Icons/Complete.svg'
+import CompleteIcon from 'widgets/Icons/Complete.svg?react'
 import { ImportStep, ActionType } from './common'
 
 import styles from './findDevice.module.scss'

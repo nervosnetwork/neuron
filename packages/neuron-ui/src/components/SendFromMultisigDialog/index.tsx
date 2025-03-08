@@ -8,7 +8,7 @@ import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
 import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount, clsx } from 'utils'
 import { useState as useGlobalState } from 'states'
-import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
+import Add from 'widgets/Icons/Add.svg?react'
 import Button from 'widgets/Button'
 import Dialog from 'widgets/Dialog'
 
