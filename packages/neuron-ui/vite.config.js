@@ -6,6 +6,7 @@ import svgr from 'vite-plugin-svgr'
 import eslintPlugin from 'vite-plugin-eslint'
 import path from 'path'
 import postcss from 'postcss-preset-env'
+import legacy from '@vitejs/plugin-legacy'
 import { configDefaults } from 'vitest/config'
 
 export default defineConfig({
@@ -20,6 +21,9 @@ export default defineConfig({
     }),
     svgr({
       include: '**/*.svg?react',
+    }),
+    legacy({
+      targets: ['defaults', 'not IE 11'],
     }),
     ...[process.env.DISABLE_ESLINT_PLUGIN === 'true' ? [] : [eslintPlugin()]],
   ],
