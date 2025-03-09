@@ -5,7 +5,7 @@ import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Trash from 'widgets/Icons/Trash.svg?react'
 import Attention from 'widgets/Icons/ExperimentalAttention.svg?react'
-import TimeClock from 'widgets/Icons/TimeClock.svg?react'
+import TimeClock from 'widgets/Icons/TimeClock.svg'
 
 import { formatDate } from 'widgets/DatetimePickerDialog'
 import { localNumberFormatter, isSecp256k1Address, clsx } from 'utils'

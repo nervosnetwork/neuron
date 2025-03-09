@@ -96,6 +96,7 @@ module.exports = {
         allowExpressions: true,
       },
     ],
+    '@typescript-eslint/ban-types': 'off',
     'import/no-unresolved': [2, { ignore: ['.svg'] }],
   },
 }

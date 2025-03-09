@@ -151,7 +151,7 @@ const Welcome = ({ rootPath = '/wizard/', wallets = [], dispatch }: WizardElemen
 
   return (
     <div className={styles.welcome}>
-      <img src={`${process.env.PUBLIC_URL}/icon.png`} width="58px" className={styles.logo} alt="logo" />
+      <img src="/icon.png" width="58px" className={styles.logo} alt="logo" />
       <span className={styles.slogan}>{t('wizard.welcome-to-nervos-neuron')}</span>
       <Button
         type="default"

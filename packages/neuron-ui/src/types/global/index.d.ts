@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-svgr/client" />
+
 declare interface Window {
   electron: {
     clipboard: any
@@ -11,6 +13,11 @@ declare interface Window {
 declare module '*.json' {
   const value: string
   export default value
+}
+
+declare module '*.svg' {
+  const content: string
+  export default content
 }
 
 declare module '*.svg?react' {

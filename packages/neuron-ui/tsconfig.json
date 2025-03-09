@@ -8,8 +8,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "types": ["@types/jest", "vitest/globals", "@testing-library/jest-dom"],
-    "typeRoots": ["src/types", "node_modules/@nervosnetwork/ckb-types", "node_modules/@types"],
+    "typeRoots": [
+      "src/types",
+      "node_modules/@nervosnetwork/ckb-types",
+      "node_modules/@types",
+      "node_modules/@testing-library",
+      "node_modules/vite"
+    ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true
   },

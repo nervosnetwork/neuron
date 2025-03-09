@@ -18,9 +18,12 @@ export default defineConfig({
     postcss({
       autoprefixer: false,
     }),
-    svgr({ include: '**/*.svg?react' }),
+    svgr({
+      include: '**/*.svg?react',
+    }),
     ...[process.env.DISABLE_ESLINT_PLUGIN === 'true' ? [] : [eslintPlugin()]],
   ],
+  assetsInclude: ['**/*.svg'],
   base: './',
   root: './',
   resolve: {

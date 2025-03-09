@@ -18,7 +18,7 @@
     "start": "cross-env DISABLE_ESLINT_PLUGIN=true vite",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
     "test": "vitest --environment=jsdom --run --watch=false",
-    "build": "cross-env DISABLE_ESLINT_PLUGIN=true vite build",
+    "build": "cross-env DISABLE_ESLINT_PLUGIN=true tsc && vite build",
     "clean": "npx rimraf build",
     "precommit": "lint-staged",
     "storybook": "storybook dev -p 9009",
