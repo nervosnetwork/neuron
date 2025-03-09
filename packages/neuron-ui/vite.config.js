@@ -1,20 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import requireTransform from 'vite-plugin-require-transform'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
 import eslintPlugin from 'vite-plugin-eslint'
 import path from 'path'
 import postcss from 'postcss-preset-env'
-import legacy from '@vitejs/plugin-legacy'
 import { configDefaults } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
     react(),
-    requireTransform({
-      fileRegex: /src\/.*\.[tj]sx?$/,
-    }),
     nodePolyfills(),
     postcss({
       autoprefixer: false,
@@ -22,14 +17,10 @@ export default defineConfig({
     svgr({
       include: '**/*.svg?react',
     }),
-    legacy({
-      targets: ['defaults', 'not IE 11'],
-    }),
     ...[process.env.DISABLE_ESLINT_PLUGIN === 'true' ? [] : [eslintPlugin()]],
   ],
   assetsInclude: ['**/*.svg'],
   base: './',
-  root: './',
   resolve: {
     alias: {
       electron: path.resolve(__dirname, './src/electron-modules'),
@@ -54,12 +45,19 @@ export default defineConfig({
     host: '0.0.0.0',
   },
   build: {
-    target: 'modules',
-    minify: 'esbuild',
+    target: 'esnext',
     manifest: false,
     sourcemap: false,
     outDir: 'build',
-    rollupOptions: {},
+    assetsDir: 'assets',
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        format: 'es',
+        entryFileNames: '[name].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
   },
   css: {
     preprocessorOptions: {
