@@ -5,11 +5,13 @@ import svgr from 'vite-plugin-svgr'
 import eslintPlugin from 'vite-plugin-eslint'
 import path from 'path'
 import postcss from 'postcss-preset-env'
+import commonjs from 'vite-plugin-commonjs'
 import { configDefaults } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
     react(),
+    commonjs(),
     nodePolyfills(),
     postcss({
       autoprefixer: false,
