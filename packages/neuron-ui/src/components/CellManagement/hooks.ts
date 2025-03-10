@@ -416,9 +416,8 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
   const [error, setError] = useState<ErrorCode | string | undefined>()
   const isNotAvailable = useMemo(() => {
     return (
-      error === ErrorCode.DeviceNotFound ||
-      error === ErrorCode.CkbAppNotFound ||
-      error === ErrorCode.DeviceNotMatchWallet
+      typeof error === 'number' &&
+      [ErrorCode.DeviceNotFound, ErrorCode.CkbAppNotFound, ErrorCode.DeviceNotMatchWallet].includes(error)
     )
   }, [error])
 
