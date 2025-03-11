@@ -9,7 +9,7 @@ import Transaction from '../models/chain/transaction'
 import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
-import { MultisigNotSignedNeedError, OfflineSignFailed } from '../exceptions'
+import { MultisigNotSignedNeedError, OfflineSignFailed, IncorrectPassword } from '../exceptions'
 import MultisigConfigModel from '../models/multisig-config'
 import { getMultisigStatus } from '../utils/multisig'
 import { generateRPC } from '../utils/ckb-rpc'
@@ -119,6 +119,9 @@ export default class OfflineSignController {
         result: signer.toJSON(),
       }
     } catch (err) {
+      if (err.message === 'Incorrect password!') {
+        throw new IncorrectPassword()
+      }
       if (err.code) {
         throw err
       }
