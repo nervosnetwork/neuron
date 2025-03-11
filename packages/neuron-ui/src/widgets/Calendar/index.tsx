@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ReactComponent as ArrowPrev } from 'widgets/Icons/ArrowPrev.svg'
-import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
+import ArrowPrev from 'widgets/Icons/ArrowPrev.svg?react'
+import ArrowNext from 'widgets/Icons/ArrowNext.svg?react'
 import {
   getMonthCalendar,
   getLocalMonthNames,

@@ -14,7 +14,7 @@ import FormattedTokenAmount, { FormattedCKBBalanceChange } from 'components/Form
 import { useState as useGlobalState, useDispatch } from 'states'
 import { exportTransactions } from 'services/remote'
 
-import { ReactComponent as CKBAvatar } from 'widgets/Icons/Nervos.svg'
+import CKBAvatar from 'widgets/Icons/Nervos.svg?react'
 
 import { RoutePath, isMainnet as isMainnetUtil, uniformTimeFormatter } from 'utils'
 import { onEnter } from 'utils/inputDevice'
@@ -237,7 +237,6 @@ const History = () => {
           navigate(`${RoutePath.History}?pageNo=${pageNo}&keywords=${keywords}&sort=${key}&direction=${type}`)
         }}
       />
-
       <div className={styles.container}>
         <div className={styles.pagination}>
           <Pagination

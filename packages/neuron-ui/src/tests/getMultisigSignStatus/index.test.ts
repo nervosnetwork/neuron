@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { MultisigConfig } from 'services/remote'
 import { addressToScript, getMultisigSignStatus } from 'utils'
 import { computeScriptHash } from '@ckb-lumos/lumos/utils'

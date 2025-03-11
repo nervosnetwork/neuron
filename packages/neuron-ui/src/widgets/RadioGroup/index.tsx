@@ -33,7 +33,7 @@ const RadioGroup = ({
   const handleChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value: selectedValue } = e.target as HTMLInputElement
-      if (selectedValue !== value ?? checkedValue) {
+      if (selectedValue !== (value ?? checkedValue)) {
         setCheckedValue(selectedValue)
         onChange?.(selectedValue)
       }

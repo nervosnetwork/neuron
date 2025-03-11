@@ -73,9 +73,9 @@ export const Tabs = <T extends {}, E extends {} = DefaultVariantProps>({
 
   const combinedOnTabChange = useCallback<VariantProps<T>['onTabChange']>(
     id => {
-      const selectedTab = tabs.find(tab => tab.id === id) ?? tabs[0]
-      setSelectedTabId(selectedTab.id)
-      onTabChange?.(selectedTab)
+      const foundTab = tabs.find(tab => tab.id === id) ?? tabs[0]
+      setSelectedTabId(foundTab.id)
+      onTabChange?.(foundTab)
     },
     [onTabChange, tabs]
   )

@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect } from 'vitest'
 import { currencyFormatter } from 'utils/formatters'
 import fixtures from './fixtures'
 

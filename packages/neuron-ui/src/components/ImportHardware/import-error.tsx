@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
-import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
+import FailedInfo from 'widgets/Icons/FailedInfo.svg?react'
 import { errorFormatter } from 'utils'
 import { ActionType, ImportHardwareState, ImportStep } from './common'
 

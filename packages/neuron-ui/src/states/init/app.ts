@@ -1,6 +1,5 @@
-import { CapacityUnit, CONSTANTS, ErrorCode } from 'utils'
-
-const { INIT_SEND_PRICE } = CONSTANTS
+import { CapacityUnit, ErrorCode } from 'utils'
+import { INIT_SEND_PRICE } from 'utils/const'
 
 const initNotifications: Array<State.Message> = [
   {

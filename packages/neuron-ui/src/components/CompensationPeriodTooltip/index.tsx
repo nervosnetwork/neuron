@@ -1,9 +1,8 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getCompensatedTime, getCompensationPeriod, CONSTANTS, CompensationPeriod, uniformTimeFormatter } from 'utils'
+import { getCompensatedTime, getCompensationPeriod, CompensationPeriod, uniformTimeFormatter } from 'utils'
+import { WITHDRAW_EPOCHS } from 'utils/const'
 import styles from './compensationPeriodTooltip.module.scss'
-
-const { WITHDRAW_EPOCHS } = CONSTANTS
 
 const HOUR = 3_600_000
 const HOURS_PER_EPOCH = 4 * HOUR

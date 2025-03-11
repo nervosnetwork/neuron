@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react'
-import { ReactComponent as SuccessCircle } from 'widgets/Icons/SuccessCircle.svg'
+import SuccessCircle from 'widgets/Icons/SuccessCircle.svg?react'
 
 import styles from './toast.module.scss'
 

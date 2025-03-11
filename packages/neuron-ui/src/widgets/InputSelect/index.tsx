@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { useDidMount, useForceUpdate } from 'utils'
 import { ADDRESS_MIN_LENGTH, ADDRESS_HEAD_TAIL_LENGTH } from 'utils/const'
-import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
+import Arrow from 'widgets/Icons/Arrow.svg?react'
 
 import styles from './input-select.module.scss'
 

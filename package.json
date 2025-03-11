@@ -53,6 +53,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "husky": "8.0.3",
+    "jest": "27.5.1",
     "lerna": "8.1.5",
     "lint-staged": "15.2.7",
     "ncp": "2.0.0",

@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react'
 import Alert from 'widgets/Alert'
-import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
+import Edit from 'widgets/Icons/Edit.svg?react'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
 

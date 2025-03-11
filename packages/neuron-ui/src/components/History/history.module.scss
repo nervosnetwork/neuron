@@ -1,5 +1,4 @@
 @import '../../styles/mixin.scss';
-@import '../../styles/theme.scss';
 @import '../../styles/animation.scss';
 
 $history-info-title-color: #999;
@@ -224,7 +223,7 @@ body {
 }
 
 .isReceive {
-  color: $main-color;
+  color: var(--primary-color);
 }
 
 .tokenName {

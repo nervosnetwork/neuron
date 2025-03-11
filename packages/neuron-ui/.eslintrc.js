@@ -65,7 +65,7 @@ module.exports = {
     'import/no-extraneous-dependencies': [
       'error',
       {
-        devDependencies: ['**/*.stories.*', 'src/setupTests.ts', '**/*.test.ts'],
+        devDependencies: ['**/*.stories.*', 'src/setupTests.ts', '**/*.test.ts', './vitest-setup.js'],
       },
     ],
     'import/extensions': [
@@ -96,5 +96,7 @@ module.exports = {
         allowExpressions: true,
       },
     ],
+    '@typescript-eslint/ban-types': 'off',
+    'import/no-unresolved': [2, { ignore: ['.svg'] }],
   },
 }

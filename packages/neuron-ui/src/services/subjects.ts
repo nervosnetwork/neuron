@@ -1,7 +1,5 @@
-import { CONSTANTS } from 'utils'
+import { LOCALES } from 'utils/const'
 import { ipcRenderer, type IpcRendererEvent } from 'electron'
-
-const { LOCALES } = CONSTANTS
 
 const FallbackSubject = {
   subscribe: (args: any) => {
