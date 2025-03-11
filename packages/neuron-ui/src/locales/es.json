@@ -700,6 +700,7 @@
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
         "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
+        "408": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
         "600": "Asegúrese de que la sincronización haya finalizado antes de realizar cualquier operación relacionada con transacciones."
       }
     },

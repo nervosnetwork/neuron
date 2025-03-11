@@ -707,6 +707,7 @@
         "402": "L'application CKB n'est pas ouverte. Veuillez ouvrir l'application CKB sur votre appareil.",
         "403": "Aucun appareil détecté. Veuillez connecter votre appareil",
         "404": "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté.",
+        "408": "Le portefeuille matériel actuellement connecté ne correspond pas au portefeuille actuel.",
         "600": "Veuillez vous assurer que la synchronisation est finalisée avant d'effectuer toute opération liée à une transaction."
       }
     },

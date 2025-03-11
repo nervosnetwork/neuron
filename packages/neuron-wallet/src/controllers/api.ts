@@ -945,8 +945,8 @@ export default class ApiController {
     })
 
     // Hardware wallet
-    handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
-      await this.#hardwareController.connectDevice(deviceInfo)
+    handle('connect-device', async (_, params: DeviceInfo & { walletID?: string }) => {
+      await this.#hardwareController.connectDevice(params)
     })
 
     handle('detect-device', async (_, model: Pick<DeviceInfo, 'manufacturer' | 'product'>) => {

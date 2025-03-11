@@ -1,4 +1,4 @@
-import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
+import { CkbAppNotFoundException, DeviceNotFoundException, DeviceNotMatchWalletException } from 'exceptions'
 import { TFunction } from 'i18next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -415,7 +415,10 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
   }, [])
   const [error, setError] = useState<ErrorCode | string | undefined>()
   const isNotAvailable = useMemo(() => {
-    return error === ErrorCode.DeviceNotFound || error === ErrorCode.CkbAppNotFound
+    return (
+      typeof error === 'number' &&
+      [ErrorCode.DeviceNotFound, ErrorCode.CkbAppNotFound, ErrorCode.DeviceNotMatchWallet].includes(error)
+    )
   }, [error])
 
   const [deviceInfo, setDeviceInfo] = useState(wallet.device)
@@ -424,14 +427,16 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
   const ensureDeviceAvailable = useCallback(
     async (device: State.DeviceInfo) => {
       try {
-        const connectionRes = await connectDevice(device)
+        const connectionRes = await connectDevice({ ...device, walletID: wallet.id })
         let { descriptor } = device
         if (!isSuccessResponse(connectionRes)) {
           // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
           // so if we can't connect to the device, we need to re-search device automatically.
           // for unix, the descriptor never changes unless user plugs the device into another USB port,
           // in that case, mannauly re-search device one time will do.
-          if (isWin32) {
+          if (connectionRes.status === ErrorCode.DeviceNotMatchWallet) {
+            throw new DeviceNotMatchWalletException()
+          } else if (isWin32) {
             setIsReconnecting(true)
             const devicesRes = await getDevices(device)
             setIsReconnecting(false)
@@ -467,13 +472,17 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
         setError(undefined)
         return true
       } catch (err) {
-        if (err instanceof CkbAppNotFoundException || err instanceof DeviceNotFoundException) {
+        if (
+          err instanceof CkbAppNotFoundException ||
+          err instanceof DeviceNotFoundException ||
+          err instanceof DeviceNotMatchWalletException
+        ) {
           setError(err.code)
         }
         return false
       }
     },
-    [isWin32]
+    [isWin32, wallet]
   )
 
   const reconnect = useCallback(async () => {
@@ -515,6 +524,8 @@ export const useHardWallet = ({ wallet, t }: { wallet: State.WalletIdentity; t: 
         return t('hardware-verify-address.status.disconnect')
       case ErrorCode.CkbAppNotFound:
         return t(CkbAppNotFoundException.message)
+      case ErrorCode.DeviceNotMatchWallet:
+        return t(DeviceNotMatchWalletException.message)
       default:
         return error
     }

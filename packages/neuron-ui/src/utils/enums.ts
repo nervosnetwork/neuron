@@ -107,6 +107,7 @@ export enum ErrorCode {
   UnknownError = 405,
   SignMessageFailed = 406,
   UnsupportedManufacturer = 407,
+  DeviceNotMatchWallet = 408,
   // offline
   DeviceInSleep = 501,
   // active warning

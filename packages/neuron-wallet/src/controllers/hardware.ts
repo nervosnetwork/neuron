@@ -1,16 +1,26 @@
 import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
-import { connectDeviceFailed } from '../exceptions'
+import WalletService from '../services/wallets'
+import { connectDeviceFailed, DeviceNotMatchWallet } from '../exceptions'
 import { hd } from '@ckb-lumos/lumos'
 
 export default class HardwareController {
-  public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
+  public async connectDevice(params: DeviceInfo & { walletID?: string }): Promise<Controller.Response<void>> {
+    const { walletID, ...deviceInfo } = params
     const device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
     try {
       await device!.connect()
     } catch (error) {
       throw new connectDeviceFailed(error.message)
+    }
+
+    if (walletID) {
+      const walletPK = WalletService.getInstance().get(walletID).accountExtendedPublicKey()
+      const devicePK = await device.getExtendedPublicKey()
+      if (!walletPK.publicKey.includes(devicePK.publicKey)) {
+        throw new DeviceNotMatchWallet()
+      }
     }
 
     return {
