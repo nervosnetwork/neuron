@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo } from 'react'
+import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Stack } from 'office-ui-fabric-react'
 import Spinner from 'widgets/Spinner'
 import { handleViewError } from 'services/remote'
@@ -16,11 +16,10 @@ const handleError = (error: Error, errorInfo?: ErrorInfo) => {
   if (import.meta.env.MODE !== 'development') {
     window.location.reload()
   }
-  return { hasError: true }
 }
 
-class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactChild }) {
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
     super(props)
     this.state = {
       hasError: false,
@@ -32,7 +31,8 @@ class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState(handleError(error, errorInfo))
+    handleError(error, errorInfo)
+    this.setState({ hasError: true })
   }
 
   render() {

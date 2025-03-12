@@ -284,7 +284,11 @@ export default class ApiController {
       if (env.isDevMode) {
         console.error(error)
       }
-      logger.error(JSON.parse(error))
+      try {
+        logger.error(JSON.parse(error))
+      } catch (e) {
+        logger.error(error)
+      }
     })
 
     handle('set-locale', async (_, locale: Locale) => {
