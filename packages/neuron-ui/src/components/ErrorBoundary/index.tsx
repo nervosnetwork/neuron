@@ -1,10 +1,18 @@
-import React, { Component } from 'react'
+import React, { Component, ErrorInfo } from 'react'
 import { Stack } from 'office-ui-fabric-react'
 import Spinner from 'widgets/Spinner'
 import { handleViewError } from 'services/remote'
 
-const handleError = (error: Error) => {
-  handleViewError(error.toString())
+const handleError = (error: Error, errorInfo?: ErrorInfo) => {
+  handleViewError(
+    JSON.stringify([
+      `UI crash: ${error.message}`,
+      {
+        stack: error.stack,
+        componentStack: errorInfo?.componentStack || 'N/A',
+      },
+    ])
+  )
   if (import.meta.env.MODE !== 'development') {
     window.location.reload()
   }
@@ -23,8 +31,8 @@ class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError
     return handleError(error)
   }
 
-  public componentDidCatch(error: Error) {
-    this.setState(handleError(error))
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState(handleError(error, errorInfo))
   }
 
   render() {
