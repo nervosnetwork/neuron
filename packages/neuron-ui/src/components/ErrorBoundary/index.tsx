@@ -1,18 +1,25 @@
-import React, { Component } from 'react'
+import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Stack } from 'office-ui-fabric-react'
 import Spinner from 'widgets/Spinner'
 import { handleViewError } from 'services/remote'
 
-const handleError = (error: Error) => {
-  handleViewError(error.toString())
+const handleError = (error: Error, errorInfo?: ErrorInfo) => {
+  handleViewError(
+    JSON.stringify([
+      `UI crash: ${error.message}`,
+      {
+        stack: error.stack,
+        componentStack: errorInfo?.componentStack || 'N/A',
+      },
+    ])
+  )
   if (import.meta.env.MODE !== 'development') {
     window.location.reload()
   }
-  return { hasError: true }
 }
 
-class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactChild }) {
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
     super(props)
     this.state = {
       hasError: false,
@@ -23,8 +30,9 @@ class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError
     return handleError(error)
   }
 
-  public componentDidCatch(error: Error) {
-    this.setState(handleError(error))
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    handleError(error, errorInfo)
+    this.setState({ hasError: true })
   }
 
   render() {
