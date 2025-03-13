@@ -1163,6 +1163,8 @@
           "daoWithdraw": "从 DAO 取出"
         }
       },
+      "dao-ledger-notice": "Ledger 钱包目前仅支持签署 DAO 交易，无法发起存款或提取。请关注未来的更新。",
+      "dao-hardware-not-match": "当前连接的硬件钱包与当前钱包不匹配。",
       "import-dialog": {
         "actions": {
           "cancel": "取消",

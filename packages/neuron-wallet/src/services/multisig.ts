@@ -13,6 +13,12 @@ import Multisig from '../models/multisig'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import { NetworkType } from '../models/network'
 import logger from '../utils/logger'
+import { TransactionPersistor } from './tx'
+import { DAO_DATA } from '../utils/const'
+import RpcService from '../services/rpc-service'
+import TransactionWithStatus from '../models/chain/transaction-with-status'
+import TxStatus from '../models/chain/tx-status'
+import SystemScriptInfo from '../models/system-script-info'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -107,8 +113,8 @@ export default class MultisigService {
     })
   }
 
-  static async getLiveCells(multisigConfigs: MultisigConfig[]) {
-    const liveCells: MultisigOutput[] = []
+  static async getCells(multisigConfigs: MultisigConfig[]) {
+    const cells: any[] = []
     const addressCursorMap: Map<string, string> = new Map()
     let currentMultisigConfigs = MultisigService.removeDulpicateConfig(multisigConfigs)
     const network = NetworksService.getInstance().getCurrent()
@@ -144,17 +150,18 @@ export default class MultisigService {
           const config = currentMultisigConfigs[idx]
           const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
           addressCursorMap.set(script.args, v?.result?.last_cursor)
-          liveCells.push(
-            ...v.result.objects
-              .filter((object: any) => !object?.output?.type)
-              .map((object: any) => MultisigOutput.fromIndexer(object))
-          )
+          cells.push(...v.result.objects)
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
         }
       })
       currentMultisigConfigs = nextMultisigConfigs
     }
-    return liveCells
+    return cells
+  }
+
+  static async getLiveCells(multisigConfigs: MultisigConfig[]) {
+    const cells = await MultisigService.getCells(multisigConfigs)
+    return cells.filter((object: any) => !object?.output?.type).map((object: any) => MultisigOutput.fromIndexer(object))
   }
 
   static async saveLiveMultisigOutput() {
@@ -163,6 +170,41 @@ export default class MultisigService {
     if (liveCells.length) {
       await getConnection().manager.save(liveCells)
       MultisigOutputChangedSubject.getSubject().next('create')
+    }
+  }
+
+  static async saveMultisigDaoTx(multisigConfigs: MultisigConfig[]) {
+    const cells = await MultisigService.getCells(multisigConfigs)
+    if (cells.length) {
+      const daoTxHash = new Set<string>()
+      cells.forEach((cell: any) => {
+        if (cell?.output?.type?.code_hash === SystemScriptInfo.DAO_CODE_HASH) {
+          daoTxHash.add(cell.out_point.tx_hash)
+        }
+      })
+      if (daoTxHash.size > 0) {
+        const network = NetworksService.getInstance().getCurrent()
+        const rpcService = new RpcService(network.remote, network.type)
+        for (const txHash of daoTxHash) {
+          const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
+            await rpcService.getTransaction(txHash)
+          if (txWithStatus?.transaction) {
+            const tx = Transaction.fromSDK(txWithStatus.transaction)
+            tx.blockHash = txWithStatus.txStatus.blockHash || undefined
+            if (tx.blockHash) {
+              const header = await rpcService.getHeader(tx.blockHash)
+              tx.timestamp = header?.timestamp
+              tx.blockNumber = header?.number
+            }
+            tx.outputsData.forEach((item, index) => {
+              if (item === DAO_DATA) {
+                tx.outputs[index].daoData = DAO_DATA
+              }
+            })
+            await TransactionPersistor.saveFetchTx(tx)
+          }
+        }
+      }
     }
   }
 
@@ -302,6 +344,7 @@ export default class MultisigService {
     try {
       const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
       await MultisigService.saveLiveMultisigOutput()
+      await MultisigService.saveMultisigDaoTx(multisigConfigs)
       await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
       await MultisigService.saveMultisigSyncBlockNumber(multisigConfigs, lastestBlockNumber)
       MultisigOutputChangedSubject.getSubject().next('update')

@@ -1321,15 +1321,6 @@ export default class CellsService {
       return {}
     }
     const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
-
-    const outputs = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .where('output.lockHash IN (:...lockHashes)', { lockHashes })
-      .andWhere('output.hasData = :hasData', { hasData: true })
-      .andWhere('output.typeHash IS NOT NULL')
-      .getMany()
-
     const connection = await getConnection()
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `
@@ -1345,7 +1336,7 @@ export default class CellsService {
       `,
       {
         lockHashes,
-        statuses: [OutputStatus.Live, OutputStatus.Sent],
+        statuses: [OutputStatus.Live],
       },
       {}
     )
@@ -1367,18 +1358,6 @@ export default class CellsService {
           isMainnet
         )
       ] = c.balance
-    })
-
-    outputs.forEach(item => {
-      const key = scriptToAddress(
-        {
-          args: item.lockArgs,
-          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-        },
-        isMainnet
-      )
-      balances[key] = (BigInt(balances[key]) - BigInt(item.capacity)).toString()
     })
 
     return balances

@@ -1171,6 +1171,8 @@
           "daoWithdraw": "DAO Withdraw"
         }
       },
+      "dao-ledger-notice": "Ledger wallets currently support only signing DAO transactions, not initiating deposits or withdrawals. Please check back for future updates.",
+      "dao-hardware-not-match": "The hardware wallet currently connected does not match the current wallet.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancel",

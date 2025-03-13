@@ -204,6 +204,25 @@ const MultisigAddress = () => {
     [listActionOptions]
   )
 
+  const daoDisabledMessage = useMemo(() => {
+    if (wallet.device) {
+      if (
+        (daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen) ||
+        (daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen)
+      ) {
+        const multisigConfig = daoDepositAction.depositFromMultisig || daoWithdrawAction.withdrawFromMultisig
+        if (!multisigConfig) return ''
+        const { canSign } = getMultisigSignStatus({
+          multisigConfig,
+          addresses,
+        })
+
+        return canSign ? 'dao-ledger-notice' : 'dao-hardware-not-match'
+      }
+    }
+    return ''
+  }, [daoDepositAction, daoWithdrawAction, wallet.device, addresses])
+
   const { keywords, onChange, onBlur } = useSearch(clearSelected, onFilterConfig)
 
   const sendTotalBalance = useMemo(() => {
@@ -584,7 +603,7 @@ const MultisigAddress = () => {
         />
       ) : null}
 
-      {daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen ? (
+      {!daoDisabledMessage && daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen ? (
         <DepositDialog
           balance={multisigBanlances[daoDepositAction.depositFromMultisig.fullPayload]}
           wallet={wallet}
@@ -600,12 +619,23 @@ const MultisigAddress = () => {
         />
       ) : null}
 
-      {daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen ? (
+      {!daoDisabledMessage && daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen ? (
         <MultisigAddressNervosDAODialog
           closeDialog={daoWithdrawAction.closeDialog}
           multisigConfig={daoWithdrawAction.withdrawFromMultisig}
         />
       ) : null}
+
+      <AlertDialog
+        show={!!daoDisabledMessage}
+        message={t(`multisig-address.${daoDisabledMessage}`)}
+        type="warning"
+        okProps={{ style: { display: 'none' } }}
+        onCancel={() => {
+          daoDepositAction.closeDialog()
+          daoWithdrawAction.closeDialog()
+        }}
+      />
     </div>
   )
 }

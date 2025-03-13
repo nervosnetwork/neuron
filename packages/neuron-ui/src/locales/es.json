@@ -1154,6 +1154,8 @@
           "daoWithdraw": "Retirar de DAO"
         }
       },
+      "dao-ledger-notice": "Las billeteras Ledger actualmente solo admiten la firma de transacciones DAO, no la iniciación de depósitos o retiros. Vuelva a consultar para futuras actualizaciones.",
+      "dao-hardware-not-match": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancelar",
