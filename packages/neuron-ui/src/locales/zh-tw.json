@@ -1164,7 +1164,7 @@
           "daoWithdraw": "從 DAO 取出"
         }
       },
-      "dao-ledger-notice": "Ledger 錢包目前僅支援簽署 DAO 交易，無法發起存款或提取。請關注未來的更新。",
+      "dao-ledger-notice": "Ledger 錢包目前不支援多重簽名地址的 DAO 交易。請使用單一簽名地址或等待未來的更新。",
       "dao-hardware-not-match": "當前連接的硬體錢包與當前錢包不匹配。",
       "import-dialog": {
         "actions": {

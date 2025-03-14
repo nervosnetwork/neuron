@@ -114,7 +114,7 @@ export default class MultisigService {
   }
 
   static async getCells(multisigConfigs: MultisigConfig[]) {
-    const cells: any[] = []
+    const cells: RPC.IndexerCell[] = []
     const addressCursorMap: Map<string, string> = new Map()
     let currentMultisigConfigs = MultisigService.removeDulpicateConfig(multisigConfigs)
     const network = NetworksService.getInstance().getCurrent()
@@ -161,7 +161,7 @@ export default class MultisigService {
 
   static async getLiveCells(multisigConfigs: MultisigConfig[]) {
     const cells = await MultisigService.getCells(multisigConfigs)
-    return cells.filter((object: any) => !object?.output?.type).map((object: any) => MultisigOutput.fromIndexer(object))
+    return cells.filter(object => !object?.output?.type).map(object => MultisigOutput.fromIndexer(object))
   }
 
   static async saveLiveMultisigOutput() {
@@ -177,8 +177,8 @@ export default class MultisigService {
     const cells = await MultisigService.getCells(multisigConfigs)
     if (cells.length) {
       const daoTxHash = new Set<string>()
-      cells.forEach((cell: any) => {
-        if (cell?.output?.type?.code_hash === SystemScriptInfo.DAO_CODE_HASH) {
+      cells.forEach(cell => {
+        if (cell.output?.type?.code_hash === SystemScriptInfo.DAO_CODE_HASH) {
           daoTxHash.add(cell.out_point.tx_hash)
         }
       })

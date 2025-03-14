@@ -205,21 +205,23 @@ const MultisigAddress = () => {
   )
 
   const daoDisabledMessage = useMemo(() => {
-    if (wallet.device) {
-      if (
-        (daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen) ||
-        (daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen)
-      ) {
-        const multisigConfig = daoDepositAction.depositFromMultisig || daoWithdrawAction.withdrawFromMultisig
-        if (!multisigConfig) return ''
-        const { canSign } = getMultisigSignStatus({
-          multisigConfig,
-          addresses,
-        })
+    if (!wallet.device) return ''
 
-        return canSign ? 'dao-ledger-notice' : 'dao-hardware-not-match'
-      }
+    const multisigConfig = daoDepositAction.depositFromMultisig || daoWithdrawAction.withdrawFromMultisig
+    if (!multisigConfig) return ''
+
+    if (
+      (daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen) ||
+      (daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen)
+    ) {
+      const { canSign } = getMultisigSignStatus({
+        multisigConfig,
+        addresses,
+      })
+
+      return canSign ? 'dao-ledger-notice' : 'dao-hardware-not-match'
     }
+
     return ''
   }, [daoDepositAction, daoWithdrawAction, wallet.device, addresses])
 

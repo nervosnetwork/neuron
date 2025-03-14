@@ -1161,7 +1161,7 @@
           "daoWithdraw": "Retirer de DAO"
         }
       },
-      "dao-ledger-notice": "Les portefeuilles Ledger prennent actuellement en charge uniquement la signature des transactions DAO, mais pas l’initiation des dépôts ou des retraits. Veuillez vérifier les mises à jour futures.",
+      "dao-ledger-notice": "Les portefeuilles Ledger ne prennent actuellement pas en charge les transactions DAO pour les adresses multisignatures. Veuillez utiliser une adresse à signature unique ou attendre les futures mises à jour.",
       "dao-hardware-not-match": "Le portefeuille matériel actuellement connecté ne correspond pas au portefeuille actuel.",
       "import-dialog": {
         "actions": {
