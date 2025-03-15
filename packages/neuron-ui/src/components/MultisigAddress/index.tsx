@@ -207,15 +207,13 @@ const MultisigAddress = () => {
   const daoDisabledMessage = useMemo(() => {
     if (!wallet.device) return ''
 
-    const multisigConfig = daoDepositAction.depositFromMultisig || daoWithdrawAction.withdrawFromMultisig
-    if (!multisigConfig) return ''
-
     if (
       (daoDepositAction.depositFromMultisig && daoDepositAction.isDialogOpen) ||
       (daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen)
     ) {
+      const multisigConfig = daoDepositAction.depositFromMultisig || daoWithdrawAction.withdrawFromMultisig
       const { canSign } = getMultisigSignStatus({
-        multisigConfig,
+        multisigConfig: multisigConfig!,
         addresses,
       })
 
