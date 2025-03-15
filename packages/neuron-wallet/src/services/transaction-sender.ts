@@ -896,8 +896,7 @@ export default class TransactionSender {
         multisigConfig.m,
         multisigConfig.n
       )
-      const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
-      output = new Output(outputCapacity.toString(), AddressParser.parse(multisigAddresses), undefined, '0x')
+      output = new Output(outputCapacity.toString(), lockScript, undefined, '0x')
     } else {
       const wallet = WalletService.getInstance().get(walletID)
       const address = await wallet.getNextAddress()
@@ -919,7 +918,10 @@ export default class TransactionSender {
       withdrawOutput.lock
     )
 
-    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(WitnessArgs.EMPTY_LOCK, '0x0000000000000000')
+    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(
+      multisigConfig ? '' : WitnessArgs.EMPTY_LOCK,
+      '0x0000000000000000'
+    )
     const tx: Transaction = Transaction.fromObject({
       version: '0',
       cellDeps: [cellDep, daoCellDep],
