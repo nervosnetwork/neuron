@@ -19,6 +19,7 @@ import RpcService from '../services/rpc-service'
 import TransactionWithStatus from '../models/chain/transaction-with-status'
 import TxStatus from '../models/chain/tx-status'
 import SystemScriptInfo from '../models/system-script-info'
+import OutPoint from '../models/chain/out-point'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -182,25 +183,44 @@ export default class MultisigService {
           daoTxHash.add(cell.out_point.tx_hash)
         }
       })
+
+      const network = NetworksService.getInstance().getCurrent()
+      const rpcService = new RpcService(network.remote, network.type)
+
+      const getTx = async (txHash: string) => {
+        const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
+          await rpcService.getTransaction(txHash)
+        if (txWithStatus?.transaction) {
+          const tx = Transaction.fromSDK(txWithStatus.transaction)
+          tx.blockHash = txWithStatus.txStatus.blockHash || undefined
+          if (tx.blockHash) {
+            const header = await rpcService.getHeader(tx.blockHash)
+            tx.timestamp = header?.timestamp
+            tx.blockNumber = header?.number
+          }
+          return tx
+        }
+      }
+
       if (daoTxHash.size > 0) {
-        const network = NetworksService.getInstance().getCurrent()
-        const rpcService = new RpcService(network.remote, network.type)
         for (const txHash of daoTxHash) {
-          const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
-            await rpcService.getTransaction(txHash)
-          if (txWithStatus?.transaction) {
-            const tx = Transaction.fromSDK(txWithStatus.transaction)
-            tx.blockHash = txWithStatus.txStatus.blockHash || undefined
-            if (tx.blockHash) {
-              const header = await rpcService.getHeader(tx.blockHash)
-              tx.timestamp = header?.timestamp
-              tx.blockNumber = header?.number
-            }
-            tx.outputsData.forEach((item, index) => {
-              if (item === DAO_DATA) {
-                tx.outputs[index].daoData = DAO_DATA
+          const tx = await getTx(txHash)
+          if (tx) {
+            const previousTxHashes: string[] = []
+            tx.outputs.forEach((output, index) => {
+              if (output.type?.codeHash === SystemScriptInfo.DAO_CODE_HASH) {
+                output.daoData = tx.outputsData[index]
+                if (tx.outputsData[index] !== DAO_DATA) {
+                  const previousTxHash = tx.inputs[index].previousOutput!.txHash
+                  previousTxHashes.push(previousTxHash)
+                  output.setDepositOutPoint(new OutPoint(previousTxHash, tx.inputs[index].previousOutput!.index))
+                }
               }
             })
+            for (const previousTxHash of previousTxHashes) {
+              const previousTx = await getTx(previousTxHash)
+              if (previousTx) await TransactionPersistor.saveFetchTx(previousTx)
+            }
             await TransactionPersistor.saveFetchTx(tx)
           }
         }
