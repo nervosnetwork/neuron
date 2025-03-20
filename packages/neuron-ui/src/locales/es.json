@@ -1154,6 +1154,8 @@
           "daoWithdraw": "Retirar de DAO"
         }
       },
+      "dao-ledger-notice": "Las billeteras Ledger actualmente no admiten transacciones DAO para direcciones multifirma. Por favor, use una dirección de firma única o espere futuras actualizaciones.",
+      "dao-hardware-not-match": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancelar",

@@ -1171,6 +1171,8 @@
           "daoWithdraw": "DAO Withdraw"
         }
       },
+      "dao-ledger-notice": "Ledger wallets currently do not support DAO transactions for multisig addresses. Please use a single-signature address or await future updates.",
+      "dao-hardware-not-match": "The hardware wallet currently connected does not match the current wallet.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancel",

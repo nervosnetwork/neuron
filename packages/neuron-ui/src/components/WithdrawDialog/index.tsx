@@ -75,7 +75,7 @@ const WithdrawDialog = ({
     (Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length))
   ).toFixed(1)
   const message =
-    epochs >= 0 ? (
+    epochs > 5 ? (
       <>
         <Attention />
         {t('nervos-dao.notice-wait-time', {
