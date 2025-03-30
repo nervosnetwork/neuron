@@ -1093,7 +1093,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Envoyer {{extraCKB}} CKBytes supplémentaires pour créer un compte d'actif pour le destinataire"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "L'adresse du destinataire a un script de verrouillage inconnu, assurez-vous que le destinataire sait comment le gérer, et {{extraCKB}} CKBytes supplémentaires seront envoyés avec {{assetName}} pour détenir l'actif"
         },
         "select-option": "Veuillez confirmer l'option ci-dessus avant de soumettre"

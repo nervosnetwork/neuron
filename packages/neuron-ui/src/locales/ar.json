@@ -1103,7 +1103,7 @@
         "extra-ckb-send-to-acp": {
           "label": "إرسال {{extraCKB}} CKBytes إضافية لإنشاء حساب أصل للمستلم"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "عنوان الاستلام يحتوي على نص قفل غير معروف، يرجى التأكد من أن المستلم يعرف كيفية التعامل معه، وسيتم إرسال {{extraCKB}} CKBytes إضافية مع {{assetName}} للاحتفاظ بالأصل"
         },
         "select-option": "يرجى تأكيد الخيار أعلاه قبل الإرسال"

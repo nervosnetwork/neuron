@@ -93,7 +93,7 @@ export function useOptions({
       return [
         {
           label:
-            addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp.label' : 'extra-ckb-send-to-unknow.label',
+            addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp.label' : 'extra-ckb-send-to-unknown.label',
           key: addressLockType === AddressLockType.acp ? SendType.acpNewCell : SendType.unknowNewCell,
           params: { assetName: accountInfo?.accountName, extraCKB: shannonToCKBFormatter(holdSUDTCellCapacity) },
         },
