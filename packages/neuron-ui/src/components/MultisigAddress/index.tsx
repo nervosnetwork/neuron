@@ -621,6 +621,7 @@ const MultisigAddress = () => {
 
       {!daoDisabledMessage && daoWithdrawAction.withdrawFromMultisig && daoWithdrawAction.isDialogOpen ? (
         <MultisigAddressNervosDAODialog
+          balance={multisigBanlances[daoWithdrawAction.withdrawFromMultisig.fullPayload]}
           closeDialog={daoWithdrawAction.closeDialog}
           multisigConfig={daoWithdrawAction.withdrawFromMultisig}
         />

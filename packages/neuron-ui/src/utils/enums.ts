@@ -224,7 +224,7 @@ export enum SendType {
   secp256NewCell = 'secp256NewCell',
   acpExistCell = 'acpExistCell',
   acpNewCell = 'acpNewCell',
-  unknowNewCell = 'unknowNewCell',
+  unknownNewCell = 'unknownNewCell',
   sendCKB = 'sendCKB',
 }
 

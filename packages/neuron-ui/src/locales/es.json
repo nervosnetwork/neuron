@@ -1086,7 +1086,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Enviar {{extraCKB}} CKBytes adicionales para crear una cuenta de activo para el receptor"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "La dirección de recepción tiene un script de bloqueo desconocido, asegúrese de que el receptor sepa cómo manejarlo, y se enviarán {{extraCKB}} CKBytes adicionales junto con {{assetName}} para mantener el activo"
         },
         "select-option": "Confirme la opción anterior antes de enviar"
