@@ -56,7 +56,7 @@
     "@ckb-lumos/helpers": "0.23.0",
     "@ckb-lumos/lumos": "0.23.0",
     "@ckb-lumos/rpc": "0.23.0",
-    "canvg": "2.0.0",
+    "canvg": "3.0.11",
     "i18next": "23.7.11",
     "immer": "9.0.21",
     "jsqr": "1.4.0",
