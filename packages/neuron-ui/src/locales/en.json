@@ -1103,7 +1103,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Send extra {{extraCKB}} CKBytes to create an asset account for receiver"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "Receive address has an unknown lock script, please make sure receiver knowns how to handle it, and extra {{extraCKB}} CKBytes will be sent along with {{assetName}} to hold the asset"
         },
         "select-option": "Please confirm the above option before submitting"
