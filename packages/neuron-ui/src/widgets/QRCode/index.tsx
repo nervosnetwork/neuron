@@ -122,9 +122,6 @@ const QRCode = forwardRef(
       const ctx = canvasRef.current.getContext('2d')
       if (!ctx) return
 
-      // Set canvas dimensions
-      // canvasRef.current.setAttribute(`style`, `width:${size}px;height:${size}px`)
-
       // Clear the canvas before rendering
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
