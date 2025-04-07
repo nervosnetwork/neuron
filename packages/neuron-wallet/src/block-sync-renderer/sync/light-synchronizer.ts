@@ -280,14 +280,18 @@ export default class LightSynchronizer extends Synchronizer {
   }
 
   private async initSync(syncMultisig?: boolean) {
-    if (syncMultisig) {
-      await this.initMultisigSyncProgress()
-    } else {
-      await this.initSyncProgress()
-    }
-    while (this.pollingIndexer) {
-      await this.synchronize()
-      await scheduler.wait(5000)
+    try {
+      if (syncMultisig) {
+        await this.initMultisigSyncProgress()
+      } else {
+        await this.initSyncProgress()
+      }
+      while (this.pollingIndexer) {
+        await this.synchronize()
+        await scheduler.wait(5000)
+      }
+    } catch (error) {
+      logger.error(`Error connecting to Light: ${error.message}`)
     }
   }
 
@@ -324,15 +328,10 @@ export default class LightSynchronizer extends Synchronizer {
   }
 
   public async connect(syncMultisig?: boolean) {
-    try {
-      logger.info('LightConnector:\tconnect ...:')
-      this.pollingIndexer = true
-      this.syncMultisig = syncMultisig
-      this.initSync(syncMultisig)
-    } catch (error) {
-      logger.error(`Error connecting to Light: ${error.message}`)
-      throw error
-    }
+    logger.info('LightConnector:\tconnect ...:')
+    this.pollingIndexer = true
+    this.syncMultisig = syncMultisig
+    this.initSync(syncMultisig)
   }
 
   private async checkTxExist(txHashes: string[]) {

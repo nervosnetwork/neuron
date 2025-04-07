@@ -26,24 +26,23 @@ export default class FullSynchronizer extends Synchronizer {
   }
 
   private async initSync() {
-    await this.processNextBlockNumber()
+    try {
+      await this.processNextBlockNumber()
 
-    while (this.pollingIndexer) {
-      const indexerTipBlock = await this.indexer.tip()
-      await this.synchronize(indexerTipBlock)
-      await CommonUtils.sleep(5000)
+      while (this.pollingIndexer) {
+        const indexerTipBlock = await this.indexer.tip()
+        await this.synchronize(indexerTipBlock)
+        await CommonUtils.sleep(5000)
+      }
+    } catch (error) {
+      logger.error(`Error connecting to Indexer: ${error.message}`)
     }
   }
 
   public async connect() {
-    try {
-      this.pollingIndexer = true
+    this.pollingIndexer = true
 
-      this.initSync()
-    } catch (error) {
-      logger.error(`Error connecting to Indexer: ${error.message}`)
-      throw error
-    }
+    this.initSync()
   }
 
   async processTxsInNextBlockNumber() {
