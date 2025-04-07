@@ -280,7 +280,8 @@ class NodeService {
     const network = NetworksService.getInstance().getCurrent()
     try {
       const res = await rpcRequest<{ error?: { code: number } }>(network.remote, { method: 'get_indexer_tip' })
-      if (res.error?.code === START_WITHOUT_INDEXER) {
+
+      if (res.error?.code === START_WITHOUT_INDEXER || (Array.isArray(res) && res.length === 0)) {
         logger.info('Node:\tthe ckb node does not start with --indexer')
         return false
       }

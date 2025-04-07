@@ -116,6 +116,15 @@ const Navbar = () => {
   }, [i18n.language])
 
   useEffect(() => {
+    if (verifyCkbResult && !verifyCkbResult.withIndexer) {
+      showGlobalAlertDialog({
+        type: 'warning',
+        message: t('navbar.ckb-without-indexer'),
+        action: 'ok',
+      })(dispatch)
+      return
+    }
+
     // isUpdated is true or version is not empty means check update has return
     if (!verifyCkbResult || (isUpdated !== true && !version)) {
       return
@@ -140,12 +149,6 @@ const Navbar = () => {
             ]}
           />
         ),
-        action: 'ok',
-      })(dispatch)
-    } else if (!verifyCkbResult.withIndexer) {
-      showGlobalAlertDialog({
-        type: 'warning',
-        message: t('navbar.ckb-without-indexer'),
         action: 'ok',
       })(dispatch)
     }
