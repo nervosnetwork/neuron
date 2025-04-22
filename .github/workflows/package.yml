@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20.15.1
+          - lts/*
         os:
           - macos-latest
-          - ubuntu-20.04
-          - windows-2019
+          - ubuntu-latest
+          - windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -88,11 +88,11 @@ jobs:
           smctl windows certsync
         shell: cmd
 
-      - name: Install libudev
-        if: matrix.os == 'ubuntu-20.04'
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libudev-dev
+          sudo apt-get install -y libudev-dev libusb-1.0-0-dev
 
       - name: Install Lerna
         run: yarn global add lerna
