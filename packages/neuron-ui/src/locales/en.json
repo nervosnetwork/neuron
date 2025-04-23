@@ -1260,8 +1260,8 @@
       "switchToPrice": "Switch to price"
     },
     "set-start-block-number": {
-      "title": "Set the start block number",
-      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
+      "title": "Set synchronization start block",
+      "warn": "To ensure accurate data synchronization, please enter the block number of your wallet's first transaction",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",

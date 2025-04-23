@@ -1250,8 +1250,8 @@
       "switchToPrice": "Basculer vers le prix"
     },
     "set-start-block-number": {
-      "title": "Définir le numéro de bloc de départ",
-      "warn": "Veuillez noter que les transactions antérieures à la synchronisation du bloc initial ne seront pas synchronisées !",
+      "title": "Définir le bloc de début de synchronisation",
+      "warn": "Pour garantir une synchronisation précise des données, veuillez saisir le numéro de bloc de la première transaction de votre portefeuille",
       "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
