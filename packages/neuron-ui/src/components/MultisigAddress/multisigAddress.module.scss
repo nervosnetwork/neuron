@@ -2,6 +2,37 @@
 @import '../../styles/animation.scss';
 
 .container {
+  .topTip {
+    color: var(--warn-text-color);
+    background: var(--warn-background-color);
+    margin: -20px -16px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    gap: 4px;
+    font-weight: 500;
+    height: 44px;
+    border-bottom: 1px solid var(--warn-border-color);
+    padding: 0 16px;
+    max-width: 648px;
+    & > svg {
+      width: 16px;
+      flex-shrink: 0;
+    }
+    button {
+      color: var(--warn-text-color);
+      font-size: 12px;
+      padding: 0;
+      font-weight: 500;
+      display: inline-block;
+      background: transparent;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
   .head {
     display: flex;
     align-items: center;
@@ -98,6 +129,20 @@
 
   .address {
     font-family: 'JetBrains Mono';
+    position: relative;
+
+    .legacy {
+      font-size: 10px;
+      height: 16px;
+      color: var(--third-text-color);
+      font-weight: 500;
+      position: absolute;
+      top: -16px;
+      right: -10px;
+      background: var(--table-head-border-color);
+      padding: 0 4px;
+      border-radius: 48px;
+    }
   }
 
   .descTipRoot {
@@ -206,6 +251,15 @@
             fill: var(--main-text-color);
           }
         }
+
+        &[data-key='regenerate'] {
+          g,
+          path {
+            stroke: var(--main-text-color);
+            fill: none;
+          }
+        }
+
         &:hover {
           border-radius: 8px;
           background-color: var(--tooltip-hover-background-color);
@@ -218,6 +272,22 @@
 .ok {
   margin: 12px 0;
   text-align: center;
+}
+
+.regenerateDialog {
+  width: 568px;
+  @include checkbox;
+  .regenerateDialogDetail {
+    color: var(--main-text-color);
+    margin-bottom: -24px;
+    & > div {
+      margin-bottom: 32px;
+    }
+  }
+  .checkboxWrap {
+    font-size: 14px;
+    color: var(--third-text-color);
+  }
 }
 
 .closeMultisigDialog {
@@ -277,7 +347,7 @@
     &:hover,
     &:active {
       path {
-        stroke: var(--primary-color);
+        stroke: var(--secondary-text-color);
       }
     }
   }

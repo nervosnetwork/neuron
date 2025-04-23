@@ -70,6 +70,7 @@ import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
 import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
 import { AddStartBlockNumber1716539079505 } from './migrations/1716539079505-AddStartBlockNumber'
 import { AddUdtType1720089814860 } from './migrations/1720089814860-AddUdtType'
+import { AddLockCodeHash1744960856059 } from './migrations/1744960856059-AddLockCodeHash'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 export type ConnectionName = 'light' | 'full'
@@ -177,6 +178,7 @@ const getConnectionOptions = (genesisBlockHash: string, connectionName: Connecti
       UpdateOutputChequeLockHash1652945662504,
       RemoveAddressesMultisigConfig1651820157100,
       AddSyncProgress1676441837373,
+      AddLockCodeHash1744960856059,
       AddTypeSyncProgress1681360188494,
       TxLock1684488676083,
       ResetSyncProgressPrimaryKey1690361215400,

@@ -1,6 +1,7 @@
 import React from 'react'
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import {
+  LegacyMultiSigLockInfo,
   MultiSigLockInfo,
   LocktimeLockInfo,
   DefaultLockInfo,
@@ -27,7 +28,7 @@ const ScriptTag = ({
     return null
   }
 
-  const commonLockArray = [MultiSigLockInfo, LocktimeLockInfo, DefaultLockInfo]
+  const commonLockArray = [LegacyMultiSigLockInfo, MultiSigLockInfo, LocktimeLockInfo, DefaultLockInfo]
 
   const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
     ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]

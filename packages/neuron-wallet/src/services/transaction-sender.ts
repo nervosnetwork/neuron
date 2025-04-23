@@ -583,7 +583,8 @@ export default class TransactionSender {
         multisigConfig.blake160s,
         multisigConfig.r,
         multisigConfig.m,
-        multisigConfig.n
+        multisigConfig.n,
+        multisigConfig.lockCodeHash
       )
       const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
       const tx: Transaction = await TransactionGenerator.generateTx({
@@ -594,8 +595,8 @@ export default class TransactionSender {
         feeRate: '1000',
         lockClass: {
           lockArgs: [lockScript.args],
-          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: lockScript.codeHash,
+          hashType: lockScript.hashType,
         },
         multisigConfig,
       })
@@ -713,7 +714,8 @@ export default class TransactionSender {
       multisigConfig.blake160s,
       multisigConfig.r,
       multisigConfig.m,
-      multisigConfig.n
+      multisigConfig.n,
+      multisigConfig.lockCodeHash
     )
     const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
 
@@ -726,8 +728,8 @@ export default class TransactionSender {
       feeRate,
       {
         lockArgs: [lockScript.args],
-        codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-        hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+        codeHash: lockScript.codeHash,
+        hashType: lockScript.hashType,
       },
       multisigConfig
     )
@@ -783,7 +785,8 @@ export default class TransactionSender {
       multisigConfig.blake160s,
       multisigConfig.r,
       multisigConfig.m,
-      multisigConfig.n
+      multisigConfig.n,
+      multisigConfig.lockCodeHash
     )
     const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
 
@@ -811,8 +814,8 @@ export default class TransactionSender {
       feeRate,
       {
         lockArgs: [lockScript.args],
-        codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-        hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+        codeHash: lockScript.codeHash,
+        hashType: lockScript.hashType,
       },
       multisigConfig
     )
@@ -847,7 +850,7 @@ export default class TransactionSender {
     }
 
     const cellDep = multisigConfig
-      ? await SystemScriptInfo.getInstance().getMultiSignCellDep()
+      ? await SystemScriptInfo.getInstance().getMultiSignCellDep(multisigConfig.lockCodeHash)
       : await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
 
@@ -894,7 +897,8 @@ export default class TransactionSender {
         multisigConfig.blake160s,
         multisigConfig.r,
         multisigConfig.m,
-        multisigConfig.n
+        multisigConfig.n,
+        multisigConfig.lockCodeHash
       )
       output = new Output(outputCapacity.toString(), lockScript, undefined, '0x')
     } else {
@@ -979,7 +983,8 @@ export default class TransactionSender {
       multisigConfig.blake160s,
       multisigConfig.r,
       multisigConfig.m,
-      multisigConfig.n
+      multisigConfig.n,
+      multisigConfig.lockCodeHash
     )
     const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
 
@@ -992,8 +997,8 @@ export default class TransactionSender {
       feeRate,
       {
         lockArgs: [lockScript.args],
-        codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-        hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+        codeHash: lockScript.codeHash,
+        hashType: lockScript.hashType,
       },
       multisigConfig
     )

@@ -136,7 +136,7 @@ export default {
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
       'no-match-address-for-sign': 'Not found matched address',
-      'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address',
+      'target-lock-error': 'CKB asset account can only transfer to secp256k1 or acp address',
       'no-exist-ckb-node-data':
         '{{path}} has no CKB Node config and storage, press confirm to synchronize from scratch',
       'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account",

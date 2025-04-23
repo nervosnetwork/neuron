@@ -32,6 +32,7 @@ export default class MultisigService {
         m: multisigConfig.m,
         n: multisigConfig.n,
         blake160s: multisigConfig.blake160s.toString(),
+        lockCodeHash: multisigConfig.lockCodeHash,
       })
       .getCount()
     if (result > 0) {
@@ -105,7 +106,7 @@ export default class MultisigService {
   private static removeDulpicateConfig(multisigConfigs: MultisigConfig[]) {
     const existMultisigLockHash: Set<string> = new Set()
     return multisigConfigs.filter(v => {
-      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n).computeHash()
+      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash).computeHash()
       if (existMultisigLockHash.has(multisigLockHash)) {
         return false
       }
@@ -123,7 +124,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         network.remote,
         currentMultisigConfigs.map(v => {
-          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash)
           return {
             method: 'get_cells',
             params: [
@@ -149,7 +150,7 @@ export default class MultisigService {
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
           const config = currentMultisigConfigs[idx]
-          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
           addressCursorMap.set(script.args, v?.result?.last_cursor)
           cells.push(...v.result.objects)
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
@@ -237,7 +238,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         network.remote,
         currentMultisigConfigs.map(v => {
-          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash)
           return {
             method: 'get_transactions',
             params: [
@@ -263,7 +264,7 @@ export default class MultisigService {
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
           const config = currentMultisigConfigs[idx]
-          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
           addressCursorMap.set(script.args, v?.result?.last_cursor)
           v.result.objects.forEach((obj: any) => {
             multisigOutputTxHashList.add(obj.tx_hash || obj.transaction?.hash)
@@ -310,7 +311,7 @@ export default class MultisigService {
   static async deleteRemovedMultisigOutput() {
     const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     const multisigLockHashList = multisigConfigs.map(v =>
-      scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+      scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))
     )
     await getConnection()
       .createQueryBuilder()
@@ -327,7 +328,7 @@ export default class MultisigService {
     const network = await NetworksService.getInstance().getCurrent()
     if (network.type === NetworkType.Light) {
       const multisigScriptHashList = multisigConfigs.map(v =>
-        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))
       )
       const syncBlockNumbers = await getConnection()
         .getRepository(SyncProgress)
@@ -343,7 +344,7 @@ export default class MultisigService {
         .save(
           multisigConfigs.map(v => {
             const blockNumber =
-              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))]
+              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))]
             v.lastestBlockNumber = `0x${BigInt(blockNumber ?? v.lastestBlockNumber).toString(16)}`
             return v
           })
@@ -409,7 +410,7 @@ export default class MultisigService {
     const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     return multisigConfigs.map(v => ({
       walletId: v.walletId,
-      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),
+      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash),
       addressType: SyncAddressType.Multisig,
       scriptType: 'lock' as CKBRPC.ScriptType,
       startBlockNumber: v.startBlockNumber,

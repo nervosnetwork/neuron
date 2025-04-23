@@ -13,6 +13,7 @@ export enum LocalCacheKey {
   ShownNodeId = 'ShownNodeId',
   ScreenAwake = 'ScreenAwake',
   RetryUnlockWindowInfo = 'RetryUnlockWindowInfo',
+  RemaindRegenerateMultisigAddress = 'RemaindRegenerateMultisigAddress',
 }
 
 export const addresses = {
@@ -192,5 +193,15 @@ export const retryUnlockWindow = {
     } catch (error) {
       return { retryTimes: 0 }
     }
+  },
+}
+
+export const remaindRegenerateMultisigAddress = {
+  get: () => {
+    const value = window.localStorage.getItem(LocalCacheKey.RemaindRegenerateMultisigAddress)
+    return !!value && value === 'true'
+  },
+  save: (value: boolean) => {
+    window.localStorage.setItem(LocalCacheKey.RemaindRegenerateMultisigAddress, value.toString())
   },
 }

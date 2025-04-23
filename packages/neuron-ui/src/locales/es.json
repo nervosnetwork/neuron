@@ -1151,7 +1151,8 @@
           "approve": "Aprobar",
           "delete": "Eliminar",
           "daoDeposit": "Depositar en DAO",
-          "daoWithdraw": "Retirar de DAO"
+          "daoWithdraw": "Retirar de DAO",
+          "regenerate": "Regenerar"
         }
       },
       "dao-ledger-notice": "Las billeteras Ledger actualmente no admiten transacciones DAO para direcciones multifirma. Por favor, use una dirección de firma única o espere futuras actualizaciones.",
@@ -1175,6 +1176,13 @@
         "send": "Enviar",
         "cancel": "Cancelar",
         "export": "Exportar Tx"
+      },
+      "multisig-script-update-notice": "Debido a la <0>actualización del script multisig</0>, recomendamos regenerar las direcciones multisig y transferir los activos desde la antigua para garantizar el funcionamiento adecuado.",
+      "regenerate-dialog": {
+        "title": "Regenerar",
+        "detail": "Se generará una nueva dirección utilizando la configuración de tu dirección multisig anterior, actualizada al formato de script más reciente.",
+        "donnot-worry": "No te preocupes — la dirección antigua seguirá siendo accesible.",
+        "donnot-remind-again": "No volver a recordar"
       },
       "multi-details": "Detalles de la dirección multifirma",
       "synchronization-abort": "Abortar sincronización",

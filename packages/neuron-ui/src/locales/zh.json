@@ -1160,7 +1160,8 @@
           "approve": "确认",
           "delete": "删除",
           "daoDeposit": "存入 DAO",
-          "daoWithdraw": "从 DAO 取出"
+          "daoWithdraw": "从 DAO 取出",
+          "regenerate": "重新生成"
         }
       },
       "dao-ledger-notice": "Ledger 钱包目前不支持多签地址的 DAO 交易。请使用单签地址或等待未来的更新。",
@@ -1184,6 +1185,13 @@
         "send": "发送",
         "cancel": "取消",
         "export": "导出交易"
+      },
+      "multisig-script-update-notice": "由于<0>多签脚本升级</0>，我们建议重新生成多签地址，并将资产从旧地址转移，以确保正常使用。",
+      "regenerate-dialog": {
+        "title": "重新生成",
+        "detail": "将使用您旧多签地址的设置生成一个新地址，升级为最新脚本格式",
+        "donnot-worry": "别担心 — 旧地址仍然可以访问",
+        "donnot-remind-again": "不再提醒"
       },
       "multi-details": "多签地址详情",
       "synchronization-abort": "同步中止",

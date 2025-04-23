@@ -1035,6 +1035,10 @@ export default class ApiController {
       return this.#multisigController.getMultisigBalances(params)
     })
 
+    handle('get-multisig-dao-balances', async (_, params) => {
+      return this.#multisigController.getMultisigDAOBalances(params)
+    })
+
     handle('load-multisig-tx-json', async (_, fullPayload) => {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
     })

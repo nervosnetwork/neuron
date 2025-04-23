@@ -5,6 +5,7 @@ import CellsService from '../../src/services/cells'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { systemScripts } from '../../src/utils/systemScripts'
 import { NetworkType } from '../../src/models/network'
+import SystemScriptInfo from '../../src/models/system-script-info'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -139,6 +140,7 @@ describe('test for multisig controller', () => {
       m: 1,
       n: 1,
       blake160s: [],
+      lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
       alias: 'string',
       changed: expect.any(Function),
       lastestBlockNumber: '',

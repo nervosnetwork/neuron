@@ -37,6 +37,8 @@ import {
   LineDownArrow,
   DAODeposit,
   DAOWithdrawal,
+  Attention,
+  Regenerate,
 } from 'widgets/Icons/icon'
 import { getHeader } from 'services/chain'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
@@ -48,6 +50,7 @@ import Button from 'widgets/Button'
 import SetStartBlockNumberDialog from 'components/SetStartBlockNumberDialog'
 import { type TFunction } from 'i18next'
 import hooks from 'components/NervosDAO/hooks'
+import { remaindRegenerateMultisigAddress } from 'services/localCache'
 import {
   useSearch,
   useConfigManage,
@@ -85,6 +88,10 @@ const tableActions = [
   {
     key: 'daoWithdraw',
     icon: <DAOWithdrawal />,
+  },
+  {
+    key: 'regenerate',
+    icon: <Regenerate />,
   },
 ]
 
@@ -133,20 +140,24 @@ const MultisigAddress = () => {
     onImportConfig,
     configs,
     onFilterConfig,
+    regenerateConfig,
   } = useConfigManage({
     walletId,
     isMainnet,
   })
-  const { multisigBanlances, multisigSyncProgress } = useSubscription({
+  const { multisigBanlances, multisigDaoBalances, multisigSyncProgress } = useSubscription({
     walletId,
     isMainnet,
     configs: allConfigs,
     isLightClient,
   })
-  const { deleteAction, infoAction, sendAction, approveAction, daoDepositAction, daoWithdrawAction } = useActions({
-    deleteConfigById,
-  })
+  const { deleteAction, infoAction, sendAction, approveAction, daoDepositAction, daoWithdrawAction, regenerateAction } =
+    useActions({
+      deleteConfigById,
+      regenerateConfig,
+    })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
@@ -177,6 +188,14 @@ const MultisigAddress = () => {
         case 'daoWithdraw':
           daoWithdrawAction.action(multisigConfig)
           break
+        case 'regenerate':
+          if (remaindRegenerateMultisigAddress.get()) {
+            regenerateAction.action(multisigConfig)
+          } else {
+            regenerateAction.setConfig(multisigConfig)
+            setShowRegenerateDialog(true)
+          }
+          break
         default:
           break
       }
@@ -195,13 +214,29 @@ const MultisigAddress = () => {
       })),
     [t, selectIds]
   )
-  const listNoBalanceActionOptions = useMemo(
-    () =>
-      listActionOptions.map(item => ({
-        ...item,
-        disabled: item.disabled || item.key === 'send',
-      })),
-    [listActionOptions]
+
+  const getListActionOptions = useCallback(
+    (config: MultisigConfig) => {
+      const options: typeof listActionOptions = []
+      listActionOptions.forEach(item => {
+        if (config.isLegacy && ['daoDeposit', 'daoWithdraw'].includes(item.key)) {
+          return
+        }
+        if (!config.isLegacy && ['regenerate'].includes(item.key)) {
+          return
+        }
+        if (!multisigBanlances[config.fullPayload] || multisigBanlances[config.fullPayload] === '0') {
+          options.push({
+            ...item,
+            disabled: item.disabled || item.key === 'send',
+          })
+        } else {
+          options.push(item)
+        }
+      })
+      return options
+    },
+    [listActionOptions, multisigBanlances]
   )
 
   const daoDisabledMessage = useMemo(() => {
@@ -297,6 +332,10 @@ const MultisigAddress = () => {
     }
   }, [t, setNotice, daoDepositAction, daoWithdrawAction])
 
+  const showDaoMultisigScriptNotice = useMemo(() => {
+    return allConfigs.some(config => config.isLegacy)
+  }, [allConfigs])
+
   return (
     <div>
       <Dialog
@@ -320,6 +359,24 @@ const MultisigAddress = () => {
         showFooter={false}
       >
         <div className={styles.container}>
+          {showDaoMultisigScriptNotice && (
+            <div className={styles.topTip}>
+              <Attention />
+              <div>
+                <Trans
+                  i18nKey="multisig-address.multisig-script-update-notice"
+                  components={[
+                    <button
+                      type="button"
+                      onClick={() => openExternal('https://github.com/Magickbase/neuron-public-issues/issues/457')}
+                    >
+                      {' '}
+                    </button>,
+                  ]}
+                />
+              </div>
+            </div>
+          )}
           <div className={styles.head}>
             <div className={styles.searchBox}>
               <Search />
@@ -378,6 +435,7 @@ const MultisigAddress = () => {
                     return (
                       <div className={styles.address}>
                         {item.fullPayload.slice(0, 5)}...{item.fullPayload.slice(-5)}
+                        {item.isLegacy && <div className={styles.legacy}>Legacy</div>}
                       </div>
                     )
                   },
@@ -460,7 +518,15 @@ const MultisigAddress = () => {
                   render(_, __, item, show) {
                     return (
                       <div>
-                        {show ? shannonToCKBFormatter(multisigBanlances[item.fullPayload] || '0') : HIDE_BALANCE} CKB
+                        <div>
+                          {show ? shannonToCKBFormatter(multisigBanlances[item.fullPayload] || '0') : HIDE_BALANCE} CKB
+                        </div>
+                        {!item.isLegacy && multisigDaoBalances[item.fullPayload] && (
+                          <div>
+                            (Nervos DAO:
+                            {show ? shannonToCKBFormatter(multisigDaoBalances[item.fullPayload]) : HIDE_BALANCE} CKB)
+                          </div>
+                        )}
                       </div>
                     )
                   },
@@ -478,10 +544,7 @@ const MultisigAddress = () => {
                           className={styles.tipContent}
                           tip={
                             <div className={styles.actionOptions}>
-                              {(!multisigBanlances[item.fullPayload] || multisigBanlances[item.fullPayload] === '0'
-                                ? listNoBalanceActionOptions
-                                : listActionOptions
-                              ).map(({ key, label, icon, disabled }) => (
+                              {getListActionOptions(item).map(({ key, label, icon, disabled }) => (
                                 <button
                                   type="button"
                                   key={key}
@@ -558,6 +621,45 @@ const MultisigAddress = () => {
           deleteAction.action()
           setShowDeleteDialog(false)
         }}
+      />
+
+      <AlertDialog
+        show={showRegenerateDialog}
+        className={styles.regenerateDialog}
+        title={t('multisig-address.regenerate-dialog.title')}
+        message={
+          <div className={styles.regenerateDialogDetail}>
+            <div>
+              {t('multisig-address.regenerate-dialog.detail')}
+              <br />
+              {t('multisig-address.regenerate-dialog.donnot-worry')}
+            </div>
+
+            <label htmlFor="receiver" className={styles.checkboxWrap}>
+              <input
+                type="checkbox"
+                id="receiver"
+                onChange={regenerateAction.handleCheckbox}
+                checked={regenerateAction.isNoRemind}
+              />
+              <span>{t('multisig-address.regenerate-dialog.donnot-remind-again')}</span>
+            </label>
+          </div>
+        }
+        type="warning"
+        onCancel={() => setShowRegenerateDialog(false)}
+        okText={t('multisig-address.regenerate-dialog.title')}
+        onOk={() => {
+          regenerateAction.action(regenerateAction.config!)
+          setShowRegenerateDialog(false)
+        }}
+      />
+
+      <AlertDialog
+        show={regenerateAction.isDialogOpen}
+        title={regenerateAction.regenerateErrorMessage}
+        type="failed"
+        onCancel={regenerateAction.closeDialog}
       />
 
       <Dialog

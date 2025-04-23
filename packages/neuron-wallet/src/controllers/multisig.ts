@@ -27,12 +27,26 @@ interface MultisigConfigOutput {
       sighash_addresses: string[]
       require_first_n: number
       threshold: number
-      alias?: string
+      alias?: string | string[]
+      lockCodeHash: string | string[]
     }
   >
 }
 
-const validateImportConfig = (configOutput: MultisigConfigOutput) => {
+interface MultisigConfigInput {
+  multisig_configs: Record<
+    string,
+    {
+      sighash_addresses: string[]
+      require_first_n: number
+      threshold: number
+      alias?: string
+      lockCodeHash?: string | string[]
+    }
+  >
+}
+
+const validateImportConfig = (configOutput: MultisigConfigInput) => {
   return (
     configOutput.multisig_configs &&
     Object.values(configOutput.multisig_configs).length &&
@@ -49,9 +63,25 @@ export default class MultisigController {
     this.#multisigService = new MultisigService()
   }
 
-  async saveConfig(params: { walletId: string; r: number; m: number; n: number; blake160s: string[]; alias?: string }) {
+  async saveConfig(params: {
+    walletId: string
+    r: number
+    m: number
+    n: number
+    blake160s: string[]
+    alias?: string
+    lockCodeHash?: string
+  }) {
     const multiSignConfig = MultisigConfig.fromModel(
-      new MultisigConfigModel(params.walletId, params.r, params.m, params.n, params.blake160s, params.alias)
+      new MultisigConfigModel(
+        params.walletId,
+        params.r,
+        params.m,
+        params.n,
+        params.blake160s,
+        params.lockCodeHash || SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+        params.alias
+      )
     )
     const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
     return {
@@ -63,7 +93,7 @@ export default class MultisigController {
   async resetMultisigSync(config: MultisigConfig, startBlockNumber: number) {
     const network = NetworksService.getInstance().getCurrent()
     const lightRpc = new LightRPC(network.remote)
-    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
     await lightRpc.setScripts(
       [
         {
@@ -137,7 +167,7 @@ export default class MultisigController {
     }
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
-      const configOutput: MultisigConfigOutput = JSON.parse(json)
+      const configOutput: MultisigConfigInput = JSON.parse(json)
       if (!validateImportConfig(configOutput)) {
         ShowGlobalDialogSubject.next({
           type: 'failed',
@@ -146,14 +176,40 @@ export default class MultisigController {
         })
         return
       }
-      const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
-        r: +config.require_first_n,
-        m: +config.threshold,
-        n: config.sighash_addresses.length,
-        blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
-        walletId,
-        alias: config.alias,
-      }))
+      const saveConfigs: {
+        r: number
+        m: number
+        n: number
+        blake160s: string[]
+        walletId: string
+        alias?: string
+        lockCodeHash?: string
+      }[] = []
+      Object.values(configOutput.multisig_configs).forEach(config => {
+        if (Array.isArray(config.lockCodeHash)) {
+          config.lockCodeHash.forEach((lockCodeHash, index) => {
+            saveConfigs.push({
+              r: +config.require_first_n,
+              m: +config.threshold,
+              n: config.sighash_addresses.length,
+              blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
+              walletId,
+              alias: config.alias?.[index],
+              lockCodeHash,
+            })
+          })
+        } else {
+          saveConfigs.push({
+            r: +config.require_first_n,
+            m: +config.threshold,
+            n: config.sighash_addresses.length,
+            blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
+            walletId,
+            alias: config.alias,
+            lockCodeHash: config.lockCodeHash,
+          })
+        }
+      })
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
       for (let idx = 0; idx < savedResult.length; idx++) {
@@ -191,6 +247,7 @@ export default class MultisigController {
       m: number
       n: number
       blake160s: string[]
+      lockCodeHash: string
       alias?: string
     }[]
   ) {
@@ -204,13 +261,27 @@ export default class MultisigController {
     const isMainnet = NetworksService.getInstance().isMainnet()
     const output: MultisigConfigOutput = { multisig_configs: {} }
     configs.forEach(v => {
-      output.multisig_configs[Multisig.hash(v.blake160s, v.r, v.m, v.n)] = {
-        sighash_addresses: v.blake160s.map(args =>
-          scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
-        ),
-        require_first_n: v.r,
-        threshold: v.m,
-        alias: v.alias,
+      const hash = Multisig.hash(v.blake160s, v.r, v.m, v.n)
+      if (output.multisig_configs[hash]) {
+        const existingLockCodeHash = output.multisig_configs[hash].lockCodeHash
+        output.multisig_configs[hash].lockCodeHash = Array.isArray(existingLockCodeHash)
+          ? [...existingLockCodeHash, v.lockCodeHash]
+          : [existingLockCodeHash, v.lockCodeHash]
+
+        const existingAlias = output.multisig_configs[hash].alias || ''
+        output.multisig_configs[hash].alias = Array.isArray(existingAlias)
+          ? [...existingAlias, v.alias || '']
+          : [existingAlias, v.alias || '']
+      } else {
+        output.multisig_configs[hash] = {
+          sighash_addresses: v.blake160s.map(args =>
+            scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
+          ),
+          require_first_n: v.r,
+          threshold: v.m,
+          lockCodeHash: v.lockCodeHash,
+          alias: v.alias,
+        }
       }
     })
 
@@ -232,6 +303,14 @@ export default class MultisigController {
 
   async getMultisigBalances({ isMainnet, multisigAddresses }: { isMainnet: boolean; multisigAddresses: string[] }) {
     const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
+    return {
+      status: ResponseCode.Success,
+      result: balances,
+    }
+  }
+
+  async getMultisigDAOBalances({ isMainnet, multisigAddresses }: { isMainnet: boolean; multisigAddresses: string[] }) {
+    const balances = await CellsService.getMultisigDAOBalances(isMainnet, multisigAddresses)
     return {
       status: ResponseCode.Success,
       result: balances,

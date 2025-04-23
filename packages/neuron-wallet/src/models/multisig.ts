@@ -45,8 +45,8 @@ export default class Multisig {
     return Multisig.hash([blake160]) + this.since(minutes, headerEpoch).slice(2)
   }
 
-  static getMultisigScript(blake160s: string[], r: number, m: number, n: number) {
-    return SystemScriptInfo.generateMultiSignScript(Multisig.hash(blake160s, r, m, n))
+  static getMultisigScript(blake160s: string[], r: number, m: number, n: number, lockCodeHash: string) {
+    return SystemScriptInfo.generateMultiSignScript(Multisig.hash(blake160s, r, m, n), lockCodeHash)
   }
 
   static parseSince(args: string): bigint {

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDialog } from 'utils'
+import { useDialog, clsx } from 'utils'
 import Button from 'widgets/Button'
 import Failed from 'widgets/Icons/Failed.png'
 import Success from 'widgets/Icons/Success.png'
@@ -23,6 +23,7 @@ const AlertDialog = ({
   cancelText,
   cancelProps,
   okProps,
+  className,
 }: {
   show?: boolean
   title?: string
@@ -36,6 +37,7 @@ const AlertDialog = ({
   cancelText?: string
   cancelProps?: object
   okProps?: object
+  className?: string
 }) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
@@ -48,12 +50,12 @@ const AlertDialog = ({
   }, [action, type, onCancel])
 
   return (
-    <dialog ref={dialogRef} className={styles.alertDialog}>
+    <dialog ref={dialogRef} className={clsx(styles.alertDialog, className)}>
       {type === 'failed' && <img src={Failed} alt="failed" className={styles.typeImg} />}
       {type === 'success' && <img src={Success} alt="success" className={styles.typeImg} />}
       {type === 'warning' && <img src={Tips} alt="warning" className={styles.typeImg} />}
       <h2 className={styles.title}>{title}</h2>
-      <p className={styles.message}>{message}</p>
+      <div className={styles.message}>{message}</div>
       <div className={styles.actions}>
         {actions.map(v =>
           v === 'cancel' ? (

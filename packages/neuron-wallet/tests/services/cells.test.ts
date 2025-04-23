@@ -77,7 +77,10 @@ describe('CellsService', () => {
   }
 
   const multisigPublicKeyHash = '0x447ff8941a6f0162d2194e9b592bb2534a3e6b74'
-  const multisigLockScript = SystemScriptInfo.generateMultiSignScript(multisigPublicKeyHash)
+  const multisigLockScript = SystemScriptInfo.generateMultiSignScript(
+    multisigPublicKeyHash,
+    SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+  )
   const multisigInfo = {
     lockScript: multisigLockScript,
     lockHash: multisigLockScript.computeHash(),
@@ -138,7 +141,7 @@ describe('CellsService', () => {
     output.lockCodeHash = who.lockScript.codeHash
     output.lockArgs = who.lockScript.args
     output.lockHashType = who.lockScript.hashType
-    if (who.lockScript.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+    if (who.lockScript.codeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH) {
       output.multiSignBlake160 = who.lockScript.args
     }
     output.lockHash = who.lockScript.computeHash()
@@ -555,8 +558,8 @@ describe('CellsService', () => {
         await expect(
           CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
             lockArgs: ['bob.blake160'],
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+            codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
           })
         ).rejects.toThrow(new CapacityNotEnough())
       })
@@ -565,8 +568,8 @@ describe('CellsService', () => {
         await expect(
           CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
             lockArgs: [multisigInfo.lockScript.args],
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+            codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
           })
         ).rejects.toThrow(new MultisigConfigNeedError())
       })
@@ -584,8 +587,8 @@ describe('CellsService', () => {
             undefined,
             {
               lockArgs: [multisigInfo.lockScript.args],
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -614,8 +617,8 @@ describe('CellsService', () => {
             undefined,
             {
               lockArgs: [multisigInfo.lockScript.args],
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -644,8 +647,8 @@ describe('CellsService', () => {
             undefined,
             {
               lockArgs: [multisigInfo.lockScript.args],
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -673,8 +676,8 @@ describe('CellsService', () => {
             undefined,
             {
               lockArgs: [multisigInfo.lockScript.args],
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -703,8 +706,8 @@ describe('CellsService', () => {
           undefined,
           {
             lockArgs: [multisigInfo.lockScript.args],
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+            codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
           },
           [
             {
@@ -780,8 +783,8 @@ describe('CellsService', () => {
       })
       it('gather with exist args', async () => {
         const inputs = await CellsService.gatherAllInputs(walletId1, {
-          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+          hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
           args: multisigInfo.lockScript.args,
         })
         expect(inputs).toHaveLength(1)
@@ -789,8 +792,8 @@ describe('CellsService', () => {
       })
       it('gather with non-exist args', async () => {
         const inputs = await CellsService.gatherAllInputs(walletId1, {
-          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+          hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
           args: 'non-exist-args',
         })
         expect(inputs).toHaveLength(0)
@@ -1231,7 +1234,10 @@ describe('CellsService', () => {
     const publicKeyHash = bob.lockScript.args
     const bobDefaultLock = SystemScriptInfo.generateSecpScript(publicKeyHash)
     const multiSignHash = Multisig.hash([publicKeyHash])
-    const multiSignLockScript = SystemScriptInfo.generateMultiSignScript(multiSignHash)
+    const multiSignLockScript = SystemScriptInfo.generateMultiSignScript(
+      multiSignHash,
+      SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+    )
     const pageSize = 2
 
     describe('with indexed customized asset outputs', () => {
@@ -1689,7 +1695,10 @@ describe('CellsService', () => {
         '61',
         OutputStatus.Sent,
         false,
-        SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049'))
+        SystemScriptInfo.generateMultiSignScript(
+          Multisig.args(bob.blake160, +10, '0x7080291000049'),
+          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+        )
       )
       await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
@@ -1731,14 +1740,17 @@ describe('CellsService', () => {
     it('MULTI_LOCK_TIME', () => {
       const output = Output.fromObject({
         capacity: '1000',
-        lock: SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.blake160, +10, '0x7080291000049')),
+        lock: SystemScriptInfo.generateMultiSignScript(
+          Multisig.args(bob.blake160, +10, '0x7080291000049'),
+          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+        ),
       })
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTI_LOCK_TIME)
     })
     it('MULTI_LOCK', () => {
       const output = Output.fromObject({
         capacity: '1000',
-        lock: Multisig.getMultisigScript([bob.blake160], 1, 1, 1),
+        lock: Multisig.getMultisigScript([bob.blake160], 1, 1, 1, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH),
       })
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTISIG)
     })
@@ -1863,7 +1875,7 @@ describe('CellsService', () => {
       input.lockCodeHash = who.lockScript.codeHash
       input.lockArgs = who.lockScript.args
       input.lockHashType = who.lockScript.hashType
-      if (who.lockScript.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      if (who.lockScript.codeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH) {
         input.multiSignBlake160 = who.lockScript.args
       }
       input.lockHash = who.lockScript.computeHash()

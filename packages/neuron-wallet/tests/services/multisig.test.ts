@@ -52,6 +52,7 @@ describe('multisig service', () => {
     2,
     3,
     [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+    SystemScriptInfo.MULTI_SIGN_CODE_HASH,
     'alias'
   )
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
@@ -234,11 +235,14 @@ describe('multisig service', () => {
 
   describe('removeDulpicateConfig', () => {
     it('exist duplicate config', () => {
-      const multisigConfigModel = new MultisigConfigModel('walletId', 1, 2, 3, [
-        alice.publicKeyInBlake160,
-        bob.publicKeyInBlake160,
-        charlie.publicKeyInBlake160,
-      ])
+      const multisigConfigModel = new MultisigConfigModel(
+        'walletId',
+        1,
+        2,
+        3,
+        [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+        SystemScriptInfo.MULTI_SIGN_CODE_HASH
+      )
       const multisigConfigs = [
         MultisigConfig.fromModel(multisigConfigModel),
         MultisigConfig.fromModel(multisigConfigModel),
@@ -250,18 +254,24 @@ describe('multisig service', () => {
     it('non-exist duplicate config', () => {
       const multisigConfigs = [
         MultisigConfig.fromModel(
-          new MultisigConfigModel('walletId', 1, 2, 3, [
-            alice.publicKeyInBlake160,
-            bob.publicKeyInBlake160,
-            charlie.publicKeyInBlake160,
-          ])
+          new MultisigConfigModel(
+            'walletId',
+            1,
+            2,
+            3,
+            [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+            SystemScriptInfo.MULTI_SIGN_CODE_HASH
+          )
         ),
         MultisigConfig.fromModel(
-          new MultisigConfigModel('walletId', 2, 2, 3, [
-            alice.publicKeyInBlake160,
-            bob.publicKeyInBlake160,
-            charlie.publicKeyInBlake160,
-          ])
+          new MultisigConfigModel(
+            'walletId',
+            2,
+            2,
+            3,
+            [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+            SystemScriptInfo.MULTI_SIGN_CODE_HASH
+          )
         ),
       ]
       //@ts-ignore private-method

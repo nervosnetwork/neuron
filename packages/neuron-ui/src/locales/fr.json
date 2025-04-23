@@ -1158,7 +1158,8 @@
           "approve": "Approuver",
           "delete": "Supprimer",
           "daoDeposit": "Déposer dans DAO",
-          "daoWithdraw": "Retirer de DAO"
+          "daoWithdraw": "Retirer de DAO",
+          "regenerate": "Régénérer"
         }
       },
       "dao-ledger-notice": "Les portefeuilles Ledger ne prennent actuellement pas en charge les transactions DAO pour les adresses multisignatures. Veuillez utiliser une adresse à signature unique ou attendre les futures mises à jour.",
@@ -1182,6 +1183,13 @@
         "send": "Envoyer",
         "cancel": "Annuler",
         "export": "Exporter Tx"
+      },
+      "multisig-script-update-notice": "En raison de la <0>mise à jour du script multisig</0>, nous recommandons de régénérer les adresses multisig et de transférer les actifs depuis l’ancienne adresse pour garantir un bon fonctionnement.",
+      "regenerate-dialog": {
+        "title": "Régénérer",
+        "detail": "Une nouvelle adresse sera générée en utilisant les paramètres de votre ancienne adresse multisig, mise à jour au nouveau format de script.",
+        "donnot-worry": "Ne vous inquiétez pas — l’ancienne adresse restera accessible.",
+        "donnot-remind-again": "Ne plus me le rappeler"
       },
       "multi-details": "Détails de l'adresse multisig",
       "synchronization-abort": "Abandon de la synchronisation",

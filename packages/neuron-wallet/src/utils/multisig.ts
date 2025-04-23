@@ -10,7 +10,13 @@ import { deepCamelizeKeys } from './deep-camelize-keys'
 
 export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signatures: Signatures) => {
   const multisigLockHash = scriptToHash(
-    Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
+    Multisig.getMultisigScript(
+      multisigConfig.blake160s,
+      multisigConfig.r,
+      multisigConfig.m,
+      multisigConfig.n,
+      multisigConfig.lockCodeHash
+    )
   )
   let signed = 0
   signatures?.[multisigLockHash]?.forEach(blake160 => {
@@ -37,7 +43,7 @@ export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction 
   const txObj = Transaction.fromObject(deepCamelizeKeys(transaction) as any)
   if (multisig_configs && Object.keys(multisig_configs).length) {
     const args = Object.keys(multisig_configs)[0]
-    const lock = SystemScriptInfo.generateMultiSignScript(args)
+    const lock = SystemScriptInfo.generateMultiSignScript(args, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
 
     txObj.inputs.forEach((input: Input) => {
       if (!input?.lock) {

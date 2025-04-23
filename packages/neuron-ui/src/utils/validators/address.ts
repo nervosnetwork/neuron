@@ -8,6 +8,7 @@ import {
 } from 'exceptions'
 import {
   DefaultLockInfo,
+  LegacyMultiSigLockInfo,
   MultiSigLockInfo,
   LocktimeLockInfo,
   AnyoneCanPayLockInfoOnAggron,
@@ -44,6 +45,7 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
 
 const addressTagMap = {
   [DefaultLockInfo.TagName]: [DefaultLockInfo, DefaultLockInfo],
+  [LegacyMultiSigLockInfo.TagName]: [LegacyMultiSigLockInfo, LegacyMultiSigLockInfo],
   [MultiSigLockInfo.TagName]: [MultiSigLockInfo, MultiSigLockInfo],
   [LocktimeLockInfo.TagName]: [LocktimeLockInfo, LocktimeLockInfo],
   [AnyoneCanPayLockInfoOnAggron.TagName]: [AnyoneCanPayLockInfoOnLina, AnyoneCanPayLockInfoOnAggron],

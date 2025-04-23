@@ -190,8 +190,8 @@ export class TransactionGenerator {
     enableUseSentCell?: boolean
   }): Promise<Transaction> => {
     let cellDep: CellDep
-    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
-      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    if (SystemScriptInfo.isMultiSignCodeHash(lockClass.codeHash)) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(lockClass.codeHash)
     } else {
       cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     }
@@ -212,7 +212,10 @@ export class TransactionGenerator {
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
-        const script = SystemScriptInfo.generateMultiSignScript(Multisig.args(blake160, +minutes, tipHeaderEpoch))
+        const script = SystemScriptInfo.generateMultiSignScript(
+          Multisig.args(blake160, +minutes, tipHeaderEpoch),
+          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+        )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
@@ -292,7 +295,7 @@ export class TransactionGenerator {
   }): Promise<Transaction> => {
     let cellDep: CellDep
     if (multisigConfig) {
-      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(multisigConfig.lockCodeHash)
     } else {
       cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     }
@@ -308,7 +311,13 @@ export class TransactionGenerator {
       walletID,
       multisigConfig
         ? Script.fromSDK(
-            Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
+            Multisig.getMultisigScript(
+              multisigConfig.blake160s,
+              multisigConfig.r,
+              multisigConfig.m,
+              multisigConfig.n,
+              multisigConfig.lockCodeHash
+            )
           )
         : undefined,
       consumeOutPoints,
@@ -333,7 +342,8 @@ export class TransactionGenerator {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script: Script = SystemScriptInfo.generateMultiSignScript(
-          Multisig.args(blake160, minutes, tipHeaderEpoch)
+          Multisig.args(blake160, minutes, tipHeaderEpoch),
+          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
         )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
@@ -417,8 +427,8 @@ export class TransactionGenerator {
     multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
     let cellDep: CellDep
-    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
-      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    if (SystemScriptInfo.isMultiSignCodeHash(lockClass.codeHash)) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(lockClass.codeHash)
     } else {
       cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     }
@@ -491,8 +501,8 @@ export class TransactionGenerator {
     multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
     let cellDep: CellDep
-    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
-      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    if (SystemScriptInfo.isMultiSignCodeHash(lockClass.codeHash)) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(lockClass.codeHash)
     } else {
       cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     }
@@ -505,7 +515,13 @@ export class TransactionGenerator {
     const allInputs: Input[] = await CellsService.gatherAllInputs(
       walletId,
       multisigConfig
-        ? Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
+        ? Multisig.getMultisigScript(
+            multisigConfig.blake160s,
+            multisigConfig.r,
+            multisigConfig.m,
+            multisigConfig.n,
+            multisigConfig.lockCodeHash
+          )
         : undefined
     )
     if (allInputs.length === 0) {
@@ -573,8 +589,8 @@ export class TransactionGenerator {
     multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
     let cellDep: CellDep
-    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
-      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    if (SystemScriptInfo.isMultiSignCodeHash(lockClass.codeHash)) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(lockClass.codeHash)
     } else {
       cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     }
