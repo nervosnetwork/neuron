@@ -110,10 +110,18 @@ describe('TransactionGenerator', () => {
     ])
 
     // @ts-ignore: Private method
-    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+    SystemScriptInfo.getInstance().legacyMultiSignOutPointInfo = new Map<string, OutPoint>([
       [
         '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
         new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '1'),
+      ],
+    ])
+
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+      [
+        '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
+        new OutPoint('0x6888aa39ab30c570c2c30d9d5684d3769bf77265a7973211a3c087fe8efbf738', '1'),
       ],
     ])
 
@@ -764,7 +772,7 @@ describe('TransactionGenerator', () => {
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda',
           ].map(v => addressToScript(v).args),
-          lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+          lockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
         }),
       })
 
