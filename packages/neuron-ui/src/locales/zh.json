@@ -1095,7 +1095,7 @@
         "extra-ckb-send-to-acp": {
           "label": "额外发送 {{extraCKB}} CKBytes 为收款方创建资产账户"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "收款地址包含未知 Lock Script, 请确保接收者知道如何处理该资产, 额外 {{extraCKB}} CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产"
         },
         "select-option": "提交前请确认上述选项"
@@ -1261,7 +1261,7 @@
     },
     "set-start-block-number": {
       "title": "设置同步起始区块",
-      "warn": "请注意，同步起始区块之前的交易不会被同步！",
+      "warn": "为确保数据同步准确性，请输入您钱包第一笔交易的区块高度",
       "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",

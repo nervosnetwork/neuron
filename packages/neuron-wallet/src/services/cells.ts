@@ -1321,7 +1321,6 @@ export default class CellsService {
       return {}
     }
     const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
-
     const connection = await getConnection()
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `

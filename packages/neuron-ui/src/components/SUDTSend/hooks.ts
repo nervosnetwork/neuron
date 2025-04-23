@@ -11,7 +11,7 @@ import { SendType, UDTType } from 'utils/enums'
 export enum AddressLockType {
   secp256 = 'secp256',
   acp = 'acp',
-  unknow = 'unknow',
+  unknown = 'unknown',
 }
 
 export function useAddressLockType(address: string, isMainnet: boolean) {
@@ -22,7 +22,7 @@ export function useAddressLockType(address: string, isMainnet: boolean) {
     if (isAnyoneCanPayAddress(address, isMainnet)) {
       return AddressLockType.acp
     }
-    return AddressLockType.unknow
+    return AddressLockType.unknown
   }, [address])
 }
 
@@ -93,8 +93,8 @@ export function useOptions({
       return [
         {
           label:
-            addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp.label' : 'extra-ckb-send-to-unknow.label',
-          key: addressLockType === AddressLockType.acp ? SendType.acpNewCell : SendType.unknowNewCell,
+            addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp.label' : 'extra-ckb-send-to-unknown.label',
+          key: addressLockType === AddressLockType.acp ? SendType.acpNewCell : SendType.unknownNewCell,
           params: { assetName: accountInfo?.accountName, extraCKB: shannonToCKBFormatter(holdSUDTCellCapacity) },
         },
       ]
@@ -123,7 +123,7 @@ export function useSendType({
       case AddressLockType.acp:
         setSendType(undefined)
         break
-      case AddressLockType.unknow:
+      case AddressLockType.unknown:
         setSendType(undefined)
         break
       default:
@@ -205,7 +205,7 @@ export function useOnSubmit({
             break
           case SendType.acpNewCell:
           case SendType.secp256NewCell:
-          case SendType.unknowNewCell:
+          case SendType.unknownNewCell:
             actionType = 'send-acp-sudt-to-new-cell'
             break
           default:

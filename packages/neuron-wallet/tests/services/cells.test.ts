@@ -1769,11 +1769,11 @@ describe('CellsService', () => {
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.SECP256K1)
     })
     it('Unknown', () => {
-      const unknowScript = Script.fromObject(bob.lockScript)
-      unknowScript.codeHash = `0x${'00'.repeat(32)}`
+      const unknownScript = Script.fromObject(bob.lockScript)
+      unknownScript.codeHash = `0x${'00'.repeat(32)}`
       const output = Output.fromObject({
         capacity: '1000',
-        lock: unknowScript,
+        lock: unknownScript,
       })
       expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.Unknown)
     })
