@@ -50,7 +50,7 @@ import Button from 'widgets/Button'
 import SetStartBlockNumberDialog from 'components/SetStartBlockNumberDialog'
 import { type TFunction } from 'i18next'
 import hooks from 'components/NervosDAO/hooks'
-import { remaindRegenerateMultisigAddress } from 'services/localCache'
+import { remindRegenerateMultisigAddress } from 'services/localCache'
 import {
   useSearch,
   useConfigManage,
@@ -189,7 +189,7 @@ const MultisigAddress = () => {
           daoWithdrawAction.action(multisigConfig)
           break
         case 'regenerate':
-          if (remaindRegenerateMultisigAddress.get()) {
+          if (remindRegenerateMultisigAddress.get()) {
             regenerateAction.action(multisigConfig)
           } else {
             regenerateAction.setConfig(multisigConfig)

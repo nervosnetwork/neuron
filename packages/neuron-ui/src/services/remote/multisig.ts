@@ -28,7 +28,7 @@ export type MultisigEntity = MultisigParams & {
 export type MultisigConfig = MultisigEntity & {
   addresses: string[]
   fullPayload: string
-  isLegacy: boolean
+  isLegacy?: boolean
 }
 
 export const saveMultisigConfig = remoteApi<PartialSome<MultisigEntity, 'id'>, MultisigEntity>('save-multisig-config')

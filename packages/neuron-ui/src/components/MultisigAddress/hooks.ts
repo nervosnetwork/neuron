@@ -25,7 +25,7 @@ import {
   getMultisigSyncProgress,
 } from 'services/remote'
 import { computeScriptHash } from '@ckb-lumos/lumos/utils'
-import { remaindRegenerateMultisigAddress } from 'services/localCache'
+import { remindRegenerateMultisigAddress } from 'services/localCache'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
@@ -321,7 +321,7 @@ const useRegenerateAction = (regenerateConfig: (config: MultisigConfig) => Promi
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { checked } = e.target
       setIsNoRemind(checked)
-      remaindRegenerateMultisigAddress.save(checked)
+      remindRegenerateMultisigAddress.save(checked)
     },
     [setIsNoRemind]
   )
