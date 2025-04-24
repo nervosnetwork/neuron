@@ -1189,7 +1189,7 @@
       "multisig-script-update-notice": "由于<0>多签脚本升级</0>，我们建议重新生成多签地址，并将资产从旧地址转移，以确保正常使用。",
       "regenerate-dialog": {
         "title": "重新生成",
-        "detail": "将使用您旧多签地址的设置生成一个新地址，升级为最新脚本格式",
+        "detail": "将使用您旧多签地址的设置生成一个新地址, 升级为新多签合约",
         "donnot-worry": "别担心 — 旧地址仍然可以访问",
         "donnot-remind-again": "不再提醒"
       },

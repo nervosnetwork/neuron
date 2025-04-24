@@ -5,11 +5,13 @@
   padding: 0;
   position: relative;
 
+  /* 對話框背景遮罩 */
   &::backdrop {
     @include overlay;
   }
 }
 
+/* 對話框頭部 */
 .header {
   position: -webkit-sticky;
   position: sticky;
@@ -45,13 +47,20 @@
   }
 }
 
+/* 對話框內容區域 */
 .content {
   padding: 20px 16px;
   position: relative;
   max-height: calc(100vh - 260px);
   overflow-y: auto;
+
+  /* 隱藏滾動條但保持滾動功能 */
+  &::-webkit-scrollbar {
+    width: 0;
+  }
 }
 
+/* 對話框底部區域 */
 .footerWrap {
   height: 104px;
 }

@@ -6,7 +6,7 @@ export class AddLockCodeHash1744960856059 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.query(`ALTER TABLE "multisig_config" ADD COLUMN "lockCodeHash" character(32);`)
-      await queryRunner.query(`UPDATE "multisig_config" SET lockCodeHash = "${SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH}" where lockCodeHash IS NULL`)
+      await queryRunner.query(`UPDATE "multisig_config" SET lockCodeHash = "${SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH}" where lockCodeHash IS NULL`)
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

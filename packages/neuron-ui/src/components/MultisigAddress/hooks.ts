@@ -312,7 +312,6 @@ const useDeleteAction = (deleteConfigById: (id: number) => void) => {
 }
 
 const useRegenerateAction = (regenerateConfig: (config: MultisigConfig) => Promise<void>) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [config, setConfig] = useState<MultisigConfig>()
   const [isNoRemind, setIsNoRemind] = useState(false)
   const [regenerateErrorMessage, setRegenerateErrorMessage] = useState<string | undefined>()
@@ -331,24 +330,20 @@ const useRegenerateAction = (regenerateConfig: (config: MultisigConfig) => Promi
       try {
         await regenerateConfig(multisigConfig)
       } catch (error) {
-        setIsDialogOpen(true)
         setRegenerateErrorMessage(error instanceof Error ? error.message : '')
       }
     },
-    [setIsDialogOpen, config, isNoRemind]
+    [config, isNoRemind, setRegenerateErrorMessage]
   )
-  const closeDialog = useCallback(() => {
-    setIsDialogOpen(false)
-  }, [setIsDialogOpen])
+
   return {
     action: regenerate,
-    closeDialog,
     config,
     setConfig,
-    isDialogOpen,
     isNoRemind,
     handleCheckbox,
     regenerateErrorMessage,
+    setRegenerateErrorMessage,
   }
 }
 

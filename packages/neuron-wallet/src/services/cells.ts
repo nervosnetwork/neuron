@@ -353,7 +353,7 @@ export default class CellsService {
       `,
         {
           liveStatus: OutputStatus.Live,
-          multiSignlockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+          multiSignlockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
           chequeLockCodeHash,
           nftIssuerCodehash,
           nftClassCodehash,
@@ -467,7 +467,7 @@ export default class CellsService {
             data: 'withdraw-able',
           })
         }
-      } else if (o.lockCodeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH) {
+      } else if (o.lockCodeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SingleMultiSign,
           type: '',
@@ -770,7 +770,7 @@ export default class CellsService {
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
-        if (lockClass.codeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH) {
+        if (lockClass.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
           const multisigConfig = multisigConfigMap[cell.lockHash]
           if (!multisigConfig) {
             throw new MultisigConfigNeedError()
@@ -1372,7 +1372,7 @@ export default class CellsService {
     switch (output.lock.codeHash) {
       case assetAccountInfo.getChequeInfo().codeHash:
         return LockScriptCategory.Cheque
-      case SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH:
+      case SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH:
         if (output.lock.args.length === LOCKTIME_ARGS_LENGTH) {
           return LockScriptCategory.MULTI_LOCK_TIME
         }

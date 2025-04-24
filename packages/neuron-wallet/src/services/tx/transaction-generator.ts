@@ -214,7 +214,7 @@ export class TransactionGenerator {
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = SystemScriptInfo.generateMultiSignScript(
           Multisig.args(blake160, +minutes, tipHeaderEpoch),
-          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+          SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
         )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
@@ -343,7 +343,7 @@ export class TransactionGenerator {
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script: Script = SystemScriptInfo.generateMultiSignScript(
           Multisig.args(blake160, minutes, tipHeaderEpoch),
-          SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+          SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
         )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))

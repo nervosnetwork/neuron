@@ -43,7 +43,7 @@ export const parseMultisigTxJsonFromCkbCli = (tx: OfflineSignJSON): Transaction 
   const txObj = Transaction.fromObject(deepCamelizeKeys(transaction) as any)
   if (multisig_configs && Object.keys(multisig_configs).length) {
     const args = Object.keys(multisig_configs)[0]
-    const lock = SystemScriptInfo.generateMultiSignScript(args, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+    const lock = SystemScriptInfo.generateMultiSignScript(args, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
 
     txObj.inputs.forEach((input: Input) => {
       if (!input?.lock) {

@@ -15,7 +15,7 @@ describe('getMultisigStatus test', () => {
       m: 2,
       n: 3,
       blake160s: Object.values(addressesToArgs),
-      lockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+      lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
     })
     it('Unsigned', () => {
       expect(getMultisigStatus(multisigConfig, {})).toBe(SignStatus.Unsigned)

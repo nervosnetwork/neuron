@@ -103,7 +103,7 @@ export default class AddressMeta implements Address {
   public generateSingleMultiSignLockScript(): Script {
     return SystemScriptInfo.generateMultiSignScript(
       Multisig.hash([this.blake160]),
-      SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+      SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
     )
   }
 

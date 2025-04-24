@@ -10,8 +10,8 @@ import { MAINNET_CLIENT_LIST } from '../utils/const'
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
   static DAO_CODE_HASH = process.env.DAO_CODE_HASH!
-  static LEGACY_MULTI_SIGN_CODE_HASH = process.env.LEGACY_MULTISIG_CODE_HASH!
-  static MULTI_SIGN_CODE_HASH = process.env.MULTISIG_CODE_HASH!
+  static LEGACY_MULTISIG_CODE_HASH = process.env.LEGACY_MULTISIG_CODE_HASH!
+  static MULTISIG_CODE_HASH = process.env.MULTISIG_CODE_HASH!
 
   static SECP_HASH_TYPE = ScriptHashType.Type
   static DAO_HASH_TYPE = ScriptHashType.Type
@@ -42,7 +42,7 @@ export default class SystemScriptInfo {
   private multiSignOutPointInfo = new Map<string, OutPoint>()
 
   public static getMultiSignHashType(lockCodeHash: string): ScriptHashType {
-    if (lockCodeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+    if (lockCodeHash === SystemScriptInfo.MULTISIG_CODE_HASH) {
       return SystemScriptInfo.MULTI_SIGN_HASH_TYPE
     }
     return SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE
@@ -74,7 +74,7 @@ export default class SystemScriptInfo {
   }
 
   public async getMultiSignCellDep(
-    lockCodeHash: string = SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+    lockCodeHash: string = SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
     network: {
       remote: string
       genesisHash: string
@@ -84,7 +84,7 @@ export default class SystemScriptInfo {
   ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     const multiSignOutPointInfo =
-      lockCodeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH
+      lockCodeHash === SystemScriptInfo.MULTISIG_CODE_HASH
         ? this.multiSignOutPointInfo
         : this.legacyMultiSignOutPointInfo
 
@@ -113,14 +113,14 @@ export default class SystemScriptInfo {
   }
 
   public static isMultiSignCodeHash(codeHash: string): boolean {
-    return [SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH, SystemScriptInfo.MULTI_SIGN_CODE_HASH].includes(codeHash)
+    return [SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH, SystemScriptInfo.MULTISIG_CODE_HASH].includes(codeHash)
   }
 
   public static isMultiSignScript(script: Script): boolean {
     return (
-      (script.codeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH &&
+      (script.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH &&
         script.hashType === SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE) ||
-      (script.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH &&
+      (script.codeHash === SystemScriptInfo.MULTISIG_CODE_HASH &&
         script.hashType === SystemScriptInfo.MULTI_SIGN_HASH_TYPE)
     )
   }

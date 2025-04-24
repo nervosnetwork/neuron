@@ -692,7 +692,7 @@ describe('TransactionSender Test', () => {
           n: 1,
           r: 1,
           blake160s: ['blake160s'],
-          lockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+          lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
         })
         await transactionSender.generateMultisigSendAllTx(targetOutputs, multisigConfig)
         expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith({
@@ -895,7 +895,7 @@ describe('TransactionSender Test', () => {
             since: '0x0',
             lock: Script.fromObject({
               args: '',
-              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+              codeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
               hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
             }),
           }),
@@ -936,7 +936,7 @@ describe('TransactionSender Test', () => {
             m,
             n: addresses.length,
             blake160s: addresses.map(v => addressToScript(v).args),
-            lockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+            lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
           }),
         ]
       }
@@ -959,7 +959,7 @@ describe('TransactionSender Test', () => {
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
         const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
         )
         const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
         expect(res.witnesses[0]).toBe(
@@ -990,7 +990,7 @@ describe('TransactionSender Test', () => {
           const getAddressInfos = transactionSender.getAddressInfos
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
           tx.inputs[0]!.setLock(
-            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
           )
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
@@ -1058,7 +1058,7 @@ describe('TransactionSender Test', () => {
 
         const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
         )
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])).rejects.toThrow(
           new NoMatchAddressForSign()
@@ -1097,7 +1097,7 @@ describe('TransactionSender Test', () => {
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
           const tx = Transaction.fromObject(transactionObject)
           tx.inputs[0]!.setLock(
-            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
           )
           const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const expectedValue = serializeWitnessArgs({
@@ -1133,7 +1133,7 @@ describe('TransactionSender Test', () => {
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
         const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
         )
         tx.inputs.push(
           Input.fromObject({
@@ -1144,7 +1144,7 @@ describe('TransactionSender Test', () => {
             since: '0x0',
             lock: Script.fromObject({
               args: multiArgs,
-              codeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+              codeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
               hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
             }),
           })
@@ -1181,7 +1181,7 @@ describe('TransactionSender Test', () => {
             since: '0x0',
             lock: Script.fromObject({
               args: '',
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
             }),
           }),
@@ -1222,7 +1222,7 @@ describe('TransactionSender Test', () => {
             m,
             n: addresses.length,
             blake160s: addresses.map(v => addressToScript(v).args),
-            lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            lockCodeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
           }),
         ]
       }
@@ -1244,9 +1244,7 @@ describe('TransactionSender Test', () => {
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
         const tx = Transaction.fromObject(transactionObject)
-        tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTI_SIGN_CODE_HASH)
-        )
+        tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTISIG_CODE_HASH))
         const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
         expect(res.witnesses[0]).toBe(
           '0x810000001000000081000000810000006d00000000010102729a884056fed321daaca410d94a5d6425a6ca1f0fbd88910d2348d69da5a980f2376a7a1a04feb56b75ef075f1cb4a3e681846c7d8c6ad1575dc5889a2685df215dc566c346757d6d3d46b4201b38f55f87d381fc65e074c1292145fedda1e6d179e6b1052194e200'
@@ -1276,7 +1274,7 @@ describe('TransactionSender Test', () => {
           const getAddressInfos = transactionSender.getAddressInfos
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
           tx.inputs[0]!.setLock(
-            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTISIG_CODE_HASH)
           )
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
@@ -1343,9 +1341,7 @@ describe('TransactionSender Test', () => {
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
 
         const tx = Transaction.fromObject(transactionObject)
-        tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTI_SIGN_CODE_HASH)
-        )
+        tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTISIG_CODE_HASH))
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])).rejects.toThrow(
           new NoMatchAddressForSign()
         )
@@ -1383,7 +1379,7 @@ describe('TransactionSender Test', () => {
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
           const tx = Transaction.fromObject(transactionObject)
           tx.inputs[0]!.setLock(
-            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+            SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTISIG_CODE_HASH)
           )
           const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const expectedValue = serializeWitnessArgs({
@@ -1418,9 +1414,7 @@ describe('TransactionSender Test', () => {
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
         const tx = Transaction.fromObject(transactionObject)
-        tx.inputs[0]!.setLock(
-          SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTI_SIGN_CODE_HASH)
-        )
+        tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs, SystemScriptInfo.MULTISIG_CODE_HASH))
         tx.inputs.push(
           Input.fromObject({
             previousOutput: OutPoint.fromObject({
@@ -1430,7 +1424,7 @@ describe('TransactionSender Test', () => {
             since: '0x0',
             lock: Script.fromObject({
               args: multiArgs,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
             }),
           })

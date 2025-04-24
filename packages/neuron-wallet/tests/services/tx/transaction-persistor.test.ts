@@ -146,7 +146,7 @@ describe('TransactionPersistor', () => {
       const txWithCheque = Transaction.fromObject(tx)
       const multisigLockTimeLock = SystemScriptInfo.generateMultiSignScript(
         Multisig.hash([txWithCheque.outputs[0].lock.args]),
-        SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+        SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
       )
       txWithCheque.outputs[0].setLock(multisigLockTimeLock)
       const args = [...tx.inputs.map(v => v.lock?.args), ...tx.outputs.map(v => v.lock.args)]

@@ -656,10 +656,10 @@ const MultisigAddress = () => {
       />
 
       <AlertDialog
-        show={regenerateAction.isDialogOpen}
+        show={!!regenerateAction.regenerateErrorMessage}
         title={regenerateAction.regenerateErrorMessage}
         type="failed"
-        onCancel={regenerateAction.closeDialog}
+        onCancel={() => regenerateAction.setRegenerateErrorMessage('')}
       />
 
       <Dialog

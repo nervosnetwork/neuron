@@ -79,7 +79,7 @@ export default class MultisigController {
         params.m,
         params.n,
         params.blake160s,
-        params.lockCodeHash || SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+        params.lockCodeHash || SystemScriptInfo.MULTISIG_CODE_HASH,
         params.alias
       )
     )

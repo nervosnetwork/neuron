@@ -140,7 +140,7 @@ describe('test for multisig controller', () => {
       m: 1,
       n: 1,
       blake160s: [],
-      lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+      lockCodeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
       alias: 'string',
       changed: expect.any(Function),
       lastestBlockNumber: '',

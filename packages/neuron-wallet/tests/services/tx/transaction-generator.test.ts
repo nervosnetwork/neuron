@@ -476,7 +476,7 @@ describe('TransactionGenerator', () => {
           expect(expectedFee).toEqual(BigInt(472))
           expect(tx.fee).toEqual(expectedFee.toString())
 
-          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
           expect(multiSignOutput).toBeDefined()
 
           const epoch = Multisig.parseSince(multiSignOutput!.lock.args)
@@ -738,7 +738,7 @@ describe('TransactionGenerator', () => {
           feeRate,
         })
 
-        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH)
+        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
 
         const epoch = Multisig.parseSince(tx.outputs[0].lock.args)
         const parsedEpoch = since.parseEpoch(epoch)
@@ -772,7 +772,7 @@ describe('TransactionGenerator', () => {
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda',
           ].map(v => addressToScript(v).args),
-          lockCodeHash: SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH,
+          lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
         }),
       })
 
@@ -1053,7 +1053,7 @@ describe('TransactionGenerator', () => {
       capacity: toShannon('1000'),
       lock: SystemScriptInfo.generateMultiSignScript(
         Multisig.args(bob.lockScript.args, 100, '0x7080018000001'),
-        SystemScriptInfo.LEGACY_MULTI_SIGN_CODE_HASH
+        SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
       ),
     })
     const outPoint = OutPoint.fromObject({

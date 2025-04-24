@@ -52,7 +52,7 @@ describe('multisig service', () => {
     2,
     3,
     [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-    SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+    SystemScriptInfo.MULTISIG_CODE_HASH,
     'alias'
   )
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
@@ -65,7 +65,7 @@ describe('multisig service', () => {
       multisigConfigModel.m,
       multisigConfigModel.n
     ),
-    codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+    codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
     hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
   }
   const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
@@ -241,7 +241,7 @@ describe('multisig service', () => {
         2,
         3,
         [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-        SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        SystemScriptInfo.MULTISIG_CODE_HASH
       )
       const multisigConfigs = [
         MultisigConfig.fromModel(multisigConfigModel),
@@ -260,7 +260,7 @@ describe('multisig service', () => {
             2,
             3,
             [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-            SystemScriptInfo.MULTI_SIGN_CODE_HASH
+            SystemScriptInfo.MULTISIG_CODE_HASH
           )
         ),
         MultisigConfig.fromModel(
@@ -270,7 +270,7 @@ describe('multisig service', () => {
             2,
             3,
             [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-            SystemScriptInfo.MULTI_SIGN_CODE_HASH
+            SystemScriptInfo.MULTISIG_CODE_HASH
           )
         ),
       ]
