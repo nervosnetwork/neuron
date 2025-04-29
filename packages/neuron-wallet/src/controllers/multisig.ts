@@ -20,30 +20,20 @@ import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-d
 import { LightRPC } from '../utils/ckb-rpc'
 import SyncProgressService from '../services/sync-progress'
 
+interface MultisigConfigItem {
+  sighash_addresses: string[]
+  require_first_n: number
+  threshold: number
+  alias?: string | string[]
+  lockCodeHash: string | string[]
+}
+
 interface MultisigConfigOutput {
-  multisig_configs: Record<
-    string,
-    {
-      sighash_addresses: string[]
-      require_first_n: number
-      threshold: number
-      alias?: string | string[]
-      lockCodeHash: string | string[]
-    }
-  >
+  multisig_configs: Record<string, MultisigConfigItem>
 }
 
 interface MultisigConfigInput {
-  multisig_configs: Record<
-    string,
-    {
-      sighash_addresses: string[]
-      require_first_n: number
-      threshold: number
-      alias?: string
-      lockCodeHash?: string | string[]
-    }
-  >
+  multisig_configs: Record<string, Omit<MultisigConfigItem, 'lockCodeHash'> & { lockCodeHash?: string | string[] }>
 }
 
 const validateImportConfig = (configOutput: MultisigConfigInput) => {
