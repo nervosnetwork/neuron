@@ -195,7 +195,7 @@ export default class MultisigController {
             n: config.sighash_addresses.length,
             blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
             walletId,
-            alias: config.alias,
+            alias: config.alias as string,
             lockCodeHash: config.lockCodeHash,
           })
         }

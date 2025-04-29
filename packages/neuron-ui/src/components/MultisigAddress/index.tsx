@@ -225,14 +225,17 @@ const MultisigAddress = () => {
         if (!config.isLegacy && ['regenerate'].includes(item.key)) {
           return
         }
-        if (!multisigBanlances[config.fullPayload] || multisigBanlances[config.fullPayload] === '0') {
+        if (
+          item.key === 'send' &&
+          (!multisigBanlances[config.fullPayload] || multisigBanlances[config.fullPayload] === '0')
+        ) {
           options.push({
             ...item,
-            disabled: item.disabled || item.key === 'send',
+            disabled: true,
           })
-        } else {
-          options.push(item)
+          return
         }
+        options.push(item)
       })
       return options
     },
