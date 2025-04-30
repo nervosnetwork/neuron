@@ -24,8 +24,8 @@ interface MultisigConfigItem {
   sighash_addresses: string[]
   require_first_n: number
   threshold: number
-  alias?: string | string[]
-  lockCodeHash: string | string[]
+  alias?: string
+  lockCodeHash: string
 }
 
 interface MultisigConfigOutput {
@@ -33,7 +33,7 @@ interface MultisigConfigOutput {
 }
 
 interface MultisigConfigInput {
-  multisig_configs: Record<string, Omit<MultisigConfigItem, 'lockCodeHash'> & { lockCodeHash?: string | string[] }>
+  multisig_configs: Record<string, Omit<MultisigConfigItem, 'lockCodeHash'> & { lockCodeHash?: string }>
 }
 
 const validateImportConfig = (configOutput: MultisigConfigInput) => {
@@ -157,7 +157,7 @@ export default class MultisigController {
     }
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
-      const configOutput: MultisigConfigInput = JSON.parse(json)
+      const configOutput: MultisigConfigOutput = JSON.parse(json)
       if (!validateImportConfig(configOutput)) {
         ShowGlobalDialogSubject.next({
           type: 'failed',
@@ -166,40 +166,15 @@ export default class MultisigController {
         })
         return
       }
-      const saveConfigs: {
-        r: number
-        m: number
-        n: number
-        blake160s: string[]
-        walletId: string
-        alias?: string
-        lockCodeHash?: string
-      }[] = []
-      Object.values(configOutput.multisig_configs).forEach(config => {
-        if (Array.isArray(config.lockCodeHash)) {
-          config.lockCodeHash.forEach((lockCodeHash, index) => {
-            saveConfigs.push({
-              r: +config.require_first_n,
-              m: +config.threshold,
-              n: config.sighash_addresses.length,
-              blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
-              walletId,
-              alias: config.alias?.[index],
-              lockCodeHash,
-            })
-          })
-        } else {
-          saveConfigs.push({
-            r: +config.require_first_n,
-            m: +config.threshold,
-            n: config.sighash_addresses.length,
-            blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
-            walletId,
-            alias: config.alias as string,
-            lockCodeHash: config.lockCodeHash,
-          })
-        }
-      })
+      const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
+        r: +config.require_first_n,
+        m: +config.threshold,
+        n: config.sighash_addresses.length,
+        blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
+        walletId,
+        alias: config.alias,
+        lockCodeHash: config.lockCodeHash,
+      }))
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
       for (let idx = 0; idx < savedResult.length; idx++) {
@@ -251,27 +226,14 @@ export default class MultisigController {
     const isMainnet = NetworksService.getInstance().isMainnet()
     const output: MultisigConfigOutput = { multisig_configs: {} }
     configs.forEach(v => {
-      const hash = Multisig.hash(v.blake160s, v.r, v.m, v.n)
-      if (output.multisig_configs[hash]) {
-        const existingLockCodeHash = output.multisig_configs[hash].lockCodeHash
-        output.multisig_configs[hash].lockCodeHash = Array.isArray(existingLockCodeHash)
-          ? [...existingLockCodeHash, v.lockCodeHash]
-          : [existingLockCodeHash, v.lockCodeHash]
-
-        const existingAlias = output.multisig_configs[hash].alias || ''
-        output.multisig_configs[hash].alias = Array.isArray(existingAlias)
-          ? [...existingAlias, v.alias || '']
-          : [existingAlias, v.alias || '']
-      } else {
-        output.multisig_configs[hash] = {
-          sighash_addresses: v.blake160s.map(args =>
-            scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
-          ),
-          require_first_n: v.r,
-          threshold: v.m,
-          lockCodeHash: v.lockCodeHash,
-          alias: v.alias,
-        }
+      output.multisig_configs[`${Multisig.hash(v.blake160s, v.r, v.m, v.n)}_${v.lockCodeHash.slice(2, 10)}`] = {
+        sighash_addresses: v.blake160s.map(args =>
+          scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
+        ),
+        require_first_n: v.r,
+        threshold: v.m,
+        alias: v.alias,
+        lockCodeHash: v.lockCodeHash,
       }
     })
 

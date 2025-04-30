@@ -66,7 +66,7 @@ describe('multisig service', () => {
       multisigConfigModel.n
     ),
     codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
-    hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+    hashType: SystemScriptInfo.MULTISIGN_HASH_TYPE,
   }
   const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
   const defaultOutput = {

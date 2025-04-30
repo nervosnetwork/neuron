@@ -7,6 +7,7 @@ import {
   useGoBack,
   useOnWindowResize,
   calculateFee,
+  clsx,
 } from 'utils'
 import appState from 'states/init/app'
 import { useState as useGlobalState } from 'states'
@@ -22,6 +23,7 @@ import Table from 'widgets/Table'
 import Tooltip from 'widgets/Tooltip'
 import Toast from 'widgets/Toast'
 import AlertDialog from 'widgets/AlertDialog'
+import CopyZone from 'widgets/CopyZone'
 import {
   Download,
   Search,
@@ -39,6 +41,8 @@ import {
   DAOWithdrawal,
   Attention,
   Regenerate,
+  LockCodeHash,
+  Copy,
 } from 'widgets/Icons/icon'
 import { getHeader } from 'services/chain'
 import AttentionCloseDialog from 'widgets/Icons/Attention.png'
@@ -372,9 +376,8 @@ const MultisigAddress = () => {
                     <button
                       type="button"
                       onClick={() => openExternal('https://github.com/Magickbase/neuron-public-issues/issues/457')}
-                    >
-                      {' '}
-                    </button>,
+                      aria-label=" "
+                    />,
                   ]}
                 />
               </div>
@@ -437,8 +440,30 @@ const MultisigAddress = () => {
                   render(_, __, item) {
                     return (
                       <div className={styles.address}>
+                        <Tooltip
+                          tip={
+                            <div>
+                              <div className={styles.titleWrap}>
+                                <p>Code_hash</p>
+                                <div className={clsx(styles.tag, item.isLegacy && styles.legacy)}>
+                                  {item.isLegacy ? 'Legacy' : 'Recommended'}
+                                </div>
+                              </div>
+                              <CopyZone content={item.lockCodeHash} className={styles.copyLockCodeHash}>
+                                {item.lockCodeHash}
+                                <Copy />
+                              </CopyZone>
+                            </div>
+                          }
+                          isTriggerNextToChild
+                          tipClassName={styles.lockCodeHashTip}
+                        >
+                          <div className={clsx(styles.lockCodeHash, item.isLegacy && styles.legacy)}>
+                            <LockCodeHash />
+                            <span>@{item.lockCodeHash.slice(2, 10)}</span>
+                          </div>
+                        </Tooltip>
                         {item.fullPayload.slice(0, 5)}...{item.fullPayload.slice(-5)}
-                        {item.isLegacy && <div className={styles.legacy}>Legacy</div>}
                       </div>
                     )
                   },

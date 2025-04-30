@@ -61,7 +61,7 @@ interface PathAndPrivateKey {
 }
 
 export default class TransactionSender {
-  static MULTI_SIGN_ARGS_LENGTH = 58
+  static MULTISIGN_ARGS_LENGTH = 58
 
   private walletService: WalletService
 
@@ -147,7 +147,7 @@ export default class TransactionSender {
 
     // Only one multi sign input now.
     const isMultisig =
-      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
+      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTISIGN_ARGS_LENGTH
 
     const addressInfos = await this.getAddressInfos(walletID)
     const multiSignBlake160s = isMultisig
@@ -162,7 +162,7 @@ export default class TransactionSender {
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
     const findPrivateKey = (args: string) => {
       let path: string | undefined
-      if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
+      if (args.length === TransactionSender.MULTISIGN_ARGS_LENGTH) {
         path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
       } else if (args.length === 42) {
         path = addressInfos.find(i => i.blake160 === args)!.path

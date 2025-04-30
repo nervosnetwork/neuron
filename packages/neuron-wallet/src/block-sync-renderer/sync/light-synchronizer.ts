@@ -12,6 +12,7 @@ import Multisig from '../../services/multisig'
 import SyncProgress, { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import WalletService from '../../services/wallets'
 import AssetAccountInfo from '../../models/asset-account-info'
+import SystemScriptInfo from '../../models/system-script-info'
 import { DepType } from '../../models/chain/cell-dep'
 import { vector, blockchain } from '@ckb-lumos/lumos/codec'
 import type { Base } from '@ckb-lumos/lumos/rpc'
@@ -39,6 +40,9 @@ export default class LightSynchronizer extends Synchronizer {
 
   private async getDepTxs(): Promise<string[]> {
     const assetAccountInfo = new AssetAccountInfo()
+    const multiSignCellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep(
+      SystemScriptInfo.MULTISIG_CODE_HASH
+    )
     const fetchCellDeps = [
       assetAccountInfo.anyoneCanPayCellDep,
       assetAccountInfo.sudtCellDep,
@@ -48,6 +52,8 @@ export default class LightSynchronizer extends Synchronizer {
       assetAccountInfo.getNftIssuerInfo().cellDep,
       assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep,
       assetAccountInfo.getChequeInfo().cellDep,
+      multiSignCellDep,
+
       ...assetAccountInfo.getSporeInfos().map(info => info.cellDep),
       ...assetAccountInfo.getSporeClusterInfo().map(info => info.cellDep),
     ]

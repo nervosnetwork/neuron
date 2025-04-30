@@ -15,7 +15,7 @@
     height: 44px;
     border-bottom: 1px solid var(--warn-border-color);
     padding: 0 16px;
-    max-width: 648px;
+    max-width: 780px;
     & > svg {
       width: 16px;
       flex-shrink: 0;
@@ -112,7 +112,7 @@
   .tableWrap {
     margin-top: 16px;
     min-height: 360px;
-    min-width: 648px;
+    min-width: 748px;
     border: 1px solid var(--table-head-border-color);
     border-radius: 16px;
     border-top: none;
@@ -130,18 +130,58 @@
   .address {
     font-family: 'JetBrains Mono';
     position: relative;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
 
-    .legacy {
-      font-size: 10px;
-      height: 16px;
-      color: var(--third-text-color);
+    .titleWrap {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--main-text-color);
       font-weight: 500;
-      position: absolute;
-      top: -16px;
-      right: -10px;
-      background: var(--table-head-border-color);
+
+      .tag {
+        font-size: 12px;
+        line-height: 18px;
+        color: var(--tabs-active);
+        font-weight: 500;
+        background: var(--tag-background-color);
+        padding: 0 4px;
+        border-radius: 2px;
+      }
+      .legacy {
+        color: var(--third-text-color);
+        background: var(--input-border-color);
+      }
+    }
+    .lockCodeHash {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      border: 1px solid var(--tabs-active);
+      border-radius: 4px;
       padding: 0 4px;
-      border-radius: 48px;
+      line-height: 24px;
+      color: var(--tabs-active);
+      font-weight: 500;
+      &.legacy {
+        border: 1px solid var(--divide-line-color);
+        color: var(--input-second-color);
+        svg {
+          path {
+            stroke: var(--input-second-color);
+          }
+        }
+      }
+    }
+
+    .copyLockCodeHash {
+      @include copyAddress;
+    }
+
+    .lockCodeHashTip {
+      margin-left: 50px;
     }
   }
 

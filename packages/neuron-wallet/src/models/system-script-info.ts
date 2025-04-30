@@ -15,8 +15,8 @@ export default class SystemScriptInfo {
 
   static SECP_HASH_TYPE = ScriptHashType.Type
   static DAO_HASH_TYPE = ScriptHashType.Type
-  static LEGACY_MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
-  static MULTI_SIGN_HASH_TYPE = ScriptHashType.Data1
+  static LEGACY_MULTISIGN_HASH_TYPE = ScriptHashType.Type
+  static MULTISIGN_HASH_TYPE = ScriptHashType.Data1
 
   static DAO_SCRIPT_HASH = new Script(
     systemScripts.DAO.CODE_HASH,
@@ -41,11 +41,12 @@ export default class SystemScriptInfo {
   private legacyMultiSignOutPointInfo = new Map<string, OutPoint>()
   private multiSignOutPointInfo = new Map<string, OutPoint>()
 
-  public static getMultiSignHashType(lockCodeHash: string): ScriptHashType {
-    if (lockCodeHash === SystemScriptInfo.MULTISIG_CODE_HASH) {
-      return SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+  public static getMultiSignHashType(lockCodeHash: string) {
+    if (!SystemScriptInfo.isMultiSignCodeHash(lockCodeHash)) {
+      throw new Error('Unknown Multisig Code Hash')
     }
-    return SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE
+    if (lockCodeHash === SystemScriptInfo.MULTISIG_CODE_HASH) return SystemScriptInfo.MULTISIGN_HASH_TYPE
+    if (lockCodeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) return SystemScriptInfo.LEGACY_MULTISIGN_HASH_TYPE
   }
 
   // need network url and genesisBlockHash
@@ -105,7 +106,7 @@ export default class SystemScriptInfo {
   }
 
   public static generateMultiSignScript(args: string, lockCodeHash: string): Script {
-    return new Script(lockCodeHash, args, SystemScriptInfo.getMultiSignHashType(lockCodeHash))
+    return new Script(lockCodeHash, args, SystemScriptInfo.getMultiSignHashType(lockCodeHash) as ScriptHashType)
   }
 
   public static isSecpScript(script: Script): boolean {
@@ -119,9 +120,9 @@ export default class SystemScriptInfo {
   public static isMultiSignScript(script: Script): boolean {
     return (
       (script.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH &&
-        script.hashType === SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE) ||
+        script.hashType === SystemScriptInfo.LEGACY_MULTISIGN_HASH_TYPE) ||
       (script.codeHash === SystemScriptInfo.MULTISIG_CODE_HASH &&
-        script.hashType === SystemScriptInfo.MULTI_SIGN_HASH_TYPE)
+        script.hashType === SystemScriptInfo.MULTISIGN_HASH_TYPE)
     )
   }
 

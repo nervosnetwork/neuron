@@ -896,7 +896,7 @@ describe('TransactionSender Test', () => {
             lock: Script.fromObject({
               args: '',
               codeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
-              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              hashType: SystemScriptInfo.LEGACY_MULTISIGN_HASH_TYPE,
             }),
           }),
         ],
@@ -1145,7 +1145,7 @@ describe('TransactionSender Test', () => {
             lock: Script.fromObject({
               args: multiArgs,
               codeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
-              hashType: SystemScriptInfo.LEGACY_MULTI_SIGN_HASH_TYPE,
+              hashType: SystemScriptInfo.LEGACY_MULTISIGN_HASH_TYPE,
             }),
           })
         )
@@ -1182,7 +1182,7 @@ describe('TransactionSender Test', () => {
             lock: Script.fromObject({
               args: '',
               codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+              hashType: SystemScriptInfo.MULTISIGN_HASH_TYPE,
             }),
           }),
         ],
@@ -1425,7 +1425,7 @@ describe('TransactionSender Test', () => {
             lock: Script.fromObject({
               args: multiArgs,
               codeHash: SystemScriptInfo.MULTISIG_CODE_HASH,
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+              hashType: SystemScriptInfo.MULTISIGN_HASH_TYPE,
             }),
           })
         )
