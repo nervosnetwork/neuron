@@ -11,6 +11,9 @@ import {
   ChequeLockInfoOnLina,
   clsx,
 } from 'utils'
+import Tooltip from 'widgets/Tooltip'
+import CopyZone from 'widgets/CopyZone'
+import { Copy } from 'widgets/Icons/icon'
 import styles from './scriptTag.module.scss'
 
 const ScriptTag = ({
@@ -45,6 +48,36 @@ const ScriptTag = ({
     return null
   }
 
+  if (LegacyMultiSigLockInfo.TagName === foundLock.TagName || MultiSigLockInfo.TagName === foundLock.TagName) {
+    const isLegacy = LegacyMultiSigLockInfo.TagName === foundLock.TagName
+    return (
+      <div className={clsx(styles.tagWrap, className)}>
+        <Tooltip
+          tip={
+            <div>
+              <div className={styles.titleWrap}>
+                <p>Code_hash</p>
+                <div className={clsx(styles.badge, isLegacy && styles.legacy)}>
+                  {isLegacy ? 'Legacy' : 'Recommended'}
+                </div>
+              </div>
+              <CopyZone content={foundLock.CodeHash} className={styles.copyLockCodeHash}>
+                {foundLock.CodeHash}
+                <Copy />
+              </CopyZone>
+            </div>
+          }
+          showTriangle
+          placement="top"
+        >
+          <button type="button" className={styles.tag} onClick={onClick}>
+            Multisig
+            <span className={clsx(!isLegacy && styles.highlight)}>(@{foundLock.CodeHash.slice(0, 8)})</span>
+          </button>
+        </Tooltip>
+      </div>
+    )
+  }
   return (
     <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
       {foundLock.TagName}

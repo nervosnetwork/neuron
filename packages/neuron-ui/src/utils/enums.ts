@@ -155,7 +155,7 @@ export enum LegacyMultiSigLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
-  TagName = 'secp256k1/multisig/@5c5069eb',
+  TagName = 'Multisig(@5c5069eb)',
 }
 
 export enum MultiSigLockInfo {
@@ -163,7 +163,7 @@ export enum MultiSigLockInfo {
   HashType = 'data1',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
-  TagName = 'secp256k1/multisig/@36c971b8',
+  TagName = 'Multisig(@36c971b8)',
 }
 
 export enum LocktimeLockInfo {
