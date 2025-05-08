@@ -56,7 +56,7 @@ const ScriptTag = ({
           tip={
             <div>
               <div className={styles.titleWrap}>
-                <p>Code_hash</p>
+                <p>Code hash</p>
                 <div className={clsx(styles.badge, isLegacy && styles.legacy)}>
                   {isLegacy ? 'Legacy' : 'Recommended'}
                 </div>

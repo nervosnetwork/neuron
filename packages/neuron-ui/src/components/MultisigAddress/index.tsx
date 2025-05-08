@@ -376,7 +376,7 @@ const MultisigAddress = () => {
                     <button
                       type="button"
                       onClick={() => openExternal('https://github.com/Magickbase/neuron-public-issues/issues/457')}
-                      aria-label=" "
+                      aria-label="Learn more"
                     />,
                   ]}
                 />
@@ -444,7 +444,7 @@ const MultisigAddress = () => {
                           tip={
                             <div>
                               <div className={styles.titleWrap}>
-                                <p>Code_hash</p>
+                                <p>Code hash</p>
                                 <div className={clsx(styles.badge, item.isLegacy && styles.legacy)}>
                                   {item.isLegacy ? 'Legacy' : 'Recommended'}
                                 </div>
