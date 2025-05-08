@@ -444,7 +444,7 @@ const MultisigAddress = () => {
                           tip={
                             <div>
                               <div className={styles.titleWrap}>
-                                <p>Code hash</p>
+                                <p>Code Hash</p>
                                 <div className={clsx(styles.badge, item.isLegacy && styles.legacy)}>
                                   {item.isLegacy ? 'Legacy' : 'Recommended'}
                                 </div>
