@@ -125,17 +125,7 @@ const Navbar = () => {
       return
     }
 
-    // isUpdated is true or version is not empty means check update has return
-    if (!verifyCkbResult || (isUpdated !== true && !version)) {
-      return
-    }
-    if (version && verifyCkbResult.shouldUpdate) {
-      showGlobalAlertDialog({
-        type: 'warning',
-        message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
-        action: 'ok',
-      })(dispatch)
-    } else if (!verifyCkbResult.ckbIsCompatible) {
+    if (verifyCkbResult && !verifyCkbResult.ckbIsCompatible) {
       showGlobalAlertDialog({
         type: 'warning',
         message: (
@@ -149,6 +139,18 @@ const Navbar = () => {
             ]}
           />
         ),
+        action: 'ok',
+      })(dispatch)
+    }
+
+    // isUpdated is true or version is not empty means check update has return
+    if (!verifyCkbResult || (isUpdated !== true && !version)) {
+      return
+    }
+    if (version && verifyCkbResult.shouldUpdate) {
+      showGlobalAlertDialog({
+        type: 'warning',
+        message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
         action: 'ok',
       })(dispatch)
     }
