@@ -70,7 +70,7 @@ import SudtTokenInfoSubscribe from './subscriber/sudt-token-info-subscriber'
 import AssetAccountSubscribe from './subscriber/asset-account-subscriber'
 import { AddStartBlockNumber1716539079505 } from './migrations/1716539079505-AddStartBlockNumber'
 import { AddUdtType1720089814860 } from './migrations/1720089814860-AddUdtType'
-import { AddLockCodeHash1744960856059 } from './migrations/1744960856059-AddLockCodeHash'
+import { AddLockCodeHash1744960856059, checkLockCodeHash } from './migrations/1744960856059-AddLockCodeHash'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 export type ConnectionName = 'light' | 'full'
@@ -225,6 +225,12 @@ const initConnectionWithType = async (genesisBlockHash: string, connectionName: 
     await dataSource[connectionName]?.initialize()
     await dataSource[connectionName]?.manager.query(`PRAGMA busy_timeout = 3000;`)
     await dataSource[connectionName]?.manager.query(`PRAGMA temp_store = MEMORY;`)
+
+    const queryRunner = dataSource[connectionName]?.createQueryRunner()
+    if (queryRunner) {
+      await checkLockCodeHash(queryRunner)
+      await queryRunner.release()
+    }
   } catch (err) {
     logger.error(err.message)
   }
