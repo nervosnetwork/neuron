@@ -85,7 +85,7 @@
     "@storybook/testing-library": "0.2.2",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
-    "@types/enzyme": "3.10.18",
+    "@types/enzyme": "3.10.19",
     "@types/enzyme-adapter-react-16": "1.0.9",
     "@types/node": "20.10.5",
     "@types/react": "18.3.21",
