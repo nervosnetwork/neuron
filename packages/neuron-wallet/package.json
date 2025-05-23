@@ -75,7 +75,7 @@
   "devDependencies": {
     "@electron/notarize": "2.3.2",
     "@nervosnetwork/ckb-types": "0.109.1",
-    "@types/archiver": "6.0.2",
+    "@types/archiver": "6.0.3",
     "@types/async": "3.2.24",
     "@types/electron-devtools-installer": "2.2.5",
     "@types/elliptic": "6.4.18",
@@ -89,8 +89,8 @@
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",
     "electron": "30.0.0",
-    "electron-builder": "24.9.1",
-    "electron-devtools-installer": "3.2.0",
+    "electron-builder": "24.13.3",
+    "electron-devtools-installer": "3.2.1",
     "jest-when": "3.6.0",
     "neuron-ui": "0.121.1",
     "typescript": "5.3.3"
