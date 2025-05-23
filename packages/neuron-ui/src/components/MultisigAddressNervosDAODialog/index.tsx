@@ -221,7 +221,7 @@ const MultisigAddressNervosDAODialog = ({
   return (
     <Dialog
       show
-      title={t('multisig-address.send-ckb.title')}
+      title={t('multisig-address.nervos-dao')}
       onCancel={closeDialog}
       showFooter={false}
       contentClassName={styles.dialogContainer}

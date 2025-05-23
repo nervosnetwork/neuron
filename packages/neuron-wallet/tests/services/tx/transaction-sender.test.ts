@@ -699,7 +699,7 @@ describe('TransactionSender Test', () => {
           walletID: '',
           targetOutputs,
           fee: '0',
-          feeRate: '1000',
+          feeRate: '2000',
           multisigConfig,
         })
       })

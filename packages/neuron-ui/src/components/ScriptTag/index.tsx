@@ -51,7 +51,7 @@ const ScriptTag = ({
   if (LegacyMultiSigLockInfo.TagName === foundLock.TagName || MultiSigLockInfo.TagName === foundLock.TagName) {
     const isLegacy = LegacyMultiSigLockInfo.TagName === foundLock.TagName
     return (
-      <div className={clsx(styles.tagWrap, className)}>
+      <div className={styles.tagWrap}>
         <Tooltip
           tip={
             <div>
@@ -68,9 +68,8 @@ const ScriptTag = ({
             </div>
           }
           showTriangle
-          placement="top"
         >
-          <button type="button" className={styles.tag} onClick={onClick}>
+          <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
             Multisig
             <span className={clsx(!isLegacy && styles.highlight)}>(@{foundLock.CodeHash.slice(0, 8)})</span>
           </button>

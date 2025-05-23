@@ -1194,6 +1194,7 @@
         "cancel": "Cancel",
         "export": "Export Tx"
       },
+      "nervos-dao": "Nervos DAO",
       "multisig-script-update-notice": "Due to the <0>multisig script upgrade</0>, we recommend regenerating the multisig addresses and transferring assets from the legacy one to ensure proper functionality. ",
       "regenerate-dialog": {
         "title": "Regenerate",

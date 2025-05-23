@@ -562,7 +562,7 @@ export default class TransactionSender {
       walletID: '',
       targetOutputs,
       fee: '0',
-      feeRate: '1000',
+      feeRate: '2000',
       multisigConfig,
     })
 
@@ -592,7 +592,7 @@ export default class TransactionSender {
         targetOutputs,
         changeAddress: multisigAddresses,
         fee: '0',
-        feeRate: '1000',
+        feeRate: '2000',
         lockClass: {
           lockArgs: [lockScript.args],
           codeHash: lockScript.codeHash,

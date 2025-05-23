@@ -1184,6 +1184,7 @@
         "cancel": "Annuler",
         "export": "Exporter Tx"
       },
+      "nervos-dao": "Nervos DAO",
       "multisig-script-update-notice": "En raison de la <0>mise à jour du script multisig</0>, nous recommandons de régénérer les adresses multisig et de transférer les actifs depuis l’ancienne adresse pour garantir un bon fonctionnement.",
       "regenerate-dialog": {
         "title": "Régénérer",

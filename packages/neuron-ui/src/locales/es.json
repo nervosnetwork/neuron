@@ -1177,6 +1177,7 @@
         "cancel": "Cancelar",
         "export": "Exportar Tx"
       },
+      "nervos-dao": "Nervos DAO",
       "multisig-script-update-notice": "Debido a la <0>actualización del script multisig</0>, recomendamos regenerar las direcciones multisig y transferir los activos desde la antigua para garantizar el funcionamiento adecuado.",
       "regenerate-dialog": {
         "title": "Regenerar",

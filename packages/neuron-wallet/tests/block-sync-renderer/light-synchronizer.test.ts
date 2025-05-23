@@ -13,6 +13,7 @@ const removeByHashesAndAddressType = jest.fn()
 const getOtherTypeSyncProgressMock = jest.fn()
 const getOtherTypeSyncBlockNumberMock = jest.fn()
 const getExistingSyncArgsesMock = jest.fn()
+const getExistingSyncScriptsMock = jest.fn()
 
 const setScriptsMock = jest.fn()
 const getScriptsMock = jest.fn()
@@ -66,6 +67,7 @@ jest.mock('../../src/services/sync-progress', () => {
     static getOtherTypeSyncProgress: any = () => getOtherTypeSyncProgressMock()
     static getOtherTypeSyncBlockNumber: any = () => getOtherTypeSyncBlockNumberMock()
     static getExistingSyncArgses: any = () => getExistingSyncArgsesMock()
+    static getExistingSyncScripts: any = () => getExistingSyncScriptsMock()
   }
 })
 

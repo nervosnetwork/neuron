@@ -15,10 +15,12 @@
     height: 44px;
     border-bottom: 1px solid var(--warn-border-color);
     padding: 0 16px;
-    max-width: 780px;
     & > svg {
       width: 16px;
       flex-shrink: 0;
+    }
+    & > div {
+      max-width: 90%;
     }
     button {
       color: var(--warn-text-color);

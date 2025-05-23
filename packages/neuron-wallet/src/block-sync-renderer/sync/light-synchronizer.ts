@@ -251,9 +251,9 @@ export default class LightSynchronizer extends Synchronizer {
     if (!multisigScripts.length) {
       return
     }
-    const existSyncArgses = await SyncProgressService.getExistingSyncArgses()
+    const existSyncProgressScripts = await SyncProgressService.getExistingSyncScripts()
     const syncScripts = await this.lightRpc.getScripts()
-    const retainedSyncScripts = syncScripts.filter(v => existSyncArgses.has(v.script.args))
+    const retainedSyncScripts = syncScripts.filter(v => existSyncProgressScripts.has(scriptToHash(v.script)))
     const existSyncScripts: Record<string, LightScriptFilter> = {}
     retainedSyncScripts.forEach(v => {
       existSyncScripts[scriptToHash(v.script)] = v
