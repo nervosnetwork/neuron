@@ -1328,13 +1328,14 @@ export default class CellsService {
             CAST(SUM(CAST(multisig_output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
             lockArgs,
             lockCodeHash,
-            lockHashType
+            lockHashType,
+            lockHash
         from
             multisig_output
         where
             multisig_output.lockHash in (:...lockHashes) AND
             status in (:...statuses)
-        group by multisig_output.lockArgs
+        group by multisig_output.lockHash
       `,
       {
         lockHashes,

@@ -1186,6 +1186,7 @@
         "cancel": "取消",
         "export": "导出交易"
       },
+      "nervos-dao": "Nervos DAO",
       "multisig-script-update-notice": "由于<0>多签脚本升级</0>，我们建议重新生成多签地址，并将资产从旧地址转移，以确保正常使用。",
       "regenerate-dialog": {
         "title": "重新生成",
