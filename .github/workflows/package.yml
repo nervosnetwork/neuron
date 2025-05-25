@@ -50,19 +50,19 @@ jobs:
           key: 2022-12-21-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Add msbuild to PATH
-        if: matrix.os == 'windows-2019'
+        if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
       - name: Setup Certificate
-        if: matrix.os == 'windows-2019'
+        if: runner.os == 'Windows'
         run: |
           echo "${{ secrets.SM_CLIENT_CERT_FILE_BASE64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
         shell: bash
 
       - name: Set variables
-        if: matrix.os == 'windows-2019'
+        if: runner.os == 'Windows'
         run: |
           echo "SM_KEYPAIR_NAME=${{ secrets.SM_KEYPAIR_ALIAS }}" >> "$GITHUB_ENV"
           echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
@@ -75,7 +75,7 @@ jobs:
         shell: bash
 
       - name: Setting up the client tools
-        if: ${{ matrix.os == 'windows-2019' && env.SM_API_KEY != '' }}
+        if: ${{ runner.os == 'Windows' && env.SM_API_KEY != '' }}
         run: |
           curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi
           msiexec /i smtools-windows-x64.msi /quiet /qn
@@ -83,7 +83,7 @@ jobs:
         shell: cmd
 
       - name: Certificates Sync
-        if: ${{ matrix.os == 'windows-2019' && env.SM_API_KEY != '' }}
+        if: ${{ runner.os == 'Windows' && env.SM_API_KEY != '' }}
         run: |
           smctl windows certsync
         shell: cmd
@@ -109,7 +109,7 @@ jobs:
           echo "LOG_ENCRYPTION_PUBLIC_KEY=${{ secrets.LOG_ENCRYPTION_PUBLIC_KEY }}" >> packages/neuron-wallet/.env
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         run: |
           ./scripts/download-ckb.sh mac
           yarn release mac
@@ -122,7 +122,7 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
 
       - name: Package for Windows
-        if: matrix.os == 'windows-2019'
+        if: runner.os == 'Windows'
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
@@ -132,7 +132,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Package for Linux
-        if: matrix.os == 'ubuntu-20.04'
+        if: runner.os == 'Linux'
         run: |
           ./scripts/download-ckb.sh
           yarn release linux
@@ -140,42 +140,42 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Neuron App Zip
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Mac-x64
           path: release/Neuron-*-mac-x64.zip
 
       - name: Upload Neuron App Zip(arm64)
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Mac-arm64
           path: release/Neuron-*-mac-arm64.zip
 
       - name: Upload Neuron Dmg
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Dmg-x64
           path: release/Neuron-*-x64.dmg
 
       - name: Upload Neuron Dmg(arm64)
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Dmg-arm64
           path: release/Neuron-*-arm64.dmg
 
       - name: Upload Neuron Win
-        if: matrix.os == 'windows-2019'
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Win
           path: release/Neuron-*-setup.exe
 
       - name: Upload Neuron Linux
-        if: matrix.os == 'ubuntu-20.04'
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: Neuron-Linux
