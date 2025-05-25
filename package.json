@@ -65,7 +65,7 @@
   },
   "dependencies": {},
   "resolutions": {
-    "@types/react": "18.3.21",
+    "@types/react": "18.3.22",
     "react-i18next": ">=11.16.4",
     "react-refresh": "0.17.0",
     "node-fetch": "2.6.13",

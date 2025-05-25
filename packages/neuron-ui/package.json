@@ -88,7 +88,7 @@
     "@types/enzyme": "3.10.19",
     "@types/enzyme-adapter-react-16": "1.0.9",
     "@types/node": "20.10.5",
-    "@types/react": "18.3.21",
+    "@types/react": "18.3.22",
     "@types/react-dom": "18.3.7",
     "@types/react-router-dom": "5.3.3",
     "@types/styled-components": "5.1.34",
