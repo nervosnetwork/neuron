@@ -102,7 +102,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.27.2.tgz#4183f9e642fd84e74e3eea7ffa93a412e3b102c9"
   integrity sha512-TUtMJYRPyUb/9aU8f3K0mjmjf6M9N5Woshn2CS6nqJSeJtTtQcpLUXjGt9vbF8ZGff0El99sWkLgzwW3VXnxZQ==
 
-"@babel/core@7.27.1":
+"@babel/core@7.27.1", "@babel/core@^7.26.10":
   version "7.27.1"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.27.1.tgz#89de51e86bd12246003e3524704c49541b16c3e6"
   integrity sha512-IaaGWsQqfsQWVLqMn9OB92MNN7zukfVA4s7KKAI0KfrrDsZ0yhi5uV4baBuLuN7n3vsZpwP8asPPcVwApxvjBQ==
@@ -165,7 +165,7 @@
     json5 "^2.2.3"
     semver "^6.3.1"
 
-"@babel/core@^7.21.3", "@babel/core@^7.26.0", "@babel/core@^7.7.2", "@babel/core@^7.8.0":
+"@babel/core@^7.21.3", "@babel/core@^7.7.2", "@babel/core@^7.8.0":
   version "7.26.9"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.26.9.tgz#71838542a4b1e49dfed353d7acbc6eb89f4a76f2"
   integrity sha512-lWBYIrF7qK5+GjY5Uy+/hEgp8OJWOD/rpy74GplYRhEauvbHDeFB8t5hPOZxCZ0Oxf4Cc36tK51/l3ymJysrKw==
@@ -3460,6 +3460,11 @@
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.14.1.tgz#6d2dd03d52e604279c38911afc1079d58c50a755"
   integrity sha512-Qg4DMQsfPNAs88rb2xkdk03N3bjK4jgX5fR24eHCTR9q6PrhZQZ4UJBPzCHJkIpTRN1UKxx2DzjZmnC+7Lj0Ow==
 
+"@rolldown/pluginutils@1.0.0-beta.9":
+  version "1.0.0-beta.9"
+  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.9.tgz#68ef9fff5a9791a642cea0dc4380ce6cb487a84a"
+  integrity sha512-e9MeMtVWo186sgvFFJOPGy7/d2j2mZhLJIdVW0C/xDluuOvymEATqz6zKsP0ZmXGzQtqlyjz5sC1sYQUoJG98w==
+
 "@rollup/plugin-inject@^5.0.5":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-inject/-/plugin-inject-5.0.5.tgz#616f3a73fe075765f91c5bec90176608bed277a3"
@@ -4884,16 +4889,17 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
-"@vitejs/plugin-react@4.3.4":
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-4.3.4.tgz#c64be10b54c4640135a5b28a2432330e88ad7c20"
-  integrity sha512-SCCPBJtYLdE8PX/7ZQAs1QAZ8Jqwih+0VBLum1EGqmCCQal+MIUqLCzj3ZUy8ufbC0cAM4LRlSTm7IQJwWT4ug==
+"@vitejs/plugin-react@4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-4.5.0.tgz#ef2bad6be3031af2b2105b7ab2754f710e890a32"
+  integrity sha512-JuLWaEqypaJmOJPLWwO335Ig6jSgC1FTONCWAxnqcQthLTK/Yc9aH6hr9z/87xciejbQcnP3GnA1FWUSWeXaeg==
   dependencies:
-    "@babel/core" "^7.26.0"
+    "@babel/core" "^7.26.10"
     "@babel/plugin-transform-react-jsx-self" "^7.25.9"
     "@babel/plugin-transform-react-jsx-source" "^7.25.9"
+    "@rolldown/pluginutils" "1.0.0-beta.9"
     "@types/babel__core" "^7.20.5"
-    react-refresh "^0.14.2"
+    react-refresh "^0.17.0"
 
 "@vitest/expect@2.0.5":
   version "2.0.5"
@@ -14103,7 +14109,7 @@ react-is@^17.0.0, react-is@^17.0.1, react-is@^17.0.2:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-refresh@0.17.0, react-refresh@^0.14.2:
+react-refresh@0.17.0, react-refresh@^0.17.0:
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.17.0.tgz#b7e579c3657f23d04eccbe4ad2e58a8ed51e7e53"
   integrity sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==

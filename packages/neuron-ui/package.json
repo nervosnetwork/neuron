@@ -92,7 +92,7 @@
     "@types/react-dom": "18.3.7",
     "@types/react-router-dom": "5.3.3",
     "@types/styled-components": "5.1.34",
-    "@vitejs/plugin-react": "4.3.4",
+    "@vitejs/plugin-react": "4.5.0",
     "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
     "electron": "30.0.0",
