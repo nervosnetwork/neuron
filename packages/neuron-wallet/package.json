@@ -52,7 +52,7 @@
     "@magickbase/hw-app-ckb": "0.2.0-alpha.0",
     "@spore-sdk/core": "0.1.0",
     "archiver": "6.0.2",
-    "async": "3.2.5",
+    "async": "3.2.6",
     "bn.js": "4.12.0",
     "chalk": "3.0.0",
     "dotenv": "8.6.0",
