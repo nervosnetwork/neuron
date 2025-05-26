@@ -68,6 +68,7 @@ const ScriptTag = ({
             </div>
           }
           showTriangle
+          isTriggerNextToChild
         >
           <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
             Multisig
