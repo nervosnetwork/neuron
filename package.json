@@ -55,7 +55,7 @@
     "husky": "8.0.3",
     "jest": "27.5.1",
     "lerna": "8.2.2",
-    "lint-staged": "15.2.7",
+    "lint-staged": "15.5.2",
     "ncp": "2.0.0",
     "prettier": "2.8.8",
     "ts-jest": "29.2.0",
@@ -65,7 +65,7 @@
   },
   "dependencies": {},
   "resolutions": {
-    "@types/react": "18.3.21",
+    "@types/react": "18.3.22",
     "react-i18next": ">=11.16.4",
     "react-refresh": "0.17.0",
     "node-fetch": "2.6.13",
