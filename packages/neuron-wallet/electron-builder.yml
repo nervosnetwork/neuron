@@ -79,6 +79,7 @@ mac:
       arch:
         - arm64
         - x64
+  notarize: false # https://github.com/electron/notarize/issues/163#issuecomment-1726106735
 
 linux:
   artifactName: "${productName}-v${version}-${arch}.${ext}"
