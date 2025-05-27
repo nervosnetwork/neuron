@@ -126,6 +126,7 @@ declare namespace State {
       m: number
       n: number
       blake160s: string[]
+      lockCodeHash: string
     }
     onSuccess?: () => void
     showType?: 'Global' | ''

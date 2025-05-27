@@ -32,6 +32,7 @@ export default class MultisigService {
         m: multisigConfig.m,
         n: multisigConfig.n,
         blake160s: multisigConfig.blake160s.toString(),
+        lockCodeHash: multisigConfig.lockCodeHash,
       })
       .getCount()
     if (result > 0) {
@@ -78,7 +79,24 @@ export default class MultisigService {
       .createQueryBuilder()
       .orderBy('id', 'DESC')
       .getMany()
-    return result
+    const existMultisigLockHash: Set<string> = new Set()
+    const uniqueMultisigConfigs: MultisigConfig[] = []
+    for (const multisigConfig of result) {
+      const multisigLockHash = Multisig.getMultisigScript(
+        multisigConfig.blake160s,
+        multisigConfig.r,
+        multisigConfig.m,
+        multisigConfig.n,
+        multisigConfig.lockCodeHash
+      ).computeHash()
+      if (existMultisigLockHash.has(multisigLockHash)) {
+        await this.deleteConfig(multisigConfig.id)
+      } else {
+        existMultisigLockHash.add(multisigLockHash)
+        uniqueMultisigConfigs.push(multisigConfig)
+      }
+    }
+    return uniqueMultisigConfigs
   }
 
   async getMultisigConfigById(id: number) {
@@ -105,7 +123,7 @@ export default class MultisigService {
   private static removeDulpicateConfig(multisigConfigs: MultisigConfig[]) {
     const existMultisigLockHash: Set<string> = new Set()
     return multisigConfigs.filter(v => {
-      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n).computeHash()
+      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash).computeHash()
       if (existMultisigLockHash.has(multisigLockHash)) {
         return false
       }
@@ -123,7 +141,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         network.remote,
         currentMultisigConfigs.map(v => {
-          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash)
           return {
             method: 'get_cells',
             params: [
@@ -140,7 +158,7 @@ export default class MultisigService {
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args),
+              addressCursorMap.get(scriptToHash(script)),
             ],
           }
         })
@@ -149,8 +167,8 @@ export default class MultisigService {
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
           const config = currentMultisigConfigs[idx]
-          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
-          addressCursorMap.set(script.args, v?.result?.last_cursor)
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
+          addressCursorMap.set(scriptToHash(script), v?.result?.last_cursor)
           cells.push(...v.result.objects)
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
         }
@@ -175,54 +193,39 @@ export default class MultisigService {
   }
 
   static async saveMultisigDaoTx(multisigConfigs: MultisigConfig[]) {
-    const cells = await MultisigService.getCells(multisigConfigs)
-    if (cells.length) {
-      const daoTxHash = new Set<string>()
-      cells.forEach(cell => {
-        if (cell.output?.type?.code_hash === SystemScriptInfo.DAO_CODE_HASH) {
-          daoTxHash.add(cell.out_point.tx_hash)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(network.remote, network.type)
+    const getTx = async (txHash: string) => {
+      const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
+        await rpcService.getTransaction(txHash)
+      if (txWithStatus?.transaction) {
+        const tx = Transaction.fromSDK(txWithStatus.transaction)
+        tx.blockHash = txWithStatus.txStatus.blockHash || undefined
+        if (tx.blockHash) {
+          const header = await rpcService.getHeader(tx.blockHash)
+          tx.timestamp = header?.timestamp
+          tx.blockNumber = header?.number
         }
-      })
-
-      const network = NetworksService.getInstance().getCurrent()
-      const rpcService = new RpcService(network.remote, network.type)
-
-      const getTx = async (txHash: string) => {
-        const txWithStatus: TransactionWithStatus | undefined | { transaction: null; txStatus: TxStatus } =
-          await rpcService.getTransaction(txHash)
-        if (txWithStatus?.transaction) {
-          const tx = Transaction.fromSDK(txWithStatus.transaction)
-          tx.blockHash = txWithStatus.txStatus.blockHash || undefined
-          if (tx.blockHash) {
-            const header = await rpcService.getHeader(tx.blockHash)
-            tx.timestamp = header?.timestamp
-            tx.blockNumber = header?.number
-          }
-          return tx
-        }
+        return tx
       }
-
-      if (daoTxHash.size > 0) {
-        for (const txHash of daoTxHash) {
-          const tx = await getTx(txHash)
-          if (tx) {
-            const previousTxHashes: string[] = []
-            tx.outputs.forEach((output, index) => {
-              if (output.type?.codeHash === SystemScriptInfo.DAO_CODE_HASH) {
-                output.daoData = tx.outputsData[index]
-                if (tx.outputsData[index] !== DAO_DATA) {
-                  const previousTxHash = tx.inputs[index].previousOutput!.txHash
-                  previousTxHashes.push(previousTxHash)
-                  output.setDepositOutPoint(new OutPoint(previousTxHash, tx.inputs[index].previousOutput!.index))
-                }
+    }
+    const multisigTxHashList = await MultisigService.getMultisigTransactionHashList(multisigConfigs)
+    for (const txHash of [...multisigTxHashList].reverse()) {
+      const tx = await getTx(txHash)
+      if (tx) {
+        if (tx.inputs.some(input => input.since && +input.since > 0)) {
+          await TransactionPersistor.saveFetchTx(tx)
+        } else if (tx.outputs.some(output => output.type?.codeHash === SystemScriptInfo.DAO_CODE_HASH)) {
+          tx.outputs.forEach((output, index) => {
+            if (output.type?.codeHash === SystemScriptInfo.DAO_CODE_HASH) {
+              output.daoData = tx.outputsData[index]
+              if (tx.outputsData[index] !== DAO_DATA) {
+                const previousTxHash = tx.inputs[index].previousOutput!.txHash
+                output.setDepositOutPoint(new OutPoint(previousTxHash, tx.inputs[index].previousOutput!.index))
               }
-            })
-            for (const previousTxHash of previousTxHashes) {
-              const previousTx = await getTx(previousTxHash)
-              if (previousTx) await TransactionPersistor.saveFetchTx(previousTx)
             }
-            await TransactionPersistor.saveFetchTx(tx)
-          }
+          })
+          await TransactionPersistor.saveFetchTx(tx)
         }
       }
     }
@@ -237,7 +240,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         network.remote,
         currentMultisigConfigs.map(v => {
-          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash)
           return {
             method: 'get_transactions',
             params: [
@@ -254,7 +257,7 @@ export default class MultisigService {
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args),
+              addressCursorMap.get(scriptToHash(script)),
             ],
           }
         })
@@ -263,8 +266,8 @@ export default class MultisigService {
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
           const config = currentMultisigConfigs[idx]
-          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
-          addressCursorMap.set(script.args, v?.result?.last_cursor)
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
+          addressCursorMap.set(scriptToHash(script), v?.result?.last_cursor)
           v.result.objects.forEach((obj: any) => {
             multisigOutputTxHashList.add(obj.tx_hash || obj.transaction?.hash)
           })
@@ -310,7 +313,7 @@ export default class MultisigService {
   static async deleteRemovedMultisigOutput() {
     const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     const multisigLockHashList = multisigConfigs.map(v =>
-      scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+      scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))
     )
     await getConnection()
       .createQueryBuilder()
@@ -327,7 +330,7 @@ export default class MultisigService {
     const network = await NetworksService.getInstance().getCurrent()
     if (network.type === NetworkType.Light) {
       const multisigScriptHashList = multisigConfigs.map(v =>
-        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))
       )
       const syncBlockNumbers = await getConnection()
         .getRepository(SyncProgress)
@@ -343,7 +346,7 @@ export default class MultisigService {
         .save(
           multisigConfigs.map(v => {
             const blockNumber =
-              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))]
+              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash))]
             v.lastestBlockNumber = `0x${BigInt(blockNumber ?? v.lastestBlockNumber).toString(16)}`
             return v
           })
@@ -409,7 +412,7 @@ export default class MultisigService {
     const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     return multisigConfigs.map(v => ({
       walletId: v.walletId,
-      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),
+      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash),
       addressType: SyncAddressType.Multisig,
       scriptType: 'lock' as CKBRPC.ScriptType,
       startBlockNumber: v.startBlockNumber,

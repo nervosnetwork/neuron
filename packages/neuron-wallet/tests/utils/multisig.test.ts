@@ -1,7 +1,7 @@
 import { getMultisigStatus } from '../../src/utils/multisig'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import { SignStatus } from '../../src/models/offline-sign'
-
+import SystemScriptInfo from '../../src/models/system-script-info'
 describe('getMultisigStatus test', () => {
   const addressesToArgs: Record<string, string> = {
     ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4: '0x729a884056fed321daaca410d94a5d6425a6ca1f',
@@ -15,6 +15,7 @@ describe('getMultisigStatus test', () => {
       m: 2,
       n: 3,
       blake160s: Object.values(addressesToArgs),
+      lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
     })
     it('Unsigned', () => {
       expect(getMultisigStatus(multisigConfig, {})).toBe(SignStatus.Unsigned)

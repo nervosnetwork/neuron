@@ -1,6 +1,7 @@
 import React from 'react'
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
 import {
+  LegacyMultiSigLockInfo,
   MultiSigLockInfo,
   LocktimeLockInfo,
   DefaultLockInfo,
@@ -10,6 +11,9 @@ import {
   ChequeLockInfoOnLina,
   clsx,
 } from 'utils'
+import Tooltip from 'widgets/Tooltip'
+import CopyZone from 'widgets/CopyZone'
+import { Copy } from 'widgets/Icons/icon'
 import styles from './scriptTag.module.scss'
 
 const ScriptTag = ({
@@ -27,7 +31,7 @@ const ScriptTag = ({
     return null
   }
 
-  const commonLockArray = [MultiSigLockInfo, LocktimeLockInfo, DefaultLockInfo]
+  const commonLockArray = [LegacyMultiSigLockInfo, MultiSigLockInfo, LocktimeLockInfo, DefaultLockInfo]
 
   const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
     ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
@@ -44,6 +48,36 @@ const ScriptTag = ({
     return null
   }
 
+  if (LegacyMultiSigLockInfo.TagName === foundLock.TagName || MultiSigLockInfo.TagName === foundLock.TagName) {
+    const isLegacy = LegacyMultiSigLockInfo.TagName === foundLock.TagName
+    return (
+      <div className={styles.tagWrap}>
+        <Tooltip
+          tip={
+            <div>
+              <div className={styles.titleWrap}>
+                <p>Code Hash</p>
+                <div className={clsx(styles.badge, isLegacy && styles.legacy)}>
+                  {isLegacy ? 'Legacy' : 'Recommended'}
+                </div>
+              </div>
+              <CopyZone content={foundLock.CodeHash} className={styles.copyLockCodeHash}>
+                {foundLock.CodeHash}
+                <Copy />
+              </CopyZone>
+            </div>
+          }
+          showTriangle
+          isTriggerNextToChild
+        >
+          <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
+            Multisig
+            <span className={clsx(!isLegacy && styles.highlight)}>(@{foundLock.CodeHash.slice(0, 8)})</span>
+          </button>
+        </Tooltip>
+      </div>
+    )
+  }
   return (
     <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
       {foundLock.TagName}

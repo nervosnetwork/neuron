@@ -2,6 +2,39 @@
 @import '../../styles/animation.scss';
 
 .container {
+  .topTip {
+    color: var(--warn-text-color);
+    background: var(--warn-background-color);
+    margin: -20px -16px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    gap: 4px;
+    font-weight: 500;
+    height: 44px;
+    border-bottom: 1px solid var(--warn-border-color);
+    padding: 0 16px;
+    & > svg {
+      width: 16px;
+      flex-shrink: 0;
+    }
+    & > div {
+      max-width: 90%;
+    }
+    button {
+      color: var(--warn-text-color);
+      font-size: 12px;
+      padding: 0;
+      font-weight: 500;
+      display: inline-block;
+      background: transparent;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
   .head {
     display: flex;
     align-items: center;
@@ -81,7 +114,7 @@
   .tableWrap {
     margin-top: 16px;
     min-height: 360px;
-    min-width: 648px;
+    min-width: 748px;
     border: 1px solid var(--table-head-border-color);
     border-radius: 16px;
     border-top: none;
@@ -98,6 +131,60 @@
 
   .address {
     font-family: 'JetBrains Mono';
+    position: relative;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+
+    .titleWrap {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--main-text-color);
+      font-weight: 500;
+
+      .badge {
+        font-size: 12px;
+        line-height: 18px;
+        color: var(--tabs-active);
+        font-weight: 500;
+        background: var(--tag-background-color);
+        padding: 0 4px;
+        border-radius: 2px;
+      }
+      .legacy {
+        color: var(--third-text-color);
+        background: var(--input-border-color);
+      }
+    }
+    .lockCodeHash {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      border: 1px solid var(--tabs-active);
+      border-radius: 4px;
+      padding: 0 4px;
+      line-height: 24px;
+      color: var(--tabs-active);
+      font-weight: 500;
+      &.legacy {
+        border: 1px solid var(--divide-line-color);
+        color: var(--input-second-color);
+        svg {
+          path {
+            stroke: var(--input-second-color);
+          }
+        }
+      }
+    }
+
+    .copyLockCodeHash {
+      @include copyAddress;
+    }
+
+    .lockCodeHashTip {
+      margin-left: 50px;
+    }
   }
 
   .descTipRoot {
@@ -206,6 +293,15 @@
             fill: var(--main-text-color);
           }
         }
+
+        &[data-key='regenerate'] {
+          g,
+          path {
+            stroke: var(--main-text-color);
+            fill: none;
+          }
+        }
+
         &:hover {
           border-radius: 8px;
           background-color: var(--tooltip-hover-background-color);
@@ -218,6 +314,22 @@
 .ok {
   margin: 12px 0;
   text-align: center;
+}
+
+.regenerateDialog {
+  width: 568px;
+  @include checkbox;
+  .regenerateDialogDetail {
+    color: var(--main-text-color);
+    margin-bottom: -24px;
+    & > div {
+      margin-bottom: 32px;
+    }
+  }
+  .checkboxWrap {
+    font-size: 14px;
+    color: var(--third-text-color);
+  }
 }
 
 .closeMultisigDialog {
@@ -277,7 +389,7 @@
     &:hover,
     &:active {
       path {
-        stroke: var(--primary-color);
+        stroke: var(--secondary-text-color);
       }
     }
   }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import { MultisigConfig } from 'services/remote'
 import MultisigAddressInfo, { MultisigAddressTable } from 'components/MultisigAddressInfo'
-import { isMainnet as isMainnetUtil } from 'utils'
+import { isMainnet as isMainnetUtil, MultiSigLockInfo } from 'utils'
 import Dialog from 'widgets/Dialog'
 import TextField from 'widgets/TextField'
 import { useMAndN, useMultiAddress, useViewMultisigAddress } from './hooks'
@@ -90,6 +90,7 @@ const MultisigAddressCreateDialog = ({
       n: Number(n),
       r: Number(r),
       addresses,
+      lockCodeHash: MultiSigLockInfo.CodeHash,
     })
       .then(() => {
         closeDialog()

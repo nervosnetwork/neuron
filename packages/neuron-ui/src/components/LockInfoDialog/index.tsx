@@ -35,19 +35,23 @@ const ShortAddr = ({
     return null
   }
 
-  const shortAddr = scriptToAddress(lockScript, { isMainnet, deprecated: true })
+  try {
+    const shortAddr = scriptToAddress(lockScript, { isMainnet, deprecated: true })
 
-  return (
-    <>
-      <div title={t('transaction.deprecated-address-format')} className={styles.title}>
-        {t('transaction.deprecated-address-format')}
-      </div>
-      <div className={styles.shortAddr}>
-        <span>{shortAddr}</span>
-        <Copy className={styles.copyIcon} onClick={() => onCopy(shortAddr)} />
-      </div>
-    </>
-  )
+    return (
+      <>
+        <div title={t('transaction.deprecated-address-format')} className={styles.title}>
+          {t('transaction.deprecated-address-format')}
+        </div>
+        <div className={styles.shortAddr}>
+          <span>{shortAddr}</span>
+          <Copy className={styles.copyIcon} onClick={() => onCopy(shortAddr)} />
+        </div>
+      </>
+    )
+  } catch (error) {
+    return null
+  }
 }
 
 const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps) => {

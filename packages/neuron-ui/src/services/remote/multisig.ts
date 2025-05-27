@@ -22,11 +22,13 @@ export type MultisigEntity = MultisigParams & {
   walletId: string
   alias?: string
   startBlockNumber?: number
+  lockCodeHash: string
 }
 
 export type MultisigConfig = MultisigEntity & {
   addresses: string[]
   fullPayload: string
+  isLegacy?: boolean
 }
 
 export const saveMultisigConfig = remoteApi<PartialSome<MultisigEntity, 'id'>, MultisigEntity>('save-multisig-config')
@@ -41,6 +43,10 @@ export const getMultisigBalances = remoteApi<
   { isMainnet: boolean; multisigAddresses: string[] },
   Record<string, string>
 >('get-multisig-balances')
+export const getMultisigDAOBalances = remoteApi<
+  { isMainnet: boolean; multisigAddresses: string[] },
+  Record<string, string>
+>('get-multisig-dao-balances')
 export const generateMultisigTx = remoteApi<{
   items: { address: string; capacity: string }[]
   multisigConfig: MultisigConfig

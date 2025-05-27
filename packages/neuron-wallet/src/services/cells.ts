@@ -353,7 +353,7 @@ export default class CellsService {
       `,
         {
           liveStatus: OutputStatus.Live,
-          multiSignlockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+          multiSignlockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
           chequeLockCodeHash,
           nftIssuerCodehash,
           nftClassCodehash,
@@ -467,7 +467,7 @@ export default class CellsService {
             data: 'withdraw-able',
           })
         }
-      } else if (o.lockCodeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      } else if (o.lockCodeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SingleMultiSign,
           type: '',
@@ -770,7 +770,7 @@ export default class CellsService {
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
-        if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+        if (lockClass.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
           const multisigConfig = multisigConfigMap[cell.lockHash]
           if (!multisigConfig) {
             throw new MultisigConfigNeedError()
@@ -1326,13 +1326,16 @@ export default class CellsService {
       `
         select
             CAST(SUM(CAST(multisig_output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
-            lockArgs
+            lockArgs,
+            lockCodeHash,
+            lockHashType,
+            lockHash
         from
             multisig_output
         where
             multisig_output.lockHash in (:...lockHashes) AND
             status in (:...statuses)
-        group by multisig_output.lockArgs
+        group by multisig_output.lockHash
       `,
       {
         lockHashes,
@@ -1343,6 +1346,8 @@ export default class CellsService {
     const cells: {
       lockArgs: string
       balance: string
+      lockCodeHash: string
+      lockHashType: string
     }[] = await connection.getRepository(MultisigOutput).manager.query(sql, parameters)
 
     const balances: Record<string, string> = {}
@@ -1352,8 +1357,8 @@ export default class CellsService {
         scriptToAddress(
           {
             args: c.lockArgs,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+            codeHash: c.lockCodeHash,
+            hashType: c.lockHashType,
           },
           isMainnet
         )
@@ -1368,7 +1373,7 @@ export default class CellsService {
     switch (output.lock.codeHash) {
       case assetAccountInfo.getChequeInfo().codeHash:
         return LockScriptCategory.Cheque
-      case SystemScriptInfo.MULTI_SIGN_CODE_HASH:
+      case SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH:
         if (output.lock.args.length === LOCKTIME_ARGS_LENGTH) {
           return LockScriptCategory.MULTI_LOCK_TIME
         }
@@ -1446,5 +1451,58 @@ export default class CellsService {
         }
       })
       .filter((v): v is { withdrawBlockHash: string; depositOutPoint: OutPoint } => !!v)
+  }
+
+  public static async getMultisigDAOBalances(isMainnet: boolean, multisigAddresses: string[]) {
+    if (!multisigAddresses.length) {
+      return {}
+    }
+    const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
+
+    const connection = await getConnection()
+    const [sql, parameters] = connection.driver.escapeQueryWithParameters(
+      `
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
+            lockArgs,
+            lockCodeHash,
+            lockHashType
+        from
+            output
+        where
+            output.daoData = '0x0000000000000000' AND
+            output.lockHash in (:...lockHashes) AND
+            status in (:...statuses)
+        group by output.lockArgs
+      `,
+      {
+        lockHashes,
+        statuses: [OutputStatus.Live],
+      },
+      {}
+    )
+    const cells: {
+      lockArgs: string
+      balance: string
+      lockCodeHash: string
+      lockHashType: string
+    }[] = await connection.getRepository(OutputEntity).manager.query(sql, parameters)
+
+    const balances: Record<string, string> = {}
+
+    cells.forEach(c => {
+      balances[
+        scriptToAddress(
+          {
+            args: c.lockArgs,
+            codeHash: c.lockCodeHash,
+            hashType: c.lockHashType,
+          },
+          isMainnet
+        )
+      ] = c.balance
+    })
+
+    return balances
   }
 }

@@ -32,6 +32,12 @@ export default class MultisigConfig {
   @Column()
   startBlockNumber?: number
 
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  lockCodeHash!: string
+
   public static fromModel(model: MultisigConfigModel): MultisigConfig {
     const multisigConfig = new MultisigConfig()
 
@@ -43,6 +49,7 @@ export default class MultisigConfig {
     if (model.alias) {
       multisigConfig.alias = model.alias
     }
+    multisigConfig.lockCodeHash = model.lockCodeHash
     return multisigConfig
   }
 
@@ -57,6 +64,7 @@ export default class MultisigConfig {
     if (this.alias) {
       multisigConfig.alias = this.alias
     }
+    multisigConfig.lockCodeHash = this.lockCodeHash
     return multisigConfig
   }
 

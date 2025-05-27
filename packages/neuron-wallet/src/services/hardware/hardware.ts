@@ -43,7 +43,7 @@ export abstract class Hardware {
     })
 
     const isMultisig =
-      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
+      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTISIGN_ARGS_LENGTH
 
     const multiSignBlake160s = isMultisig
       ? addressInfos.map(i => {
@@ -55,7 +55,7 @@ export abstract class Hardware {
       : []
 
     const findPath = (args: string) => {
-      if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
+      if (args.length === TransactionSender.MULTISIGN_ARGS_LENGTH) {
         return multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
       } else if (args.length === 42) {
         return addressInfos.find(i => i.blake160 === args)!.path

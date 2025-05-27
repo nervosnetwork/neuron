@@ -67,6 +67,8 @@ import DAODepositSvg from './DAODeposit.svg?react'
 import DAOWithdrawalSvg from './DAOWithdrawal.svg?react'
 import RecycleSvg from './Recycle.svg?react'
 import MoreSvg from './More.svg?react'
+import RegenerateSvg from './Regenerate.svg?react'
+import LockCodeHashSvg from './LockCodeHash.svg?react'
 
 import styles from './icon.module.scss'
 
@@ -150,3 +152,5 @@ export const DAODeposit = WrapSvg(DAODepositSvg)
 export const DAOWithdrawal = WrapSvg(DAOWithdrawalSvg)
 export const Recycle = WrapSvg(RecycleSvg)
 export const More = WrapSvg(MoreSvg)
+export const Regenerate = WrapSvg(RegenerateSvg)
+export const LockCodeHash = WrapSvg(LockCodeHashSvg)

@@ -12,10 +12,6 @@ export const systemScripts = {
     CODE_HASH: systemScriptsMainnet.DAO.CODE_HASH,
     HASH_TYPE: systemScriptsMainnet.DAO.HASH_TYPE,
   },
-  SECP256K1_BLAKE160_MULTISIG: {
-    CODE_HASH: systemScriptsMainnet.SECP256K1_BLAKE160_MULTISIG.CODE_HASH,
-    HASH_TYPE: systemScriptsMainnet.SECP256K1_BLAKE160_MULTISIG.HASH_TYPE,
-  },
   ANYONE_CAN_PAY_MAINNET: {
     CODE_HASH: systemScriptsMainnet.ANYONE_CAN_PAY.CODE_HASH,
     HASH_TYPE: systemScriptsMainnet.ANYONE_CAN_PAY.HASH_TYPE,

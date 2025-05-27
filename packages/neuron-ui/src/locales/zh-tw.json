@@ -1161,7 +1161,8 @@
           "approve": "確認",
           "delete": "删除",
           "daoDeposit": "存入 DAO",
-          "daoWithdraw": "從 DAO 取出"
+          "daoWithdraw": "從 DAO 取出",
+          "regenerate": "重新生成"
         }
       },
       "dao-ledger-notice": "Ledger 錢包目前不支援多重簽名地址的 DAO 交易。請使用單一簽名地址或等待未來的更新。",
@@ -1185,6 +1186,14 @@
         "send": "發送",
         "cancel": "取消",
         "export": "導出交易"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "由於<0>多簽腳本升級</0>，我們建議重新生成多簽地址，並將資產從舊地址轉移，以確保正常功能。",
+      "regenerate-dialog": {
+        "title": "重新生成",
+        "detail": "將使用您舊多簽地址的設置生成一個新地址，升級為新多簽合約",
+        "donnot-worry": "別擔心 — 舊地址仍然可以使用。",
+        "donnot-remind-again": "不再提醒"
       },
       "multi-details": "多簽地址詳情",
       "synchronization-abort": "同步中止",

@@ -150,12 +150,20 @@ export enum DefaultLockInfo {
   TagName = 'secp256k1/blake160',
 }
 
-export enum MultiSigLockInfo {
+export enum LegacyMultiSigLockInfo {
   CodeHash = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
   HashType = 'type',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
-  TagName = 'secp256k1/multisig',
+  TagName = 'Multisig(@5c5069eb)',
+}
+
+export enum MultiSigLockInfo {
+  CodeHash = '0x36c971b8d41fbd94aabca77dc75e826729ac98447b46f91e00796155dddb0d29',
+  HashType = 'data1',
+  CodeHashIndex = '0x01',
+  ArgsLen = '20',
+  TagName = 'Multisig(@36c971b8)',
 }
 
 export enum LocktimeLockInfo {
