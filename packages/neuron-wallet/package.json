@@ -88,7 +88,7 @@
     "@types/sqlite3": "3.1.11",
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",
-    "electron": "30.0.0",
+    "electron": "36.3.1",
     "electron-builder": "24.13.3",
     "electron-devtools-installer": "3.2.1",
     "jest-when": "3.6.0",
