@@ -100,11 +100,15 @@ export default class AddressMeta implements Address {
     return SystemScriptInfo.generateSecpScript(this.blake160)
   }
 
-  public generateSingleMultiSignLockScript(): Script {
+  public generateLegacySingleMultiSignLockScript(): Script {
     return SystemScriptInfo.generateMultiSignScript(
       Multisig.hash([this.blake160]),
       SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
     )
+  }
+
+  public generateSingleMultiSignLockScript(): Script {
+    return SystemScriptInfo.generateMultiSignScript(Multisig.hash([this.blake160]), SystemScriptInfo.MULTISIG_CODE_HASH)
   }
 
   public generateACPLockScript(): Script {
