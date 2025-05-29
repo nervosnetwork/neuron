@@ -70,6 +70,7 @@ const addressMeta = AddressMeta.fromObject(address)
 const addressMetas = [addressMeta]
 const defaultLockScript = addressMeta.generateDefaultLockScript()
 const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
+const legacySingleMultiSignLockScript = addressMeta.generateLegacySingleMultiSignLockScript()
 const chequeLockScript = addressMeta.generateChequeLockScriptWithReceiverLockHash()
 const acpLockScript = addressMeta.generateACPLockScript()
 const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
@@ -82,6 +83,11 @@ const formattedSingleMultiSignLockScript = {
   codeHash: singleMultiSignLockScript.codeHash,
   hashType: singleMultiSignLockScript.hashType,
   args: singleMultiSignLockScript.args + '0'.repeat(14),
+}
+const formattedLegacySingleMultiSignLockScript = {
+  codeHash: legacySingleMultiSignLockScript.codeHash,
+  hashType: legacySingleMultiSignLockScript.hashType,
+  args: legacySingleMultiSignLockScript.args + '0'.repeat(14),
 }
 const formattedChequeLockScript = {
   codeHash: chequeLockScript.codeHash,
@@ -276,6 +282,17 @@ describe('indexer cache service', () => {
 
         stubbedCellCollectorConstructor.mockReset()
         when(stubbedCellCollectorConstructor)
+          .calledWith(
+            expect.anything(),
+            expect.objectContaining({
+              lock: {
+                ...formattedLegacySingleMultiSignLockScript,
+                args: formattedLegacySingleMultiSignLockScript.args.slice(0, 42),
+              },
+              argsLen: 28,
+            })
+          )
+          .mockReturnValue(fakeCollectorObj)
           .calledWith(
             expect.anything(),
             expect.objectContaining({

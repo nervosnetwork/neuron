@@ -320,7 +320,7 @@ export default class CellsService {
           (
             output.hasData = 0 AND
             output.typeHash IS NULL AND
-            output.lockCodeHash = :multiSignlockCodeHash
+            output.lockCodeHash in (:...multiSignlockCodeHash)
           )
           OR
           (
@@ -353,7 +353,7 @@ export default class CellsService {
       `,
         {
           liveStatus: OutputStatus.Live,
-          multiSignlockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
+          multiSignlockCodeHash: [SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH, SystemScriptInfo.MULTISIG_CODE_HASH],
           chequeLockCodeHash,
           nftIssuerCodehash,
           nftClassCodehash,
@@ -467,7 +467,9 @@ export default class CellsService {
             data: 'withdraw-able',
           })
         }
-      } else if (o.lockCodeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
+      } else if (
+        [SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH, SystemScriptInfo.MULTISIG_CODE_HASH].includes(o.lockCodeHash)
+      ) {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SingleMultiSign,
           type: '',
@@ -770,7 +772,9 @@ export default class CellsService {
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
-        if (lockClass.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH) {
+        if (
+          [SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH, SystemScriptInfo.MULTISIG_CODE_HASH].includes(lockClass.codeHash)
+        ) {
           const multisigConfig = multisigConfigMap[cell.lockHash]
           if (!multisigConfig) {
             throw new MultisigConfigNeedError()
@@ -1374,6 +1378,7 @@ export default class CellsService {
       case assetAccountInfo.getChequeInfo().codeHash:
         return LockScriptCategory.Cheque
       case SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH:
+      case SystemScriptInfo.MULTISIG_CODE_HASH:
         if (output.lock.args.length === LOCKTIME_ARGS_LENGTH) {
           return LockScriptCategory.MULTI_LOCK_TIME
         }
