@@ -13,6 +13,7 @@ import {
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
+import { RPC } from '@ckb-lumos/rpc/lib/types/rpc'
 
 export interface LightScriptFilter {
   script: Script
@@ -21,6 +22,11 @@ export interface LightScriptFilter {
 }
 
 export type LightScriptSyncStatus = LightScriptFilter
+
+interface ExtendedSyncState extends RPC.SyncState {
+  assume_valid_target: string
+  assume_valid_target_reached: boolean
+}
 
 const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0], 'name'>> = {
   setScripts: {
@@ -118,7 +124,41 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
   },
 }
 
+class Method extends SdkRpcMethod {
+  constructor(node: CKBComponents.Node, options: CKBComponents.Method) {
+    super(node, options, rpcConfig)
+  }
+}
+
 export class FullCKBRPC extends CKBRPC {
+  constructor(url: string, rpcConfig: Partial<RPCConfig>) {
+    super(url, rpcConfig)
+    this.setNode({ url })
+
+    this.getSyncState = new Method(this.node, {
+      name: 'getSyncState',
+      method: 'sync_state',
+      paramsFormatters: [],
+      resultFormatters: (state: ExtendedSyncState) => {
+        if (!state) {
+          return state
+        }
+        return {
+          assumeValidTarget: state.assume_valid_target,
+          assumeValidTargetReached: state.assume_valid_target_reached,
+          bestKnownBlockNumber: state.best_known_block_number,
+          bestKnownBlockTimestamp: state.best_known_block_timestamp,
+          fastTime: state.fast_time,
+          ibd: state.ibd,
+          inflightBlocksCount: state.inflight_blocks_count,
+          lowTime: state.low_time,
+          normalTime: state.normal_time,
+          orphanBlocksCount: state.orphan_blocks_count,
+        }
+      },
+    }).call
+  }
+
   getGenesisBlockHash = async () => {
     return this.getBlockHash('0x0')
   }
@@ -126,11 +166,9 @@ export class FullCKBRPC extends CKBRPC {
   getGenesisBlock = async (): Promise<Block> => {
     return this.getBlockByNumber('0x0')
   }
-}
 
-class Method extends SdkRpcMethod {
-  constructor(node: CKBComponents.Node, options: CKBComponents.Method) {
-    super(node, options, rpcConfig)
+  getSyncState = async (): Promise<CKBComponents.SyncState> => {
+    return this.getSyncState()
   }
 }
 

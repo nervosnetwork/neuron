@@ -7,17 +7,17 @@ import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDi
 import Button from 'widgets/Button'
 import Spinner, { SpinnerSize } from 'widgets/Spinner'
 import PageContainer from 'components/PageContainer'
-import { ReactComponent as Experiment } from 'widgets/Icons/Experiment.svg'
-import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
-import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
-import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
+import Experiment from 'widgets/Icons/Experiment.svg?react'
+import EyesOpen from 'widgets/Icons/EyesOpen.svg?react'
+import EyesClose from 'widgets/Icons/EyesClose.svg?react'
+import AddSimple from 'widgets/Icons/AddSimple.svg?react'
 import SUDTReceiveDialog, { DataProps } from 'components/SUDTReceiveDialog'
+import RecycleUDTCellDialog, { DataProps as RecycleDataProps } from 'components/RecycleUDTCellDialog'
 import Toast from 'widgets/Toast'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 import { Search } from 'widgets/Icons/icon'
-
-import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {
+  addressToScript,
   isMainnet as isMainnetUtil,
   RoutePath,
   CONSTANTS,
@@ -26,7 +26,7 @@ import {
   useOnGenerateNewAccountTransaction,
   UDTType,
 } from 'utils'
-
+import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import { getSUDTAccountList, updateSUDTAccount } from 'services/remote'
 
 import styles from './sUDTAccountList.module.scss'
@@ -57,6 +57,7 @@ const SUDTAccountList = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const [receiveData, setReceiveData] = useState<DataProps | null>(null)
+  const [recycleData, setRecycleData] = useState<RecycleDataProps | null>(null)
   const [showBalance, setShowBalance] = useState(true)
   const [notice, setNotice] = useState('')
 
@@ -127,6 +128,17 @@ const SUDTAccountList = () => {
           accountName: account.accountName ?? DEFAULT_SUDT_FIELDS.accountName,
           tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
           symbol: account.symbol ?? DEFAULT_SUDT_FIELDS.symbol,
+        })
+        break
+      }
+      case 'recycle': {
+        const account = sUDTAccounts.find(a => a.accountId === id)
+        if (!account) {
+          break
+        }
+        setRecycleData({
+          lockArgs: addressToScript(account.address, { isMainnet }).args,
+          tokenID: account.tokenId,
         })
         break
       }
@@ -269,6 +281,8 @@ const SUDTAccountList = () => {
         {receiveData ? <SUDTReceiveDialog data={receiveData} onClose={() => setReceiveData(null)} /> : null}
 
         {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
+
+        {recycleData ? <RecycleUDTCellDialog data={recycleData} onClose={() => setRecycleData(null)} /> : null}
 
         {dialog?.action === 'create' ? (
           <SUDTCreateDialog

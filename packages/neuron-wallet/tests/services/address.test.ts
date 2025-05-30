@@ -732,8 +732,6 @@ describe('integration tests for AddressService', () => {
       let walletID = ''
 
       beforeAll(() => {
-        jest.setTimeout(15000)
-
         walletService.clearAll()
 
         const seed = hd.mnemonic.mnemonicToSeedSync(mnemonic)

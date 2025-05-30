@@ -499,7 +499,26 @@
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
         "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
-        "ckb-node-storage": "CKB Node Storage"
+        "ckb-node-storage": "CKB Node Storage",
+        "browse-local-files": "Browse Local Files",
+        "modify-path": "Modify Path",
+        "modify-path-notice": "Please ensure the remaining disk space is greater than {{needSize}} G for storing CKB Node Data.",
+        "modify-path-content": "You can choose a new path to resynchronize or migrate previous data to continue synchronization.",
+        "retain-previous-data": "Retain previous data",
+        "set-a-new-path": "Set a new path",
+        "browse": "Browse",
+        "migrate-previous-ckb-node-data": "Migrate previous CKB Node Data",
+        "migrate-previous-ckb-node-data-notice": "Before clicking the Confirm button, complete the following:",
+        "migrate-confirm": "Confirm ({{seconds}}s)",
+        "migrate-step-1": "Open the storage path of the previous CKB node data.",
+        "migrate-step-2": "Open the newly set path.",
+        "migrate-step-3": "Copy all files to the new path.",
+        "click-here": "Click Here",
+        "migrate-data-successful": "Migrate data successful",
+        "resync": "Resync",
+        "retry": "Retry",
+        "sync-file-lost": "Sync file lost",
+        "sync-file-lost-notice": "Please recover and retry, or resync."
       }
     },
     "password-request": {
@@ -698,6 +717,7 @@
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
+        "408": "The hardware wallet currently connected does not match the current wallet.",
         "600": "Please make sure the sync has finalized before you do any transaction related operation."
       }
     },
@@ -1083,7 +1103,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Send extra {{extraCKB}} CKBytes to create an asset account for receiver"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "Receive address has an unknown lock script, please make sure receiver knowns how to handle it, and extra {{extraCKB}} CKBytes will be sent along with {{assetName}} to hold the asset"
         },
         "select-option": "Please confirm the above option before submitting"
@@ -1100,6 +1120,19 @@
         "decimal": "Decimal",
         "confirm": "Confirm",
         "cancel": "Cancel"
+      },
+      "recycle-dialog": {
+        "title": "Recycle UDT Cell",
+        "notation": "Please note that recycling the cells will destroy the UDT and release the locked CKB",
+        "destroy": "Destroy",
+        "release": "Release",
+        "current-wallet": "Current Wallet",
+        "receive-address": "Receive Address",
+        "receive-address-placeholder": "Please input receive address",
+        "submitted-tips": "Recycling of the UDT cell transaction has been submitted",
+        "connect-wallet": "Connect Wallet",
+        "verifying": "Verifying",
+        "view-details": "View Details"
       }
     },
     "multisig-address": {
@@ -1135,9 +1168,12 @@
           "approve": "Approve",
           "delete": "Delete",
           "daoDeposit": "DAO Deposit",
-          "daoWithdraw": "DAO Withdraw"
+          "daoWithdraw": "DAO Withdraw",
+          "regenerate": "Regenerate"
         }
       },
+      "dao-ledger-notice": "Ledger wallets currently do not support DAO transactions for multisig addresses. Please use a single-signature address or await future updates.",
+      "dao-hardware-not-match": "The hardware wallet currently connected does not match the current wallet.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancel",
@@ -1157,6 +1193,14 @@
         "send": "Send",
         "cancel": "Cancel",
         "export": "Export Tx"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "Due to the <0>multisig script upgrade</0>, we recommend regenerating the multisig addresses and transferring assets from the legacy one to ensure proper functionality. ",
+      "regenerate-dialog": {
+        "title": "Regenerate",
+        "detail": "A new address will be generated using the settings from your legacy multisig address, upgraded to the latest script format.",
+        "donnot-worry": "Don't worry — the legacy address will still be accessible.",
+        "donnot-remind-again": "Don't Remind Again"
       },
       "multi-details": "Multisig address details",
       "synchronization-abort": "Synchronization Abort",
@@ -1225,8 +1269,8 @@
       "switchToPrice": "Switch to price"
     },
     "set-start-block-number": {
-      "title": "Set the start block number",
-      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
+      "title": "Set synchronization start block",
+      "warn": "To ensure accurate data synchronization, please enter the block number of your wallet's first transaction",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
@@ -1311,7 +1355,8 @@
       "unlock": "Unlock",
       "consume": "Consume",
       "verify": "Verify",
-      "consolidate": "Consolidate"
+      "consolidate": "Consolidate",
+      "recycle": "Recycle"
     },
     "send-tx-detail": {
       "page-title": "Transaction Detail",

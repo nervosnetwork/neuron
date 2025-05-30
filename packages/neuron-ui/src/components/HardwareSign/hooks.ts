@@ -1,4 +1,4 @@
-import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
+import { CkbAppNotFoundException, DeviceNotFoundException, DeviceNotMatchWalletException } from 'exceptions'
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -69,9 +69,10 @@ export default ({
   const userInputStatus = t('hardware-sign.status.user-input')
   const disconnectStatus = t('hardware-sign.status.disconnect')
   const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
+  const deviceNotMatchWalletStatus = t(DeviceNotMatchWalletException.message)
   const isNotAvailableToSign = useMemo(() => {
-    return status === disconnectStatus || status === ckbAppNotFoundStatus
-  }, [status, disconnectStatus, ckbAppNotFoundStatus])
+    return status === disconnectStatus || status === ckbAppNotFoundStatus || status === deviceNotMatchWalletStatus
+  }, [status, disconnectStatus, ckbAppNotFoundStatus, deviceNotMatchWalletStatus])
   const [error, setError] = useState('')
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
@@ -162,14 +163,16 @@ export default ({
   const ensureDeviceAvailable = useCallback(
     async (device: DeviceInfo) => {
       try {
-        const connectionRes = await connectDevice(device)
+        const connectionRes = await connectDevice({ ...device, walletID: wallet.id })
         let { descriptor } = device
         if (!isSuccessResponse(connectionRes)) {
           // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
           // so if we can't connect to the device, we need to re-search device automatically.
           // for unix, the descriptor never changes unless user plugs the device into another USB port,
           // in that case, mannauly re-search device one time will do.
-          if (isWin32) {
+          if (connectionRes.status === ErrorCode.DeviceNotMatchWallet) {
+            throw new DeviceNotMatchWalletException()
+          } else if (isWin32) {
             setIsReconnecting(true)
             const devicesRes = await getDevices(device)
             setIsReconnecting(false)
@@ -206,6 +209,8 @@ export default ({
       } catch (err) {
         if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
+        } else if (err instanceof DeviceNotMatchWalletException) {
+          setStatus(deviceNotMatchWalletStatus)
         } else {
           setStatus(disconnectStatus)
         }

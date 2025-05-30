@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { getDevices, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
 import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
-import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
+import SuccessInfo from 'widgets/Icons/SuccessInfo.svg?react'
 import { Error as ErrorIcon } from 'widgets/Icons/icon'
 import Spinner from 'widgets/Spinner'
 import {

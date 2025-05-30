@@ -110,10 +110,18 @@ describe('TransactionGenerator', () => {
     ])
 
     // @ts-ignore: Private method
-    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+    SystemScriptInfo.getInstance().legacyMultiSignOutPointInfo = new Map<string, OutPoint>([
       [
         '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
         new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '1'),
+      ],
+    ])
+
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+      [
+        '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
+        new OutPoint('0x6888aa39ab30c570c2c30d9d5684d3769bf77265a7973211a3c087fe8efbf738', '1'),
       ],
     ])
 
@@ -468,7 +476,7 @@ describe('TransactionGenerator', () => {
           expect(expectedFee).toEqual(BigInt(472))
           expect(tx.fee).toEqual(expectedFee.toString())
 
-          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
           expect(multiSignOutput).toBeDefined()
 
           const epoch = Multisig.parseSince(multiSignOutput!.lock.args)
@@ -730,7 +738,7 @@ describe('TransactionGenerator', () => {
           feeRate,
         })
 
-        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH)
 
         const epoch = Multisig.parseSince(tx.outputs[0].lock.args)
         const parsedEpoch = since.parseEpoch(epoch)
@@ -764,6 +772,7 @@ describe('TransactionGenerator', () => {
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda',
           ].map(v => addressToScript(v).args),
+          lockCodeHash: SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH,
         }),
       })
 
@@ -1042,7 +1051,10 @@ describe('TransactionGenerator', () => {
   describe('generateWithdrawMultiSignTx', () => {
     const prevOutput = Output.fromObject({
       capacity: toShannon('1000'),
-      lock: SystemScriptInfo.generateMultiSignScript(Multisig.args(bob.lockScript.args, 100, '0x7080018000001')),
+      lock: SystemScriptInfo.generateMultiSignScript(
+        Multisig.args(bob.lockScript.args, 100, '0x7080018000001'),
+        SystemScriptInfo.LEGACY_MULTISIG_CODE_HASH
+      ),
     })
     const outPoint = OutPoint.fromObject({
       txHash: '0x' + '0'.repeat(64),

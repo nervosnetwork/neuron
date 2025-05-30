@@ -19,3 +19,7 @@ export class UnsupportedManufacturer extends Error {
     super(t('messages.unsupported-manufacturer', { manufacturer }))
   }
 }
+
+export class DeviceNotMatchWallet extends Error {
+  public code = 408
+}

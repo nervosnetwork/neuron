@@ -2,26 +2,21 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./src",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "types": ["@types/jest"],
     "typeRoots": [
       "src/types",
       "node_modules/@nervosnetwork/ckb-types",
-      "node_modules/@types"
+      "node_modules/@types",
+      "node_modules/@testing-library",
+      "node_modules/vite"
     ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src", "vitest-setup.js"]
 }

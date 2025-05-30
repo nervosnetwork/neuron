@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import React, { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { clipboard, nativeImage } from 'electron'
-import canvg from 'canvg'
+import { Canvg, presets } from 'canvg'
 import styles from './qrcode.module.scss'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -115,17 +115,28 @@ const QRCode = forwardRef(
     }, [value, includeMargin, size, scale, bgColor, fgColor, level])
 
     useEffect(() => {
-      if (canvasRef.current !== null) {
-        canvg(canvasRef.current, svgStr, {
-          enableRedraw: false,
-          ignoreMouse: true,
-          renderCallback: () => {
-            if (canvasRef.current) {
-              canvasRef.current.setAttribute(`style`, `width:${size}px;height:${size}px`)
-            }
-          },
-        })
+      if (!(canvasRef.current instanceof HTMLCanvasElement)) {
+        return
       }
+
+      const ctx = canvasRef.current.getContext('2d')
+      if (!ctx) return
+
+      // Clear the canvas before rendering
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+
+      Canvg.from(ctx, svgStr, {
+        ...presets,
+        enableRedraw: false,
+        ignoreMouse: true,
+      })
+        .then(async canvg => {
+          canvg.resize(size, size)
+          await canvg.render()
+        })
+        .catch((error: Error) => {
+          console.error('Error creating Canvg instance:', error)
+        })
     }, [svgStr, size])
 
     return (

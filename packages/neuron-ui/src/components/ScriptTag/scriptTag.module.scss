@@ -1,3 +1,36 @@
+@import '../../styles/mixin.scss';
+
+.tagWrap {
+  display: inline-block;
+
+  .titleWrap {
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+    color: var(--main-text-color);
+    font-weight: 500;
+
+    .badge {
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--tabs-active);
+      font-weight: 500;
+      background: var(--tag-background-color);
+      padding: 0 4px;
+      border-radius: 2px;
+      max-width: 200px;
+    }
+    .legacy {
+      color: var(--third-text-color);
+      background: var(--input-border-color);
+    }
+  }
+
+  .copyLockCodeHash {
+    @include copyAddress;
+  }
+}
+
 .tag {
   margin: auto 4px;
   padding: 0 6px;
@@ -6,4 +39,9 @@
   background-color: var(--script-tag-background-color);
   color: var(--script-tag-color);
   cursor: pointer;
+
+  .highlight {
+    color: var(--primary-color);
+    margin-left: 2px;
+  }
 }

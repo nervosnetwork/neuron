@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { ReactComponent as PendingIcon } from 'widgets/Icons/Pending.svg'
+import PendingIcon from 'widgets/Icons/Pending.svg?react'
 import { getDeviceExtendedPublickey } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 import { ImportStep, ActionType } from './common'

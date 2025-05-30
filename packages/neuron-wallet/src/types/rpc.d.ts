@@ -251,6 +251,8 @@ declare namespace RPC {
     txs_fee: string
   }
   export interface SyncState {
+    assume_valid_target: string
+    assume_valid_target_reached: boolean
     best_known_block_number: string
     best_known_block_timestamp: string
     fast_time: string

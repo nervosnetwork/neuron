@@ -482,7 +482,26 @@
         "move-data-finish": "Se han movido los datos",
         "re-sync": "Sincronizar desde cero",
         "disabled-set-path": "Cuando el nodo CKB se inicia manualmente, la configuración de la ruta de configuración y el almacenamiento del nodo CKB no tienen efecto",
-        "ckb-node-storage": "Almacenamiento del Nodo CKB"
+        "ckb-node-storage": "Almacenamiento de Nodo CKB",
+        "browse-local-files": "Explorar archivos locales",
+        "modify-path": "Modificar ruta",
+        "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{needSize}} GB para almacenar los datos del Nodo CKB.",
+        "modify-path-content": "Puedes elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores para continuar la sincronización.",
+        "retain-previous-data": "Conservar datos anteriores",
+        "set-a-new-path": "Establecer una nueva ruta",
+        "browse": "Explorar",
+        "migrate-previous-ckb-node-data": "Migrar datos anteriores del Nodo CKB",
+        "migrate-previous-ckb-node-data-notice": "Antes de hacer clic en el botón Confirmar, complete lo siguiente:",
+        "migrate-confirm": "Confirmar ({{seconds}}s)",
+        "migrate-step-1": "Abrir la ruta de almacenamiento de los datos anteriores del Nodo CKB.",
+        "migrate-step-2": "Abrir la nueva ruta establecida.",
+        "migrate-step-3": "Copiar todos los archivos al nuevo camino.",
+        "click-here": "Haz clic aquí",
+        "migrate-data-successful": "Migración de datos exitosa",
+        "resync": "Reiniciar sincronización",
+        "retry": "Reintentar",
+        "sync-file-lost": "Archivo de sincronización perdido",
+        "sync-file-lost-notice": "Por favor, recupere el archivo e intente de nuevo, o reinicie la sincronización."
       }
     },
     "password-request": {
@@ -681,6 +700,7 @@
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
         "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
+        "408": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
         "600": "Asegúrese de que la sincronización haya finalizado antes de realizar cualquier operación relacionada con transacciones."
       }
     },
@@ -1066,7 +1086,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Enviar {{extraCKB}} CKBytes adicionales para crear una cuenta de activo para el receptor"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "La dirección de recepción tiene un script de bloqueo desconocido, asegúrese de que el receptor sepa cómo manejarlo, y se enviarán {{extraCKB}} CKBytes adicionales junto con {{assetName}} para mantener el activo"
         },
         "select-option": "Confirme la opción anterior antes de enviar"
@@ -1083,6 +1103,19 @@
         "decimal": "Decimal",
         "confirm": "Confirmar",
         "cancel": "Cancelar"
+      },
+      "recycle-dialog": {
+        "title": "Reciclar Celda UDT",
+        "notation": "Tenga en cuenta que reciclar las celdas destruirá el UDT y liberará el CKB bloqueado",
+        "destroy": "Destruir",
+        "release": "Liberar",
+        "current-wallet": "Billetera Actual",
+        "receive-address": "Dirección de Recepción",
+        "receive-address-placeholder": "Por favor ingrese la dirección de recepción",
+        "submitted-tips": "La transacción de reciclaje de la celda UDT ha sido enviada",
+        "connect-wallet": "Conectar Billetera",
+        "verifying": "Verificando",
+        "view-details": "Ver Detalles"
       }
     },
     "multisig-address": {
@@ -1118,9 +1151,12 @@
           "approve": "Aprobar",
           "delete": "Eliminar",
           "daoDeposit": "Depositar en DAO",
-          "daoWithdraw": "Retirar de DAO"
+          "daoWithdraw": "Retirar de DAO",
+          "regenerate": "Regenerar"
         }
       },
+      "dao-ledger-notice": "Las billeteras Ledger actualmente no admiten transacciones DAO para direcciones multifirma. Por favor, use una dirección de firma única o espere futuras actualizaciones.",
+      "dao-hardware-not-match": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
       "import-dialog": {
         "actions": {
           "cancel": "Cancelar",
@@ -1140,6 +1176,14 @@
         "send": "Enviar",
         "cancel": "Cancelar",
         "export": "Exportar Tx"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "Debido a la <0>actualización del script multisig</0>, recomendamos regenerar las direcciones multisig y transferir los activos desde la antigua para garantizar el funcionamiento adecuado.",
+      "regenerate-dialog": {
+        "title": "Regenerar",
+        "detail": "Se generará una nueva dirección utilizando la configuración de tu dirección multisig anterior, actualizada al formato de script más reciente.",
+        "donnot-worry": "No te preocupes — la dirección antigua seguirá siendo accesible.",
+        "donnot-remind-again": "No volver a recordar"
       },
       "multi-details": "Detalles de la dirección multifirma",
       "synchronization-abort": "Abortar sincronización",
@@ -1208,8 +1252,8 @@
       "switchToPrice": "Cambio a precio"
     },
     "set-start-block-number": {
-      "title": "Configurar el número de bloque inicial",
-      "tip": "El número de bloque de sincronización inicial se configura cuando se utiliza el nodo CKB de cliente ligero, por tanto puede configurarlo y acelerar la sincronización",
+      "title": "Establecer bloque de inicio de sincronización",
+      "warn": "Para garantizar una sincronización precisa de datos, ingrese el número de bloque de la primera transacción de su billetera",
       "input-place-holder": "Ingrese el número de bloque de sincronización inicial, por ejemplo: 10,100,101",
       "locate-first-tx": "Ubicar la primera transacción",
       "view-block": "Ver bloque"
@@ -1291,7 +1335,8 @@
       "unlock": "Desbloquear",
       "consume": "Consumir",
       "verify": "Verificar",
-      "consolidate": "Consolidar"
+      "consolidate": "Consolidar",
+      "recycle": "Reciclar"
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",

@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect } from 'vitest'
 import { ConnectionStatus } from 'utils'
 import getConnectionStatus from 'utils/getConnectionStatus'
 import fixtures from './fixtures.json'

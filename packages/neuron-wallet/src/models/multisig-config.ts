@@ -9,13 +9,24 @@ export default class MultisigConfigModel {
   public n: number
   public blake160s: string[]
   public alias?: string
+  public lockCodeHash: string
 
-  constructor(walletId: string, r: number, m: number, n: number, blake160s: string[], alias?: string, id?: number) {
+  constructor(
+    walletId: string,
+    r: number,
+    m: number,
+    n: number,
+    blake160s: string[],
+    lockCodeHash: string,
+    alias?: string,
+    id?: number
+  ) {
     this.walletId = walletId
     this.r = r
     this.m = m
     this.n = n
     this.blake160s = blake160s
+    this.lockCodeHash = lockCodeHash
     this.alias = alias
     this.id = id
   }
@@ -26,6 +37,7 @@ export default class MultisigConfigModel {
     n: number
     r: number
     blake160s: string[]
+    lockCodeHash: string
     alias?: string
     id?: number
   }): MultisigConfigModel {
@@ -35,6 +47,7 @@ export default class MultisigConfigModel {
       params.m,
       params.n,
       params.blake160s,
+      params.lockCodeHash,
       params.alias,
       params.id
     )
@@ -47,10 +60,11 @@ export default class MultisigConfigModel {
       r: this.r,
       blake160s: this.blake160s,
       alias: this.alias,
+      lockCodeHash: this.lockCodeHash,
     }
   }
 
   public getLockHash() {
-    return scriptToHash(Multisig.getMultisigScript(this.blake160s, this.r, this.m, this.n))
+    return scriptToHash(Multisig.getMultisigScript(this.blake160s, this.r, this.m, this.n, this.lockCodeHash))
   }
 }

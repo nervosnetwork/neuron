@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react'
-import { ReactComponent as Loading } from 'widgets/Icons/Loading.svg'
+import Loading from 'widgets/Icons/Loading.svg?react'
 
 export enum SpinnerSize {
   /**

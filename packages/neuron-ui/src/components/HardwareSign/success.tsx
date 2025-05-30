@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { RoutePath } from 'utils'
 import Button from 'widgets/Button'
-import { ReactComponent as CompleteIcon } from 'widgets/Icons/Complete.svg'
+import CompleteIcon from 'widgets/Icons/Complete.svg?react'
 
 import styles from './hardwareSign.module.scss'
 

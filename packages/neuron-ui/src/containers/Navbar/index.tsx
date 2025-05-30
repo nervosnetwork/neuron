@@ -116,17 +116,16 @@ const Navbar = () => {
   }, [i18n.language])
 
   useEffect(() => {
-    // isUpdated is true or version is not empty means check update has return
-    if (!verifyCkbResult || (isUpdated !== true && !version)) {
-      return
-    }
-    if (version && verifyCkbResult.shouldUpdate) {
+    if (verifyCkbResult && !verifyCkbResult.withIndexer) {
       showGlobalAlertDialog({
         type: 'warning',
-        message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
+        message: t('navbar.ckb-without-indexer'),
         action: 'ok',
       })(dispatch)
-    } else if (!verifyCkbResult.ckbIsCompatible) {
+      return
+    }
+
+    if (verifyCkbResult && !verifyCkbResult.ckbIsCompatible) {
       showGlobalAlertDialog({
         type: 'warning',
         message: (
@@ -142,10 +141,16 @@ const Navbar = () => {
         ),
         action: 'ok',
       })(dispatch)
-    } else if (!verifyCkbResult.withIndexer) {
+    }
+
+    // isUpdated is true or version is not empty means check update has return
+    if (!verifyCkbResult || (isUpdated !== true && !version)) {
+      return
+    }
+    if (version && verifyCkbResult.shouldUpdate) {
       showGlobalAlertDialog({
         type: 'warning',
-        message: t('navbar.ckb-without-indexer'),
+        message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
         action: 'ok',
       })(dispatch)
     }

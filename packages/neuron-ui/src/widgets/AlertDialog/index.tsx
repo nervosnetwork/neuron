@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDialog } from 'utils'
+import { useDialog, clsx } from 'utils'
 import Button from 'widgets/Button'
 import Failed from 'widgets/Icons/Failed.png'
 import Success from 'widgets/Icons/Success.png'
@@ -18,6 +18,12 @@ const AlertDialog = ({
   onOk,
   onCancel,
   action,
+  okText,
+  disabled,
+  cancelText,
+  cancelProps,
+  okProps,
+  className,
 }: {
   show?: boolean
   title?: string
@@ -26,6 +32,12 @@ const AlertDialog = ({
   onOk?: () => void
   onCancel?: () => void
   action?: Action
+  okText?: string
+  disabled?: boolean
+  cancelText?: string
+  cancelProps?: object
+  okProps?: object
+  className?: string
 }) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
@@ -34,22 +46,35 @@ const AlertDialog = ({
     if (action) {
       return action === 'all' ? ['cancel', 'ok'] : [action]
     }
-    return type === 'warning' ? ['cancel', 'ok'] : ['ok']
-  }, [action, type])
+    return type === 'warning' || onCancel ? ['cancel', 'ok'] : ['ok']
+  }, [action, type, onCancel])
 
   return (
-    <dialog ref={dialogRef} className={styles.alertDialog}>
+    <dialog ref={dialogRef} className={clsx(styles.alertDialog, className)}>
       {type === 'failed' && <img src={Failed} alt="failed" className={styles.typeImg} />}
       {type === 'success' && <img src={Success} alt="success" className={styles.typeImg} />}
       {type === 'warning' && <img src={Tips} alt="warning" className={styles.typeImg} />}
       <h2 className={styles.title}>{title}</h2>
-      <p className={styles.message}>{message}</p>
+      <div className={styles.message}>{message}</div>
       <div className={styles.actions}>
         {actions.map(v =>
           v === 'cancel' ? (
-            <Button type="cancel" onClick={onCancel} label={t('common.cancel')} />
+            <Button
+              key={v}
+              type="cancel"
+              onClick={onCancel}
+              label={cancelText || t('common.cancel')}
+              {...cancelProps}
+            />
           ) : (
-            <Button type="confirm" onClick={onOk || onCancel} label={t('common.confirm')} />
+            <Button
+              key={v}
+              type="confirm"
+              onClick={onOk || onCancel}
+              label={okText || t('common.confirm')}
+              disabled={disabled}
+              {...okProps}
+            />
           )
         )}
       </div>

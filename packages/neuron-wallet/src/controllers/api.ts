@@ -19,6 +19,7 @@ import fs from 'fs'
 import env from '../env'
 import { showWindow } from './app/show-window'
 import CommonUtils from '../utils/common'
+import { CKB_NODE_DATA_SIZE_BUFFER_RATIO } from '../utils/const'
 import { NetworkType, Network } from '../models/network'
 import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
@@ -282,6 +283,11 @@ export default class ApiController {
     handle('handle-view-error', async (_, error: string) => {
       if (env.isDevMode) {
         console.error(error)
+      }
+      try {
+        logger.error(JSON.parse(error))
+      } catch (e) {
+        logger.error(error)
       }
     })
 
@@ -767,7 +773,7 @@ export default class ApiController {
         status: ResponseCode.Success,
         result: {
           isFirstSync: SettingsService.getInstance().isFirstSync && currentNetwork.type === NetworkType.Default,
-          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * 1.2),
+          needSize: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * CKB_NODE_DATA_SIZE_BUFFER_RATIO),
           ckbNodeDataPath: SettingsService.getInstance().getNodeDataPath(),
         },
       }
@@ -778,6 +784,13 @@ export default class ApiController {
       this.#networksController.activate(this.#networksController.currentID().result)
       return {
         status: ResponseCode.Success,
+      }
+    })
+
+    handle('get-ckb-node-data-need-size', () => {
+      return {
+        status: ResponseCode.Success,
+        result: Math.ceil(+process.env.CKB_NODE_DATA_SIZE! * CKB_NODE_DATA_SIZE_BUFFER_RATIO),
       }
     })
 
@@ -909,13 +922,36 @@ export default class ApiController {
       return this.#sudtController.getSUDTTokenInfo(params)
     })
 
+    handle(
+      'get-sudt-token-info-and-balance',
+      async (_, params: { tokenID: string; holder: string; outpoint?: CKBComponents.OutPoint }) => {
+        return this.#sudtController.getUDTTokenInfoAndBalance(params)
+      }
+    )
+
+    handle(
+      'generate-recycle-udt-cell-tx',
+      async (
+        _,
+        params: {
+          walletId: string
+          holder: string
+          tokenID: string
+          receiver: string
+          outpoint?: CKBComponents.OutPoint
+        }
+      ) => {
+        return this.#assetAccountController.generateRecycleUDTCellTx(params)
+      }
+    )
+
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.destroyAssetAccount(params)
     })
 
     // Hardware wallet
-    handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
-      await this.#hardwareController.connectDevice(deviceInfo)
+    handle('connect-device', async (_, params: DeviceInfo & { walletID?: string }) => {
+      await this.#hardwareController.connectDevice(params)
     })
 
     handle('detect-device', async (_, model: Pick<DeviceInfo, 'manufacturer' | 'product'>) => {
@@ -997,6 +1033,10 @@ export default class ApiController {
 
     handle('get-multisig-balances', async (_, params) => {
       return this.#multisigController.getMultisigBalances(params)
+    })
+
+    handle('get-multisig-dao-balances', async (_, params) => {
+      return this.#multisigController.getMultisigDAOBalances(params)
     })
 
     handle('load-multisig-tx-json', async (_, fullPayload) => {

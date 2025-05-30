@@ -1,5 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Attention, Consume, DetailIcon, EyesClose, EyesOpen, LockCell, UnLock, Consolidate } from 'widgets/Icons/icon'
+import {
+  Attention,
+  Consume,
+  DetailIcon,
+  EyesClose,
+  EyesOpen,
+  LockCell,
+  UnLock,
+  Consolidate,
+  Recycle,
+} from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
@@ -14,6 +24,7 @@ import {
   LockScriptCategory,
   getLockTimestamp,
   isMainnet as isMainnetUtil,
+  TypeScriptCategory,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -27,6 +38,7 @@ import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 import Hardware from 'widgets/Icons/Hardware.png'
 import Button from 'widgets/Button'
 import Alert from 'widgets/Alert'
+import RecycleUDTCellDialog from 'components/RecycleUDTCellDialog'
 import { Actions, useAction, useHardWallet, useLiveCells, usePassword, useSelect } from './hooks'
 import styles from './cellManagement.module.scss'
 
@@ -183,39 +195,51 @@ const getColumns = ({
       dataIndex: 'action',
       title: t('cell-manage.table.head.action'),
       render(_, index, item) {
-        const { locked, lockedReason } = item
+        const { locked, lockedReason, lockScriptType, typeScriptType } = item
+        const showRecycleAction =
+          lockScriptType === LockScriptCategory.ANYONE_CAN_PAY &&
+          typeScriptType &&
+          [TypeScriptCategory.SUDT, TypeScriptCategory.XUDT].includes(typeScriptType)
         return (
           <div className={styles.actions}>
             <Tooltip tip={t('history.detail')} showTriangle placement="top">
               <DetailIcon onClick={onAction} data-action={Actions.View} data-index={index} />
             </Tooltip>
-            {locked ? (
-              <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
-                <UnLock
-                  data-disabled={!!lockedReason}
-                  onClick={lockedReason ? undefined : onAction}
-                  data-action={Actions.Unlock}
-                  data-index={index}
-                />
+            {showRecycleAction ? (
+              <Tooltip tip={t('cell-manage.recycle')} showTriangle placement="top">
+                <Recycle onClick={onAction} data-action={Actions.Recycle} data-index={index} />
               </Tooltip>
             ) : (
-              <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
-                <LockCell
-                  data-disabled={!!lockedReason}
-                  onClick={lockedReason ? undefined : onAction}
-                  data-action={Actions.Lock}
-                  data-index={index}
-                />
-              </Tooltip>
+              <div className={styles.actions}>
+                {locked ? (
+                  <Tooltip tip={t('cell-manage.unlock')} showTriangle placement="top">
+                    <UnLock
+                      data-disabled={!!lockedReason}
+                      onClick={lockedReason ? undefined : onAction}
+                      data-action={Actions.Unlock}
+                      data-index={index}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip tip={t('cell-manage.lock')} showTriangle placement="top">
+                    <LockCell
+                      data-disabled={!!lockedReason}
+                      onClick={lockedReason ? undefined : onAction}
+                      data-action={Actions.Lock}
+                      data-index={index}
+                    />
+                  </Tooltip>
+                )}
+                <Tooltip tip={t('cell-manage.consume')} showTriangle placement="top">
+                  <Consume
+                    data-disabled={!!locked}
+                    onClick={locked ? undefined : onAction}
+                    data-action={Actions.Consume}
+                    data-index={index}
+                  />
+                </Tooltip>
+              </div>
             )}
-            <Tooltip tip={t('cell-manage.consume')} showTriangle placement="top">
-              <Consume
-                data-disabled={!!locked}
-                onClick={locked ? undefined : onAction}
-                data-action={Actions.Consume}
-                data-index={index}
-              />
-            </Tooltip>
           </div>
         )
       },
@@ -245,7 +269,9 @@ const CellManagement = () => {
         direction: SortType.Decrease,
       }
     : undefined
-  const { liveCells, updateLiveCell, onSorted, updateLiveCellsLockStatus } = useLiveCells({ initSortInfo })
+  const { liveCells, updateLiveCell, onSorted, updateLiveCellsLockStatus, fetchLiveCells } = useLiveCells({
+    initSortInfo,
+  })
   const { pageNo, pageSize, onPageChange } = usePagination()
   const currentPageLiveCells = useMemo(() => {
     return liveCells.slice(pageSize * (pageNo - 1), pageSize * pageNo)
@@ -363,6 +389,17 @@ const CellManagement = () => {
         onCancel={onActionCancel}
         isMainnet={isMainnet}
       />
+      {action === Actions.Recycle && operateCells[0] && (
+        <RecycleUDTCellDialog
+          data={{
+            tokenID: operateCells[0].type.args,
+            lockArgs: operateCells[0].lock.args,
+            outpoint: operateCells[0].outPoint,
+          }}
+          onClose={onActionCancel}
+          onConfirm={fetchLiveCells}
+        />
+      )}
       {wallet.device ? (
         <Dialog
           show={action === Actions.Lock || action === Actions.Unlock}

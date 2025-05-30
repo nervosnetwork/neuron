@@ -1,3 +1,45 @@
+# 0.201.0 (2025-05-30)
+
+### Caveat
+
+The [CKB 2023](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0051-ckb2023/0051-ckb2023.md) Hardfork will be activated at **Epoch 12,293**(estimated 2025-07-01) and requires **CKB@v0.200.0** or **Light Client@v0.4.0** and above.
+
+To ensure synchronization after the hardfork, please upgrade Neuron to [v0.201.0](https://github.com/nervosnetwork/neuron/releases/tag/v0.201.0) or later for full node users, and to [v0.119.0](https://github.com/nervosnetwork/neuron/releases/tag/v0.119.0) or later for light client users.
+
+Visit https://explorer.nervos.org/hardfork for more information about the hardfork.
+
+### CKB Node & Light Client
+
+- [CKB@v0.201.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.201.0) was released on Apr. 3rd, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.4.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.4.1) was released on Nov. 13th, 2024. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x8d98cc0af11e54e7c66b10d188cea7bd1ec33acee624eb0fddd9bb6951cf720e`(at height `16,284,813`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3357)
+
+---
+
+[![Neuron@v0.201.0](https://github.com/user-attachments/assets/0195090e-b178-4a23-9068-fc0df9d615cd)](https://youtu.be/JFe0Pwr4Io0)
+
+YouTube: https://youtu.be/JFe0Pwr4Io0
+
+---
+
+## New features
+
+- #3323: Support UDT destruction.(@devchenyan)
+- #3329, #3347: Introduce new Multisig Script, and support Nervos DAO with it.(@devchenyan)
+
+## Bug fixes
+
+- #3317: Hide 'View Private Key' when it's a hardware wallet.(@devchenyan)
+- #3332: Better note for external node running without the indexer module enabled.(@devchenyan)
+- #3352: Fix screen flicker when connecting to external nodes running new versions.(@devchenyan)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.121.1...v0.201.0
+
+
 # 0.121.1 (2025-02-13)
 
 ### CKB Node & Light Client

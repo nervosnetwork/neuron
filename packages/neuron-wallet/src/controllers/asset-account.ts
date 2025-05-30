@@ -110,6 +110,29 @@ export default class AssetAccountController {
     }
   }
 
+  public async generateRecycleUDTCellTx(params: {
+    walletId: string
+    holder: string
+    tokenID: string
+    receiver: string
+    outpoint?: CKBComponents.OutPoint
+  }) {
+    const tokens = await SudtTokenInfoService.findSudtTokenInfoByArgs([params.tokenID])
+    if (!tokens || !tokens.length) {
+      throw new ServiceHasNoResponse('UDT Cell')
+    }
+
+    const { udtType } = tokens[0]
+    const tx = await AssetAccountService.generateRecycleUDTCellTx({
+      ...params,
+      udtType,
+    })
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public async getAccount(params: {
     walletID: string
     id: number

@@ -1,6 +1,6 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { MultisigConfig } from 'services/remote'
-import { addressToScript, getMultisigSignStatus } from 'utils'
+import { addressToScript, getMultisigSignStatus, MultiSigLockInfo } from 'utils'
 import { computeScriptHash } from '@ckb-lumos/lumos/utils'
 
 const addresses = [
@@ -16,7 +16,8 @@ const multisigConfig: MultisigConfig = {
   n: 3,
   addresses,
   blake160s: addresses.map(v => addressToScript(v).args),
-  fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2f2scddm0lvmq36hmzx8nfhw8ucxzslhqussgky',
+  lockCodeHash: MultiSigLockInfo.CodeHash,
+  fullPayload: 'ckt1qqmvjudc6s0mm992hjnhm367sfnjntycg3a5d7g7qpukz4wamvxjjq593v2gev3yp5sxmfr002ydqrcdpepwfkqwqz8gp',
 }
 const fullPayloadHash = computeScriptHash(addressToScript(multisigConfig.fullPayload))
 

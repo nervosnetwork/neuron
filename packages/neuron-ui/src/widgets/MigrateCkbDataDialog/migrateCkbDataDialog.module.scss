@@ -1,68 +1,61 @@
 @import '../../styles/mixin.scss';
 
 .dialogContainer {
-  max-width: 700px;
+  width: 680px;
   color: var(--main-text-color);
   font-size: 14px;
   line-height: 24px;
+  display: flex;
+  flex-direction: column;
 
-  .attention {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-    width: 80%;
-    margin: 32px auto 0;
-    background: var(--warn-background-color);
-    border: 1px solid rgba(252, 136, 0, 0.2);
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 24px;
-    color: var(--warn-text-color);
-
-    @media (prefers-color-scheme: dark) {
-      border: none;
-    }
-
-    svg {
-      margin-right: 4px;
-      width: 14px;
-    }
-  }
-}
-
-.footer {
-  padding: 24px 0;
-  @include dialog-footer;
-  --footer-background-color: #ecf9f0;
-  @media (prefers-color-scheme: dark) {
-    --footer-background-color: #2d3534;
+  .title {
+    text-align: center;
+    color: var(--main-text-color);
+    margin: 0;
   }
 
-  .footerBtn {
-    padding: 0 20px;
-    background: var(--footer-background-color);
-    color: var(--primary-color);
-    &:not([disabled]) {
-      &:hover,
-      &:focus {
-        background-color: var(--footer-background-color);
-        color: color-mix(in srgb, #000000 20%, var(--primary-color));
+  .noticeWrap {
+    margin: 16px auto 0;
+    border-radius: 8px;
+    background: var(--fourth-background-color);
+    padding: 12px 16px 12px 30px;
+    position: relative;
+
+    &::before {
+      content: '';
+      height: 66px;
+      width: 2px;
+      background: var(--primary-color);
+      position: absolute;
+      left: 16px;
+      top: 24px;
+    }
+
+    div {
+      display: flex;
+      gap: 8px;
+      padding: 3px 0;
+      position: relative;
+      &::before {
+        content: '';
+        height: 10px;
+        width: 10px;
+        border-radius: 100%;
+        background: var(--primary-color);
+        position: absolute;
+        left: -18px;
+        top: 10px;
+      }
+      p {
+        margin: 0;
+        line-height: 24px;
       }
 
-      &:active {
-        background-color: var(--footer-background-color);
-        color: color-mix(in srgb, #000000 20%, var(--primary-color));
-      }
-    }
-    &:last-of-type {
-      margin-left: 24px;
-    }
-    svg {
-      g,
-      path {
-        fill: var(--primary-color);
+      button {
+        height: auto;
+        padding: 0;
+        min-width: 0;
+        font-size: 14px;
       }
     }
   }

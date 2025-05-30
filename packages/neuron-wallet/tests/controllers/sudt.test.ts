@@ -58,6 +58,7 @@ describe('SUDTController', () => {
       tokenName: 'Eirc-2',
       symbol: 'ET2',
       decimal: '8',
+      udtType: 'sUDT',
     }
     const testLiveCell = new LiveCell(
       'txHash',

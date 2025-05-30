@@ -11,6 +11,7 @@ interface DialogProps {
   subTitle?: string
   onConfirm?: (e: React.FormEvent) => void
   onCancel?: () => void
+  onClose?: () => void
   confirmText?: string
   cancelText?: string
   disabled?: boolean | undefined
@@ -34,6 +35,7 @@ const Dialog = ({
   subTitle,
   onConfirm,
   onCancel,
+  onClose,
   disabled,
   confirmText,
   cancelText,
@@ -81,7 +83,8 @@ const Dialog = ({
       className={`${styles.dialogWrap} ${className}`}
       onKeyDown={e => {
         if (e.key === 'Escape' && enableCloseWithEsc) {
-          onCancel?.()
+          // eslint-disable-next-line no-unused-expressions
+          onClose ? onClose() : onCancel?.()
         } else if (e.key === 'Enter' && showFooter && showConfirm) {
           handleConfirm(e)
         }
@@ -94,7 +97,7 @@ const Dialog = ({
             {title}
             {subTitle ? <span className={styles.subTitle}>{subTitle}</span> : null}
           </div>
-          <Close onClick={onCancel} />
+          <Close onClick={onClose || onCancel} />
         </div>
       ) : null}
       <div className={clsx(styles.content, contentClassName)}>{children}</div>

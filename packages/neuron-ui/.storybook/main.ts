@@ -1,29 +1,30 @@
-export default {
-  stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+import { StorybookConfig } from '@storybook/react-vite'
+const { mergeConfig } = require('vite')
+import path from 'path'
+
+const config: StorybookConfig = {
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
-    '@storybook/preset-create-react-app',
     'storybook-addon-react-router-v6',
   ],
-  framework: {
-    name: '@storybook/react-webpack5',
-    options: {},
+  framework: '@storybook/react-vite',
+  core: {
+    builder: '@storybook/builder-vite',
   },
-  webpackFinal: config => {
-    config.resolve.fallback = {
-      fs: false,
-      crypto: false,
-      buffer: false,
-    }
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      electron: require.resolve('./electron'),
-    }
-    return config
+  async viteFinal(config) {
+    return mergeConfig(config, {
+      resolve: {
+        alias: { electron: path.resolve(__dirname, '../.storybook/electron') },
+      },
+    })
   },
   docs: {
     autodocs: true,
   },
+  staticDirs: ['../public'],
 }
+
+export default config

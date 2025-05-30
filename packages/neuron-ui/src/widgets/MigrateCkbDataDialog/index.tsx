@@ -1,90 +1,106 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import Dialog from 'widgets/Dialog'
+import { shell } from 'electron'
 import { useTranslation } from 'react-i18next'
 import { setCkbNodeDataPath } from 'services/remote'
 import { isSuccessResponse } from 'utils'
-import { Attention } from 'widgets/Icons/icon'
 import Button from 'widgets/Button'
 import AlertDialog from 'widgets/AlertDialog'
 import styles from './migrateCkbDataDialog.module.scss'
 
 const MigrateCkbDataDialog = ({
-  show,
   prevPath,
   currentPath,
   onCancel,
   onConfirm,
+  onClose,
+  setNotice,
 }: {
-  show: boolean
   prevPath: string
   currentPath: string
   onCancel: () => void
   onConfirm: (dataPath: string) => void
+  onClose?: () => void
+  setNotice?: (notice: string) => void
 }) => {
   const [t] = useTranslation()
-  const resyncRef = useRef<HTMLButtonElement | null>(null)
   const [failureMessage, setFailureMessage] = useState('')
-  const [savingType, setSavingType] = useState<string | undefined>()
-  const startSync = useCallback(
-    (syncType: string) => {
-      setFailureMessage('')
-      setSavingType(syncType)
-      setCkbNodeDataPath({
-        dataPath: currentPath,
-        clearCache: syncType === 'resync',
-      })
-        .then(res => {
-          if (isSuccessResponse(res)) {
-            onConfirm(currentPath)
-          } else {
-            setFailureMessage(typeof res.message === 'string' ? res.message : res.message.content!)
-          }
-        })
-        .finally(() => {
-          setSavingType(undefined)
-        })
-    },
-    [currentPath, onConfirm]
-  )
-  const onActionClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (e.currentTarget.dataset.syncType) {
-        startSync(e.currentTarget.dataset.syncType)
+  const [isSaving, setIsSaving] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [seconds, setSeconds] = useState(5)
+
+  const openPath = (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const elm = e.target
+    if (!(elm instanceof HTMLButtonElement)) return
+    const { path } = elm.dataset
+    if (!path) return
+    shell.openPath(path)
+  }
+
+  useEffect(() => {
+    if (seconds !== 0) {
+      timerRef.current = setTimeout(() => {
+        setSeconds(seconds - 1)
+      }, 1000)
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
       }
-    },
-    [startSync]
-  )
+    }
+  }, [seconds])
+
+  const handleMigrate = useCallback(() => {
+    setFailureMessage('')
+    setIsSaving(true)
+    setCkbNodeDataPath({
+      dataPath: currentPath,
+      clearCache: false,
+    })
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          onConfirm(currentPath)
+          setNotice?.(t('settings.data.migrate-data-successful'))
+        } else {
+          setFailureMessage(typeof res.message === 'string' ? res.message : res.message.content!)
+        }
+      })
+      .finally(() => {
+        setIsSaving(false)
+      })
+  }, [currentPath, onConfirm, setNotice])
+
   return (
     <>
-      <Dialog show={show} title={t('settings.data.ckb-node-storage')} onCancel={onCancel} showFooter={false}>
+      <Dialog
+        show={!failureMessage}
+        title={t('settings.data.migrate-previous-ckb-node-data')}
+        cancelText={t('common.back')}
+        confirmText={seconds ? t('settings.data.migrate-confirm', { seconds }) : t('common.confirm')}
+        onCancel={onCancel}
+        onConfirm={handleMigrate}
+        disabled={isSaving || !!seconds}
+        onClose={onClose}
+      >
         <div className={styles.dialogContainer}>
-          <div>{t('settings.data.remove-ckb-data-tip', { prevPath, currentPath })}</div>
-          <div className={styles.attention}>
-            <Attention />
-            {t('settings.data.resync-ckb-node-describe')}
-          </div>
-
-          <div className={styles.footer}>
-            <Button
-              ref={resyncRef}
-              disabled={!!savingType}
-              className={styles.footerBtn}
-              data-sync-type="resync"
-              label={t('settings.data.re-sync')}
-              type="primary"
-              onClick={onActionClick}
-              loading={savingType === 'resync'}
-            />
-
-            <Button
-              disabled={!!savingType}
-              className={styles.footerBtn}
-              data-sync-type="move"
-              label={t('settings.data.move-data-finish')}
-              type="primary"
-              onClick={onActionClick}
-              loading={savingType === 'move'}
-            />
+          <p className={styles.title}>{t('settings.data.migrate-previous-ckb-node-data-notice')}</p>
+          <div className={styles.noticeWrap}>
+            <div>
+              <p>{t('settings.data.migrate-step-1')}</p>
+              <Button type="text" onClick={openPath} data-path={prevPath}>
+                {t('settings.data.click-here')}
+              </Button>
+            </div>
+            <div>
+              <p>{t('settings.data.migrate-step-2')}</p>
+              <Button type="text" onClick={openPath} data-path={currentPath}>
+                {t('settings.data.click-here')}
+              </Button>
+            </div>
+            <div>
+              <p>{t('settings.data.migrate-step-3')}</p>
+            </div>
           </div>
         </div>
       </Dialog>
@@ -94,9 +110,7 @@ const MigrateCkbDataDialog = ({
         message={failureMessage}
         type="warning"
         onCancel={() => setFailureMessage('')}
-        onOk={() => {
-          startSync('resync')
-        }}
+        onOk={handleMigrate}
       />
     </>
   )

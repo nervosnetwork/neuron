@@ -9,6 +9,7 @@ import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
 import { Signatures } from '../../models/offline-sign'
 import { ckbHash } from '@ckb-lumos/lumos/utils'
+import { UDTType } from '../../utils/const'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -22,6 +23,7 @@ export interface SudtTokenInfo {
   tokenID: string
   tokenName: string
   decimal: string
+  udtType?: UDTType | undefined
 }
 
 export interface SudtInfo {

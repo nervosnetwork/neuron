@@ -492,7 +492,26 @@
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
         "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
-        "ckb-node-storage": "CKB节点数据"
+        "ckb-node-storage": "CKB节点数据",
+        "browse-local-files": "浏览本地文件",
+        "modify-path": "修改路径",
+        "modify-path-notice": "请确保剩余的磁盘空间大于 {{needSize}} GB 以存储 CKB 节点数据。",
+        "modify-path-content": "您可以选择一个新路径重新同步或迁移以前的数据以继续同步。",
+        "retain-previous-data": "保留以前的数据",
+        "set-a-new-path": "设置新路径",
+        "browse": "浏览",
+        "migrate-previous-ckb-node-data": "迁移以前的 CKB 节点数据",
+        "migrate-previous-ckb-node-data-notice": "在点击确认按钮之前，请完成以下操作：",
+        "migrate-confirm": "确认 ({{seconds}}秒)",
+        "migrate-step-1": "打开以前 CKB 节点数据的存储路径。",
+        "migrate-step-2": "打开新设置的路径。",
+        "migrate-step-3": "将所有文件复制到新路径。",
+        "click-here": "点击这里",
+        "migrate-data-successful": "数据迁移成功",
+        "resync": "重新同步",
+        "retry": "重试",
+        "sync-file-lost": "同步文件丢失",
+        "sync-file-lost-notice": "请恢复文件并重试，或重新同步。"
       }
     },
     "password-request": {
@@ -691,6 +710,7 @@
         "402": "CKB 应用未打开。请在你的设备打开 CKB 应用。",
         "403": "未检测到设备，请检查你的设备连接",
         "404": "检查到多个设备，同一型号的设备只能同时连接一个。",
+        "408": "当前连接的硬件钱包与当前钱包不匹配。",
         "600": "做任何交易相关的钱包操作前请先确保同步已完成。"
       }
     },
@@ -1075,7 +1095,7 @@
         "extra-ckb-send-to-acp": {
           "label": "额外发送 {{extraCKB}} CKBytes 为收款方创建资产账户"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "收款地址包含未知 Lock Script, 请确保接收者知道如何处理该资产, 额外 {{extraCKB}} CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产"
         },
         "select-option": "提交前请确认上述选项"
@@ -1092,6 +1112,19 @@
         "decimal": "小数位",
         "confirm": "确认",
         "cancel": "取消"
+      },
+      "recycle-dialog": {
+        "title": "回收 UDT Cell",
+        "notation": "请注意，回收 Cell 将销毁 UDT 并释放锁定的 CKB",
+        "destroy": "销毁",
+        "release": "释放",
+        "current-wallet": "当前钱包",
+        "receive-address": "接收地址",
+        "receive-address-placeholder": "请输入接收地址",
+        "submitted-tips": "UDT Cell 回收交易已提交",
+        "connect-wallet": "连接钱包",
+        "verifying": "正在验证",
+        "view-details": "查看详情"
       }
     },
     "multisig-address": {
@@ -1127,9 +1160,12 @@
           "approve": "确认",
           "delete": "删除",
           "daoDeposit": "存入 DAO",
-          "daoWithdraw": "从 DAO 取出"
+          "daoWithdraw": "从 DAO 取出",
+          "regenerate": "重新生成"
         }
       },
+      "dao-ledger-notice": "Ledger 钱包目前不支持多签地址的 DAO 交易。请使用单签地址或等待未来的更新。",
+      "dao-hardware-not-match": "当前连接的硬件钱包与当前钱包不匹配。",
       "import-dialog": {
         "actions": {
           "cancel": "取消",
@@ -1149,6 +1185,14 @@
         "send": "发送",
         "cancel": "取消",
         "export": "导出交易"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "由于<0>多签脚本升级</0>，我们建议重新生成多签地址，并将资产从旧地址转移，以确保正常使用。",
+      "regenerate-dialog": {
+        "title": "重新生成",
+        "detail": "将使用您旧多签地址的设置生成一个新地址, 升级为新多签合约",
+        "donnot-worry": "别担心 — 旧地址仍然可以访问",
+        "donnot-remind-again": "不再提醒"
       },
       "multi-details": "多签地址详情",
       "synchronization-abort": "同步中止",
@@ -1218,7 +1262,7 @@
     },
     "set-start-block-number": {
       "title": "设置同步起始区块",
-      "warn": "请注意，同步起始区块之前的交易不会被同步！",
+      "warn": "为确保数据同步准确性，请输入您钱包第一笔交易的区块高度",
       "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",
@@ -1303,7 +1347,8 @@
       "unlock": "解锁",
       "consume": "花费",
       "verify": "验证",
-      "consolidate": "合并"
+      "consolidate": "合并",
+      "recycle": "回收"
     },
     "send-tx-detail": {
       "page-title": "交易详情",

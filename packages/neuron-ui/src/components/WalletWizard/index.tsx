@@ -10,12 +10,12 @@ import {
   RoutePath,
   MnemonicAction,
   ErrorCode,
-  CONSTANTS,
   isSuccessResponse,
   validatePasswordComplexity,
   useDidMount,
   useDialogWrapper,
 } from 'utils'
+import { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import i18n from 'utils/i18n'
 import MnemonicInput from 'widgets/MnemonicInput'
 import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'components/ReplaceDuplicateWalletDialog'
@@ -26,8 +26,6 @@ import { showGlobalAlertDialog, useDispatch } from 'states'
 import { importedWalletDialogShown } from 'services/localCache'
 import { useInputWords } from './hooks'
 import styles from './walletWizard.module.scss'
-
-const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
 const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return createWallet(params).then(res => {
@@ -153,7 +151,7 @@ const Welcome = ({ rootPath = '/wizard/', wallets = [], dispatch }: WizardElemen
 
   return (
     <div className={styles.welcome}>
-      <img src={`${process.env.PUBLIC_URL}/icon.png`} width="58px" className={styles.logo} alt="logo" />
+      <img src="icon.png" width="58px" className={styles.logo} alt="logo" />
       <span className={styles.slogan}>{t('wizard.welcome-to-nervos-neuron')}</span>
       <Button
         type="default"

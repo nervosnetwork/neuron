@@ -1,5 +1,3 @@
-@import '../../styles/theme.scss';
-
 .container {
   position: relative;
   display: inline-block;
@@ -16,7 +14,7 @@
     justify-content: center;
     align-items: center;
     font-weight: 400;
-    color: $main-color;
+    color: var(--primary-color);
     background-color: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(1px);
     user-select: none;

@@ -1,5 +1,13 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
-import { isSuccessResponse, getMultisigAddress, DefaultLockInfo, addressToScript, scriptToAddress } from 'utils'
+import {
+  isSuccessResponse,
+  getMultisigAddress,
+  DefaultLockInfo,
+  addressToScript,
+  scriptToAddress,
+  LegacyMultiSigLockInfo,
+  MultiSigLockInfo,
+} from 'utils'
 import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
@@ -11,11 +19,13 @@ import {
   exportMultisigConfig,
   deleteMultisigConfig,
   getMultisigBalances,
+  getMultisigDAOBalances,
   loadMultisigTxJson,
   OfflineSignJSON,
   getMultisigSyncProgress,
 } from 'services/remote'
 import { computeScriptHash } from '@ckb-lumos/lumos/utils'
+import { remindRegenerateMultisigAddress } from 'services/localCache'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
@@ -55,13 +65,45 @@ export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey:
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
   const [entities, setEntities] = useState<MultisigEntity[]>([])
   const saveConfig = useCallback(
-    ({ m, n, r, addresses }: { m: number; n: number; r: number; addresses: string[] }) => {
+    ({
+      m,
+      n,
+      r,
+      addresses,
+      lockCodeHash = MultiSigLockInfo.CodeHash,
+    }: {
+      m: number
+      n: number
+      r: number
+      addresses: string[]
+      lockCodeHash?: string
+    }) => {
       return saveMultisigConfig({
         m,
         n,
         r,
         blake160s: addresses.map(v => addressToScript(v).args),
         walletId,
+        lockCodeHash,
+      }).then(res => {
+        if (isSuccessResponse(res)) {
+          setEntities(v => (res.result ? [res.result, ...v] : v))
+        } else {
+          throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
+        }
+      })
+    },
+    [walletId, setEntities]
+  )
+  const regenerateConfig = useCallback(
+    (config: MultisigConfig) => {
+      return saveMultisigConfig({
+        m: config.m,
+        n: config.n,
+        r: config.r,
+        blake160s: config.blake160s,
+        walletId,
+        lockCodeHash: MultiSigLockInfo.CodeHash,
       }).then(res => {
         if (isSuccessResponse(res)) {
           setEntities(v => (res.result ? [res.result, ...v] : v))
@@ -132,7 +174,8 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
             { isMainnet }
           )
         ),
-        fullPayload: getMultisigAddress(entity.blake160s, entity.r, entity.m, entity.n, isMainnet),
+        fullPayload: getMultisigAddress(entity.blake160s, entity.r, entity.m, entity.n, isMainnet, entity.lockCodeHash),
+        isLegacy: entity.lockCodeHash === LegacyMultiSigLockInfo.CodeHash,
       })),
     [entities, isMainnet]
   )
@@ -145,6 +188,7 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
   )
   return {
     saveConfig,
+    regenerateConfig,
     allConfigs,
     onUpdateConfigAlias,
     onUpdateConfig,
@@ -267,6 +311,42 @@ const useDeleteAction = (deleteConfigById: (id: number) => void) => {
   }
 }
 
+const useRegenerateAction = (regenerateConfig: (config: MultisigConfig) => Promise<void>) => {
+  const [config, setConfig] = useState<MultisigConfig>()
+  const [isNoRemind, setIsNoRemind] = useState(false)
+  const [regenerateErrorMessage, setRegenerateErrorMessage] = useState<string | undefined>()
+
+  const handleCheckbox = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { checked } = e.target
+      setIsNoRemind(checked)
+      remindRegenerateMultisigAddress.save(checked)
+    },
+    [setIsNoRemind]
+  )
+
+  const regenerate = useCallback(
+    async (multisigConfig: MultisigConfig) => {
+      try {
+        await regenerateConfig(multisigConfig)
+      } catch (error) {
+        setRegenerateErrorMessage(error instanceof Error ? error.message : '')
+      }
+    },
+    [config, isNoRemind, setRegenerateErrorMessage]
+  )
+
+  return {
+    action: regenerate,
+    config,
+    setConfig,
+    isNoRemind,
+    handleCheckbox,
+    regenerateErrorMessage,
+    setRegenerateErrorMessage,
+  }
+}
+
 const useApproveAction = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
@@ -342,7 +422,13 @@ const useDaoWithdrawAction = () => {
   }
 }
 
-export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
+export const useActions = ({
+  deleteConfigById,
+  regenerateConfig,
+}: {
+  deleteConfigById: (id: number) => void
+  regenerateConfig: (config: MultisigConfig) => Promise<void>
+}) => {
   return {
     deleteAction: useDeleteAction(deleteConfigById),
     infoAction: useInfoAction(),
@@ -350,6 +436,7 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
     approveAction: useApproveAction(),
     daoDepositAction: useDaoDepositAction(),
     daoWithdrawAction: useDaoWithdrawAction(),
+    regenerateAction: useRegenerateAction(regenerateConfig),
   }
 }
 
@@ -365,6 +452,7 @@ export const useSubscription = ({
   isLightClient: boolean
 }) => {
   const [multisigBanlances, setMultisigBanlances] = useState<Record<string, string>>({})
+  const [multisigDaoBalances, setMultisigDaoBalances] = useState<Record<string, string>>({})
   const [multisigSyncProgress, setMultisigSyncProgress] = useState<Record<string, number>>({})
   const getAndSaveMultisigBalances = useCallback(() => {
     getMultisigBalances({ isMainnet, multisigAddresses: configs.map(v => v.fullPayload) }).then(res => {
@@ -372,7 +460,12 @@ export const useSubscription = ({
         setMultisigBanlances(res.result)
       }
     })
-  }, [setMultisigBanlances, isMainnet, configs])
+    getMultisigDAOBalances({ isMainnet, multisigAddresses: configs.map(v => v.fullPayload) }).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setMultisigDaoBalances(res.result)
+      }
+    })
+  }, [setMultisigBanlances, setMultisigDaoBalances, isMainnet, configs])
   const hashToPayload = useMemo(
     () =>
       configs.reduce<Record<string, string>>(
@@ -415,7 +508,7 @@ export const useSubscription = ({
       clearInterval(interval)
     }
   }, [isLightClient, getAndSaveMultisigSyncProgress])
-  return { multisigBanlances, multisigSyncProgress }
+  return { multisigBanlances, multisigDaoBalances, multisigSyncProgress }
 }
 
 export const useCancelWithLightClient = () => {

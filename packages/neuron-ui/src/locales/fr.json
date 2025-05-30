@@ -489,7 +489,26 @@
         "move-data-finish": "Les données ont été déplacées",
         "re-sync": "Synchroniser depuis le début",
         "disabled-set-path": "Lorsque le noeud CKB est démarré manuellement, la configuration du chemin du noeud CKB ne prend pas effet.",
-        "ckb-node-storage": "Stockage du noeud CKB"
+        "ckb-node-storage": "Stockage du noeud CKB",
+        "browse-local-files": "Parcourir les fichiers locaux",
+        "modify-path": "Modifier le chemin",
+        "modify-path-notice": "Veuillez vous assurer que l'espace disque restant est supérieur à {{needSize}} Go pour stocker les données du nœud CKB.",
+        "modify-path-content": "Vous pouvez choisir un nouveau chemin pour resynchroniser ou migrer les données précédentes afin de continuer la synchronisation.",
+        "retain-previous-data": "Conserver les données précédentes",
+        "set-a-new-path": "Définir un nouveau chemin",
+        "browse": "Parcourir",
+        "migrate-previous-ckb-node-data": "Migrer les données précédentes du nœud CKB",
+        "migrate-previous-ckb-node-data-notice": "Avant de cliquer sur le bouton Confirmer, veuillez compléter ce qui suit :",
+        "migrate-confirm": "Confirmer ({{seconds}}s)",
+        "migrate-step-1": "Ouvrir le chemin de stockage des données précédentes du nœud CKB.",
+        "migrate-step-2": "Ouvrir le nouveau chemin défini.",
+        "migrate-step-3": "Copier tous les fichiers vers le nouveau chemin.",
+        "click-here": "Cliquez ici",
+        "migrate-data-successful": "Migration des données réussie",
+        "resync": "Resynchroniser",
+        "retry": "Réessayer",
+        "sync-file-lost": "Fichier de synchronisation perdu",
+        "sync-file-lost-notice": "Veuillez récupérer le fichier et réessayer, ou resynchroniser."
       }
     },
     "password-request": {
@@ -688,6 +707,7 @@
         "402": "L'application CKB n'est pas ouverte. Veuillez ouvrir l'application CKB sur votre appareil.",
         "403": "Aucun appareil détecté. Veuillez connecter votre appareil",
         "404": "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté.",
+        "408": "Le portefeuille matériel actuellement connecté ne correspond pas au portefeuille actuel.",
         "600": "Veuillez vous assurer que la synchronisation est finalisée avant d'effectuer toute opération liée à une transaction."
       }
     },
@@ -1073,7 +1093,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Envoyer {{extraCKB}} CKBytes supplémentaires pour créer un compte d'actif pour le destinataire"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "L'adresse du destinataire a un script de verrouillage inconnu, assurez-vous que le destinataire sait comment le gérer, et {{extraCKB}} CKBytes supplémentaires seront envoyés avec {{assetName}} pour détenir l'actif"
         },
         "select-option": "Veuillez confirmer l'option ci-dessus avant de soumettre"
@@ -1090,6 +1110,19 @@
         "decimal": "Décimal",
         "confirm": "Confirmer",
         "cancel": "Annuler"
+      },
+      "recycle-dialog": {
+        "title": "Recycler la UDT Cell",
+        "notation": "Veuillez noter que recycler les cellules détruira l'UDT et libérera le CKB verrouillé",
+        "destroy": "Détruire",
+        "release": "Libérer",
+        "current-wallet": "Portefeuille actuel",
+        "receive-address": "Adresse de réception",
+        "receive-address-placeholder": "Veuillez entrer l'adresse de réception",
+        "submitted-tips": "La transaction de recyclage de la UDT Cell a été soumise",
+        "connect-wallet": "Connecter le portefeuille",
+        "verifying": "Vérification en cours",
+        "view-details": "Voir les détails"
       }
     },
     "multisig-address": {
@@ -1125,9 +1158,12 @@
           "approve": "Approuver",
           "delete": "Supprimer",
           "daoDeposit": "Déposer dans DAO",
-          "daoWithdraw": "Retirer de DAO"
+          "daoWithdraw": "Retirer de DAO",
+          "regenerate": "Régénérer"
         }
       },
+      "dao-ledger-notice": "Les portefeuilles Ledger ne prennent actuellement pas en charge les transactions DAO pour les adresses multisignatures. Veuillez utiliser une adresse à signature unique ou attendre les futures mises à jour.",
+      "dao-hardware-not-match": "Le portefeuille matériel actuellement connecté ne correspond pas au portefeuille actuel.",
       "import-dialog": {
         "actions": {
           "cancel": "Annuler",
@@ -1147,6 +1183,14 @@
         "send": "Envoyer",
         "cancel": "Annuler",
         "export": "Exporter Tx"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "En raison de la <0>mise à jour du script multisig</0>, nous recommandons de régénérer les adresses multisig et de transférer les actifs depuis l’ancienne adresse pour garantir un bon fonctionnement.",
+      "regenerate-dialog": {
+        "title": "Régénérer",
+        "detail": "Une nouvelle adresse sera générée en utilisant les paramètres de votre ancienne adresse multisig, mise à jour au nouveau format de script.",
+        "donnot-worry": "Ne vous inquiétez pas — l’ancienne adresse restera accessible.",
+        "donnot-remind-again": "Ne plus me le rappeler"
       },
       "multi-details": "Détails de l'adresse multisig",
       "synchronization-abort": "Abandon de la synchronisation",
@@ -1215,8 +1259,8 @@
       "switchToPrice": "Basculer vers le prix"
     },
     "set-start-block-number": {
-      "title": "Définir le numéro de bloc de départ",
-      "warn": "Veuillez noter que les transactions antérieures à la synchronisation du bloc initial ne seront pas synchronisées !",
+      "title": "Définir le bloc de début de synchronisation",
+      "warn": "Pour garantir une synchronisation précise des données, veuillez saisir le numéro de bloc de la première transaction de votre portefeuille",
       "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
@@ -1301,7 +1345,8 @@
       "unlock": "Déverrouiller",
       "consume": "Consommer",
       "verify": "Vérifier",
-      "consolidate": "Consolider"
+      "consolidate": "Consolider",
+      "recycle": "Recycler"
     },
     "send-tx-detail": {
       "page-title": "Détail de l'historique",

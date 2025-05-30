@@ -6,6 +6,7 @@
   padding: 16px 0 16px 16px;
   border-radius: 16px;
   column-gap: 16px;
+  position: relative;
 
   .info {
     flex: 1;
@@ -67,6 +68,31 @@
             fill: none;
             stroke: var(--orange-color);
           }
+        }
+      }
+    }
+  }
+
+  .recycleBtn {
+    position: absolute;
+    right: 4px;
+    top: 14px;
+    border: none;
+    height: 24px;
+    width: 36px;
+    background: var(--table-head-background-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    cursor: pointer;
+
+    &:hover {
+      svg {
+        g,
+        path {
+          fill: var(--primary-color);
         }
       }
     }

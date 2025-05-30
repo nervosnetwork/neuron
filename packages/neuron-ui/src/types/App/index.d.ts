@@ -126,6 +126,7 @@ declare namespace State {
       m: number
       n: number
       blake160s: string[]
+      lockCodeHash: string
     }
     onSuccess?: () => void
     showType?: 'Global' | ''
@@ -326,7 +327,7 @@ declare namespace State {
     secp256NewCell = 'secp256NewCell',
     acpExistCell = 'acpExistCell',
     acpNewCell = 'acpNewCell',
-    unknowNewCell = 'unknowNewCell',
+    unknownNewCell = 'unknownNewCell',
     sendCKB = 'sendCKB',
   }
 

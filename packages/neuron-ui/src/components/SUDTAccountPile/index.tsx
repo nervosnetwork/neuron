@@ -4,9 +4,9 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import { HIDE_BALANCE, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { sudtValueToAmount } from 'utils/formatters'
 import Tooltip from 'widgets/Tooltip'
-import { ReactComponent as Send } from 'widgets/Icons/SendStroke.svg'
-import { ReactComponent as Receive } from 'widgets/Icons/ReceiveStroke.svg'
-import { ArrowNext } from 'widgets/Icons/icon'
+import Send from 'widgets/Icons/SendStroke.svg?react'
+import Receive from 'widgets/Icons/ReceiveStroke.svg?react'
+import { ArrowNext, Recycle } from 'widgets/Icons/icon'
 import styles from './sUDTAccountPile.module.scss'
 
 export interface SUDTAccountPileProps {
@@ -92,6 +92,21 @@ const SUDTAccountPile = ({
           )}
         </div>
       </div>
+
+      {!isCKB && !disabled && (
+        <button
+          type="button"
+          data-id={accountId}
+          className={styles.recycleBtn}
+          data-role="recycle"
+          onClick={onClick}
+          disabled={disabled}
+        >
+          <Tooltip tip={t('cell-manage.recycle')} showTriangle placement="top" isTriggerNextToChild>
+            <Recycle />
+          </Tooltip>
+        </button>
+      )}
     </div>
   )
 }
