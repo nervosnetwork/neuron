@@ -34,7 +34,7 @@ YouTube: https://youtu.be/JFe0Pwr4Io0
 
 - #3317: Hide 'View Private Key' when it's a hardware wallet.(@devchenyan)
 - #3332: Better note for external node running without the indexer module enabled.(@devchenyan)
-- #3352: Fix screen flicker when connecting to external ndoes running new versions.(@devchenyan)
+- #3352: Fix screen flicker when connecting to external nodes running new versions.(@devchenyan)
 
 
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.121.1...v0.201.0
