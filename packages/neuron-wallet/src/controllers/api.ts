@@ -69,6 +69,8 @@ import { type OutPoint } from '@ckb-lumos/lumos'
 import { updateApplicationMenu } from './app/menu'
 import { DuplicateImportWallet } from '../exceptions'
 import CommandSubject from '../models/subjects/command'
+import PerunController from './perun'
+import { AddressType } from '@ckb-lumos/hd'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet'
 // Handle channel messages from renderer process and user actions.
@@ -85,11 +87,13 @@ export default class ApiController {
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
   #multisigController = new MultisigController()
+  #perunController = new PerunController()
 
   public async mount() {
     this.#registerHandlers()
 
     await this.#networksController.start()
+    await this.#perunController.start()
 
     nativeTheme.themeSource = SettingsService.getInstance().themeSource
   }
@@ -380,6 +384,10 @@ export default class ApiController {
 
     handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
       return this.#walletsController.importKeystore(params)
+    })
+
+    handle('get-wallet-xpubkey', async (_, params: { type: AddressType; index: number }) => {
+      return this.#walletsController.getCurrentAccountExtendedPubKey(params.type, params.index)
     })
 
     handle('create-wallet', async (_, params: { name: string; password: string; mnemonic: string }) => {
@@ -853,8 +861,20 @@ export default class ApiController {
       return this.#signAndVerifyController.verify(params)
     })
 
-    // sUDT
+    // Perun
+    handle('sign-raw-message', async (_, params: Controller.Params.SignRawParams) => {
+      return this.#signAndVerifyController.signRaw(params)
+    })
 
+    handle('respond-perun-request', async (_, params: Controller.Params.RespondPerunRequestParams) => {
+      return this.#perunController.respondPerunRequest(params)
+    })
+
+    handle('perun-service-action', async (_, params: Controller.Params.PerunServiceActionParams) => {
+      return this.#perunController.perunServiceAction(params)
+    })
+
+    // sUDT
     handle('get-anyone-can-pay-script', () => {
       return this.#anyoneCanPayController.getScript()
     })

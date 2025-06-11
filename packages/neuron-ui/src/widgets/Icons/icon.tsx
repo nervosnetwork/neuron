@@ -67,6 +67,11 @@ import DAODepositSvg from './DAODeposit.svg?react'
 import DAOWithdrawalSvg from './DAOWithdrawal.svg?react'
 import RecycleSvg from './Recycle.svg?react'
 import MoreSvg from './More.svg?react'
+import PerunSvg from './Perun.svg?react'
+import CkbIconSvg from './CkbIcon.svg?react'
+import PartnerSvg from './Partner.svg?react'
+import PerunSendSvg from './PerunSend.svg?react'
+import PerunCloseSvg from './PerunClose.svg?react'
 
 import styles from './icon.module.scss'
 
@@ -150,3 +155,8 @@ export const DAODeposit = WrapSvg(DAODepositSvg)
 export const DAOWithdrawal = WrapSvg(DAOWithdrawalSvg)
 export const Recycle = WrapSvg(RecycleSvg)
 export const More = WrapSvg(MoreSvg)
+export const PerunIcon = WrapSvg(PerunSvg)
+export const CkbIcon = WrapSvg(CkbIconSvg)
+export const PartnerIcon = WrapSvg(PartnerSvg)
+export const PerunSend = WrapSvg(PerunSendSvg)
+export const PerunClose = WrapSvg(PerunCloseSvg)
