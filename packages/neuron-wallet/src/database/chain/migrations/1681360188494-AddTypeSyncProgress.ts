@@ -18,7 +18,7 @@ export class AddTypeSyncProgress1681360188494 implements MigrationInterface {
     // after add a column for multisig_config here will throw exception if use `queryRunner.manager.find(MultisigConfig)`
     // so it's better to use query to find the items
     const multisigConfigs: MultisigConfig[] = await queryRunner.manager.query('select * from multisig_config')
-    const scriptHashes = multisigConfigs.map(v => scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)))
+    const scriptHashes = multisigConfigs.map(v => scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n, v.lockCodeHash)))
     await queryRunner.query(`UPDATE sync_progress set addressType=1 where hash in (${scriptHashes.map(v => `'${v}'`).join(',')})`)
   }
 

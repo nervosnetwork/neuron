@@ -81,10 +81,6 @@ const SetStartBlockNumberDialog = ({
     const explorerUrl = getExplorerUrl(isMainnet)
     openExternal(`${explorerUrl}/address/${address}?sort=time`)
   }, [address, isMainnet])
-  const onViewBlock = useCallback(() => {
-    const explorerUrl = getExplorerUrl(isMainnet)
-    openExternal(`${explorerUrl}/block/${startBlockNumber}`)
-  }, [startBlockNumber, isMainnet])
   const onConfirm = useCallback(() => {
     if (startBlockNumber !== undefined) {
       onUpdateStartBlockNumber(startBlockNumber).catch(res => {
@@ -95,14 +91,16 @@ const SetStartBlockNumberDialog = ({
   useEffect(() => {
     if (show) {
       setStartBlockNumber(initStartBlockNumber)
+      resetCountDown()
     }
-  }, [show, initStartBlockNumber, setStartBlockNumber])
+  }, [show, initStartBlockNumber, setStartBlockNumber, resetCountDown])
   return (
     <Dialog
       title={t('set-start-block-number.title')}
-      confirmText={countdown ? `${t('common.confirm')}(${countdown})` : t('common.confirm')}
+      confirmText={countdown ? `${t('common.confirm')} (${countdown})` : t('common.confirm')}
       show={show}
       onCancel={onCancel}
+      showCancel={false}
       onConfirm={onConfirm}
       disabled={!startBlockNumber || !!countdown}
       contentClassName={styles.setBlockContent}
@@ -120,17 +118,10 @@ const SetStartBlockNumberDialog = ({
           value={startBlockNumber === undefined ? '' : localNumberFormatter(startBlockNumber)}
           error={blockNumberErr}
           suffix={
-            startBlockNumber !== undefined ? (
-              <button type="button" className={styles.viewAction} onClick={onViewBlock}>
-                {t('set-start-block-number.view-block')}
-                <NewTab />
-              </button>
-            ) : (
-              <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
-                {t('set-start-block-number.locate-first-tx')}
-                <NewTab />
-              </button>
-            )
+            <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
+              {t('set-start-block-number.locate-first-tx')}
+              <NewTab />
+            </button>
           }
         />
         {isSetLessThanBefore ? (

@@ -1086,7 +1086,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Enviar {{extraCKB}} CKBytes adicionales para crear una cuenta de activo para el receptor"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "La dirección de recepción tiene un script de bloqueo desconocido, asegúrese de que el receptor sepa cómo manejarlo, y se enviarán {{extraCKB}} CKBytes adicionales junto con {{assetName}} para mantener el activo"
         },
         "select-option": "Confirme la opción anterior antes de enviar"
@@ -1151,7 +1151,8 @@
           "approve": "Aprobar",
           "delete": "Eliminar",
           "daoDeposit": "Depositar en DAO",
-          "daoWithdraw": "Retirar de DAO"
+          "daoWithdraw": "Retirar de DAO",
+          "regenerate": "Regenerar"
         }
       },
       "dao-ledger-notice": "Las billeteras Ledger actualmente no admiten transacciones DAO para direcciones multifirma. Por favor, use una dirección de firma única o espere futuras actualizaciones.",
@@ -1175,6 +1176,14 @@
         "send": "Enviar",
         "cancel": "Cancelar",
         "export": "Exportar Tx"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "Debido a la <0>actualización del script multisig</0>, recomendamos regenerar las direcciones multisig y transferir los activos desde la antigua para garantizar el funcionamiento adecuado.",
+      "regenerate-dialog": {
+        "title": "Regenerar",
+        "detail": "Se generará una nueva dirección utilizando la configuración de tu dirección multisig anterior, actualizada al formato de script más reciente.",
+        "donnot-worry": "No te preocupes — la dirección antigua seguirá siendo accesible.",
+        "donnot-remind-again": "No volver a recordar"
       },
       "multi-details": "Detalles de la dirección multifirma",
       "synchronization-abort": "Abortar sincronización",
@@ -1243,8 +1252,8 @@
       "switchToPrice": "Cambio a precio"
     },
     "set-start-block-number": {
-      "title": "Configurar el número de bloque inicial",
-      "tip": "El número de bloque de sincronización inicial se configura cuando se utiliza el nodo CKB de cliente ligero, por tanto puede configurarlo y acelerar la sincronización",
+      "title": "Establecer bloque de inicio de sincronización",
+      "warn": "Para garantizar una sincronización precisa de datos, ingrese el número de bloque de la primera transacción de su billetera",
       "input-place-holder": "Ingrese el número de bloque de sincronización inicial, por ejemplo: 10,100,101",
       "locate-first-tx": "Ubicar la primera transacción",
       "view-block": "Ver bloque"

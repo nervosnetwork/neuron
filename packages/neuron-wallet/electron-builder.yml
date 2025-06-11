@@ -1,5 +1,5 @@
 appId: com.nervos.neuron
-copyright: Copyright (C) 2019-2024 Nervos Foundation.
+copyright: Copyright (C) 2019-2025 Nervos Foundation.
 productName: Neuron
 
 # This property will replace to false in package for test action
@@ -79,6 +79,7 @@ mac:
       arch:
         - arm64
         - x64
+  notarize: false # https://github.com/electron/notarize/issues/163#issuecomment-1726106735
 
 linux:
   artifactName: "${productName}-v${version}-${arch}.${ext}"

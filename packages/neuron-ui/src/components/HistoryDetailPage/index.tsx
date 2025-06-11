@@ -289,7 +289,7 @@ const HistoryDetailPage = () => {
       title: t('transaction.address'),
       dataIndex: 'type',
       align: 'left',
-      width: '560px',
+      width: '600px',
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (

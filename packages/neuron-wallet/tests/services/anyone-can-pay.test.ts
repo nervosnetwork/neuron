@@ -279,7 +279,7 @@ describe('anyone-can-pay-service', () => {
         outPoint: targetLiveCell.outPoint(),
       })
     })
-    it('send to unknow address', async () => {
+    it('send to unknown address', async () => {
       await expect(
         //@ts-ignore private-method
         AnyoneCanPayService.getCKBTargetOutput(
@@ -345,7 +345,7 @@ describe('anyone-can-pay-service', () => {
         outPoint: targetLiveCell.outPoint(),
       })
     })
-    it('send to unknow address', async () => {
+    it('send to unknown address', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const args = `0x${'0'.repeat(40)}`
       //@ts-ignore
@@ -396,7 +396,7 @@ describe('anyone-can-pay-service', () => {
       )
       expect(res).toBe(BigInt(MIN_SUDT_CAPACITY).toString())
     })
-    it('unknow lock not exist', async () => {
+    it('unknown lock not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       const res = await AnyoneCanPayService.getHoldSUDTCellCapacity(
         new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160),

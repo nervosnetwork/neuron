@@ -72,6 +72,8 @@ import CkbIconSvg from './CkbIcon.svg?react'
 import PartnerSvg from './Partner.svg?react'
 import PerunSendSvg from './PerunSend.svg?react'
 import PerunCloseSvg from './PerunClose.svg?react'
+import RegenerateSvg from './Regenerate.svg?react'
+import LockCodeHashSvg from './LockCodeHash.svg?react'
 
 import styles from './icon.module.scss'
 
@@ -160,3 +162,5 @@ export const CkbIcon = WrapSvg(CkbIconSvg)
 export const PartnerIcon = WrapSvg(PartnerSvg)
 export const PerunSend = WrapSvg(PerunSendSvg)
 export const PerunClose = WrapSvg(PerunCloseSvg)
+export const Regenerate = WrapSvg(RegenerateSvg)
+export const LockCodeHash = WrapSvg(LockCodeHashSvg)

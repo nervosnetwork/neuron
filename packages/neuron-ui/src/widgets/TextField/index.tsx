@@ -4,7 +4,33 @@ import Edit from 'widgets/Icons/Edit.svg?react'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
 
-const TextField = React.forwardRef(
+const TextField = React.forwardRef<
+  HTMLDivElement,
+  {
+    field: string
+    label?: string | React.ReactNode
+    value?: string
+    hint?: string
+    error?: string
+    type?: 'text' | 'password' | 'file'
+    onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+    onClick?: (e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+    className?: string
+    prefix?: string | React.ReactNode | undefined
+    suffix?: string | React.ReactNode | undefined
+    stack?: boolean
+    required?: boolean
+    readOnly?: boolean
+    placeholder?: string
+    disabled?: boolean
+    selected?: boolean
+    width?: string
+    rows?: number
+    errorWithIcon?: boolean
+    tabIndex?: number
+    [key: string]: any
+  }
+>(
   (
     {
       label,
@@ -28,31 +54,8 @@ const TextField = React.forwardRef(
       rows = 1,
       errorWithIcon = false,
       ...rest
-    }: {
-      field: string
-      label?: string | React.ReactNode
-      value?: string
-      hint?: string
-      error?: string
-      type?: 'text' | 'password' | 'file'
-      onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-      onClick?: (e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-      className?: string
-      prefix?: string | React.ReactNode | undefined
-      suffix?: string | React.ReactNode | undefined
-      stack?: boolean
-      required?: boolean
-      readOnly?: boolean
-      placeholder?: string
-      disabled?: boolean
-      selected?: boolean
-      [key: string]: any
-      width?: string
-      rows?: number
-      errorWithIcon?: boolean
-      tabIndex?: number
     },
-    ref: React.LegacyRef<HTMLDivElement>
+    ref
   ) => {
     const [isPasswordHidden, setIsPasswordHidden] = useState(true)
     const inputRef = useRef<(HTMLTextAreaElement & HTMLInputElement) | null>(null)

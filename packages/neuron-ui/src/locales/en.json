@@ -1142,7 +1142,7 @@
         "extra-ckb-send-to-acp": {
           "label": "Send extra {{extraCKB}} CKBytes to create an asset account for receiver"
         },
-        "extra-ckb-send-to-unknow": {
+        "extra-ckb-send-to-unknown": {
           "label": "Receive address has an unknown lock script, please make sure receiver knowns how to handle it, and extra {{extraCKB}} CKBytes will be sent along with {{assetName}} to hold the asset"
         },
         "select-option": "Please confirm the above option before submitting"
@@ -1207,7 +1207,8 @@
           "approve": "Approve",
           "delete": "Delete",
           "daoDeposit": "DAO Deposit",
-          "daoWithdraw": "DAO Withdraw"
+          "daoWithdraw": "DAO Withdraw",
+          "regenerate": "Regenerate"
         }
       },
       "dao-ledger-notice": "Ledger wallets currently do not support DAO transactions for multisig addresses. Please use a single-signature address or await future updates.",
@@ -1231,6 +1232,14 @@
         "send": "Send",
         "cancel": "Cancel",
         "export": "Export Tx"
+      },
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "Due to the <0>multisig script upgrade</0>, we recommend regenerating the multisig addresses and transferring assets from the legacy one to ensure proper functionality. ",
+      "regenerate-dialog": {
+        "title": "Regenerate",
+        "detail": "A new address will be generated using the settings from your legacy multisig address, upgraded to the latest script format.",
+        "donnot-worry": "Don't worry — the legacy address will still be accessible.",
+        "donnot-remind-again": "Don't Remind Again"
       },
       "multi-details": "Multisig address details",
       "synchronization-abort": "Synchronization Abort",
@@ -1299,8 +1308,8 @@
       "switchToPrice": "Switch to price"
     },
     "set-start-block-number": {
-      "title": "Set the start block number",
-      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
+      "title": "Set synchronization start block",
+      "warn": "To ensure accurate data synchronization, please enter the block number of your wallet's first transaction",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",

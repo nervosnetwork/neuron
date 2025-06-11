@@ -44,6 +44,15 @@ describe('Address Dao tests', () => {
       const script = addressMeta.generateSingleMultiSignLockScript()
       expect(script).toEqual({
         args: Multisig.hash([address.blake160]),
+        codeHash: '0x36c971b8d41fbd94aabca77dc75e826729ac98447b46f91e00796155dddb0d29',
+        hashType: 'data1',
+      })
+    })
+
+    it('#generateLegacySingleMultiSignLockScript', () => {
+      const script = addressMeta.generateLegacySingleMultiSignLockScript()
+      expect(script).toEqual({
+        args: Multisig.hash([address.blake160]),
         codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
         hashType: 'type',
       })

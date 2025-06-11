@@ -15,9 +15,11 @@ import hooks from './hooks'
 import styles from './multisigAddressNervosDAODialog.module.scss'
 
 const MultisigAddressNervosDAODialog = ({
+  balance,
   multisigConfig,
   closeDialog,
 }: {
+  balance: string
   multisigConfig: MultisigConfig
   closeDialog: () => void
 }) => {
@@ -170,7 +172,7 @@ const MultisigAddressNervosDAODialog = ({
                 currentEpoch: epoch,
                 genesisBlockTimestamp,
                 connectionStatus,
-                hasCkbBalance: +wallet.balance > 0,
+                hasCkbBalance: +balance > 0,
                 showDetailInExplorer: true,
                 isMainnet,
               }
@@ -219,7 +221,7 @@ const MultisigAddressNervosDAODialog = ({
   return (
     <Dialog
       show
-      title={t('multisig-address.send-ckb.title')}
+      title={t('multisig-address.nervos-dao')}
       onCancel={closeDialog}
       showFooter={false}
       contentClassName={styles.dialogContainer}

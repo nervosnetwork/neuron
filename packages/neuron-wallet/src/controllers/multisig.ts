@@ -20,19 +20,23 @@ import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-d
 import { LightRPC } from '../utils/ckb-rpc'
 import SyncProgressService from '../services/sync-progress'
 
-interface MultisigConfigOutput {
-  multisig_configs: Record<
-    string,
-    {
-      sighash_addresses: string[]
-      require_first_n: number
-      threshold: number
-      alias?: string
-    }
-  >
+interface MultisigConfigItem {
+  sighash_addresses: string[]
+  require_first_n: number
+  threshold: number
+  alias?: string
+  lockCodeHash: string
 }
 
-const validateImportConfig = (configOutput: MultisigConfigOutput) => {
+interface MultisigConfigOutput {
+  multisig_configs: Record<string, MultisigConfigItem>
+}
+
+interface MultisigConfigInput {
+  multisig_configs: Record<string, Omit<MultisigConfigItem, 'lockCodeHash'> & { lockCodeHash?: string }>
+}
+
+const validateImportConfig = (configOutput: MultisigConfigInput) => {
   return (
     configOutput.multisig_configs &&
     Object.values(configOutput.multisig_configs).length &&
@@ -49,9 +53,25 @@ export default class MultisigController {
     this.#multisigService = new MultisigService()
   }
 
-  async saveConfig(params: { walletId: string; r: number; m: number; n: number; blake160s: string[]; alias?: string }) {
+  async saveConfig(params: {
+    walletId: string
+    r: number
+    m: number
+    n: number
+    blake160s: string[]
+    alias?: string
+    lockCodeHash?: string
+  }) {
     const multiSignConfig = MultisigConfig.fromModel(
-      new MultisigConfigModel(params.walletId, params.r, params.m, params.n, params.blake160s, params.alias)
+      new MultisigConfigModel(
+        params.walletId,
+        params.r,
+        params.m,
+        params.n,
+        params.blake160s,
+        params.lockCodeHash || SystemScriptInfo.MULTISIG_CODE_HASH,
+        params.alias
+      )
     )
     const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
     return {
@@ -63,7 +83,7 @@ export default class MultisigController {
   async resetMultisigSync(config: MultisigConfig, startBlockNumber: number) {
     const network = NetworksService.getInstance().getCurrent()
     const lightRpc = new LightRPC(network.remote)
-    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+    const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n, config.lockCodeHash)
     await lightRpc.setScripts(
       [
         {
@@ -153,6 +173,7 @@ export default class MultisigController {
         blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
         walletId,
         alias: config.alias,
+        lockCodeHash: config.lockCodeHash,
       }))
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
@@ -191,6 +212,7 @@ export default class MultisigController {
       m: number
       n: number
       blake160s: string[]
+      lockCodeHash: string
       alias?: string
     }[]
   ) {
@@ -204,13 +226,14 @@ export default class MultisigController {
     const isMainnet = NetworksService.getInstance().isMainnet()
     const output: MultisigConfigOutput = { multisig_configs: {} }
     configs.forEach(v => {
-      output.multisig_configs[Multisig.hash(v.blake160s, v.r, v.m, v.n)] = {
+      output.multisig_configs[`${Multisig.hash(v.blake160s, v.r, v.m, v.n)}_${v.lockCodeHash.slice(2, 10)}`] = {
         sighash_addresses: v.blake160s.map(args =>
           scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
         ),
         require_first_n: v.r,
         threshold: v.m,
         alias: v.alias,
+        lockCodeHash: v.lockCodeHash,
       }
     })
 
@@ -232,6 +255,14 @@ export default class MultisigController {
 
   async getMultisigBalances({ isMainnet, multisigAddresses }: { isMainnet: boolean; multisigAddresses: string[] }) {
     const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
+    return {
+      status: ResponseCode.Success,
+      result: balances,
+    }
+  }
+
+  async getMultisigDAOBalances({ isMainnet, multisigAddresses }: { isMainnet: boolean; multisigAddresses: string[] }) {
+    const balances = await CellsService.getMultisigDAOBalances(isMainnet, multisigAddresses)
     return {
       status: ResponseCode.Success,
       result: balances,

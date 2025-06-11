@@ -137,7 +137,7 @@ export default {
         'La dirección multifirma actual no coincide con la transacción que se va a aprobar',
       'sudt-acp-have-data': 'La cuenta ACP de sUDT destruida tiene saldo',
       'no-match-address-for-sign': 'No se encontró una dirección coincidente',
-      'target-lock-error': 'La cuenta de activos CKB solo puede transferirse a una dirección sepe256k1 o acp',
+      'target-lock-error': 'La cuenta de activos CKB solo puede transferirse a una dirección secp256k1 o acp',
       'no-exist-ckb-node-data':
         '{{path}} no tiene configuración y almacenamiento de nodo CKB, presiona confirmar para sincronizar desde cero',
       'light-client-sudt-acp-error':

@@ -50,6 +50,11 @@
   position: relative;
   max-height: calc(100vh - 260px);
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+    background: transparent;
+  }
 }
 
 .footerWrap {

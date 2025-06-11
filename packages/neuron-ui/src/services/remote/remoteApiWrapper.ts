@@ -164,6 +164,7 @@ type Action =
   | 'update-multisig-config'
   | 'delete-multisig-config'
   | 'get-multisig-balances'
+  | 'get-multisig-dao-balances'
   | 'generate-multisig-tx'
   | 'generate-multisig-send-all-tx'
   | 'load-multisig-tx-json'

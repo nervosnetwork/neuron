@@ -1,7 +1,12 @@
 import { ckbHash } from '@ckb-lumos/lumos/utils'
 import { scriptToAddress } from 'utils'
-import { MultiSigLockInfo } from './enums'
+import { LegacyMultiSigLockInfo, MultiSigLockInfo } from './enums'
 import { MAX_M_N_NUMBER } from './const'
+
+const MultiSigLockInfoMap = {
+  [LegacyMultiSigLockInfo.CodeHash]: LegacyMultiSigLockInfo,
+  [MultiSigLockInfo.CodeHash]: MultiSigLockInfo,
+}
 
 function getMultisigParamsHex(v: number) {
   if (v < 0 || v > MAX_M_N_NUMBER) {
@@ -25,12 +30,19 @@ function multisigHash(blake160s: string[], r: number = 0, m: number = 1, n: numb
   return ckbHash(multisigSerialize(blake160s, r, m, n)).slice(0, MULTISIGN_HASH_LENGTH)
 }
 
-export function getMultisigAddress(blake160s: string[], r: number, m: number, n: number, isMainnet: boolean) {
+export function getMultisigAddress(
+  blake160s: string[],
+  r: number,
+  m: number,
+  n: number,
+  isMainnet: boolean,
+  lockCodeHash: string = MultiSigLockInfo.CodeHash
+) {
   return scriptToAddress(
     {
       args: multisigHash(blake160s, r, m, n),
-      codeHash: MultiSigLockInfo.CodeHash,
-      hashType: MultiSigLockInfo.HashType,
+      codeHash: MultiSigLockInfoMap[lockCodeHash as keyof typeof MultiSigLockInfoMap].CodeHash,
+      hashType: MultiSigLockInfoMap[lockCodeHash as keyof typeof MultiSigLockInfoMap].HashType,
     },
     { isMainnet }
   )

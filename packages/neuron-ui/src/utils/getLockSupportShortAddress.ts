@@ -1,8 +1,20 @@
 import { type CKBComponents } from '@ckb-lumos/lumos/rpc'
-import { AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina, DefaultLockInfo, MultiSigLockInfo } from './enums'
+import {
+  AnyoneCanPayLockInfoOnAggron,
+  AnyoneCanPayLockInfoOnLina,
+  DefaultLockInfo,
+  LegacyMultiSigLockInfo,
+  MultiSigLockInfo,
+} from './enums'
 
 const getLockSupportShortAddress = (lock: CKBComponents.Script) => {
-  return [MultiSigLockInfo, DefaultLockInfo, AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina].find(
+  return [
+    LegacyMultiSigLockInfo,
+    MultiSigLockInfo,
+    DefaultLockInfo,
+    AnyoneCanPayLockInfoOnAggron,
+    AnyoneCanPayLockInfoOnLina,
+  ].find(
     info =>
       lock.codeHash === info.CodeHash &&
       lock.hashType === info.HashType &&
