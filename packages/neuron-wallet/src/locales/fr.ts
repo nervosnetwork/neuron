@@ -234,6 +234,13 @@ export default {
           ignore: 'Ignorer et continuer',
         },
       },
+      'unrecognized-multisig-transaction': {
+        message:
+          "Il s'agit d'une transaction multisignature. Veuillez l'approuver depuis l'adresse multisignature en utilisant le portefeuille approprié.",
+        buttons: {
+          cancel: 'Annuler',
+        },
+      },
     },
     prompt: {
       password: {

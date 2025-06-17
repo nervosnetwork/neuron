@@ -230,6 +230,13 @@ export default {
           ignore: 'Ignore and continue',
         },
       },
+      'unrecognized-multisig-transaction': {
+        message:
+          'This is a multisig transaction. Please approve it from the multisig address using the appropriate wallet. ',
+        buttons: {
+          cancel: 'Cancel',
+        },
+      },
     },
     prompt: {
       password: {
