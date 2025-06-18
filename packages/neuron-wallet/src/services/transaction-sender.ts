@@ -32,6 +32,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   TransactionIsNotCommittedYet,
+  UnrecognizedLockScript,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -228,6 +229,9 @@ export default class TransactionSender {
         })
         if (res.response === IGNORE_UNRECOGNIZED_AND_CONTINUE) {
           continue
+        }
+        if (res.response === BLOCK_UNRECOGNIZED) {
+          throw new UnrecognizedLockScript(message)
         }
         throw error
       }

@@ -24,6 +24,13 @@ export class TransactionInputParameterMiss extends Error {
   }
 }
 
+export class UnrecognizedLockScript extends Error {
+  public code = 117
+  constructor(message: string) {
+    super(message)
+  }
+}
+
 export default {
   TransactionNotFound,
   CapacityTooSmall,
