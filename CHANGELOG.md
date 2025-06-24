@@ -10,7 +10,7 @@ Visit https://explorer.nervos.org/hardfork for more information about the hardfo
 
 ### CKB Node & Light Client
 
-- [CKB@v0.202.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.202.0) was released on Jun. 12nd, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB@v0.202.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.202.0) was released on Jun. 12th, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
 - [CKB Light Client@v0.5.0](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.5.0) was released on Jun. 19th, 2025. This version of CKB Light Client is now bundled and preconfigured in Neuron
 
 ### Assumed valid target
