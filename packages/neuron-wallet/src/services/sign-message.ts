@@ -7,6 +7,8 @@ import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
 import { bytes } from '@ckb-lumos/lumos/codec'
+import blake2b from 'blake2b'
+import logger from '../utils/logger'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -48,8 +50,43 @@ export default class SignMessage {
     return this.signByPrivateKey(privateKey, message)
   }
 
+  // Allows signing messages with custom magic strings.
+  public static async signRaw(walletID: string, address: string, password: string, message: string): Promise<string> {
+    const wallet = WalletService.getInstance().get(walletID)
+    const addresses = await AddressService.getAddressesByWalletId(walletID)
+    let addr = addresses.find(addr => addr.address === address)
+
+    logger.info('signRaw: addresses, addr-------', walletID, addresses, address, addr)
+    if (!addr) {
+      throw new AddressNotFound()
+    }
+
+    if (wallet.isHardware()) {
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const deviceInfo = wallet.getDeviceInfo()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
+      }
+      const messagehex = Buffer.from(message, 'utf-8').toString('hex')
+      return device.signMessage(addr.path, messagehex)
+    }
+
+    // find private key of address
+    const privateKey = this.getPrivateKey(wallet, addr.path, password)
+
+    return this.signByPrivateKeyWithMagic(privateKey, message)
+  }
+
   private static signByPrivateKey(privateKey: string, message: string): string {
     const digest = SignMessage.signatureHash(message)
+    const signature = hd.key.signRecoverable(digest, privateKey)
+    return signature
+  }
+
+  private static async signByPrivateKeyWithMagic(privateKey: string, message: string) {
+    const digest = await SignMessage.customSignatureHash(message)
+    logger.info(`Signing Digest: ${digest}`)
     const signature = hd.key.signRecoverable(digest, privateKey)
     return signature
   }
@@ -72,6 +109,16 @@ export default class SignMessage {
     if (SignMessage.verify(address, oldSignature, digest)) {
       return 'old-sign'
     }
+  }
+
+  private static async customSignatureHash(message: string) {
+    logger.info(`Signing Message: ${message}`)
+    const buffer = bytes.bytify(message)
+    const hasher = blake2b(32) // Blake2b-256
+    hasher.update(buffer)
+    const out = new Uint8Array(32)
+    hasher.digest(out)
+    return bytes.hexify(out.buffer)
   }
 
   private static verify(address: string, signature: string, digest: string): boolean {

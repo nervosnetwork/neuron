@@ -17,120 +17,13 @@ import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
-import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.svg?react'
-import { InfoCircleOutlined } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
-import Toast from 'widgets/Toast'
-import Tooltip from 'widgets/Tooltip'
+import Alert from 'widgets/Alert'
 import Arrow from 'widgets/Icons/Arrow.svg?react'
-import Sign from 'widgets/Icons/Sign.svg?react'
-import HardwareSign from 'components/HardwareSign'
-import styles from './signAndVerify.module.scss'
+import { AddSimple } from 'widgets/Icons/icon'
+import styles from './perunOpenChannel.module.scss'
 
-interface PasswordDialogProps {
-  show: boolean
-  walletName: string
-  onCancel: () => void
-  onSubmit: (pwd: string) => Promise<ControllerResponse>
-}
-
-export const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
-  const [t] = useTranslation()
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const disabled = !password || loading
-
-  useEffect(() => {
-    if (!show) {
-      setPassword('')
-      setError('')
-    }
-  }, [show, setPassword, setError])
-
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setPassword(e.target.value)
-    },
-    [setPassword]
-  )
-
-  const handleConfirm = useCallback(() => {
-    if (disabled) {
-      return
-    }
-    setLoading(true)
-    onSubmit(password)
-      .then(res => {
-        if (res.status === ErrorCode.PasswordIncorrect) {
-          setError((res.message as { content: string }).content)
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [setLoading, onSubmit, password, disabled])
-
-  return (
-    <Dialog
-      show={show}
-      title={t('sign-and-verify.sign')}
-      onCancel={onCancel}
-      onConfirm={handleConfirm}
-      disabled={disabled}
-      isLoading={loading}
-    >
-      <div className={styles.passwordDialog}>
-        <p className={styles.walletName}>{walletName}</p>
-        <TextField
-          placeholder={t('sign-and-verify.password')}
-          type="password"
-          field="password"
-          value={password}
-          onChange={handleInputChange}
-          label={t('sign-and-verify.password')}
-          error={error}
-          autoFocus
-        />
-      </div>
-    </Dialog>
-  )
-}
-
-type Notification = 'verify-success' | 'verify-old-sign-success' | 'verify-failure' | 'address-not-found' | null
-
-interface NotificationsProps {
-  notification: Notification
-  failReason?: string
-  onDismiss: () => void
-  t: TFunction
-}
-
-const Notifications = ({ notification, onDismiss, t, failReason }: NotificationsProps) =>
-  notification ? (
-    <div className={styles.dialogContainer} role="presentation">
-      <div
-        role="presentation"
-        className={styles.dialog}
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-        }}
-      >
-        <div className={styles.resultDialog}>
-          <VerificationFailureIcon />
-          <span>{t('sign-and-verify.verification-failure')}</span>
-          <span className={styles.failReason}>
-            {notification === 'address-not-found' ? t('sign-and-verify.address-not-found') : failReason}
-          </span>
-          <Button label={t('common.back')} type="primary" onClick={onDismiss} />
-        </div>
-      </div>
-    </div>
-  ) : null
-
-const SignAndVerify = () => {
+const PerunOpenChannel = ({ onClose }: { onClose?: () => void }) => {
   const [t] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
   const [failReason, setFailReason] = useState<string | undefined>('')
@@ -139,6 +32,12 @@ const SignAndVerify = () => {
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
+  const [tokens, setTokens] = useState([
+    {
+      symbol: '',
+      amount: '',
+    },
+  ])
   const {
     chain: { networkID },
     settings: { networks },
@@ -257,39 +156,38 @@ const SignAndVerify = () => {
     return undefined
   }, [t, address, isMainnet, wallet.addresses])
 
-  return (
-    <div>
-      <Dialog
-        show={showDialog}
-        title={t('sign-and-verify.sign-or-verify-message')}
-        disabled={!message || !signature || !address || !!addressError}
-        onCancel={onBack}
-        confirmText={t('sign-and-verify.verify')}
-        onConfirm={handleVerifyMessage}
-      >
-        <div>
-          <TextField
-            label={t('sign-and-verify.message')}
-            placeholder={t('sign-and-verify.input-message')}
-            data-field="message"
-            value={message}
-            onChange={handleInputChange}
-            width="100%"
-            rows={4}
-          />
-          <div className={styles.tips}>
-            <span>{t('sign-and-verify.sign-with-magic-byte')}</span>
-            <Tooltip tip={t('sign-and-verify.verify-tip')}>
-              <InfoCircleOutlined />
-            </Tooltip>
-          </div>
+  const handleAddToken = useCallback(() => {
+    setTokens([
+      ...tokens,
+      {
+        symbol: '',
+        amount: '',
+      },
+    ])
+  }, [setTokens, tokens])
 
+  return (
+    <Dialog
+      show
+      title={t('perun.open-channel')}
+      disabled={!message || !signature || !address || !!addressError}
+      onCancel={onClose}
+      onConfirm={handleVerifyMessage}
+      confirmText={t('perun.open-channel')}
+      contentClassName={styles.contentClassName}
+    >
+      <div className={styles.container}>
+        <Alert status="warn" className={styles.notification}>
+          {t('perun.open-channel-notification')}
+        </Alert>
+
+        <div className={styles.mainContent}>
           <div className={styles.selectAddress}>
             <div className={styles.dropdown}>
               <div className={styles.content}>
                 <TextField
-                  label={t('sign-and-verify.address')}
-                  placeholder={t('sign-and-verify.input-choose-address')}
+                  label={t('perun.channel-participant-address')}
+                  placeholder={t('perun.choose-address')}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   data-field="address"
                   value={address}
@@ -332,62 +230,69 @@ const SignAndVerify = () => {
             </div>
           </div>
 
-          <TextField
-            label={t('sign-and-verify.signature')}
-            placeholder="-"
-            field="signature"
-            value={signature}
-            onChange={handleInputChange}
-            width="100%"
-          />
-
-          {wallet?.isWatchOnly || (
-            <div className={styles.signWrap}>
-              <Button type="text" disabled={!message || !address || !!addressError} onClick={handlePasswordDialogOpen}>
-                <Sign />
-                {t('sign-and-verify.sign')}
+          <div className={styles.tokenTitle}>
+            <p>{t('perun.token')}</p>
+            {!!tokens[0].symbol && (
+              <Button type="text" className={styles.addToken} onClick={handleAddToken}>
+                <AddSimple />
+                {t('perun.add-token')}
               </Button>
+            )}
+          </div>
+          {tokens.map(token => (
+            <div className={styles.selectToken} key={token.symbol}>
+              <div className={styles.dropdown}>
+                <div className={styles.content}>
+                  <TextField
+                    placeholder={t('perun.choose-address')}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    data-field="address"
+                    value={address}
+                    onChange={handleInputChange}
+                    suffix={
+                      <div className={styles.arrow} data-active={isDropdownOpen}>
+                        <Arrow />
+                      </div>
+                    }
+                    width="100%"
+                    error={addressError}
+                  />
+                  {wallet.balance}
+                </div>
+                {isDropdownOpen && wallet?.addresses ? (
+                  <div className={styles.selects}>
+                    {wallet.addresses.map(addr => (
+                      <Button
+                        type="text"
+                        key={addr.address}
+                        className={styles.selectItem}
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          setAddress(addr.address)
+                        }}
+                      >
+                        <div className={styles.wrap}>
+                          <div className={styles.title}>
+                            {`${addr.address.slice(0, 16)}...${addr.address.slice(-16)} `}
+                            (<Balance balance={shannonToCKBFormatter(addr.balance)} />)
+                          </div>
+                          <div className={styles.type} data-type={addr.type}>
+                            {addr.type === 1 ? t('addresses.change-address') : t('addresses.receiving-address')}
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
-          )}
-
-          {notification === 'verify-success' || notification === 'verify-old-sign-success' ? (
-            <Toast
-              type="success"
-              onDismiss={handleNotificationDismiss}
-              content={t('sign-and-verify.verification-success')}
-            />
-          ) : null}
+          ))}
         </div>
-      </Dialog>
-
-      {notification && (
-        <Notifications
-          notification={notification}
-          failReason={failReason}
-          onDismiss={handleNotificationDismiss}
-          t={t}
-        />
-      )}
-
-      {isDialogOpen && wallet?.device ? (
-        <HardwareSign
-          signType="message"
-          signMessage={handleSignMessage}
-          wallet={wallet}
-          onDismiss={handlePasswordDialogDismiss}
-        />
-      ) : (
-        <PasswordDialog
-          show={isDialogOpen}
-          walletName={wallet?.name}
-          onCancel={handlePasswordDialogDismiss}
-          onSubmit={handleSignMessage}
-        />
-      )}
-    </div>
+      </div>
+    </Dialog>
   )
 }
 
-SignAndVerify.displayName = 'SignAndVerify'
+PerunOpenChannel.displayName = 'PerunOpenChannel'
 
-export default SignAndVerify
+export default PerunOpenChannel

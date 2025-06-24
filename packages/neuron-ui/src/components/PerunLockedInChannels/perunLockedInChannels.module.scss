@@ -1,0 +1,60 @@
+@import '../../styles/mixin.scss';
+
+.content {
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+  overflow: hidden;
+
+  table {
+    height: 440px;
+    thead {
+      :first-child {
+        border-top-left-radius: 0;
+      }
+      :last-child {
+        border-top-right-radius: 0;
+      }
+      th {
+        border-top: none;
+      }
+    }
+  }
+}
+
+.addressTable {
+  height: 440px;
+  color: var(--main-text-color);
+}
+
+.container {
+  width: 648px;
+  color: var(--main-text-color);
+
+  .token {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .partner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono';
+    color: var(--primary-color);
+    font-weight: 500;
+  }
+
+  .operation {
+    min-width: 0;
+    height: 33px;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 0 12px;
+    &:hover {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+    }
+  }
+}

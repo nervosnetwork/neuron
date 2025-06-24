@@ -21,6 +21,8 @@ export const initStates = {
   updater,
   experimental: null,
   sUDTAccounts: [],
+  // TODO: Remove this dummy.
+  perunState: { request: { hello: 'world' } },
 }
 
 export default initStates

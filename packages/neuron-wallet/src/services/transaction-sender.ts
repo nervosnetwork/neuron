@@ -195,6 +195,8 @@ export default class TransactionSender {
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
+    let perunLockHash = ''
+
     for (const lockHash of lockHashes) {
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
@@ -204,6 +206,16 @@ export default class TransactionSender {
       try {
         privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
       } catch (error) {
+        const input = tx.inputs.find(input => input.lockHash === lockHash)
+        if (
+          input &&
+          input.lock &&
+          input.lock.codeHash === '0x4d86e1541c0b95fb41b7ad2c1b78a543c72187e0a0bbd60e8e8afb1fb3c46744'
+        ) {
+          perunLockHash = input.lockHash!
+          continue
+        }
+
         const BLOCK_UNRECOGNIZED = 0
         const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
         const res = await dialog.showMessageBox({
@@ -267,8 +279,16 @@ export default class TransactionSender {
       }
     }
 
-    tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.witnesses = witnessSigningEntries.map(w => {
+      if (w.lockHash === perunLockHash) {
+        return '0x19000000100000001000000019000000050000000000000000'
+      }
+      return w.witness
+    })
     tx.hash = txHash
+
+    logger.log('tx----', JSON.stringify(tx))
+    logger.log('tx.witnesses----', JSON.stringify(tx.witnesses))
 
     return tx
   }

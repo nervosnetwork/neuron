@@ -35,6 +35,7 @@ import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import AddressParser from '../models/address-parser'
 import MultisigConfigModel from '../models/multisig-config'
 import { generateRPC } from '../utils/ckb-rpc'
+import { AddressType } from '@ckb-lumos/hd'
 
 const { Keychain, Keystore, ExtendedPrivateKey, AccountExtendedPublicKey, mnemonic } = hd
 const { generateMnemonic, validateMnemonic, mnemonicToSeedSync } = mnemonic
@@ -152,6 +153,21 @@ export default class WalletsController {
     }
   }
 
+  public async getCurrentAccountExtendedPubKey(type: AddressType, index: number): Promise<Controller.Response<string>> {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.getCurrent()
+    if (!wallet) {
+      return {
+        status: ResponseCode.Fail,
+      }
+    }
+    const accountExtendedPublicKey = wallet.accountExtendedPublicKey()
+    return {
+      status: ResponseCode.Success,
+      result: accountExtendedPublicKey.publicKeyInfo(type, index).publicKey,
+    }
+  }
+
   public async importKeystore({
     name,
     password,
@@ -196,6 +212,7 @@ export default class WalletsController {
       bytes.hexify(accountKeychain.publicKey),
       bytes.hexify(accountKeychain.chainCode)
     )
+    logger.info(`extended-pubkey: ${accountExtendedPublicKey.serialize()}`)
 
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.create({
