@@ -1,3 +1,25 @@
+# 0.202.0 (2025-06-25)
+
+### Caveat
+
+The [CKB 2023](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0051-ckb2023/0051-ckb2023.md) Hardfork will be activated at **Epoch 12,293**(estimated 2025-07-01) and requires **CKB@v0.200.0** or **Light Client@v0.5.0** and above.
+
+To ensure synchronization after the hardfork, please upgrade Neuron to [v0.201.0](https://github.com/nervosnetwork/neuron/releases/tag/v0.201.0) or later for full node users, and to [v0.202.0](https://github.com/nervosnetwork/neuron/releases/tag/v0.202.0) or later for light client users.
+
+Visit https://explorer.nervos.org/hardfork for more information about the hardfork.
+
+### CKB Node & Light Client
+
+- [CKB@v0.202.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.202.0) was released on Jun. 12th, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.5.0](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.5.0) was released on Jun. 19th, 2025. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x6676e2c4ef75afd8ef00a61d21a230fbe83c672e6a89dc60dcb41879884979a1`(at height `16,517,698`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3376)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.201.0...v0.202.0
+
+
 # 0.201.0 (2025-05-30)
 
 ### Caveat
