@@ -188,7 +188,7 @@ export default class TransactionSender {
           // TODO: fill in required DAO's type witness here
           witnessArgs,
           lockHash: input.lockHash!,
-          witness: '',
+          witness: typeof wit === 'string' ? wit : '',
           lockArgs,
         }
       })
@@ -196,6 +196,7 @@ export default class TransactionSender {
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     let perunLockHash = ''
+    let isCloseChannel = false
 
     for (const lockHash of lockHashes) {
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
@@ -207,6 +208,16 @@ export default class TransactionSender {
         privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
       } catch (error) {
         const input = tx.inputs.find(input => input.lockHash === lockHash)
+
+        if (
+          input &&
+          input.lock &&
+          input.lock.codeHash === '0x8c2d2f2f9468cf847823286ac11da09bfaef3e72a8acbac4e457ca4beadedfe4'
+        ) {
+          isCloseChannel = true
+          continue
+        }
+
         if (
           input &&
           input.lock &&
@@ -280,7 +291,7 @@ export default class TransactionSender {
     }
 
     tx.witnesses = witnessSigningEntries.map(w => {
-      if (w.lockHash === perunLockHash) {
+      if (!isCloseChannel && w.lockHash === perunLockHash) {
         return '0x19000000100000001000000019000000050000000000000000'
       }
       return w.witness
