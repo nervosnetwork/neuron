@@ -95,7 +95,7 @@
     "@vitejs/plugin-react": "4.5.0",
     "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
-    "electron": "36.3.1",
+    "electron": "36.6.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.8",
     "eslint-config-airbnb": "19.0.4",
