@@ -5,6 +5,7 @@ export const getCurrentWallet = remoteApi<void>('get-current-wallet')
 export const setCurrentWallet = remoteApi<Controller.SetCurrentWalletParams>('set-current-wallet')
 export const importMnemonic = remoteApi<Controller.ImportMnemonicParams>('import-mnemonic')
 export const importKeystore = remoteApi<Controller.ImportKeystoreParams>('import-keystore')
+export const getCurrentWalletAccountExtendedPubKey = remoteApi<Controller.GetAddressPubKey>('get-wallet-xpubkey')
 export const createWallet = remoteApi<Controller.CreateWalletParams>('create-wallet')
 export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wallet')
 export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
@@ -36,4 +37,9 @@ export const calculateUnlockDaoMaximumWithdraw = remoteApi<string, string>('calc
 
 // Sign and Verify
 export const signMessage = remoteApi<Controller.SignMessageParams>('sign-message')
+export const signRawMessage = remoteApi<Controller.SignRawMessageParams>('sign-raw-message')
 export const verifyMessage = remoteApi<Controller.VerifyMessageParams, 'old-sign' | 'new-sign'>('verify-signature')
+
+// Perun
+export const respondPerunRequest = remoteApi<Controller.RespondPerunRequestParams>('respond-perun-request')
+export const perunServiceAction = remoteApi<Controller.PerunServiceActionParams>('perun-service-action')

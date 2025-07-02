@@ -189,12 +189,15 @@ export default class TransactionSender {
           // TODO: fill in required DAO's type witness here
           witnessArgs,
           lockHash: input.lockHash!,
-          witness: '',
+          witness: typeof wit === 'string' ? wit : '',
           lockArgs,
         }
       })
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
+
+    let perunLockHash = ''
+    let isCloseChannel = false
 
     for (const lockHash of lockHashes) {
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
@@ -205,6 +208,26 @@ export default class TransactionSender {
       try {
         privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
       } catch (error) {
+        const input = tx.inputs.find(input => input.lockHash === lockHash)
+
+        if (
+          input &&
+          input.lock &&
+          input.lock.codeHash === '0x8c2d2f2f9468cf847823286ac11da09bfaef3e72a8acbac4e457ca4beadedfe4'
+        ) {
+          isCloseChannel = true
+          continue
+        }
+
+        if (
+          input &&
+          input.lock &&
+          input.lock.codeHash === '0x4d86e1541c0b95fb41b7ad2c1b78a543c72187e0a0bbd60e8e8afb1fb3c46744'
+        ) {
+          perunLockHash = input.lockHash!
+          continue
+        }
+
         const BLOCK_UNRECOGNIZED = 0
         const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
 
@@ -281,8 +304,16 @@ export default class TransactionSender {
       }
     }
 
-    tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.witnesses = witnessSigningEntries.map(w => {
+      if (!isCloseChannel && w.lockHash === perunLockHash) {
+        return '0x19000000100000001000000019000000050000000000000000'
+      }
+      return w.witness
+    })
     tx.hash = txHash
+
+    logger.log('tx----', JSON.stringify(tx))
+    logger.log('tx.witnesses----', JSON.stringify(tx.witnesses))
 
     return tx
   }

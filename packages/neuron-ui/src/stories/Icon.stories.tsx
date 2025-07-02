@@ -7,6 +7,7 @@ const backgroundForIcons: Record<string, string> = {
   Experimental: '#aaa',
   History: '#aaa',
   NervosDAO: '#aaa',
+  Perun: '#aaa',
   Overview: '#aaa',
   Send: '#aaa',
   Receive: '#aaa',
