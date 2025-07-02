@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 const MNEMONIC_SENTENCE_WORDS = 12
 
-export const useInputWords = () => {
-  const [inputsWords, setInputsWords] = useState<string[]>(new Array(MNEMONIC_SENTENCE_WORDS).fill(''))
+export const useInputWords = (wordsCount: number = MNEMONIC_SENTENCE_WORDS) => {
+  const [inputsWords, setInputsWords] = useState<string[]>(new Array(wordsCount).fill(''))
   const onChangeInput = useCallback(
     (
       e:
@@ -37,6 +37,9 @@ export const useInputWords = () => {
     },
     [setInputsWords]
   )
+  useEffect(() => {
+    setInputsWords(new Array(wordsCount).fill(''))
+  }, [wordsCount])
   return {
     inputsWords,
     onChangeInput,
