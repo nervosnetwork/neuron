@@ -1,3 +1,17 @@
+# 0.202.1 (2025-07-02)
+
+### CKB Node & Light Client
+
+- [CKB@v0.202.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.202.0) was released on Jun. 12th, 2025. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.5.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.5.1) was released on Jul. 1st, 2025. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0x49d2e56c7b595ebb61d1fee94b2814e83942064ce3ff91a175adbec0c14d26f7`(at height `16,588,228`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/3384)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.202.0...v0.202.1
+
+
 # 0.202.0 (2025-06-25)
 
 ### Caveat
