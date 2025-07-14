@@ -34,7 +34,7 @@ interface PasswordDialogProps {
   onSubmit: (pwd: string) => Promise<ControllerResponse>
 }
 
-const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
+export const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
   const [t] = useTranslation()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')

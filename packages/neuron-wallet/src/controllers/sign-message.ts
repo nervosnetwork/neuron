@@ -3,6 +3,23 @@ import { ServiceHasNoResponse } from '../exceptions'
 import { ResponseCode } from '../utils/const'
 
 export default class SignMessageController {
+  public async signRaw(params: Controller.Params.SignRawParams): Promise<Controller.Response<string>> {
+    const signature: string = await SignMessage.signRaw(
+      params.walletID,
+      params.address.trim(),
+      params.password,
+      params.message
+    )
+    if (!signature) {
+      throw new ServiceHasNoResponse('SignRaw')
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: signature,
+    }
+  }
+
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
     const signature: string = await SignMessage.sign({
       ...params,

@@ -47,6 +47,7 @@
     "displayName": "UI Tests"
   },
   "dependencies": {
+    "@ckb-connect/perun-wallet-wrapper": "1.0.5",
     "@ckb-lumos/base": "0.23.0",
     "@ckb-lumos/bi": "0.23.0",
     "@ckb-lumos/codec": "0.23.0",

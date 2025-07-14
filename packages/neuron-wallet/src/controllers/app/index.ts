@@ -17,6 +17,8 @@ import { stopCkbNode } from '../../services/ckb-runner'
 import { CKBLightRunner } from '../../services/light-runner'
 import { migrateDBFile } from '../../database/chain/ormconfig'
 import { MAINNET_GENESIS_HASH, TESTNET_GENESIS_HASH } from '../../models/network'
+import { PerunServiceRunner } from '../../services/perun/service-runner'
+import PerunController from '../perun'
 
 const app = electronApp
 
@@ -52,6 +54,7 @@ export default class AppController {
      */
     await this.apiController.mount()
     SyncApiController.getInstance().mount()
+    PerunController.getInstance().mount()
 
     await this.openWindow()
   }
@@ -63,7 +66,7 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await Promise.all([stopCkbNode(), CKBLightRunner.getInstance().stop()])
+    await Promise.all([stopCkbNode(), CKBLightRunner.getInstance().stop(), PerunServiceRunner.getInstance().stop()])
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

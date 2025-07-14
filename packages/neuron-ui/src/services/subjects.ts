@@ -30,7 +30,8 @@ const SubjectConstructor = <T>(
     | 'multisig-output-update'
     | 'migrate'
     | 'show-global-dialog'
-    | 'no-disk-space',
+    | 'no-disk-space'
+    | 'perun-request',
   isMulti?: boolean
 ) => {
   return ipcRenderer
@@ -69,6 +70,8 @@ export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sig
 export const MultisigOutputUpdate = SubjectConstructor<string>('multisig-output-update')
 export const Migrate = SubjectConstructor<'need-migrate' | 'migrating' | 'failed' | 'finish'>('migrate', true)
 export const NoDiskSpace = SubjectConstructor<boolean>('no-disk-space')
+export const PerunState = SubjectConstructor<Subject.PerunState>('perun-request')
+export const PerunRequest = SubjectConstructor<Subject.PerunRequest[]>('perun-request')
 
 export default {
   DataUpdate,
@@ -78,6 +81,7 @@ export default {
   CurrentNetworkID,
   ConnectionStatus,
   SyncState,
+  PerunState,
   AppUpdater,
   Command,
   Navigation,
@@ -85,4 +89,5 @@ export default {
   DeviceSignIndex,
   MultisigOutputUpdate,
   Migrate,
+  PerunRequest,
 }

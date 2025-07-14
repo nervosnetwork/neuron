@@ -29,6 +29,11 @@ declare namespace Controller {
     password: string
   }
 
+  interface GetAddressPubKey {
+    type: number
+    index: number
+  }
+
   interface ImportKeystoreParams {
     name: string
     keystorePath: string
@@ -188,6 +193,46 @@ declare namespace Controller {
     walletID: string
     address?: string
     password: string
+  }
+
+  interface OpenChannelParams {
+    me: Uint8Array
+    peer: Uint8Array
+    balances: [Uint8Array, Uint8Array]
+    challengeDuration: number
+  }
+  interface UpdateChannelParams {
+    channelId: string
+    index: number
+    amount: bigint
+  }
+  interface CloseChannelParams {
+    channelId: Uint8Array
+  }
+  interface GetChannelParams {
+    requester: Uint8Array
+  }
+  interface PerunServiceActionParams {
+    type: 'open' | 'update' | 'close' | 'get' | 'restore'
+    payload: OpenChannelParams | UpdateChannelParams | CloseChannelParams | GetChannelParams | RestoreChannelsParams
+  }
+  interface RespondPerunRequestParams {
+    type: 'SignMessage' | 'SignTransaction' | 'UpdateNotification'
+    response: { rejected?: { reason: string }; data: any }
+  }
+
+  interface SignRawMessageParams {
+    walletID: string
+    address: string
+    password: string
+    message: string
+  }
+
+  interface SignMessageParams {
+    walletID: string
+    address: string
+    password: string
+    message: string
   }
 
   interface VerifyMessageParams {

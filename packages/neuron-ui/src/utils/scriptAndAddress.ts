@@ -32,3 +32,6 @@ export const addressToAddress = (address: string, { deprecated = false }: { depr
     return ''
   }
 }
+
+export const bytesToHex = (bytes: Uint8Array): string =>
+  `0x${[...bytes].map(b => b.toString(16).padStart(2, '0')).join('')}`

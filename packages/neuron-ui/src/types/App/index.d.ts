@@ -345,6 +345,24 @@ declare namespace State {
     }
   }
 
+  interface PerunState {
+    request: any
+  }
+
+  interface PerunRequest {
+    type: 'SignMessage' | 'SignTransaction' | 'UpdateNotification'
+    request?: any
+  }
+
+  interface PerunChannel {
+    [key: string]: any
+  }
+
+  interface Perun {
+    channels: PerunChannel[]
+    requests: PerunRequest[]
+  }
+
   interface AppWithNeuronWallet {
     app: App
     chain: Chain
@@ -354,7 +372,9 @@ declare namespace State {
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
+    perunState: PerunState
     consumeCells?: { outPoint: OutPoint; capacity: string }[]
+    perun: Perun
   }
 
   enum LockScriptCategory {

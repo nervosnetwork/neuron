@@ -17,6 +17,8 @@ import startMonitor, { stopMonitor } from '../../services/monitor'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
 import ShowGlobalDialogSubject from '../../models/subjects/show-global-dialog'
 import NoDiskSpaceSubject from '../../models/subjects/no-disk-space'
+import PerunRequestSubject from '../../models/subjects/perun'
+import logger from '../../utils/logger'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -47,6 +49,12 @@ export const subscribe = (dispatcher: AppResponder) => {
       estimation.estimate = cachedEstimation.estimate
     }
     dispatcher.sendMessage('sync-estimate-updated', estimation)
+  })
+
+  PerunRequestSubject.pipe(debounceTime(50)).subscribe(request => {
+    // Forward backend signing requests to the renderer process.
+    logger.info('forwarding backend signing request to the renderer process')
+    dispatcher.sendMessage('perun-request', request)
   })
 
   CommandSubject.subscribe(params => {

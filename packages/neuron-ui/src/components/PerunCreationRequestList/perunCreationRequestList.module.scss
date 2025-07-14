@@ -1,0 +1,55 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  width: 648px;
+
+  & > div {
+    margin-bottom: 16px;
+  }
+}
+
+.cellWrap {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--divide-line-color);
+
+  .content {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .address {
+    font-family: 'JetBrains Mono';
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-right: 8px;
+  }
+  .amount {
+    position: relative;
+    padding-left: 6px;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      height: 12px;
+      width: 1px;
+      background: var(--divide-line-color);
+    }
+  }
+
+  // font-family: 'JetBrains Mono';
+  .creationRequestBtnWrap {
+    display: flex;
+    gap: 12px;
+    button {
+      font-size: 14px;
+      height: 40px;
+      border-radius: 12px;
+      min-width: 0;
+      padding: 0 30px;
+    }
+  }
+}

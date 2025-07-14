@@ -32,6 +32,7 @@ export enum RoutePath {
   SignVerify = 'sign-verify',
   MultisigAddress = 'multisig-address',
   BroadcastTransaction = 'broadcast-transaction',
+  PaymentChannel = '/payment-channel',
 }
 
 export enum CapacityUnit {

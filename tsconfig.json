@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2019",
     "module": "esnext",
+    "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "alwaysStrict": true,
@@ -16,6 +17,6 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "importHelpers": true,
+    "importHelpers": true
   }
 }
