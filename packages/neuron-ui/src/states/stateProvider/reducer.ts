@@ -71,6 +71,13 @@ export enum AppActions {
   // lock window
   SetLockWindowInfo = 'SetLockWindowInfo',
 }
+export enum PaymentChannelActions {
+  // Perun
+  UpdatePerunState = 'UpdatePerunState',
+
+  UpdatePerunRequest = 'UpdatePerunRequest',
+  UpdatePerunChannel = 'UpdatePerunChannel',
+}
 
 export type StateAction =
   | { type: AppActions.AddSendOutput }
@@ -122,6 +129,18 @@ export type StateAction =
   | { type: AppActions.SignVerify; payload: string }
   | { type: AppActions.UpdateConsumeCells; payload?: { outPoint: OutPoint; capacity: string }[] }
   | { type: AppActions.SetLockWindowInfo; payload: Required<State.App>['lockWindowInfo'] }
+  | {
+      type: PaymentChannelActions.UpdatePerunState
+      payload: State.Perun
+    }
+  | {
+      type: PaymentChannelActions.UpdatePerunRequest
+      payload: State.PerunRequest[]
+    }
+  | {
+      type: PaymentChannelActions.UpdatePerunChannel
+      payload: State.PerunChannel[]
+    }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -415,6 +434,16 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
 
     case AppActions.SetLockWindowInfo: {
       state.app.lockWindowInfo = { ...(state.app.lockWindowInfo ?? {}), ...action.payload }
+      break
+    }
+
+    case PaymentChannelActions.UpdatePerunRequest: {
+      state.perun.requests = action.payload
+      break
+    }
+
+    case PaymentChannelActions.UpdatePerunChannel: {
+      state.perun.channels = action.payload
       break
     }
 

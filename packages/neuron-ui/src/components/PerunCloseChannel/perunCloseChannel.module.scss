@@ -1,0 +1,73 @@
+@import '../../styles/mixin.scss';
+
+.contentClassName {
+  padding: unset;
+
+  svg {
+    top: unset;
+  }
+
+  .container {
+    width: 680px;
+  }
+}
+
+.notification {
+  text-align: center;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  word-break: break-word;
+  background-color: var(--warn-background-color);
+  color: var(--warn-text-color);
+  line-height: 1.2;
+  svg {
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+}
+
+.mainContent {
+  padding: 16px;
+
+  .tips {
+    color: var(--secondary-text-color);
+    text-align: center;
+  }
+
+  .title {
+    color: var(--secondary-text-color);
+    margin-top: 16px;
+  }
+
+  .assets {
+    display: flex;
+    gap: 8px;
+
+    .assetItem {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      padding-right: 8px;
+      font-size: 16px;
+      color: var(--main-text-color);
+      font-weight: 500;
+      margin: 12px 0;
+      &:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 4px;
+        height: 16px;
+        width: 1px;
+        background: var(--divide-line-color);
+      }
+    }
+  }
+
+  textarea {
+    font-family: 'JetBrains Mono' !important;
+  }
+}

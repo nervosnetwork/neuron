@@ -42,6 +42,7 @@
     ]
   },
   "dependencies": {
+    "@ckb-connect/perun-wallet-wrapper": "1.0.5",
     "@ckb-lumos/base": "0.23.0",
     "@ckb-lumos/ckb-indexer": "0.23.0",
     "@ckb-lumos/helpers": "0.23.0",
@@ -85,6 +86,7 @@
     "@types/ledgerhq__hw-transport-node-hid": "4.22.5",
     "@types/leveldown": "4.0.6",
     "@types/levelup": "4.3.3",
+    "@types/node-hid": "^3.0.0",
     "@types/sqlite3": "3.1.11",
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",

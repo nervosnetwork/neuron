@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
+import {
+  NeuronWalletActions,
+  PaymentChannelActions,
+  showGlobalAlertDialog,
+  useDispatch,
+  useState as useGlobalState,
+} from 'states'
 import {
   VerifyExternalCkbNodeRes,
   checkForUpdates,
@@ -10,7 +16,7 @@ import {
   openExternal,
   verifyExternalCkbNode,
 } from 'services/remote'
-import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
+import { AppUpdater as AppUpdaterSubject, PerunRequest as PerunRequestSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
 import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
@@ -33,7 +39,7 @@ const menuItems = [
     children: [
       { name: 'navbar.special-assets', key: RoutePath.SpecialAssets, url: RoutePath.SpecialAssets },
       { name: 'navbar.s-udt', key: RoutePath.SUDTAccountList, url: RoutePath.SUDTAccountList },
-      { name: 'navbar.perun', key: RoutePath.Perun, url: RoutePath.Perun },
+      { name: 'navbar.payment-channel', key: RoutePath.PaymentChannel, url: RoutePath.PaymentChannel },
     ],
   },
 ]
@@ -84,8 +90,16 @@ const Navbar = () => {
     }
     const appUpdaterSubscription = AppUpdaterSubject.subscribe(onAppUpdaterUpdates)
 
+    const perunStateSubscription = PerunRequestSubject.subscribe(payload => {
+      dispatch({
+        type: PaymentChannelActions.UpdatePerunRequest,
+        payload,
+      })
+    })
+
     return () => {
       appUpdaterSubscription.unsubscribe()
+      perunStateSubscription.unsubscribe()
     }
   }, [dispatch])
 
