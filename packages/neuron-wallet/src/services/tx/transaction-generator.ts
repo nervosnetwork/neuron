@@ -268,7 +268,10 @@ export class TransactionGenerator {
       tx.addOutput(output)
     }
 
-    tx.outputs = ArrayUtils.shuffle(tx.outputs)
+    const wallet = WalletService.getInstance().getCurrent()
+    if (!wallet?.isHardware()) {
+      tx.outputs = ArrayUtils.shuffle(tx.outputs)
+    }
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
     tx.hash = tx.computeHash()
 
