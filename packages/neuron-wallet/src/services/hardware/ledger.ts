@@ -153,6 +153,10 @@ export default class Ledger extends Hardware {
           takeUntil(timer(2000)),
           filter<DescriptorEvent<any>>(e => e.type === 'add'),
           scan<DescriptorEvent<any>, DeviceInfo[]>((acc, e) => {
+            let product = e.device.product;
+            if(e.device.manufacturer === 'Ledger' && product === "Nano S+") {
+              product = "Nano S Plus"
+            }
             return [
               ...acc,
               {
@@ -160,7 +164,7 @@ export default class Ledger extends Hardware {
                 descriptor: e.descriptor,
                 vendorId: e.device.vendorId,
                 manufacturer: e.device.manufacturer,
-                product: e.device.product,
+                product,
                 addressIndex: 0,
                 addressType: hd.AddressType.Receiving,
               },
