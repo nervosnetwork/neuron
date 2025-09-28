@@ -224,7 +224,7 @@ class NodeService {
         noLink: true,
       })
       .then(() => {
-        const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
+        const VC_REDIST_URL = `https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170`
         shell.openExternal(VC_REDIST_URL)
         env.app.quit()
         return false
