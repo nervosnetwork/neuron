@@ -3,7 +3,7 @@ import { FailureFromController } from 'services/remote/remoteApiWrapper'
 
 export enum ImportStep {
   DetectDevice = '/detect-device',
-  Comfirming = '/confirming',
+  Confirming = '/confirming',
   Error = '/error',
   Success = '/success',
   NameWallet = '/name-wallet',
