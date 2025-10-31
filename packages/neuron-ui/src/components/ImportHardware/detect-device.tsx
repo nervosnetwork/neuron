@@ -98,7 +98,7 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
   })
 
   const onNext = useCallback(() => {
-    dispatch({ step: ImportStep.Comfirming })
+    dispatch({ step: ImportStep.Confirming })
   }, [dispatch])
 
   const errorMsg = error.startsWith('messages.codes.') ? t(error) : error

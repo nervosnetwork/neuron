@@ -304,7 +304,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
           </div>
           <div className={styles.commendItem}>
             <ErrorIcon />
-            {t('wizard.do-not-save-scrrenshots')}
+            {t('wizard.do-not-save-screenshots')}
           </div>
         </div>
       )}

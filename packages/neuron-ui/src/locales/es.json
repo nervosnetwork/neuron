@@ -181,7 +181,7 @@
       "wallet-suffix": "Billetera {{suffix}}",
       "handwritten-recommended": "Se recomienda transcripción a mano",
       "do-not-copy": "No copiar",
-      "do-not-save-scrrenshots": "No guardar capturas de pantalla",
+      "do-not-save-screenshots": "No guardar capturas de pantalla",
       "replenish-your-seed": "Por favor, repón la semilla de tu billetera",
       "new-name": "Usa un nombre no usado previamente para la nueva billetera",
       "complex-password": "La contraseña debe tener entre 8 y 50 caracteres y contener al menos tres categorías de caracteres entre las siguientes: letras en mayúscula, letras en minúscula, números y símbolos especiales.",

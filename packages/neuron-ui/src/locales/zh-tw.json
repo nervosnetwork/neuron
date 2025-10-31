@@ -182,7 +182,7 @@
       "wallet-suffix": "錢包 {{suffix}}",
       "handwritten-recommended": "推薦手寫抄錄",
       "do-not-copy": "不要複製",
-      "do-not-save-scrrenshots": "不要保存截圖",
+      "do-not-save-screenshots": "不要保存截圖",
       "replenish-your-seed": "請補充您的助記詞",
       "new-name": "輸入新的錢包名稱",
       "complex-password": "密碼為 8 至 50 字元由大寫字母、小寫字母、數位、特殊符號中至少三種字元組成的字串。",

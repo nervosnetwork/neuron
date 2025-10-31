@@ -188,7 +188,7 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "handwritten-recommended": "Handwritten transcription recommended",
       "do-not-copy": "Do not copy",
-      "do-not-save-scrrenshots": "Do not save scrrenshots",
+      "do-not-save-screenshots": "Do not save screenshots",
       "replenish-your-seed": "Please replenish your wallet seed",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
