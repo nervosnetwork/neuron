@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
 import { useDialogWrapper } from 'utils'
-import Comfirming from './confirming'
+import Confirming from './confirming'
 import ImportError from './import-error'
 import SelectModel from './select-model'
 import DetectDevice from './detect-device'
@@ -33,7 +33,7 @@ const Content = () => {
   switch (importHardwareStates.step) {
     case ImportStep.ImportHardware:
     case ImportStep.DetectDevice:
-    case ImportStep.Comfirming:
+    case ImportStep.Confirming:
     case ImportStep.Error:
     case ImportStep.Success:
       return (
@@ -43,7 +43,7 @@ const Content = () => {
             {ImportStep.DetectDevice === importHardwareStates.step && (
               <DetectDevice dispatch={dispatch} model={importHardwareStates.model!} />
             )}
-            {ImportStep.Comfirming === importHardwareStates.step && <Comfirming dispatch={dispatch} />}
+            {ImportStep.Confirming === importHardwareStates.step && <Confirming dispatch={dispatch} />}
             {ImportStep.Error === importHardwareStates.step && (
               <ImportError dispatch={dispatch} error={importHardwareStates.error} />
             )}
