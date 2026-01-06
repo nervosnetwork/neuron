@@ -60,7 +60,7 @@
     "electron-updater": "6.3.0",
     "electron-window-state": "5.0.3",
     "elliptic": "6.6.1",
-    "i18next": "21.10.0",
+    "i18next": "23.7.11",
     "leveldown": "6.1.1",
     "levelup": "4.4.0",
     "reflect-metadata": "0.1.13",
@@ -94,5 +94,12 @@
     "jest-when": "3.6.0",
     "neuron-ui": "0.202.1",
     "typescript": "5.3.3"
+  },
+  "resolutions": {
+    "@ckb-lumos/base": "0.23.0",
+    "@ckb-lumos/ckb-indexer": "0.23.0",
+    "@ckb-lumos/helpers": "0.23.0",
+    "@ckb-lumos/lumos": "0.23.0",
+    "@ckb-lumos/rpc": "0.23.0"
   }
 }
