@@ -1,0 +1,104 @@
+{
+  "PREFIX": "ckt",
+  "SCRIPTS": {
+    "SECP256K1_BLAKE160": {
+      "HASH_TYPE": "type",
+      "CODE_HASH": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+      "TX_HASH": "0xf73ad8855fa59f8413f26b0d716a061bdd1056a1abcda8b5ce240fb546d877f3",
+      "INDEX": "0x0",
+      "DEP_TYPE": "depGroup"
+    },
+    "SECP256K1_BLAKE160_MULTISIG": {
+      "CODE_HASH": "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xf73ad8855fa59f8413f26b0d716a061bdd1056a1abcda8b5ce240fb546d877f3",
+      "INDEX": "0x1",
+      "DEP_TYPE": "depGroup",
+      "SHORT_ID": 1
+    },
+    "DAO": {
+      "HASH_TYPE": "type",
+      "CODE_HASH": "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+      "TX_HASH": "0x302e1206a4bece66ad1275f3078b4d1e4d453f279442e7efdbc9eb79859731ba",
+      "INDEX": "0x2",
+      "DEP_TYPE": "code"
+    },
+    "SUDT": {
+      "CODE_HASH": "0x17a058ba48314b22c94a0c4fe4541504f64b219ab2d08b64b2f152283ca45bb6",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xcae208c2947f12f14dbaa4cd8866faea7b062a6537b1f8b0bfdcea739cd071c4",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "ANYONE_CAN_PAY": {
+      "CODE_HASH": "0x4d9b8dc69fd5fefe94340b449615700845ff2d06813c2cbf59e88c16786663f0",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xae96f346044086a8263f5aa1f40bdd6231bd3f1f817af81c214dd30f92054725",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "OMNILOCK": {
+      "CODE_HASH": "0xf329effd1c475a2978453c8600e1eaf0bc2087ee093c3ee64cc96ec6847752cb",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0x27b62d8be8ed80b9f56ee0fe41355becdb6f6a40aeba82d3900434f43b1c8b60",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "CHEQUE": {
+      "CODE_HASH": "0x46acb82851956fe8e80a7617bff91469cdae4ebc0460a84c4cb1109211d0071e",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xbd306018d56d8db901c403a1d5fefbe5e2b0bcb814acf2f37e6e7c1efd69c3b2",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "CLASS_TYPE": {
+      "CODE_HASH": "0x5c49d5dd729540180ea8d9ba102e3635e0ea473e6efcfae02be43164a28ea9b7",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0x107c91377098169ce4ff65a222e6605f54df86b48c7b83c0b29e147cbf5e51fa",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "ISSUER_TYPE": {
+      "CODE_HASH": "0xa590c0c410920271cc9f3a3b4e2b5bcadbcbc45a76ad62301e66e196d2a6be8f",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xf06f97a3c666a42e308df9f1271686ecca8f521d0fbb676bb819952c5f6171dd",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "NFT_TYPE": {
+      "CODE_HASH": "0xb58dc92917aba8c30653409e96502dcb10c2036fb2febfd51aaa52dff73f66b9",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0x09cb03c8bf1215232312569715be3521e6ba04fd07418cb3fe6474b3486d7c70",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "NRC_721_FACTORY": {
+      "CODE_HASH": "0xd2d8fa5d6fb2aa7ed70f136d1aa0902dc9b5c71c061a52dfe9602d078a743257",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xe71678ff1c9ac6841a18c2441e50a7a0e8ce5ae7832be19a5be594f506687498",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "OMNI_LOCK": {
+      "CODE_HASH": "0xb213f97bbf88943bc4ba244631a0629ac635955ae45ce436a52670fa1fbed43d",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0xb6485dff1a790da5486c363a9d2d0c570090fd92ee279aaf5d0757522b2fbdd0",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "SPORE": {
+      "CODE_HASH": "0x1946ec4785ee43c25f4db46a06eef4b28cc42356c60497bb3c334aa1bb1327b0",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0x83e910e2f42ca0b4ea514d548a6daf08be2285dd69f61c3f780e6d00a8309681",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    },
+    "SPORE_CLUSTER": {
+      "CODE_HASH": "0x8faecbd8eb1acfa23905c1e6c566321e67a9e5e72a00bedf9854640265a55385",
+      "HASH_TYPE": "type",
+      "TX_HASH": "0x2875df5d4847f7870e357401c38fa15a1a656871b468d6007600dd843021b83f",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    }
+  }
+}

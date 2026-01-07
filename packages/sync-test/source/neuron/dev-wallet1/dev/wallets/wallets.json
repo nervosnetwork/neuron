@@ -1,0 +1,11 @@
+{
+  "wallets": [
+    {
+      "id": "aced9a1c-85c8-40eb-811d-9399212a92b9",
+      "name": "Wallet 1",
+      "extendedKey": "03620ce1a683278c0b3c0a18c90920eef22ddea14ffa3dfa03c3cf186498bce9ae31e660a979fb6dff2be24b2c1d3bfda7abe7b3c5e31aba96e3b5a394db008be2",
+      "isHD": true
+    }
+  ],
+  "current": "aced9a1c-85c8-40eb-811d-9399212a92b9"
+}
