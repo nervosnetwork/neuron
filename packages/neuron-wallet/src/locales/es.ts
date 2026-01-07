@@ -25,6 +25,7 @@ export default {
         'import-keystore': 'Importar desde Keystore',
         'import-xpubkey': 'Importar Clave Pública Extendida',
         'import-hardware': 'Importar Billetera de Hardware',
+        'import-hardware-mnemonic': 'Importar semilla de billetera de hardware',
       },
       edit: {
         label: 'Editar',

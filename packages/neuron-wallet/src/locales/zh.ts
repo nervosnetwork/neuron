@@ -25,6 +25,7 @@ export default {
         'import-keystore': '导入 Keystore 文件',
         'import-xpubkey': '导入 Extended Public Key',
         'import-hardware': '导入硬件钱包',
+        'import-hardware-mnemonic': '导入硬件钱包助记词',
       },
       edit: {
         label: '编辑',
