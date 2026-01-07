@@ -188,7 +188,7 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "handwritten-recommended": "Transcription manuscrite recommandée",
       "do-not-copy": "Ne pas copier",
-      "do-not-save-scrrenshots": "Ne pas sauvegarder de captures d'écran",
+      "do-not-save-screenshots": "Ne pas sauvegarder de captures d'écran",
       "replenish-your-seed": "Veuillez reconstituer la graine de votre portefeuille",
       "new-name": "Utilisez un nom inutilisé pour le nouveau Wallet",
       "complex-password": "Le mot de passe doit contenir entre 8 et 50 caractères, comprenant au moins trois catégories parmi les suivantes : lettres majuscules, lettres minuscules, chiffres et symboles spéciaux.",

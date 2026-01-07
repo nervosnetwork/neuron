@@ -233,6 +233,13 @@ export default {
           ignore: 'Ignorar y continuar',
         },
       },
+      'unrecognized-multisig-transaction': {
+        message:
+          'Esta es una transacción multisignatura. Por favor, apróbala desde la dirección multisignatura utilizando la billetera correspondiente.',
+        buttons: {
+          cancel: 'Cancelar',
+        },
+      },
     },
     prompt: {
       password: {

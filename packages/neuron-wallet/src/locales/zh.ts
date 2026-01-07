@@ -217,6 +217,12 @@ export default {
           ignore: '忽略并继续',
         },
       },
+      'unrecognized-multisig-transaction': {
+        message: '这是一笔多签交易。请使用对应的钱包在多签地址中批准该交易。',
+        buttons: {
+          cancel: '取消',
+        },
+      },
     },
     prompt: {
       password: {

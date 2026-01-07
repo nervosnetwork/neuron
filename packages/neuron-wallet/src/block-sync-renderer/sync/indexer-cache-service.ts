@@ -112,6 +112,10 @@ export default class IndexerCacheService {
           argsLen: 28,
         },
         {
+          lockScript: addressMeta.generateLegacySingleMultiSignLockScript(),
+          argsLen: 28,
+        },
+        {
           lockScript: addressMeta.generateChequeLockScriptWithReceiverLockHash(),
           argsLen: 40,
         },

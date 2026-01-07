@@ -25,8 +25,8 @@ export default class SyncProgressService {
         },
       })
     const existHashes = new Set(existProgresses.map(v => v.hash))
-    const newSyncProgreses = syncProgresses.filter(v => !existHashes.has(v.hash))
-    await getConnection().manager.save(newSyncProgreses, { chunk: 100 })
+    const newSyncProgresses = syncProgresses.filter(v => !existHashes.has(v.hash))
+    await getConnection().manager.save(newSyncProgresses, { chunk: 100 })
   }
 
   static async updateSyncProgressFlag(existWalletIds: string[]) {

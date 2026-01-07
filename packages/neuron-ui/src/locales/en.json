@@ -188,7 +188,7 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "handwritten-recommended": "Handwritten transcription recommended",
       "do-not-copy": "Do not copy",
-      "do-not-save-scrrenshots": "Do not save scrrenshots",
+      "do-not-save-screenshots": "Do not save screenshots",
       "replenish-your-seed": "Please replenish your wallet seed",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
@@ -1282,7 +1282,7 @@
       "external-node-detected-dialog": {
         "title": "Detected external node",
         "body-tips-without-network": "You have selected the internal node but started the external node, if you want to continue to use an external node, please add a new network.",
-        "body-tips-with-network": "You have currently selected an internal node but started an external node, if you need to continu using the external node please switch to another external network or add a new network.",
+        "body-tips-with-network": "You have currently selected an internal node but started an external node, if you need to continue using the external node please switch to another external network or add a new network.",
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"
       },

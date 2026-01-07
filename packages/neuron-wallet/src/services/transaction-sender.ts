@@ -32,6 +32,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   TransactionIsNotCommittedYet,
+  UnrecognizedLockScript,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -206,18 +207,31 @@ export default class TransactionSender {
       } catch (error) {
         const BLOCK_UNRECOGNIZED = 0
         const IGNORE_UNRECOGNIZED_AND_CONTINUE = 1
+
+        let message = t('messageBox.unrecognized-lock-script.message')
+        let buttons = [
+          t('messageBox.unrecognized-lock-script.buttons.cancel'),
+          t('messageBox.unrecognized-lock-script.buttons.ignore'),
+        ]
+
+        const input = tx.inputs.find(input => input.lockHash === lockHash)
+        if (input && input.lock && SystemScriptInfo.isMultiSignCodeHash(input.lock.codeHash)) {
+          message = t('messageBox.unrecognized-multisig-transaction.message')
+          buttons = [t('messageBox.unrecognized-multisig-transaction.buttons.cancel')]
+        }
+
         const res = await dialog.showMessageBox({
           type: 'warning',
-          message: t('messageBox.unrecognized-lock-script.message'),
-          buttons: [
-            t('messageBox.unrecognized-lock-script.buttons.cancel'),
-            t('messageBox.unrecognized-lock-script.buttons.ignore'),
-          ],
+          message,
+          buttons,
           defaultId: BLOCK_UNRECOGNIZED,
           cancelId: IGNORE_UNRECOGNIZED_AND_CONTINUE,
         })
         if (res.response === IGNORE_UNRECOGNIZED_AND_CONTINUE) {
           continue
+        }
+        if (res.response === BLOCK_UNRECOGNIZED) {
+          throw new UnrecognizedLockScript(message)
         }
         throw error
       }

@@ -228,6 +228,12 @@ export default {
           ignore: 'تجاهل واستمرار',
         },
       },
+      'unrecognized-multisig-transaction': {
+        message: 'هذه معاملة متعددة التوقيعات. يرجى الموافقة عليها من عنوان التوقيع المتعدد باستخدام المحفظة المناسبة.',
+        buttons: {
+          cancel: 'إلغاء',
+        },
+      },
     },
     prompt: {
       password: {
