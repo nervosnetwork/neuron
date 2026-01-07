@@ -1,8 +1,8 @@
-# 0.204.0 (2026-01-02)
+# 0.204.0 (2026-01-12)
 
 ### Caveat
 
-We have changed the AppId for some reasons. If automatic updates fail, please download it manually.
+We changed the AppId for some reasons. If automatic updates fail, please download it manually.
 
 ### CKB Node & Light Client
 
