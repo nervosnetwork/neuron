@@ -69,7 +69,7 @@
     "sqlite3": "5.1.6",
     "subleveldown": "4.1.4",
     "tslib": "2.6.3",
-    "typeorm": "0.3.17",
+    "typeorm": "0.3.26",
     "uuid": "8.3.2"
   },
   "devDependencies": {
