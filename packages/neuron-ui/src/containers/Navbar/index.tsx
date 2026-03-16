@@ -111,7 +111,7 @@ const Navbar = () => {
     }
   }, [network?.readonly])
 
-  const gotoCompatile = useCallback(() => {
+  const gotoCompatible = useCallback(() => {
     openExternal(`https://neuron.magickbase.com${i18n.language.startsWith('zh') ? '/zh' : ''}/download`)
   }, [i18n.language])
 
@@ -133,7 +133,7 @@ const Navbar = () => {
             i18nKey="navbar.ckb-node-compatible"
             values={{ version: getVersion(), btnText: t('navbar.learn-more') }}
             components={[
-              <button type="button" className={styles.learnMore} onClick={gotoCompatile}>
+              <button type="button" className={styles.learnMore} onClick={gotoCompatible}>
                 {t('navbar.learn-more')}
               </button>,
             ]}
