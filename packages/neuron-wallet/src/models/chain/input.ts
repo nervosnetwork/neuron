@@ -17,7 +17,7 @@ export default class Input {
   public data?: string | null
   public status?: OutputStatus
 
-  // don't using = directly, using setXxx instead
+  // don't use = directly, use setXxx instead
   // check hex string
   constructor(
     previousOutput: OutPoint | null,

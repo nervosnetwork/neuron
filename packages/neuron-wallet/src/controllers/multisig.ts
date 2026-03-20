@@ -112,7 +112,7 @@ export default class MultisigController {
     const network = NetworksService.getInstance().getCurrent()
     if (params.startBlockNumber && network.type === NetworkType.Light) {
       if (config?.startBlockNumber !== undefined && config.startBlockNumber > params.startBlockNumber) {
-        // if set small than last, reset by set_script
+        // if set smaller than last, reset by set_script
         this.resetMultisigSync(config, params.startBlockNumber)
       }
       // if it's light client, restart queue task
