@@ -232,7 +232,7 @@ export default class AddressService {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
-    // can be only receiving OR only change
+    // can be either only receiving OR only change
     if (receivingAddressCount < 1 && changeAddressCount < 1) {
       throw new Error('Address number error.')
     } else if (receivingAddressCount > MAX_ADDRESS_COUNT || changeAddressCount > MAX_ADDRESS_COUNT) {

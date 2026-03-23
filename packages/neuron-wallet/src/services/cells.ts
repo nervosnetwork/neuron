@@ -366,7 +366,7 @@ export default class CellsService {
     const currentNetwork = NetworksService.getInstance().getCurrent()
 
     // https://github.com/nervosnetwork/neuron/blob/dbc5a5b46dc108f660c443d43aba54ea47e233ac/packages/neuron-wallet/src/services/tx/transaction-persistor.ts#L70
-    // datum in outputs has been sliced when sync
+    // data in outputs has been sliced when sync
     // to make the Spore NFT data available,
     // we need to fetch it from RPC instead of database
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
