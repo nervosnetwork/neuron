@@ -4587,10 +4587,12 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*":
-  version "20.3.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.2.tgz#fa6a90f2600e052a03c18b8cb3fd83dd4e599898"
-  integrity sha512-vOBLVQeCQfIcF/2Y7eKFTqrMnizK5lRNQ7ykML/5RuwVXVWxYkgwS7xbt4B6fKCUPgbSL5FSsjHQpaGQP/dQmw==
+"@types/node@*", "@types/node@^22.7.7":
+  version "22.15.21"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.21.tgz#196ef14fe20d87f7caf1e7b39832767f9a995b77"
+  integrity sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==
+  dependencies:
+    undici-types "~6.21.0"
 
 "@types/node@20.10.5":
   version "20.10.5"
@@ -4598,13 +4600,6 @@
   integrity sha512-nNPsNE65wjMxEKI93yOP+NPGGBJz/PoN3kZsVLee0XMiJolxSekEVD8wRwBUBqkwc7UWop0edW50yrCQW4CyRw==
   dependencies:
     undici-types "~5.26.4"
-
-"@types/node@^22.7.7":
-  version "22.15.21"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.21.tgz#196ef14fe20d87f7caf1e7b39832767f9a995b77"
-  integrity sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==
-  dependencies:
-    undici-types "~6.21.0"
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -7943,10 +7938,10 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@36.8.1:
-  version "36.8.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-36.8.1.tgz#c27dfb13fcc1bedf29929fe67430ee13a778c4df"
-  integrity sha512-honaH58/cyCb9QAzIvD+WXWuNIZ0tW9zfBqMz5wZld/rXB+LCTEDb2B3TAv8+pDmlzPlkPio95RkUe86l6MNjg==
+electron@39.8.4:
+  version "39.8.4"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-39.8.4.tgz#0173406c76613f66f86956cbf757dd08a1edfaa6"
+  integrity sha512-eXYKxr4y+s31xs78keVJYg+XY20tGQMQzyIhZvc5L0XRDH2Gp08mbeFlbR1OjAeM5h5l/T2JYT2MFK2kYe2fMg==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
@@ -12487,7 +12482,7 @@ node-addon-api@^6.0.0:
 
 node-fetch@2.6.13, node-fetch@2.6.7, node-fetch@^2.6.11, node-fetch@^2.6.7:
   version "2.6.13"
-  resolved "https://registry.npmmirror.com/node-fetch/-/node-fetch-2.6.13.tgz#a20acbbec73c2e09f9007de5cda17104122e0010"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.13.tgz#a20acbbec73c2e09f9007de5cda17104122e0010"
   integrity sha512-StxNAxh15zr77QvvkmveSQ8uCQ4+v5FkvNTj0OESmiHu+VRi/gXArXtkWMElOsOUNLtUEvI4yS+rdtOHZTwlQA==
   dependencies:
     whatwg-url "^5.0.0"
@@ -14221,7 +14216,7 @@ react-is@^17.0.0, react-is@^17.0.1, react-is@^17.0.2:
 
 react-refresh@0.17.0, react-refresh@^0.17.0:
   version "0.17.0"
-  resolved "https://registry.npmmirror.com/react-refresh/-/react-refresh-0.17.0.tgz#b7e579c3657f23d04eccbe4ad2e58a8ed51e7e53"
+  resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.17.0.tgz#b7e579c3657f23d04eccbe4ad2e58a8ed51e7e53"
   integrity sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==
 
 react-router-dom@6.21.1:
