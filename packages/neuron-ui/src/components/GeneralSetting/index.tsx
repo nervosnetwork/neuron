@@ -12,6 +12,7 @@ import { uniformTimeFormatter, bytesFormatter, clsx, wakeScreen, releaseWakeLock
 import Switch from 'widgets/Switch'
 import { keepScreenAwake } from 'services/localCache'
 import { LanguageSelect, UnLock } from 'widgets/Icons/icon'
+import { sanitizeReleaseNotes } from 'utils/sanitizeReleaseNotes'
 import styles from './generalSetting.module.scss'
 import { useCheckUpdate, useUpdateDownloadStatus } from './hooks'
 import LockWindowDialog from './LockWindowDialog'
@@ -67,7 +68,7 @@ const UpdateDownloadStatus = ({
 
   if (available) {
     const releaseNotesHtml = () => {
-      return { __html: releaseNotes }
+      return { __html: sanitizeReleaseNotes(releaseNotes) }
     }
 
     /* eslint-disable react/no-danger */

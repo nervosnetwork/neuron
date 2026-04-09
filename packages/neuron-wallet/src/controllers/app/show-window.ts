@@ -2,6 +2,7 @@ import { BrowserWindow } from 'electron'
 import path from 'path'
 import env from '../../env'
 import AppController from '.'
+import { resolveInternalWindowTarget } from './resolve-window-url'
 
 const showWindow = (
   url: string,
@@ -9,10 +10,15 @@ const showWindow = (
   options?: Electron.BrowserWindowConstructorOptions,
   channels?: string[],
   comparator: (win: BrowserWindow) => boolean = win => win.getTitle() === title
-): BrowserWindow => {
+): BrowserWindow | null => {
+  const target = resolveInternalWindowTarget(url)
+  if (!target) {
+    return null
+  }
+
   const opened = BrowserWindow.getAllWindows().find(comparator)
   if (opened) {
-    opened.webContents.send('navigation', url.replace(/^#/, ''))
+    opened.webContents.send('navigation', target.navigationUrl)
     opened.focus()
     return opened
   } else {
@@ -38,8 +44,7 @@ const showWindow = (
     if (channels) {
       AppController.getInstance().registerChannels(win, channels)
     }
-    const fmtUrl = url.startsWith('http') || url.startsWith('file:') ? url : env.mainURL + url
-    win.loadURL(fmtUrl)
+    win.loadURL(target.windowUrl)
     win.on('ready-to-show', () => {
       win.setTitle(title)
       win.show()
