@@ -1,0 +1,76 @@
+
+data_dir = 'data'
+
+[chain]
+
+spec = { file = 'specs/dev.toml' }
+
+[logger]
+
+filter = 'info'
+color = true
+log_to_file = true
+log_to_stdout = true
+
+[sentry]
+
+dsn = ''
+
+[db]
+
+cache_size = 134217728
+options_file = 'default.db-options'
+
+[network]
+
+listen_addresses = ['/ip4/0.0.0.0/tcp/8115']
+bootnodes = []
+max_peers = 125
+max_outbound_peers = 8
+ping_interval_secs = 120
+ping_timeout_secs = 1200
+connect_outbound_interval_secs = 15
+upnp = false
+discovery_local_address = true
+bootnode_mode = false
+support_protocols = ['Ping', 'Discovery', 'Identify', 'Feeler', 'DisconnectMessage', 'Sync', 'Relay', 'Time', 'Alert', 'LightClient', 'Filter']
+
+[rpc]
+
+listen_address = '127.0.0.1:8114'
+max_request_body_size = 10485760
+modules = [
+	'Net',
+	'Pool',
+	'Miner',
+	'Chain',
+	'Stats',
+	'Subscription',
+	'Experiment',
+	'Debug',
+	'Indexer',
+]
+reject_ill_transactions = true
+enable_deprecated_rpc = false
+
+[tx_pool]
+
+max_tx_pool_size = 180000000
+min_fee_rate = 1000
+max_tx_verify_cycles = 70000000
+max_ancestors_count = 25
+
+[store]
+
+header_cache_size = 4096
+cell_data_cache_size = 128
+block_proposals_cache_size = 30
+block_tx_hashes_cache_size = 30
+block_uncles_cache_size = 30
+
+[block_assembler]
+
+code_hash = '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8'
+args = '0xc8328aabcd9b9e8e64fbc566c4385c3bdeb219d7'
+hash_type = 'type'
+message = '0x'
