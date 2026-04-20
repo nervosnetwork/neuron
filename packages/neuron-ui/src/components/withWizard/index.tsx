@@ -7,8 +7,14 @@ export interface Element {
   comp: React.FC<any>
 }
 
-export interface WithWizardState {
-  [key: string]: string
+export type WithWizardState = {
+  generated: string
+  imported: string
+  password: string
+  confirmPassword: string
+  name: string
+  isHardware: boolean
+  [propName: string]: any
 }
 
 export interface WizardProps {
@@ -27,7 +33,7 @@ export interface WizardElementProps {
 }
 
 const reducer = (
-  state: { [key: string]: string },
+  state: WithWizardState,
   {
     type,
     payload,

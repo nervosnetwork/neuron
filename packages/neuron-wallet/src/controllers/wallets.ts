@@ -70,12 +70,14 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
+    isHardware,
   }: {
     name: string
     password: string
     mnemonic: string
+    isHardware?: boolean
   }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    return await this.createByMnemonic({ name, password, mnemonic, isImporting: true })
+    return await this.createByMnemonic({ name, password, mnemonic, isImporting: true, isHardware })
   }
 
   public async create({
@@ -95,11 +97,13 @@ export default class WalletsController {
     password,
     mnemonic,
     isImporting,
+    isHardware,
   }: {
     name: string
     password: string
     mnemonic: string
     isImporting: boolean
+    isHardware?: boolean
   }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
     if (!validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
@@ -139,6 +143,7 @@ export default class WalletsController {
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
       startBlockNumber: startBlockNumber,
+      hardwareFromSeed: isHardware,
     })
 
     wallet.checkAndGenerateAddresses(isImporting)

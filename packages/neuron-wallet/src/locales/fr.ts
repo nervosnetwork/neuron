@@ -25,6 +25,7 @@ export default {
         'import-keystore': 'Importer depuis le fichier Keystore',
         'import-xpubkey': 'Importer la clé publique étendue',
         'import-hardware': 'Importer un Wallet matériel',
+        'import-hardware-mnemonic': 'Importer des semences de portefeuille matériel',
       },
       edit: {
         label: 'Édition',

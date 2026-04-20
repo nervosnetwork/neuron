@@ -18,6 +18,7 @@ import { NetworkType } from '../models/network'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import SyncProgressService from './sync-progress'
 import { prefixWith0x } from '../utils/scriptAndAddress'
+import { ROOT_ADDRESS_INDEX } from '../models/keys/hd-public-key-info'
 
 const fileService = FileService.getInstance()
 
@@ -31,6 +32,7 @@ export interface WalletProperties {
   device?: DeviceInfo
   keystore?: hd.Keystore
   startBlockNumber?: string
+  hardwareFromSeed?: boolean
 }
 
 export abstract class Wallet {
@@ -40,9 +42,10 @@ export abstract class Wallet {
   protected extendedKey: string = ''
   protected isHD: boolean
   protected startBlockNumber?: string
+  protected hardwareFromSeed?: boolean
 
   constructor(props: WalletProperties) {
-    const { id, name, extendedKey, device, isHDWallet, startBlockNumber } = props
+    const { id, name, extendedKey, device, isHDWallet, startBlockNumber, hardwareFromSeed } = props
 
     if (id === undefined) {
       throw new IsRequired('ID')
@@ -61,6 +64,7 @@ export abstract class Wallet {
     this.device = device
     this.isHD = isHDWallet ?? true
     this.startBlockNumber = startBlockNumber
+    this.hardwareFromSeed = hardwareFromSeed
   }
 
   public toJSON = () => ({
@@ -70,6 +74,7 @@ export abstract class Wallet {
     device: this.device,
     isHD: this.isHD,
     startBlockNumber: this.startBlockNumber,
+    hardwareFromSeed: this.hardwareFromSeed,
   })
 
   public fromJSON = () => {
@@ -153,17 +158,6 @@ export class FileKeystoreWallet extends Wallet {
     return hd.AccountExtendedPublicKey.parse(this.extendedKey)
   }
 
-  public toJSON = () => {
-    return {
-      id: this.id,
-      name: this.name,
-      extendedKey: this.extendedKey,
-      device: this.device,
-      isHD: this.isHD,
-      startBlockNumber: this.startBlockNumber,
-    }
-  }
-
   public loadKeystore = () => {
     const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
     return hd.Keystore.fromJson(data)
@@ -214,6 +208,59 @@ export class FileKeystoreWallet extends Wallet {
 
   public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
     return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
+  }
+
+  public getAllAddresses = async (): Promise<AddressInterface[]> => {
+    return AddressService.getAddressesByWalletId(this.id)
+  }
+}
+
+export class HardwareFromSeedWallet extends FileKeystoreWallet {
+  static fromJSON = (json: WalletProperties) => {
+    return new HardwareFromSeedWallet(json)
+  }
+
+  public toJSON = () => {
+    return {
+      id: this.id,
+      name: this.name,
+      extendedKey: this.extendedKey,
+      device: this.device,
+      isHD: this.isHD,
+      startBlockNumber: this.startBlockNumber,
+      hardwareFromSeed: true,
+    }
+  }
+
+  public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
+    const { publicKey } = hd.AccountExtendedPublicKey.parse(this.extendedKey)
+    const address = await AddressService.generateAndSaveForPublicKeyQueue.asyncPush({
+      walletId: this.id,
+      publicKey,
+      addressType: hd.AddressType.Receiving,
+      addressIndex: ROOT_ADDRESS_INDEX,
+    })
+
+    if (address) {
+      return [address]
+    }
+  }
+
+  public getNextAddress = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getFirstAddressByWalletId(this.id)
+  }
+
+  public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getFirstAddressByWalletId(this.id)
+  }
+
+  public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
+    const address = await AddressService.getFirstAddressByWalletId(this.id)
+    if (address) {
+      return [address]
+    }
+
+    return []
   }
 
   public getAllAddresses = async (): Promise<AddressInterface[]> => {
@@ -328,6 +375,9 @@ export default class WalletService {
   private fromJSON(json: WalletProperties) {
     if (json.device) {
       return HardwareWallet.fromJSON(json)
+    }
+    if (json.hardwareFromSeed) {
+      return HardwareFromSeedWallet.fromJSON(json)
     }
     return FileKeystoreWallet.fromJSON(json)
   }

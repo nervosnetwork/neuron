@@ -9,6 +9,7 @@ const MnemonicInput = ({
   inputsWords,
   onChangeInputWord,
   blankIndexes,
+  wordsCount,
 }: {
   disabled?: boolean
   words: string
@@ -23,10 +24,13 @@ const MnemonicInput = ({
           }
         }
   ) => void
-
+  wordsCount?: number
   blankIndexes?: number[]
 }) => {
-  const wordList = useMemo(() => Object.assign(new Array(12).fill(''), words?.split(' ')), [words])
+  const wordList = useMemo(
+    () => Object.assign(new Array(wordsCount ?? 12).fill(''), words?.split(' ')),
+    [words, wordsCount]
+  )
   const [focusIndex, setFocusIndex] = useState(-1)
   const mounted = useRef(true)
   const root = useRef<HTMLDivElement>(null)

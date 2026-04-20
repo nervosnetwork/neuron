@@ -103,8 +103,9 @@ export const AddressQrCodeWithCopyZone = ({
 const Receive = ({ onClose, address }: { onClose?: () => void; address?: string }) => {
   const [t] = useTranslation()
   const { wallet } = useGlobalState()
-  const { addresses } = wallet
+  const { addresses, isHD } = wallet
   const isSingleAddress = addresses.length === 1
+  const isHardwareWallet = !isHD && isSingleAddress
 
   const accountAddress = useMemo(() => {
     if (isSingleAddress) {
@@ -141,7 +142,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
           onClick={() => setIsInShortFormat(is => !is)}
         />
 
-        {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} onClose={onClose} />}
+        {isHardwareWallet && <VerifyHardwareAddress address={accountAddress} wallet={wallet} onClose={onClose} />}
       </div>
     </Dialog>
   )

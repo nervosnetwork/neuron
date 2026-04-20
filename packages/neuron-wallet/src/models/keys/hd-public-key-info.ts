@@ -3,6 +3,7 @@ import { scriptToAddress } from '../../utils/scriptAndAddress'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
 
+export const ROOT_ADDRESS_INDEX = -1
 export default class HdPublicKeyInfoModel {
   public walletId: string
   public addressType: hd.AddressType
@@ -22,6 +23,9 @@ export default class HdPublicKeyInfoModel {
   }
 
   public get path(): string {
+    if (this.addressIndex === ROOT_ADDRESS_INDEX) {
+      return hd.AccountExtendedPublicKey.ckbAccountPath
+    }
     return hd.AccountExtendedPublicKey.pathFor(this.addressType, this.addressIndex)
   }
 
