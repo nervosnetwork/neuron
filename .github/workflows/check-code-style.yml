@@ -25,6 +25,11 @@ jobs:
             */*/node_modules
           key: 2022-05-07-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev libusb-1.0-0-dev
+
       - name: Bootstrap
         run: |
           yarn
