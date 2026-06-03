@@ -8,6 +8,8 @@ node_modules
 # testing
 /**/coverage
 *.snap
+playwright-report
+test-results
 
 # production
 build
