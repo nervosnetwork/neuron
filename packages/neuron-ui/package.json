@@ -113,6 +113,6 @@
     "vite-plugin-eslint": "1.8.1",
     "vite-plugin-node-polyfills": "0.23.0",
     "vite-plugin-svgr": "4.3.0",
-    "vitest": "3.0.8"
+    "vitest": "3.2.6"
   }
 }
