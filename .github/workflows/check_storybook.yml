@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - lts/*
+          - 22
         os:
           - macos-latest
           - ubuntu-latest
