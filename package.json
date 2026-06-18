@@ -44,7 +44,7 @@
     "update:client-versions": "node ./scripts/update-ckb-client-versions.js"
   },
   "devDependencies": {
-    "@babel/core": "7.27.1",
+    "@babel/core": "7.29.6",
     "@playwright/test": "1.60.0",
     "@types/jest": "27.5.2",
     "@types/node": "20.10.5",
