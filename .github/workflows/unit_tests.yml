@@ -8,20 +8,15 @@ jobs:
   default:
     strategy:
       matrix:
-        include:
-          - node: 22
-            os: macos-latest
-            runner: macos-latest
-          - node: 22
-            os: ubuntu-latest
-            runner: ubuntu-latest
-          - node: 22
-            os: windows-latest
-            runner: windows-2022
+        node: [22]
+        runner:
+          - macos-latest
+          - ubuntu-latest
+          - windows-2022
 
     runs-on: ${{ matrix.runner }}
 
-    name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
+    name: ${{ matrix.runner }}(Node.js ${{ matrix.node }})
 
     steps:
       - name: Set git to use LF
