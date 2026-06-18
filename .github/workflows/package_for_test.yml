@@ -13,9 +13,9 @@ jobs:
       matrix:
         node: [22]
         os:
-          - macos-latest
+          - macos-15-intel
           - ubuntu-latest
-          - windows-latest
+          - windows-2022
 
     runs-on: ${{ matrix.os }}
 

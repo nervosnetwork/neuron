@@ -8,14 +8,18 @@ jobs:
   default:
     strategy:
       matrix:
-        node:
-          - lts/*
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        include:
+          - node: 22
+            os: macos-latest
+            runner: macos-latest
+          - node: 22
+            os: ubuntu-latest
+            runner: ubuntu-latest
+          - node: 22
+            os: windows-latest
+            runner: windows-2022
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
@@ -40,7 +44,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: 2022-10-11-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+          key: 2026-06-18-node${{ matrix.node }}-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
