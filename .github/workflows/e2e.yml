@@ -1,0 +1,79 @@
+name: E2E Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  playwright-electron:
+    name: Playwright Electron E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "yarn"
+
+      - name: Restore
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: 2022-12-21-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2t64 \
+            libgbm1 \
+            libgtk-3-0 \
+            libnss3 \
+            libudev-dev \
+            libusb-1.0-0-dev \
+            libx11-xcb1 \
+            libxss1 \
+            xvfb
+
+      - name: Install Lerna
+        run: yarn global add lerna
+
+      - name: Bootstrap
+        run: yarn
+        env:
+          CI: false
+
+      - name: Run Playwright Electron E2E
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" yarn test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Playwright test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/e2e
+          if-no-files-found: ignore
+          retention-days: 14
