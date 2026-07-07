@@ -31,6 +31,7 @@ describe('NodeService', () => {
   const pathJoinMock = jest.fn()
   const redistCheckMock = jest.fn()
   const isFirstSyncMock = jest.fn()
+  const showCkbDependencyDialogMock = jest.fn()
 
   const fakeHTTPUrl = 'http://fakeurl'
 
@@ -59,6 +60,7 @@ describe('NodeService', () => {
     pathJoinMock.mockReset()
     redistCheckMock.mockReset()
     isFirstSyncMock.mockReset()
+    showCkbDependencyDialogMock.mockReset()
   }
 
   beforeEach(() => {
@@ -183,6 +185,10 @@ describe('NodeService', () => {
     }))
 
     jest.doMock('utils/redist-check', () => redistCheckMock)
+
+    jest.doMock('utils/ckb-dependency-dialog', () => ({
+      showCkbDependencyDialog: showCkbDependencyDialogMock,
+    }))
 
     jest.doMock('services/settings', () => ({
       getInstance() {
@@ -594,6 +600,16 @@ describe('NodeService', () => {
       expect(stubbedLoggerInfo).toBeCalledWith(
         `CKB:\texternal RPC on default uri not detected, starting bundled CKB node.`
       )
+    })
+    it('shows the CKB dependency dialog when vcredist is missing or outdated', async () => {
+      isFirstSyncMock.mockReturnValue(false)
+      redistCheckMock.mockResolvedValue(false)
+      showCkbDependencyDialogMock.mockResolvedValue(false)
+
+      await nodeService.tryStartNodeOnDefaultURI()
+
+      expect(showCkbDependencyDialogMock).toHaveBeenCalled()
+      expect(stubbedStartCKBNode).not.toHaveBeenCalled()
     })
   })
 })

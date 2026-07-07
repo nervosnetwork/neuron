@@ -181,7 +181,7 @@ export default {
       'ckb-dependency': {
         title: 'Bundled CKB Node',
         message: 'Dependency Required',
-        detail: `The network nodes in Neuron rely on C++ components, so please install the latest version of Microsoft Visual C++Redistributable for x64 to ensure that the software runs properly.`,
+        detail: `The bundled CKB node in Neuron requires the latest Microsoft Visual C++ Redistributable for x64. The installed version is missing or too old, so please install the latest version to ensure that the software runs properly.`,
         buttons: {
           'install-and-exit': 'Install and Exit',
         },

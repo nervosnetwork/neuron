@@ -17,6 +17,8 @@ import startMonitor, { stopMonitor } from '../../services/monitor'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
 import ShowGlobalDialogSubject from '../../models/subjects/show-global-dialog'
 import NoDiskSpaceSubject from '../../models/subjects/no-disk-space'
+import CkbDependencySubject from '../../models/subjects/ckb-dependency'
+import { showCkbDependencyDialog } from '../../utils/ckb-dependency-dialog'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -24,6 +26,8 @@ interface AppResponder {
   updateMenu: () => void
   updateWindowTitle: () => void
 }
+
+let isShowingCkbDependencyDialog = false
 
 /**
  * subscribe to events and dispatch them to the renderer process
@@ -126,5 +130,18 @@ export const subscribe = (dispatcher: AppResponder) => {
   NoDiskSpaceSubject.subscribe(params => {
     stopMonitor()
     dispatcher.sendMessage('no-disk-space', params)
+  })
+
+  CkbDependencySubject.subscribe(async () => {
+    if (isShowingCkbDependencyDialog) {
+      return
+    }
+    isShowingCkbDependencyDialog = true
+    try {
+      stopMonitor('ckb')
+      await showCkbDependencyDialog()
+    } finally {
+      isShowingCkbDependencyDialog = false
+    }
   })
 }

@@ -1,11 +1,9 @@
 import fs from 'fs'
 import path from 'path'
 import { BI } from '@ckb-lumos/lumos'
-import { app as electronApp, dialog, shell, app } from 'electron'
-import { t } from 'i18next'
+import { app as electronApp, app } from 'electron'
 import { interval, BehaviorSubject, merge, Subject } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
-import env from '../env'
 import { ConnectionStatusSubject } from '../models/subjects/node'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import { NetworkType } from '../models/network'
@@ -17,6 +15,7 @@ import logger from '../utils/logger'
 import redistCheck from '../utils/redist-check'
 import { rpcRequest } from '../utils/rpc-request'
 import { generateRPC } from '../utils/ckb-rpc'
+import { showCkbDependencyDialog } from '../utils/ckb-dependency-dialog'
 import startMonitor, { stopMonitor } from './monitor'
 import { CKBLightRunner } from './light-runner'
 import SettingsService from './settings'
@@ -211,24 +210,7 @@ class NodeService {
   }
 
   private showGuideDialog = () => {
-    const I18N_PATH = `messageBox.ckb-dependency`
-    return dialog
-      .showMessageBox({
-        type: 'info',
-        buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
-        defaultId: 0,
-        title: t(`${I18N_PATH}.title`),
-        message: t(`${I18N_PATH}.message`),
-        detail: t(`${I18N_PATH}.detail`),
-        cancelId: 0,
-        noLink: true,
-      })
-      .then(() => {
-        const VC_REDIST_URL = `https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170`
-        shell.openExternal(VC_REDIST_URL)
-        env.app.quit()
-        return false
-      })
+    return showCkbDependencyDialog()
   }
 
   private getInternalNodeVersion(type: CKBNodeType) {

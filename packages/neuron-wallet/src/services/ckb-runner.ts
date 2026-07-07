@@ -12,6 +12,7 @@ import { getUsablePort } from '../utils/get-usable-port'
 import { updateToml } from '../utils/toml'
 import { BUNDLED_URL_PREFIX } from '../utils/const'
 import NoDiskSpaceSubject from '../models/subjects/no-disk-space'
+import CkbDependencySubject from '../models/subjects/ckb-dependency'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -29,6 +30,10 @@ const platform = (): string => {
 enum NeedMigrateMsg {
   Wants = 'CKB wants to migrate the data into new format',
   Recommends = 'CKB recommends migrating your data into a new format',
+}
+
+export const isVcredistVersionError = (message: string) => {
+  return /(?:VC\+\+|Visual C\+\+) Redistributable/i.test(message) && /Version is below|download\/upgrade/i.test(message)
 }
 
 const { app } = env
@@ -131,6 +136,9 @@ export const startCkbNode = async () => {
     logger.error('CKB:\trun fail:', dataString)
     if (dataString.includes(NeedMigrateMsg.Wants) || dataString.includes(NeedMigrateMsg.Recommends)) {
       MigrateSubject.next({ type: 'need-migrate' })
+    }
+    if (isVcredistVersionError(dataString)) {
+      CkbDependencySubject.next()
     }
   })
   currentProcess.stdout?.on('data', data => {

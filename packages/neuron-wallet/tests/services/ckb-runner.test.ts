@@ -11,6 +11,7 @@ const stubbedLoggerLog = jest.fn()
 const resetSyncTaskQueueAsyncPushMock = jest.fn()
 const updateTomlMock = jest.fn()
 const getUsablePortMock = jest.fn()
+const mockCkbDependencyNext = jest.fn()
 
 const stubbedProcess: any = {}
 
@@ -24,6 +25,7 @@ const resetMocks = () => {
   resetSyncTaskQueueAsyncPushMock.mockReset()
   updateTomlMock.mockReset()
   getUsablePortMock.mockReset()
+  mockCkbDependencyNext.mockReset()
 }
 
 jest.doMock('child_process', () => {
@@ -91,7 +93,16 @@ jest.doMock('../../src/utils/toml', () => ({
 jest.doMock('../../src/utils/get-usable-port', () => ({
   getUsablePort: getUsablePortMock,
 }))
-const { startCkbNode, stopCkbNode, migrateCkbData, getNodeUrl } = require('../../src/services/ckb-runner')
+jest.mock('../../src/models/subjects/ckb-dependency', () => ({
+  next: mockCkbDependencyNext,
+}))
+const {
+  startCkbNode,
+  stopCkbNode,
+  migrateCkbData,
+  getNodeUrl,
+  isVcredistVersionError,
+} = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
@@ -140,6 +151,16 @@ describe('ckb runner', () => {
             ['run', '-C', ckbDataPath, '--indexer'],
             { stdio: ['ignore', 'pipe', 'pipe'] }
           )
+        })
+
+        it('notifies when ckb reports an outdated Visual C++ Redistributable', () => {
+          stubbedCkb.stderr.emit(
+            'data',
+            Buffer.from(
+              'Detected VC++ Redistributable version (x64): v14.29.30133.00\nVersion is below 14.44.0.0. Please download/upgrade the Visual C++ Redistributable.'
+            )
+          )
+          expect(mockCkbDependencyNext).toHaveBeenCalled()
         })
       })
 
@@ -236,6 +257,19 @@ describe('ckb runner', () => {
         stubbedCkb.emit('close')
         await promise
       })
+    })
+  })
+  describe('#isVcredistVersionError', () => {
+    it('detects the bundled ckb Visual C++ Redistributable version error', () => {
+      expect(
+        isVcredistVersionError(
+          'Detected VC++ Redistributable version (x64): v14.29.30133.00\nVersion is below 14.44.0.0. Please download/upgrade the Visual C++ Redistributable.'
+        )
+      ).toBe(true)
+    })
+
+    it('ignores unrelated ckb stderr', () => {
+      expect(isVcredistVersionError('CKB wants to migrate the data into new format')).toBe(false)
     })
   })
   describe('#stopCkbNode', () => {
