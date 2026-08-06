@@ -24,6 +24,13 @@ files:
 publish:
   - github
 
+# Static AppImage runtime that bundles its own FUSE, removing the hard
+# dependency on the host libfuse2 (missing on modern distros: Ubuntu 24.04+,
+# Fedora, Arch). Requires electron-builder >= 26.
+# https://www.electron.build/docs/appimage/
+toolsets:
+  appimage: "1.0.3"
+
 nsis:
   oneClick: false
   createDesktopShortcut: always
@@ -52,9 +59,12 @@ win:
     - target: nsis
       arch:
         - x64
-  sign: scripts/customSign.js
-  signingHashAlgorithms:
-    - sha256
+  # v26 moved the custom signing hook and signing-hash algorithms under
+  # win.signtoolOptions (top-level win.sign / win.signingHashAlgorithms were removed).
+  signtoolOptions:
+    sign: scripts/customSign.js
+    signingHashAlgorithms:
+      - sha256
 
 mac:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
