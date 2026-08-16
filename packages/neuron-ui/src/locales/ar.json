@@ -1,7 +1,7 @@
 {
   "translation": {
     "launch-screen": {
-      "loading-wallets": "جارٍ تحميل المحافظ"
+      "loading-wallets": "جار تحميل المحافظ"
     },
     "contextmenu": {
       "cut": "قص",
@@ -16,36 +16,36 @@
       "receive": "استلام",
       "history": "التاريخ",
       "addresses": "العناوين",
-      "nervos-dao": "نيرفوس DAO",
+      "nervos-dao": "Nervos DAO",
       "settings": "الإعدادات",
       "special-assets": "الأصول المخصصة",
       "sync-not-start": "لم تبدأ المزامنة بعد",
-      "connecting": "جارٍ الاتصال",
-      "pause": "تم إيقاف المزامنة مؤقتًا",
+      "connecting": "جار الاتصال",
+      "pause": "تم إيقاف المزامنة مؤقتا",
       "experimental-functions": "تجريبي",
       "s-udt": "حسابات الأصول",
-      "update-neuron-with-ckb": "لا يتطابق إصدار عقدة CKB مع Neuron (الإصدار {{ version }}), مما قد يسبب مشاكل توافق. يرجى التحديث إلى أحدث إصدار من Neuron.",
+      "update-neuron-with-ckb": "لا يتطابق إصدار عقدة CKB مع Neuron (الإصدار {{ version }})، وقد يسبب ذلك مشاكل في التوافق. يرجى تحديث Neuron إلى أحدث إصدار.",
       "learn-more": "تعرف على المزيد",
-      "ckb-node-compatible": "عقدة CKB غير متوافقة مع Neuron (الإصدار {{ version }}), يرجى التحقق قبل متابعة العملية. (<0>{{btnText}}</0>)",
+      "ckb-node-compatible": "عقدة CKB غير متوافقة مع Neuron (الإصدار {{ version }})، فتحقق من الإصدار قبل المتابعة. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "يرجى إضافة الخيار '--indexer' لبدء العقدة المحلية"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "تمت مزامنة الكتلة",
-        "looking-valid-target": "جارٍ البحث عن هدف صالح مفترض",
+        "looking-valid-target": "جار البحث عن هدف صالح مفترض",
         "start-block-number": "رقم كتلة البدء",
         "set-start-block-number": "تعيين رقم كتلة البدء"
       },
-      "migrating": "جارٍ الترحيل...",
+      "migrating": "جار الترحيل...",
       "left-time": "الوقت المتبقي",
       "left-time-tip": "الوقت المتبقي تقديري ويعتمد على الشبكة الحالية وعوامل أخرى، وهو للمرجعية فقط."
     },
     "import-hardware": {
       "title": {
         "select-model": "يرجى توصيل جهازك وتحديد الطراز",
-        "detect-device": "جارٍ اكتشاف الجهاز",
+        "detect-device": "جار اكتشاف الجهاز",
         "name-wallet": "تسمية المحفظة",
-        "choose-address": "اختر عنوانًا من الجهاز"
+        "choose-address": "اختيار عنوان من الجهاز"
       },
       "actions": {
         "confirm": "يرجى التأكيد على جهازك...",
@@ -53,7 +53,7 @@
         "next": "التالي",
         "cancel": "إلغاء",
         "back": "رجوع",
-        "rescan": "إعادة المسح",
+        "rescan": "إعادة الفحص",
         "close": "إغلاق",
         "finish": "إنهاء الإنشاء"
       },
@@ -67,7 +67,7 @@
       "app-version": "تطبيق CKB الإصدار {{version}} قيد التشغيل.",
       "firmware-version": "الإصدار الثابت {{version}} تم اكتشافه.",
       "wallet-name": "اسم المحفظة",
-      "select-model": "حدد الطراز",
+      "select-model": "اختيار الطراز",
       "other-device": "جهاز آخر"
     },
     "hardware-sign": {
@@ -85,7 +85,7 @@
       "actions": {
         "close": "إغلاق",
         "success": "تمت المعاملة بنجاح!",
-        "rescan": "إعادة المسح"
+        "rescan": "إعادة الفحص"
       }
     },
     "hardware-verify-address": {
@@ -104,7 +104,7 @@
         "close": "إغلاق",
         "reconnect": "إعادة الاتصال",
         "copy-address": "نسخ العنوان",
-        "verify": "تحقق من العنوان",
+        "verify": "التحقق من العنوان",
         "finish": "موافق"
       }
     },
@@ -114,7 +114,7 @@
       "status": {
         "label": "الحالة:",
         "unsigned": "غير موقع",
-        "partially-signed": "موقع جزئيًا",
+        "partially-signed": "موقع جزئيا",
         "signed": "موقع"
       },
       "import-signed-transaction": "استيراد معاملة موقعة",
@@ -146,40 +146,40 @@
       "asset": "الأصل",
       "address": "العنوان",
       "sent": "تم الإرسال",
-      "sending": "جارٍ الإرسال",
+      "sending": "جار الإرسال",
       "received": "تم الاستلام",
-      "receiving": "جارٍ الاستلام",
+      "receiving": "جار الاستلام",
       "more": "المزيد",
       "copy-balance": "نسخ الرصيد",
       "create": "إنشاء حساب أصل {{name}}",
       "destroy": "تدمير حساب أصل {{name}}",
       "createSUDT": "إنشاء حساب أصل <0></0>",
       "destroySUDT": "تدمير حساب أصل <0></0>",
-      "wallet-ready": "المحفظة جاهزة، مرحبًا بك",
+      "wallet-ready": "المحفظة جاهزة، مرحبا بك",
       "send": "إرسال",
       "receive": "استلام",
       "locked": "المبلغ المقفل",
       "locked-balance": "الرصيد المقفل",
-      "first-sync-notice": "تتطلب المزامنة الأولية مساحة قرص لا تقل عن {{size}} جيجابايت. <br />وسيزداد حجم البيانات مع مرور الوقت. يُنصح باختيار مساحة قرص أكبر لتخزين البيانات.",
+      "first-sync-notice": "تتطلب المزامنة الأولية مساحة قرص لا تقل عن {{size}} جيجابايت. <br />وسيزداد حجم البيانات مع مرور الوقت. ينصح باختيار مساحة قرص أكبر لتخزين البيانات.",
       "start-sync": "بدء المزامنة"
     },
     "wizard": {
-      "welcome-to-nervos-neuron": "مرحبًا بك في Neuron",
+      "welcome-to-nervos-neuron": "مرحبا بك في Neuron",
       "create-or-import-your-first-wallet": "إنشاء أو استيراد محفظتك الأولى",
       "create-new-wallet": "إنشاء محفظة",
-      "import-mnemonic": "استيراد بذرة المحفظة",
+      "import-mnemonic": "استيراد عبارة الاسترداد",
       "import-keystore": "الاستيراد من Keystore",
       "import-wallet": "استيراد محفظة",
-      "import-hardware-wallet": "استيراد محفظة أجهزة",
+      "import-hardware-wallet": "استيراد محفظة الأجهزة",
       "new-wallet": "محفظة جديدة",
-      "wallet-seed": "بذرة المحفظة",
+      "wallet-seed": "عبارة الاسترداد",
       "keystore": "Keystore",
-      "hardware-wallet": "محفظة أجهزة",
+      "hardware-wallet": "محفظة الأجهزة",
       "next": "التالي",
       "back": "رجوع",
       "name": "الاسم",
-      "your-wallet-seed-is": "تم إنشاء بذرة محفظتك الجديدة",
-      "input-your-seed": "يرجى إدخال بذرة محفظتك",
+      "your-wallet-seed-is": "تم إنشاء عبارة الاسترداد الجديدة لمحفظتك",
+      "input-your-seed": "أدخل عبارة استرداد محفظتك",
       "password": "كلمة المرور",
       "confirm-password": "تأكيد كلمة المرور",
       "set-wallet-name-and-password": "يرجى تسمية محفظتك على هذا الجهاز واختيار كلمة مرور قوية لحمايتها",
@@ -189,34 +189,34 @@
       "handwritten-recommended": "يوصى بالنسخ اليدوي",
       "do-not-copy": "لا تقم بالنسخ",
       "do-not-save-screenshots": "لا تحفظ لقطات الشاشة",
-      "replenish-your-seed": "يرجى استعادة بذرة محفظتك",
-      "new-name": "استخدم اسمًا غير مستخدم للمحفظة الجديدة",
-      "complex-password": "يجب أن تتكون كلمة المرور من 8 إلى 50 حرفًا وتحتوي على ثلاث فئات على الأقل من الفئات التالية: حروف كبيرة، حروف صغيرة، أرقام، ورموز خاصة.",
+      "replenish-your-seed": "استكمال عبارة استرداد محفظتك",
+      "new-name": "استخدم اسما غير مستخدم للمحفظة الجديدة",
+      "complex-password": "يجب أن تتكون كلمة المرور من 8 إلى 50 حرفا وتحتوي على ثلاث فئات على الأقل من الفئات التالية: حروف كبيرة، حروف صغيرة، أرقام، ورموز خاصة.",
       "same-password": "يجب أن تتطابق كلمة المرور وتأكيد كلمة المرور",
-      "input-seed-verify": "يرجى إدخال بذرة المحفظة الصحيحة أو النقر على رجوع لإعادة إنشاء المحفظة",
-      "input-seed-first-empty-space": "يمكنك لصق بذرة المحفظة بالكامل في المساحة الفارغة الأولى",
+      "input-seed-verify": "أدخل عبارة الاسترداد الصحيحة أو ارجع لإعادة إنشاء المحفظة",
+      "input-seed-first-empty-space": "يمكنك لصق عبارة الاسترداد كاملة في الحقل الفارغ الأول",
       "no-wallet": "لا توجد محفظة؟",
       "create-wallet": "إنشاء محفظة",
-      "repeat-password": "أعد إدخال كلمة المرور",
+      "repeat-password": "إعادة إدخال كلمة المرور",
       "finish-create": "إنهاء الإنشاء",
-      "creating-wallet": "جارٍ إعداد المحفظة، يرجى الانتظار",
-      "add-one": "أضف واحدًا آخر",
+      "creating-wallet": "جار إعداد المحفظة، يرجى الانتظار",
+      "add-one": "إضافة محفظة أخرى",
       "detect-duplicate-wallets": "تم اكتشاف محافظ مكررة"
     },
     "import-keystore": {
       "title": "استيراد ملف Keystore",
       "select-file": "اختيار الملف",
       "import-failure": "فشل الاستيراد",
-      "import-failure-msg": "لا يدعم Neuron استيراد ملف keystore الخاص بـ ckb-cli بسبب اختلاف قواعد اشتقاق ملفات keystore.",
+      "import-failure-msg": "لا يدعم Neuron استيراد ملف Keystore الخاص بأداة ckb-cli بسبب اختلاف قواعد اشتقاق ملفات Keystore.",
       "label": {
         "path": "ملف Keystore",
         "name": "اسم المحفظة",
         "password": "كلمة المرور"
       },
       "placeholder": {
-        "path": "انقر لتحديد ملف keystore",
+        "path": "اختيار ملف Keystore",
         "name": "اسم للمحفظة الجديدة",
-        "password": "كلمة المرور للتحقق من keystore"
+        "password": "كلمة المرور للتحقق من Keystore"
       },
       "button": {
         "back": "رجوع",
@@ -242,13 +242,13 @@
       "description": "الوصف",
       "description-optional": "يرجى إدخال وصف، اختياري",
       "balance": "الرصيد",
-      "add-one": "أضف واحدًا آخر",
+      "add-one": "إضافة عنوان آخر",
       "remove-this": "إزالة هذا",
       "fee": "رسوم المعاملة (CKB)",
       "advanced-fee-settings": "إعدادات الرسوم المتقدمة",
-      "price": "السعر",
-      "pick-price": "اختيار سريع للسعر",
-      "custom-price": "سعر مخصص",
+      "price": "معدل الرسوم",
+      "pick-price": "اختيار سريع لمعدل الرسوم",
+      "custom-price": "معدل رسوم مخصص",
       "slow": "بطيء",
       "standard": "قياسي",
       "fast": "سريع",
@@ -257,9 +257,9 @@
       "set-locktime": "تعيين وقت القفل",
       "remove-receiving-address": "إزالة عنوان الاستلام",
       "remove-receiving-address-msg": "هل أنت متأكد أنك تريد إزالة عنوان الاستلام المحدد؟",
-      "locktime-notice-content": "وفقًا لارتفاع الكتلة الفعلي الجاري، قد يكون هناك بعض التفاوت في وقت القفل.",
+      "locktime-notice-content": "وفقا لارتفاع الكتلة الفعلي الجاري، قد يكون هناك بعض التفاوت في وقت القفل.",
       "release-on": "الإصدار في",
-      "locktime-warning": "يرجى التأكد من أن محفظة المستلم تدعم فتح القفل عند انتهاء المدة. (ملاحظة: 1. عمومًا، لا تدعم البورصات فتح القفل عند انتهاء المدة {{extraNote}})",
+      "locktime-warning": "يرجى التأكد من أن محفظة المستلم تدعم إلغاء القفل عند انتهاء المدة. (ملاحظة: لا تدعم منصات التداول إلغاء القفل عند انتهاء المدة عموما {{extraNote}})",
       "allow-use-sent-cell": "المخرجات غير المؤكدة مسموح بها في هذه المعاملة.",
       "submit-transaction": "إرسال المعاملة",
       "transaction-confirmed": "تم تأكيد المعاملة",
@@ -272,10 +272,10 @@
       "click-to-copy": "انقر لنسخ العنوان",
       "copy-address": "نسخ العنوان",
       "address-not-found": "العنوان غير موجود",
-      "prompt": "يختار Neuron عنوان استلام جديدًا لتحسين الخصوصية. يرجى الانتقال إلى دفتر العناوين إذا كنت تريد استخدام عنوان استلام تم استخدامه سابقًا.",
+      "prompt": "يختار Neuron عنوان استلام جديدا لتحسين الخصوصية. يرجى الانتقال إلى دفتر العناوين إذا كنت تريد استخدام عنوان استلام تم استخدامه سابقا.",
       "address-qrcode": "رمز QR للعنوان",
       "address": "عنوان {{network}}",
-      "verify-address": "تحقق من العنوان",
+      "verify-address": "التحقق من العنوان",
       "turn-into-full-version-format": "تحويل إلى تنسيق الإصدار الكامل",
       "turn-into-deprecated-format": "تحويل إلى تنسيق قديم",
       "save-qr-code": "تحميل",
@@ -285,19 +285,23 @@
       "pending": "قيد الانتظار",
       "success": "ناجح",
       "failed": "فشل",
-      "confirming": "جارٍ التأكيد"
+      "confirming": "جار التأكيد"
     },
+    "confirmationsCount_zero": "{{count}} تأكيدات",
     "confirmationsCount_one": "{{count}} تأكيد",
-    "confirmationsCount_other": "{{count}} تأكيدات",
+    "confirmationsCount_two": "{{count}} تأكيدان",
+    "confirmationsCount_few": "{{count}} تأكيدات",
+    "confirmationsCount_many": "{{count}} تأكيدا",
+    "confirmationsCount_other": "{{count}} تأكيد",
     "history": {
       "title": "التاريخ",
       "title-detail": "تفاصيل التاريخ",
-      "meta": "ميتا",
+      "meta": "البيانات الوصفية",
       "type": "النوع",
       "date": "التاريخ",
       "timestamp": "الوقت",
       "amount": "المبلغ",
-      "transaction-hash": "هاش المعاملة",
+      "transaction-hash": "تجزئة المعاملة",
       "send": "إرسال",
       "receive": "استلام",
       "other": "أخرى",
@@ -314,7 +318,7 @@
       "basic-information": "معلومات أساسية",
       "search": {
         "button": "بحث",
-        "placeholder": "بحث عن هاش المعاملة، عنوان، أو تاريخ (yyyy-mm-dd)"
+        "placeholder": "بحث عن تجزئة المعاملة، أو عنوان، أو تاريخ (yyyy-mm-dd)"
       },
       "table": {
         "name": "اسم المحفظة",
@@ -335,8 +339,8 @@
       "view-detail": "التفاصيل",
       "view-detail-button-title": "عرض التفاصيل",
       "amend": "تعديل",
-      "opening": "جارٍ الفتح",
-      "copy-tx-hash": "نسخ هاش المعاملة",
+      "opening": "جار الفتح",
+      "copy-tx-hash": "نسخ تجزئة المعاملة",
       "copy-balance": "نسخ الرصيد",
       "copy-address": "نسخ العنوان",
       "create": "إنشاء حساب أصل {{name}}",
@@ -346,7 +350,7 @@
     "transaction": {
       "window-title": "المعاملة: {{hash}}",
       "date": "التاريخ",
-      "transaction-hash": "هاش المعاملة",
+      "transaction-hash": "تجزئة المعاملة",
       "block-number": "رقم الكتلة",
       "goBack": "العودة",
       "index": "الفهرس",
@@ -355,7 +359,7 @@
       "amount": "المبلغ",
       "inputs": "المدخلات",
       "outputs": "المخرجات",
-      "cell-from-cellbase": "من cellbase",
+      "cell-from-cellbase": "من Cellbase",
       "lock-script": "نص القفل",
       "lock-script-title": "معلومات العنوان",
       "deprecated-address-format": "العنوان بالتنسيق القديم",
@@ -366,7 +370,7 @@
       "status": "الحالة",
       "size": "الحجم",
       "cycles": "الدورات",
-      "cell-detail": "تفاصيل الخلية"
+      "cell-detail": "تفاصيل Cell"
     },
     "addresses": {
       "title": "دفتر العناوين",
@@ -405,17 +409,17 @@
         "hide": "إخفاء",
         "version": "الإصدار",
         "language": "اللغة",
-        "select-language": "اختر اللغة",
+        "select-language": "اختيار اللغة",
         "apply": "تطبيق",
-        "keep-awake": "ابق الشاشة مستيقظة أثناء المزامنة",
+        "keep-awake": "إبقاء الشاشة قيد التشغيل أثناء المزامنة",
         "lock-password": "قفل كلمة مرور النافذة",
         "set-lock-password": "تعيين كلمة مرور لقفل النافذة",
         "change-lock-password": "تغيير كلمة مرور قفل النافذة",
         "lock-window": {
           "set-password": "تعيين كلمة المرور",
           "confirm-password": "تأكيد كلمة المرور",
-          "enter-current-password": "أدخل كلمة المرور الحالية",
-          "enter-new-password": "أدخل كلمة مرور جديدة",
+          "enter-current-password": "إدخال كلمة المرور الحالية",
+          "enter-new-password": "إدخال كلمة مرور جديدة",
           "password-error": "خطأ في كلمة المرور",
           "different-password": "كلمتا المرور المدخلتان غير متطابقتين",
           "set-password-success": "تم تعيين كلمة المرور بنجاح",
@@ -461,15 +465,15 @@
           "input-network": "يرجى إدخال الاسم"
         },
         "edit-success": "تم تعديل الشبكة بنجاح",
-        "mainnet": "الشبكة الرئيسية",
-        "testnet": "شبكة الاختبار",
-        "lightTestnet": "شبكة الاختبار الخفيفة",
-        "lightMainnet": "الشبكة الرئيسية الخفيفة",
-        "devnet": "شبكة التطوير",
+        "mainnet": "Mainnet",
+        "testnet": "Testnet",
+        "lightTestnet": "Light Testnet",
+        "lightMainnet": "Light Mainnet",
+        "devnet": "Devnet",
         "switch-network-type": "التبديل إلى {{type}}",
         "type": "النوع",
-        "full-node": "عقدة كاملة",
-        "light-client-node": "عقدة عميل خفيف"
+        "full-node": "العقدة الكاملة",
+        "light-client-node": "العميل الخفيف"
       },
       "locale": {
         "en": "English",
@@ -489,31 +493,31 @@
         "clear-cache-description": "امسح الذاكرة المؤقتة إذا واجهت مشاكل في مزامنة البيانات أو عرض الرصيد. سيقوم Neuron بإعادة مسح بيانات الكتلة.",
         "cache-cleared-on": "تم تحديث الذاكرة المؤقتة في {{date}}",
         "refresh": "تحديث",
-        "clearing-cache": "جارٍ مسح الذاكرة المؤقتة، يرجى الانتظار قليلاً",
+        "clearing-cache": "جار مسح الذاكرة المؤقتة، يرجى الانتظار قليلا",
         "clear-success": "تم مسح الذاكرة المؤقتة",
         "set-path": "تعيين المسار",
-        "remove-ckb-data-tip": "يرجى نقل بيانات عقدة CKB من 【{{prevPath}}】 إلى 【{{currentPath}}】 ثم النقر على \"تم نقل البيانات\" للبدء من الكتلة التي تمت مزامنتها سابقًا؛ أو النقر على \"المزامنة من البداية\" لبدء المزامنة من البداية.",
-        "resync-ckb-node-describe": "تنبيه: المزامنة من البداية لن تزيل بيانات عقدة CKB التي تم تنزيلها سابقًا",
+        "remove-ckb-data-tip": "يرجى نقل بيانات عقدة CKB من 【{{prevPath}}】 إلى 【{{currentPath}}】 ثم النقر على \"تم نقل البيانات\" للبدء من الكتلة التي تمت مزامنتها سابقا؛ أو النقر على \"المزامنة من البداية\" لبدء المزامنة من البداية.",
+        "resync-ckb-node-describe": "تنبيه: المزامنة من البداية لن تزيل بيانات عقدة CKB التي تم تنزيلها سابقا",
         "cancel": "إلغاء",
         "confirm-clear": "تأكيد",
         "move-data-finish": "تم نقل البيانات",
         "re-sync": "إعادة المزامنة من البداية",
-        "disabled-set-path": "عند بدء عقدة CKB يدويًا، لا يؤثر تكوين مسار تكوين وتخزين عقدة CKB",
+        "disabled-set-path": "عند بدء عقدة CKB يدويا، لا يؤثر تكوين مسار تكوين وتخزين عقدة CKB",
         "ckb-node-storage": "تخزين عقدة CKB",
         "browse-local-files": "تصفح الملفات المحلية",
         "modify-path": "تعديل المسار",
         "modify-path-notice": "يرجى التأكد من أن المساحة المتبقية على القرص أكبر من {{needSize}} جيجابايت لتخزين بيانات عقدة CKB.",
         "modify-path-content": "يمكنك اختيار مسار جديد لإعادة المزامنة أو نقل البيانات السابقة لمتابعة المزامنة.",
-        "retain-previous-data": "احتفظ بالبيانات السابقة",
+        "retain-previous-data": "الاحتفاظ بالبيانات السابقة",
         "set-a-new-path": "تعيين مسار جديد",
         "browse": "تصفح",
         "migrate-previous-ckb-node-data": "نقل بيانات عقدة CKB السابقة",
         "migrate-previous-ckb-node-data-notice": "قبل الضغط على زر التأكيد، أكمل ما يلي:",
         "migrate-confirm": "تأكيد ({{seconds}} ثانية)",
-        "migrate-step-1": "افتح مسار تخزين بيانات عقدة CKB السابقة.",
-        "migrate-step-2": "افتح المسار الذي تم تعيينه حديثًا.",
+        "migrate-step-1": "فتح مسار تخزين بيانات عقدة CKB السابقة.",
+        "migrate-step-2": "فتح المسار الجديد.",
         "migrate-step-3": "نسخ جميع الملفات إلى المسار الجديد.",
-        "click-here": "انقر هنا",
+        "click-here": "النقر هنا",
         "migrate-data-successful": "تم نقل البيانات بنجاح",
         "resync": "إعادة المزامنة",
         "retry": "إعادة المحاولة",
@@ -523,14 +527,14 @@
     },
     "password-request": {
       "wallet-not-found": "لم يتم العثور على المحفظة",
-      "verify-password": "تحقق من كلمة المرور",
+      "verify-password": "التحقق من كلمة المرور",
       "password": "أدخل كلمة المرور",
       "placeholder": "يرجى إدخال كلمة مرور المحفظة",
       "send": {
         "title": "إرسال المعاملة"
       },
       "send-nft": {
-        "title": "إرسال الرموز غير القابلة للاستبدال (NFT)"
+        "title": "إرسال NFT"
       },
       "delete": {
         "title": "حذف المحفظة"
@@ -581,12 +585,12 @@
         "title": "تدمير حساب الأصل"
       },
       "send-from-multisig": {
-        "title": "إرسال CKB من عنوان متعدد التوقيعات"
+        "title": "إرسال CKB من عنوان متعدد التواقيع"
       },
       "send-from-multisig-need-one": {
-        "title": "إرسال CKB من عنوان متعدد التوقيعات"
+        "title": "إرسال CKB من عنوان متعدد التواقيع"
       },
-      "xpub-notice": "بالنسبة للمحفظة المراقبة فقط، يتم دعم تصدير المعاملات فقط"
+      "xpub-notice": "لا تدعم المحفظة للقراءة فقط سوى تصدير المعاملات"
     },
     "qrcode": {
       "copy": "نسخ الصورة",
@@ -641,18 +645,18 @@
       "addr-copied": "تم نسخ العنوان إلى الحافظة",
       "qrcode-copied": "تم نسخ رمز الاستجابة السريعة إلى الحافظة",
       "view-the-run-node-doc": "عرض الدليل في المتصفح",
-      "remain-ckb-for-withdraw": "يُقترح الاحتفاظ ببعض CKBytes لعملية السحب",
+      "remain-ckb-for-withdraw": "يقترح الاحتفاظ ببعض CKBytes لعملية السحب",
       "no-valid-addresses-found": "لم يتم العثور على عناوين صالحة",
-      "decimal-range": "يجب أن يكون العشري عددًا صحيحًا ضمن النطاق {{range}} (شامل)",
+      "decimal-range": "يجب أن يكون عدد الخانات العشرية عددا صحيحا ضمن النطاق {{range}} شاملا الحدين",
       "experimental-message-hardware": "هذه ميزة تجريبية. يرجى الانتباه إلى المخاطر واستخدامها بحذر.",
       "experimental-message": "هذه ميزة تجريبية، قد تتغير في أي وقت. يرجى استخدامها بحذر.",
-      "rebuild-sync": "لتحسين تجربة المستخدم، يستخدم Neuron تخزينًا جديدًا، مما يتطلب ترحيل البيانات (يستغرق من 20 إلى 60 دقيقة تقريبًا). نعتذر عن الإزعاج.",
-      "migrate-warning": "تحذير: قد تفشل عملية الترحيل لأسباب غير معروفة مما يؤدي إلى إعادة المزامنة، يرجى النسخ الاحتياطي يدويًا وبدء الترحيل!",
+      "rebuild-sync": "لتحسين تجربة المستخدم، يستخدم Neuron تخزينا جديدا، مما يتطلب ترحيل البيانات (يستغرق من 20 إلى 60 دقيقة تقريبا). نعتذر عن الإزعاج.",
+      "migrate-warning": "تحذير: قد تفشل عملية الترحيل لأسباب غير معروفة مما يؤدي إلى إعادة المزامنة، يرجى النسخ الاحتياطي يدويا وبدء الترحيل!",
       "migrate-ckb-data": "ترحيل",
       "migrate": "ترحيل",
       "secp256k1/blake160-address-required": "العنوان من نوع Secp256k1/blake160 مطلوب",
-      "light-client-locktime-warning": "لا يدعم وضع عميل خفيف عرض CKBytes ذات وقت القفل.",
-      "light-client-cheque-warning": "تحذير: وضع عميل خفيف لا يدعم عرض أصول الشيك.",
+      "light-client-locktime-warning": "لا يدعم وضع العميل الخفيف عرض CKBytes المقفلة زمنيا.",
+      "light-client-cheque-warning": "تحذير: لا يدعم وضع العميل الخفيف عرض أصول الشيك.",
       "fields": {
         "wallet": "محفظة",
         "name": "الاسم",
@@ -672,58 +676,58 @@
         "token-name": "اسم الرمز",
         "token-id": "معرف الرمز",
         "symbol": "الرمز",
-        "decimal": "العشري"
+        "decimal": "الخانات العشرية"
       },
       "codes": {
         "-3": "",
-        "100": "المبلغ غير كافٍ.",
-        "101": "المبلغ {{amount}} CKB صغير جدًا، يرجى إدخال مبلغ لا يقل عن {{required}} CKB.",
+        "100": "المبلغ غير كاف.",
+        "101": "المبلغ {{amount}} CKB صغير جدا، يرجى إدخال مبلغ لا يقل عن {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) غير صالح.",
         "103": "$t(messages.fields.keystore-password) غير صحيح",
         "104": "فشل الاتصال بالعقدة، يرجى إعادة تشغيل Neuron.",
-        "105": "تحتاج إلى مزيد من القدرات للتغيير (أكثر من 61 CKBytes).",
-        "106": "تحتاج إلى مزيد من القدرات للتغيير (أكثر من 61 CKBytes)، أو اسحب حتى النهاية لإرسال كل رصيدك.",
-        "107": "المبلغ {{amount}} CKB صغير جدًا، يتطلب النقل باستخدام وقت القفل مبلغًا لا يقل عن 69 CKB.",
+        "105": "تتطلب مخرجات الفائض سعة تزيد على 61 CKBytes.",
+        "106": "تتطلب مخرجات الفائض سعة تزيد على 61 CKBytes، ويمكن أيضا تحريك شريط التمرير إلى الحد الأقصى لإرسال الرصيد بالكامل.",
+        "107": "المبلغ {{amount}} CKB صغير جدا، يتطلب النقل باستخدام وقت القفل مبلغا لا يقل عن 69 CKB.",
         "108": "العنوان المقدم لا ينتمي إلى المحفظة الحالية. يرجى التحقق من محفظتك أو الانتظار حتى تكتمل المزامنة.",
-        "109": "الرصيد غير كافٍ.",
-        "110": "الرصيد المتاح غير كافٍ، يرجى المحاولة مرة أخرى عندما يتم تأكيد المعاملة الأخيرة.",
+        "109": "الرصيد غير كاف.",
+        "110": "الرصيد المتاح غير كاف، يرجى المحاولة مرة أخرى عندما يتم تأكيد المعاملة الأخيرة.",
         "111": "لم يتم تعيين المحفظة الحالية.",
         "112": "لم يتم العثور على المحفظة {{id}}.",
         "113": "Keystore غير صالح، يرجى التحقق من سلامة الملف.",
         "114": "الحد الأدنى لرصيد النقل هو {{bytes}} CKBytes.",
-        "115": "تحتاج إلى مزيد من القدرات للتغيير (أكثر من 61 CKBytes)، أو انقر على زر 'الحد الأقصى' لإرسال كل رصيدك.",
+        "115": "تتطلب مخرجات الفائض سعة تزيد على 61 CKBytes، ويمكن أيضا اختيار 'الحد الأقصى' لإرسال الرصيد بالكامل.",
         "201": "$t(messages.fields.{{fieldName}}) مطلوب.",
         "202": "$t(messages.fields.{{fieldName}}) مستخدم.",
         "203": "$t(messages.fields.{{fieldName}}) يجب أن يكون أقصر من أو يساوي {{length}}.",
-        "204": "$t(messages.fields.{{fieldName}}) قصير جدًا، يجب أن يكون أطول من أو يساوي {{length}}.",
+        "204": "$t(messages.fields.{{fieldName}}) قصير جدا، يجب أن يكون أطول من أو يساوي {{length}}.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} غير صالح.",
-        "206": "$t(messages.fields.{{fieldName}}) غير صالح، يرجى إدخال $t(messages.fields.{{fieldName}}) بدون أكثر من {{length}} منازل عشرية.",
-        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} غير صالح، لا يمكن أن يكون سالبًا.",
-        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} غير صالح، يجب أن يبدأ بـ http(s)://",
+        "206": "$t(messages.fields.{{fieldName}}) غير صالح، يرجى إدخال $t(messages.fields.{{fieldName}}) بما لا يزيد على {{length}} خانات عشرية.",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} غير صالح، لا يمكن أن يكون سالبا.",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} غير صالح، ويجب أن يبدأ ببروتوكول http:// أو https://",
         "209": "$t(messages.fields.{{fieldName}}) يجب ألا يحتوي على مسافات.",
         "210": "\"{{value}}\" محجوز، يرجى استخدام آخر.",
         "211": "لا يمكن أن يكون المبلغ 0",
-        "212": "$t(messages.fields.{{fieldName}}) بسيط جدًا",
+        "212": "$t(messages.fields.{{fieldName}}) بسيط جدا",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} لا يمكن إزالته.",
         "303": "$t(messages.fields.{{fieldName}}) غير موجود.",
         "304": "الكاميرا غير متاحة أو معطلة.",
-        "305": "$t(messages.fields.address) لا يمكن أن يكون فارغًا.",
-        "306": "يرجى إدخال عنوان الشبكة الرئيسية",
-        "307": "يرجى إدخال عنوان شبكة الاختبار",
-        "308": "المبلغ غير كافٍ",
+        "305": "$t(messages.fields.address) لا يمكن أن يكون فارغا.",
+        "306": "أدخل عنوان Mainnet",
+        "307": "أدخل عنوان Testnet",
+        "308": "المبلغ غير كاف",
         "309": "المستلم بحاجة إلى ترقية عنوان حسابه لقبول المزيد من النقل.",
         "310": "يرجى إدخال عنوان {{tagName}}",
         "311": "يرجى إدخال العنوان",
         "402": "تطبيق CKB غير مفتوح. يرجى فتح تطبيق CKB على جهازك.",
         "403": "لم يتم اكتشاف أي جهاز. يرجى توصيل جهازك",
         "404": "تم اكتشاف أجهزة متعددة. يمكن توصيل جهاز واحد فقط من نفس الطراز.",
-        "408": "المحفظة الصلبة المتصلة حاليًا لا تتطابق مع المحفظة الحالية.",
+        "408": "محفظة الأجهزة المتصلة حاليا لا تتطابق مع المحفظة الحالية.",
         "600": "يرجى التأكد من أن المزامنة قد انتهت قبل القيام بأي عملية متعلقة بالمعاملات."
       }
     },
     "sync": {
       "synced": "تمت المزامنة بنسبة 100%",
-      "syncing": "جارٍ المزامنة {{ syncPercents }}",
+      "syncing": "جار المزامنة {{ syncPercents }}",
       "block-number": "رقم الكتلة",
       "syncing-balance": "يتم تحديث الرصيد",
       "slow": "المزامنة بطيئة",
@@ -731,7 +735,7 @@
       "sync-failed-detail": "فشلت المزامنة بسبب مشكلات في عقدة الشبكة أو مشاكل أخرى.",
       "learn-more": "اعرف المزيد",
       "sync-not-start": "لم تبدأ المزامنة بعد، يرجى محاولة إعادة تشغيل محفظة Neuron",
-      "connecting": "جارٍ الاتصال"
+      "connecting": "جار الاتصال"
     },
     "pagination": {
       "previous-page": "الصفحة السابقة",
@@ -759,27 +763,27 @@
       "cancel": "إلغاء",
       "proceed": "متابعة",
       "compensation": "تعويض",
-      "notice-wait-time": "تنبيه: أنت تقوم ببدء عملية السحب وسيحتاج السحب النهائي إلى انتظار {{epochs}} دورات {{blocks}} كتل (حوالي {{days}} أيام).",
+      "notice-wait-time": "تنبيه: أنت تبدأ عملية سحب. يتطلب السحب النهائي انتظار {{epochs}} epochs و{{blocks}} كتل (حوالي {{days}} أيام).",
       "deposit-dialog-title": "إيداع",
-      "deposit-terms": "يحتاج Nervos DAO إلى 102 CKBytes لتخزين خلية الإيداع، وهي خالية من التعويض. <br />يرجى زيارة <0>Nervos DAO RFC</0> لمزيد من المعلومات حول Nervos DAO",
+      "deposit-terms": "يحتاج Nervos DAO إلى 102 CKBytes لتخزين Cell الإيداع، وهي لا تحقق أي تعويض. <br />راجع <0>Nervos DAO RFC</0> لمزيد من المعلومات حول Nervos DAO.",
       "minimal-fee-required": "الحد الأدنى لرصيد الإيداع هو {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} كتل تم تجميعها كتعويض",
-      "withdraw-alert": "تلميح: هناك فقط {{epochs}} دورات (~{{hours}} ساعات) حتى نهاية فترة القفل الحالية. إذا كنت ترغب في السحب في فترة القفل الحالية، يرجى إرسال طلب السحب في الوقت المناسب. هناك {{nextLeftEpochs}} دورات (~{{days}} أيام) حتى نهاية فترة القفل التالية.",
+      "withdraw-alert": "تلميح: يتبقى {{epochs}} epochs فقط (حوالي {{hours}} ساعات) حتى نهاية فترة القفل الحالية. للسحب خلالها، أرسل الطلب في الوقت المناسب. وتنتهي الفترة التالية بعد {{nextLeftEpochs}} epochs (حوالي {{days}} أيام).",
       "balance-not-reserved": "لا تحتفظ بأي CKBytes لعمليات DAO المستقبلية (غير موصى به)",
-      "estimated-rewards": "المكافآت المقدرة لمدة {{days}} أيام",
+      "estimated-rewards": "التعويض المقدر لمدة {{days}} أيام",
       "estimated-apc": "نسبة التعويض السنوية المقدرة",
       "estimated-apc-tooltip": "نسبة التعويض السنوية المقدرة",
       "deposit-amount": "مبلغ الإيداع (CKB)",
-      "attention": "انتباه: بمجرد الإيداع في Nervos DAO، ستظل إيداعاتك مقفلة لمدة 180 دورة على الأقل (حوالي 30 يومًا).",
+      "attention": "انتباه: بعد الإيداع في Nervos DAO، ستظل أموالك مقفلة لمدة 180 epochs على الأقل (حوالي 30 يوما).",
       "deposit-submitted": "تم تقديم الإيداع",
       "deposit-record": {
         "deposited-at": "تم الإيداع في",
         "completed-at": "تم الانتهاء",
         "deposit-pending": "إيداع قيد الانتظار",
         "withdraw-action-label": "سحب",
-        "unlock-action-label": "فتح",
+        "unlock-action-label": "إلغاء القفل",
         "record": "سجل",
-        "deposited": "مُودع",
+        "deposited": "مودع",
         "withdrawn": "مسحوب",
         "unlocked": "مفتوح",
         "view-tx-detail": "عرض تفاصيل المعاملة",
@@ -788,37 +792,37 @@
         "days-hours": "{{days}} أيام {{hours}} ساعات",
         "no-deposit": "لا يوجد إيداع",
         "no-completed": "لا توجد عمليات مكتملة",
-        "insufficient-balance-to-unlock": "الرصيد غير كافٍ لرسوم المعاملة لفتح الإيداع",
+        "insufficient-balance-to-unlock": "الرصيد غير كاف لدفع رسوم معاملة إلغاء قفل الإيداع",
         "lock-warn": "القفل حتى نهاية دورة التعويض الحالية"
       },
       "compensation-period": {
         "tooltip": {
           "compensated-period": "فترة التعويض",
           "days-hours": "{{days}} أيام {{hours}} ساعات",
-          "immature-for-withdraw": "يستغرق الأمر على الأقل حوالي 16 ساعة (4 دورات) للمضي قدمًا في الإجراء التالي",
-          "normal": "مبلغ التعويض منخفض، لا يُوصى بإجراء السحب",
+          "immature-for-withdraw": "يتاح الإجراء التالي بعد نحو 16 ساعة على الأقل (4 epochs)",
+          "normal": "مبلغ التعويض منخفض، لا يوصى بإجراء السحب",
           "suggested": "فترة السحب المقترحة لتعظيم التعويض",
-          "ending": "قد يتم تأجيل السحب المطلوب وقبوله لدورة إضافية من 30 يومًا",
+          "ending": "قد يتم تأجيل السحب المطلوب وقبوله لدورة إضافية من 30 يوما",
           "withdrawn": "مسحوب"
         },
         "stage-messages": {
-          "deposit-in-progress": "جارٍ الإيداع",
-          "immature-for-withdraw": "لا يمكن سحب CKB خلال الساعات القادمة ({{hours}} ساعة)",
-          "immature-for-unlock": "لا يمكن فتح CKB خلال الساعات القادمة ({{hours}} ساعة)",
-          "next-compensation-cycle": "ستبدأ دورة التعويض التالية في حوالي {{days}} يومًا",
+          "deposit-in-progress": "جار الإيداع",
+          "immature-for-withdraw": "لا يمكن سحب CKB خلال الساعات القادمة ({{ hours }} ساعة)",
+          "immature-for-unlock": "لا يمكن إلغاء قفل CKB خلال الساعات القادمة ({{ hours }} ساعة)",
+          "next-compensation-cycle": "ستبدأ دورة التعويض التالية في حوالي {{days}} يوما",
           "next-compensation-cycle-hours": "ستبدأ دورة التعويض التالية في حوالي {{hours}} ساعة",
-          "withdrawing": "جارٍ السحب...",
-          "compensation-cycle-will-end": "تنتهي دورة التعويض في حوالي {{days}} يومًا",
+          "withdrawing": "جار السحب...",
+          "compensation-cycle-will-end": "تنتهي دورة التعويض في حوالي {{days}} يوما",
           "compensation-cycle-will-end-hours": "تنتهي دورة التعويض في حوالي {{hours}} ساعة",
           "compensation-cycle-has-ended": "انتهت الدورة، CKB جاهز للإلغاء",
-          "unlocking": "جارٍ فتح القفل...",
-          "calculating-the-compensation-cycle": "جارٍ حساب دورة التعويض"
+          "unlocking": "جار إلغاء القفل...",
+          "calculating-the-compensation-cycle": "جار حساب دورة التعويض"
         }
       }
     },
     "nervos-dao-detail": {
       "tx-detail": "تفاصيل المعاملة",
-      "deposited": "مُودع",
+      "deposited": "مودع",
       "withdrawn": "مسحوب",
       "unlocked": "مفتوح",
       "basic-information": "معلومات أساسية",
@@ -829,7 +833,7 @@
       "index": "المؤشر",
       "address": "العنوان",
       "amount": "المبلغ",
-      "cell-from-cellbase": "من خلية الأساس",
+      "cell-from-cellbase": "من Cell أساس",
       "cancel": "إلغاء",
       "next": "التالي",
       "export": "تصدير المعاملة"
@@ -837,23 +841,23 @@
     "deposit-rules": {
       "minimum-deposit": "الحد الأدنى للإيداع",
       "single-compensation-cycle": "دورة تعويض واحدة",
-      "single-compensation-cycle-description": "180 حقبة (حوالي 30 يومًا)",
+      "single-compensation-cycle-description": "180 epochs (حوالي 30 يوما)",
       "withdraw": "سحب",
       "withdraw-description": "في أي وقت",
-      "unlock": "فتح",
+      "unlock": "إلغاء القفل",
       "unlock-description": "بعد دورة التعويض الحالية",
-      "get": "احصل على"
+      "get": "الحصول"
     },
     "lock-info-dialog": {
       "address-info": "معلومات العنوان",
       "deprecated-address": "عنوان مهمل"
     },
     "updates": {
-      "check-updates": "تحقق من التحديثات",
-      "checking-updates": "جارٍ التحقق...",
-      "update-available": "تحديثات متاحة حاليًا.",
-      "downloading-update": "جارٍ تنزيل التحديث...",
-      "update-not-available": "لا توجد تحديثات متاحة حاليًا.",
+      "check-updates": "التحقق من التحديثات",
+      "checking-updates": "جار التحقق...",
+      "update-available": "تحديثات متاحة حاليا.",
+      "downloading-update": "جار تنزيل التحديث...",
+      "update-not-available": "لا توجد تحديثات متاحة حاليا.",
       "updates-found-do-you-want-to-update": "تم العثور على تحديث ({{version}})، هل ترغب في التحديث؟",
       "install-update": "تثبيت الآن",
       "updates-downloaded-about-to-quit-and-install": "تم تنزيل التحديث. جاهز للتثبيت وإعادة التشغيل.",
@@ -962,19 +966,19 @@
       "start-tomorrow": "يجب أن يبدأ الوقت المحدد من الغد."
     },
     "sign-and-verify": {
-      "window-title": "توقيع أو تحقق من الرسالة",
-      "sign-or-verify-message": "توقيع أو تحقق من الرسالة",
+      "window-title": "توقيع الرسالة أو التحقق منها",
+      "sign-or-verify-message": "توقيع الرسالة أو التحقق منها",
       "message": "الرسالة",
       "address": "العنوان",
       "signature": "التوقيع",
       "cancel": "إلغاء",
       "sign": "توقيع",
-      "verify": "تحقق",
+      "verify": "التحقق",
       "password": "كلمة المرور",
       "confirm": "تأكيد",
       "verification-success": "تم التحقق بنجاح",
       "verification-failure": "فشل التحقق",
-      "address-not-found": "العنوان المُعطى لا ينتمي إلى المحفظة الحالية. يرجى التحقق من محفظتك أو الانتظار حتى اكتمال المزامنة.",
+      "address-not-found": "العنوان المعطى لا ينتمي إلى المحفظة الحالية. يرجى التحقق من محفظتك أو الانتظار حتى اكتمال المزامنة.",
       "sign-with-magic-byte": "سيتم توقيع الرسالة بالبايتات السحرية 'Nervos Message:'",
       "verify-tip": "يمكن التحقق منها بواسطة Neuron من الإصدار v0.33.1",
       "verify-old-sign-success": "تم توقيع الرسالة بواسطة Neuron قبل الإصدار v0.33.1",
@@ -989,12 +993,12 @@
       "type-script-tooltip": "نص النوع",
       "data-tooltip": "البيانات",
       "user-defined-asset": "أصل غير مصنف",
-      "user-defined-asset-tooltip": "هذا أصل غير مصنف، لا يمكن لـ Neuron معالجته الآن، يرجى استخدام برنامج طرف ثالث للتحقق.",
+      "user-defined-asset-tooltip": "هذا أصل غير مصنف، ويتعذر على Neuron معالجته الآن. يرجى استخدام برنامج من جهة خارجية للتحقق منه.",
       "locked-asset": "مقفل",
-      "locked-asset-tooltip": "معامل القفل هو {{epochs}} حقبة، تاريخ الإصدار المقدر هو {{year}}-{{month}}-{{day}} (وفقًا لارتفاع الكتلة الفعلي الجاري، قد يكون هناك بعض الفروقات الزمنية في وقت القفل).",
-      "withdraw-asset-tooltip": "وقت الإصدار المقدر هو {{year}}-{{month}}-{{day}} {{hour}}:{{minute}} (وفقًا لارتفاع الكتلة الفعلي الجاري).",
+      "locked-asset-tooltip": "مدة القفل {{epochs}} epochs. تاريخ إلغاء القفل المقدر هو {{year}}-{{month}}-{{day}}، وقد يختلف بحسب ارتفاع الكتلة الفعلي.",
+      "withdraw-asset-tooltip": "وقت الإصدار المقدر هو {{year}}-{{month}}-{{day}} {{hour}}:{{minute}} (وفقا لارتفاع الكتلة الفعلي الجاري).",
       "user-defined-token-tooltip": "ترحيل أصل {{udtType}} إلى حساب أصل {{udtType}}",
-      "claim-asset": "ادعِ",
+      "claim-asset": "المطالبة",
       "withdraw-asset": "سحب",
       "view-details": "عرض التفاصيل",
       "release-success": "تم تحرير الأصل، عرض التفاصيل في السجل.",
@@ -1006,9 +1010,9 @@
       "transfer-nft-success": "تم نقل الأصول بنجاح",
       "migrate-sudt-success": "تم تحويل حساب أصل {{udtType}} الجديد بنجاح",
       "send-sudt-success": "تم النقل إلى حساب {{udtType}} بنجاح",
-      "unlock-success": "تم ادعاء الأصل، اذهب إلى سجل المعاملات للتفاصيل",
+      "unlock-success": "تمت المطالبة بالأصل، انتقل إلى سجل المعاملات للاطلاع على التفاصيل",
       "withdraw-cheque-success": "تم سحب الأصل، اذهب إلى سجل المعاملات للتفاصيل",
-      "claim-cheque-success": "تم ادعاء الأصل، اذهب إلى سجل المعاملات للتفاصيل"
+      "claim-cheque-success": "تمت المطالبة بالأصل، انتقل إلى سجل المعاملات للاطلاع على التفاصيل"
     },
     "migrate-sudt": {
       "title": "ترحيل إلى حساب أصل {{udtType}}",
@@ -1017,7 +1021,7 @@
       "back": "السابق",
       "input-token": "يرجى إدخال اسم الرمز",
       "input-symbol": "يرجى إدخال الرمز",
-      "input-decimal": "يرجى إدخال العشرية",
+      "input-decimal": "يرجى إدخال عدد الخانات العشرية",
       "turn-into-new-account": {
         "title": "تحويل إلى حساب أصل {{udtType}} جديد",
         "sub-title": "تحويل أصل {{udtType}} إلى حساب {{udtType}} جديد، يشغل على الأقل 142 CKBytes",
@@ -1041,7 +1045,7 @@
         "title": "حسابات الأصول",
         "no-asset-accounts": "لم يتم اكتشاف أي أصل sUDT",
         "search": "اسم الحساب، اسم الرمز أو الرمز",
-        "syncing": "جارٍ المزامنة، قد تكون البيانات الحالية غير دقيقة",
+        "syncing": "جار المزامنة، قد تكون البيانات الحالية غير دقيقة",
         "send": "إرسال",
         "receive": "استلام",
         "set-account-info": "تعيين معلومات الحساب"
@@ -1053,13 +1057,13 @@
         "account-name": "اسم الحساب",
         "sudt-account": "حساب sUDT",
         "xudt-account": "حساب xUDT",
-        "delete-failed": "فشل حذف تكوين التوقيع المتعدد، سبب الفشل: {{reason}}",
+        "delete-failed": "فشل حذف إعداد التواقيع المتعددة، سبب الفشل: {{reason}}",
         "ckb-account": "حساب CKB",
         "set-token-info": "تعيين معلومات الرمز",
         "token-id": "معرف الرمز",
         "token-name": "اسم الرمز",
         "symbol": "الرمز",
-        "decimal": "عشرية",
+        "decimal": "الخانات العشرية",
         "confirm": "تأكيد",
         "cancel": "إلغاء",
         "next": "التالي",
@@ -1071,7 +1075,7 @@
           "token-id": "يرجى إدخال معرف الرمز",
           "token-name": "يرجى إدخال اسم الرمز",
           "symbol": "يرجى إدخال الرمز",
-          "decimal": "يرجى إدخال العشرية"
+          "decimal": "يرجى إدخال عدد الخانات العشرية"
         },
         "placeholder": {
           "token-id": "معرف الرمز هو Args لنص النوع {{udtType}}، والذي هو نفس تجزئة القفل لمنشئ الرمز."
@@ -1090,8 +1094,8 @@
         "submit": "إرسال",
         "click-to-edit": "انقر للتعديل",
         "cheque-address-hint": {
-          "label": "قفل 162 CKBytes مؤقتًا",
-          "tooltip": "سيتم قفل سعة 162 CKBytes مؤقتًا لتهيئة نقل الرمز، وسيتم فكها تلقائيًا بعد ادعاء الرمز من قبل المستلم."
+          "label": "قفل 162 CKBytes مؤقتا",
+          "tooltip": "سيتم قفل سعة 162 CKBytes مؤقتا لتهيئة نقل الرمز، وسيتم إلغاء قفلها تلقائيا بعد مطالبة المستلم بالرمز."
         },
         "destroy": "تدمير",
         "destroy-ckb-desc": "سيتم إعادة جميع CKB من حساب أصل CKB هذا إلى عنوان التغيير الخاص بك.",
@@ -1117,30 +1121,30 @@
         "token-id": "معرف الرمز",
         "token-name": "اسم الرمز",
         "symbol": "الرمز",
-        "decimal": "العشرية",
+        "decimal": "الخانات العشرية",
         "confirm": "تأكيد",
         "cancel": "إلغاء"
       },
       "recycle-dialog": {
-        "title": "إعادة تدوير خلية UDT",
-        "notation": "يرجى ملاحظة أن إعادة تدوير الخلايا سيدمر UDT ويحرر CKB المقفل",
+        "title": "إعادة تدوير Cell من نوع UDT",
+        "notation": "تؤدي إعادة تدوير Cells إلى تدمير UDT وتحرير CKB المقفل",
         "destroy": "تدمير",
         "release": "إطلاق",
         "current-wallet": "المحفظة الحالية",
         "receive-address": "عنوان الاستلام",
         "receive-address-placeholder": "يرجى إدخال عنوان الاستلام",
-        "submitted-tips": "تم إرسال معاملة إعادة تدوير خلية UDT",
+        "submitted-tips": "تم إرسال معاملة إعادة تدوير Cell من نوع UDT",
         "connect-wallet": "ربط المحفظة",
         "verifying": "جاري التحقق",
         "view-details": "عرض التفاصيل"
       }
     },
     "multisig-address": {
-      "window-title": "عناوين التوقيع المتعدد",
-      "guide-tip": "ارجع إلى وثائق التوقيع المتعدد لت <0>تعلم المزيد</0>.",
-      "learn-more": "تعلم المزيد",
+      "window-title": "عناوين متعددة التواقيع",
+      "guide-tip": "راجع وثائق التواقيع المتعددة من أجل <0>معرفة المزيد</0>.",
+      "learn-more": "معرفة المزيد",
       "search": {
-        "placeholder": "بحث بواسطة عنوان التوقيع المتعدد، الاسم المستعار"
+        "placeholder": "بحث بواسطة عنوان متعدد التواقيع، الاسم المستعار"
       },
       "add": {
         "label": "إنشاء"
@@ -1151,8 +1155,8 @@
       "export": {
         "label": "تصدير"
       },
-      "ok": "حسنًا",
-      "no-data": "لا يوجد عنوان توقيع متعدد",
+      "ok": "حسنا",
+      "no-data": "لا يوجد عنوان متعدد التواقيع",
       "table": {
         "address": "عنوان الموقع",
         "alias": "الاسم المستعار",
@@ -1172,8 +1176,8 @@
           "regenerate": "إعادة إنشاء"
         }
       },
-      "dao-ledger-notice": "محافظ Ledger لا تدعم حاليًا معاملات DAO لعناوين التوقيع المتعدد. يُرجى استخدام عنوان بتوقيع فردي أو الانتظار للتحديثات المستقبلية.",
-      "dao-hardware-not-match": "المحفظة الصلبة المتصلة حاليًا لا تتطابق مع المحفظة الحالية.",
+      "dao-ledger-notice": "محافظ Ledger لا تدعم حاليا معاملات DAO لعناوين متعددة التواقيع. يرجى استخدام عنوان بتوقيع فردي أو الانتظار للتحديثات المستقبلية.",
+      "dao-hardware-not-match": "محفظة الأجهزة المتصلة حاليا لا تتطابق مع المحفظة الحالية.",
       "import-dialog": {
         "actions": {
           "cancel": "إلغاء",
@@ -1181,12 +1185,12 @@
         },
         "notice": "يمكن استيراد تكوين واحد فقط في كل مرة. إذا كان محتوى الملف مصفوفة، يتم استيراد الأول بشكل افتراضي."
       },
-      "delete-failed": "فشل حذف تكوين التوقيع المتعدد",
-      "remove-multisig-address": "إزالة عنوان التوقيع المتعدد",
-      "remove-multisig-address-msg": "هل أنت متأكد أنك تريد إزالة عنوان التوقيع المتعدد المحدد؟",
+      "delete-failed": "فشل حذف إعداد التواقيع المتعددة",
+      "remove-multisig-address": "إزالة عنوان متعدد التواقيع",
+      "remove-multisig-address-msg": "هل أنت متأكد أنك تريد إزالة عنوان متعدد التواقيع المحدد؟",
       "send-ckb": {
-        "title": "إرسال CKB من عنوان توقيع متعدد",
-        "detail": "إرسال CKB من عنوان توقيع متعدد {{m}}-من-{{n}}: <0></0>",
+        "title": "إرسال CKB من عنوان متعدد التواقيع",
+        "detail": "إرسال CKB من عنوان متعدد التواقيع {{m}}-من-{{n}}: <0></0>",
         "balance": "الرصيد",
         "address": "العنوان",
         "amount": "المبلغ",
@@ -1194,34 +1198,34 @@
         "cancel": "إلغاء",
         "export": "تصدير المعاملة"
       },
-      "nervos-dao": "نيرفوس DAO",
-      "multisig-script-update-notice": "نظرًا لـ<0>ترقية برنامج النص المتعدد التوقيعات</0>، نوصي بإعادة إنشاء عناوين التوقيع المتعدد ونقل الأصول من العنوان القديم لضمان الأداء السليم.",
+      "nervos-dao": "Nervos DAO",
+      "multisig-script-update-notice": "نظرا إلى <0>ترقية برنامج التواقيع المتعددة</0>، نوصي بإعادة إنشاء العناوين متعددة التواقيع ونقل الأصول من العنوان القديم لضمان عملها بصورة سليمة.",
       "regenerate-dialog": {
         "title": "إعادة الإنشاء",
-        "detail": "سيتم إنشاء عنوان جديد باستخدام إعدادات عنوان التوقيع المتعدد القديم، مطورًا إلى أحدث تنسيق للبرنامج النصي.",
+        "detail": "سيتم إنشاء عنوان جديد باستخدام إعدادات عنوان متعدد التواقيع القديم، مطورا إلى أحدث تنسيق للبرنامج النصي.",
         "donnot-worry": "لا تقلق — لا يزال من الممكن الوصول إلى العنوان القديم.",
         "donnot-remind-again": "لا تذكرني مرة أخرى"
       },
-      "multi-details": "تفاصيل عنوان التوقيع المتعدد",
+      "multi-details": "تفاصيل عنوان متعدد التواقيع",
       "synchronization-abort": "تم إلغاء المزامنة",
-      "synchronization-abort-msg": "سيؤدي مغادرة النافذة الحالية إلى إلغاء مزامنة التوقيع المتعدد، لذا يرجى التأكد قبل المغادرة.",
+      "synchronization-abort-msg": "سيؤدي مغادرة النافذة الحالية إلى إلغاء مزامنة التواقيع المتعددة، لذا يرجى التأكد قبل المغادرة.",
       "create-dialog": {
-        "title": "إنشاء عنوان توقيع متعدد",
-        "preview-title": "تم إنشاء عنوان توقيع متعدد",
+        "title": "إنشاء عنوان متعدد التواقيع",
+        "preview-title": "تم إنشاء عنوان متعدد التواقيع",
         "index": "المؤشر",
         "required": "مطلوب",
         "signer-address": "عنوان الموقع",
         "copy-address": "نسخ العنوان",
         "placeholder": "يرجى إدخال {{type}} (1-255)",
         "m-n": {
-          "title": "يرجى إدخال تكوين عنوان التوقيع المتعدد من نوع m-of-n حيث يتطلب أي m مفاتيح خاصة من n ممكنة لنقل الأصل.",
-          "m-less-equal-n": "بالنسبة لعنوان توقيع متعدد m-of-n، يجب ألا يكون m أكبر من n",
+          "title": "يرجى إدخال تكوين عنوان متعدد التواقيع من نوع m-of-n حيث يتطلب أي m مفاتيح خاصة من n ممكنة لنقل الأصل.",
+          "m-less-equal-n": "بالنسبة لعنوان متعدد التواقيع m-of-n، يجب ألا يكون m أكبر من n",
           "m-n-required": "يرجى إدخال m/n",
           "m-n-between-0-256": "يجب أن يكون m/n بين 0 و256"
         },
         "multi-address-info": {
-          "title": "يرجى إدخال المواقع لعنوان التوقيع المتعدد {{m}}-من-{{n}}",
-          "view-title": "عنوان التوقيع المتعدد {{m}}-من-{{n}}",
+          "title": "يرجى إدخال المواقع لعنوان متعدد التواقيع {{m}}-من-{{n}}",
+          "view-title": "عنوان متعدد التواقيع {{m}}-من-{{n}}",
           "ckb-address-placeholder": "يرجى إدخال عنوان CKB"
         },
         "multi-list": "قائمة المواقع",
@@ -1235,8 +1239,8 @@
         "duplicate-address-forbid": "لا يمكن تكرار العنوان"
       },
       "approve-dialog": {
-        "title": "الموافقة باستخدام عنوان التوقيع المتعدد",
-        "detail": "الموافقة باستخدام عنوان توقيع متعدد {{m}}-من-{{n}} <0></0>",
+        "title": "الموافقة باستخدام عنوان متعدد التواقيع",
+        "detail": "الموافقة باستخدام عنوان متعدد التواقيع {{m}}-من-{{n}} <0></0>",
         "transaction": "المعاملة",
         "cancel": "إلغاء",
         "signAndExport": "توقيع وتصدير",
@@ -1256,23 +1260,23 @@
       "placeholder": "يرجى التحديد..."
     },
     "price-switch": {
-      "price": "السعر",
-      "customPrice": "سعر مخصص",
-      "errorTip": "لا يمكن أن يكون السعر أقل من {{minPrice}} شانون/KB، يرجى إعادة الإدخال",
-      "hintTip": "السعر المقترح هو {{suggestFeeRate}} شانون/KB",
-      "priceColumn": "السعر {{priceValue}} شانون/KB | الرسوم {{feeValue}} CKB",
+      "price": "معدل الرسوم",
+      "customPrice": "معدل رسوم مخصص",
+      "errorTip": "لا يمكن أن يقل معدل الرسوم عن {{minPrice}} Shannon/KB. يرجى إدخال قيمة أخرى",
+      "hintTip": "معدل الرسوم المقترح هو {{suggestFeeRate}} Shannon/KB",
+      "priceColumn": "معدل الرسوم {{priceValue}} Shannon/KB | الرسوم {{feeValue}} CKB",
       "fast": "سريع",
       "standard": "قياسي",
       "slow": "بطيء",
-      "countDownTip": "سيتم تحديث السعر بعد {{countDown}} ثانية",
-      "switchToCustomPrice": "التبديل إلى سعر مخصص",
-      "switchToPrice": "التبديل إلى السعر"
+      "countDownTip": "سيتم تحديث معدل الرسوم بعد {{countDown}} ثانية",
+      "switchToCustomPrice": "التبديل إلى معدل رسوم مخصص",
+      "switchToPrice": "التبديل إلى معدل الرسوم"
     },
     "set-start-block-number": {
       "title": "تعيين كتلة بدء المزامنة",
-      "warn": "لضمان دقة مزامنة البيانات، يُرجى إدخال رقم الكتلة لأول معاملة في محفظتك",
+      "warn": "لضمان دقة مزامنة البيانات، يرجى إدخال رقم الكتلة لأول معاملة في محفظتك",
       "tip": "رقم كتلة المزامنة البدء هو تكوين عند استخدام عقدة ckb خفيفة العميل، ثم يمكنك تعيينه وتسريع المزامنة",
-      "input-place-holder": "يرجى إدخال رقم كتلة المزامنة البدء، مثل: 10,100,101",
+      "input-place-holder": "أدخل رقم كتلة بدء المزامنة، مثل: 10، 100، 101",
       "locate-first-tx": "تحديد المعاملة الأولى",
       "view-block": "عرض الكتلة",
       "set-less-than-before": "رقم الكتلة الذي تحدده أصغر من التعيين السابق، ستبدأ المزامنة من جديد، يرجى المتابعة بحذر.",
@@ -1282,7 +1286,7 @@
       "external-node-detected-dialog": {
         "title": "تم الكشف عن عقدة خارجية",
         "body-tips-without-network": "لقد اخترت العقدة الداخلية ولكنك بدأت العقدة الخارجية، إذا كنت ترغب في الاستمرار في استخدام العقدة الخارجية، يرجى إضافة شبكة جديدة.",
-        "body-tips-with-network": "لقد اخترت حاليًا عقدة داخلية ولكنك بدأت عقدة خارجية، إذا كنت بحاجة إلى الاستمرار في استخدام العقدة الخارجية، يرجى التبديل إلى شبكة خارجية أخرى أو إضافة شبكة جديدة.",
+        "body-tips-with-network": "لقد اخترت حاليا عقدة داخلية ولكنك بدأت عقدة خارجية، إذا كنت بحاجة إلى الاستمرار في استخدام العقدة الخارجية، يرجى التبديل إلى شبكة خارجية أخرى أو إضافة شبكة جديدة.",
         "add-network": "إضافة شبكة",
         "ignore-external-node": "تجاهل العقدة الخارجية"
       },
@@ -1292,12 +1296,12 @@
         "migrate-data": "نقل البيانات"
       },
       "import-exist-xpubkey-dialog": {
-        "replace-tip": "تم استيراد محفظة المراقبة من قبل، هل ترغب في استبدالها؟",
+        "replace-tip": "سبق استيراد محفظة للقراءة فقط، فهل تريد استبدالها؟",
         "delete-tip": "كان هناك محفظة أصلية مماثلة موجودة. إذا كنت ترغب في الاستمرار في الاستيراد، يرجى حذفها."
       }
     },
     "cell-manage": {
-      "title": "إدارة الخلية",
+      "title": "إدارة Cells",
       "wallet-balance": "رصيد المحفظة",
       "table": {
         "head": {
@@ -1313,8 +1317,8 @@
         "default-description": "لا شيء"
       },
       "cell-detail-dialog": {
-        "title": "تفاصيل الخلية",
-        "transaction-hash": "هاش المعاملة",
+        "title": "تفاصيل Cell",
+        "transaction-hash": "تجزئة المعاملة",
         "capacity-used": "السعة المستخدمة",
         "data": "البيانات",
         "total": "الإجمالي",
@@ -1326,44 +1330,44 @@
         "bigEndian": "Big-Endian"
       },
       "locked-reason": {
-        "multi-locktime": "الخلية لها قفل زمني ولا يمكنك استخدامها حتى {{time}}.",
-        "multi-locktime-reached": "انتهى القفل الزمني لهذه الخلية ويجب عليك ادعاؤها في الأصول المخصصة قبل استخدامها.",
-        "cheque-acp-multisig": "هذه خلية {{type}} ولا تدعم فك القفل.",
-        "NFT-SUDT-DAO": "هذه أصل {{type}} ولا تدعم فك القفل.",
+        "multi-locktime": "هذه Cell مقفلة زمنيا ولا يمكن استخدامها حتى {{time}}.",
+        "multi-locktime-reached": "انتهى القفل الزمني لهذه Cell. تجب المطالبة بها ضمن الأصول المخصصة قبل استخدامها.",
+        "cheque-acp-multisig": "هذه Cell من النوع {{type}} ولا تدعم إلغاء القفل.",
+        "NFT-SUDT-DAO": "تمثل هذه Cell أصلا من النوع {{type}} ولا تدعم إلغاء القفل.",
         "Unknown": "هذا أصل غير مصنف، يرجى التحقق والتأكيد قبل المتابعة."
       },
       "cell-lock-dialog": {
-        "title": "قفل الخلية",
-        "capacity": "قفل خلية مختارة {{capacity}} CKB",
-        "locked-cell-can-not-use": "تحذير، لا يمكن استخدام الخلايا المقفلة"
+        "title": "قفل Cell",
+        "capacity": "قفل Cell المحددة بسعة {{capacity}} CKB",
+        "locked-cell-can-not-use": "تحذير: لا يمكن استخدام Cells المقفلة"
       },
       "cell-unlock-dialog": {
-        "title": "فتح خلية",
-        "capacity": "فتح خلية مختارة {{capacity}} CKB"
+        "title": "إلغاء قفل Cell",
+        "capacity": "إلغاء قفل Cell المحددة بسعة {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "استهلاك الخلية",
-        "warn-consume": "سيؤدي استهلاك الخلية إلى عدم الاحتفاظ بأي بيانات واستخدام كل CKB، يرجى التأكد من عدم وجود بيانات مهمة تحتاج إلى الاحتفاظ بها"
+        "title": "استهلاك Cell",
+        "warn-consume": "سيؤدي استهلاك Cell إلى حذف كل بياناتها واستخدام كل CKB فيها. تأكد من عدم احتوائها على بيانات مهمة."
       },
       "cell-consolidate-dialog": {
-        "title": "تجميع الخلايا",
-        "warn-consume": "سيتم تجميع جميع الخلايا المختارة في خلية جديدة، تأكد من أن الخلايا المختارة لا تحتوي على بيانات مهمة."
+        "title": "تجميع Cells",
+        "warn-consume": "ستجمع كل Cells المحددة في Cell جديدة. تأكد من عدم احتوائها على بيانات مهمة."
       },
-      "enter-password": "أدخل كلمة المرور",
+      "enter-password": "إدخال كلمة المرور",
       "password-placeholder": "يرجى إدخال كلمة مرور المحفظة",
       "lock": "قفل",
-      "unlock": "فتح",
+      "unlock": "إلغاء القفل",
       "consume": "استهلاك",
-      "verify": "تحقق",
+      "verify": "التحقق",
       "consolidate": "تجميع",
       "recycle": "إعادة التدوير"
     },
     "send-tx-detail": {
       "page-title": "تفاصيل المعاملة",
       "basic-info": "معلومات أساسية",
-      "topology": "الهندسة",
+      "topology": "البنية",
       "tx-basic": {
-        "tx-hash": "هاش المعاملة",
+        "tx-hash": "تجزئة المعاملة",
         "capacity": "السعة",
         "tx-fee": "رسوم المعاملة",
         "size": "الحجم",
@@ -1371,12 +1375,12 @@
       }
     },
     "lock-window": {
-      "neuron-is-locked": "تم قفل نافذة نيورون",
-      "enter-lock-password": "أدخل كلمة مرور القفل",
+      "neuron-is-locked": "تم قفل نافذة Neuron",
+      "enter-lock-password": "إدخال كلمة مرور القفل",
       "forget-password": "هل نسيت كلمة المرور؟",
       "lock-password-error": "خطأ في كلمة مرور نافذة القفل",
       "failed-times": "فشل أكثر من {{frequency}} مرات، يرجى المحاولة بعد {{time}}",
-      "verify-wallet": "تحقق"
+      "verify-wallet": "التحقق"
     }
   }
 }

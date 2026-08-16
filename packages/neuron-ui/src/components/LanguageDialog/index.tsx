@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Dialog from 'widgets/Dialog'
 import { setLocale } from 'services/remote'
@@ -10,6 +10,12 @@ import Button from 'widgets/Button'
 import styles from './languageDialog.module.scss'
 
 const { LOCALES } = CONSTANTS
+
+// The dropdown is fixed-positioned so it is not clipped by the dialog content,
+// which means its placement has to be computed from the trigger and kept inside the window.
+const DROPDOWN_GAP = 8
+const WINDOW_MARGIN = 16
+const MIN_DROPDOWN_HEIGHT = 120
 
 interface SelectItemProps {
   locale: string
@@ -35,11 +41,49 @@ const LanguageDialog = ({ show, close }: { show: boolean; close: () => void }) =
   const [lng, setLng] = useState(i18n.language as (typeof LOCALES)[number])
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>()
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   const onSubmit = useCallback(() => {
     setLocale(lng)
     close()
   }, [close, lng])
+
+  const updateDropdownPosition = useCallback(() => {
+    if (!dropdownRef.current) {
+      return
+    }
+    const { top, bottom, left, width } = dropdownRef.current.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - bottom - DROPDOWN_GAP - WINDOW_MARGIN
+    const spaceAbove = top - DROPDOWN_GAP - WINDOW_MARGIN
+    const openUpward = spaceBelow < MIN_DROPDOWN_HEIGHT && spaceAbove > spaceBelow
+    setDropdownStyle({
+      left,
+      width,
+      maxHeight: Math.max(openUpward ? spaceAbove : spaceBelow, MIN_DROPDOWN_HEIGHT),
+      ...(openUpward ? { bottom: window.innerHeight - top + DROPDOWN_GAP } : { top: bottom + DROPDOWN_GAP }),
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!isDropdownOpen) {
+      return undefined
+    }
+    updateDropdownPosition()
+    window.addEventListener('resize', updateDropdownPosition)
+    // the dialog content scrolls, so the dropdown has to follow its trigger
+    window.addEventListener('scroll', updateDropdownPosition, true)
+    return () => {
+      window.removeEventListener('resize', updateDropdownPosition)
+      window.removeEventListener('scroll', updateDropdownPosition, true)
+    }
+  }, [isDropdownOpen, updateDropdownPosition])
+
+  useEffect(() => {
+    if (!show) {
+      setIsDropdownOpen(false)
+    }
+  }, [show])
 
   return (
     <Dialog
@@ -53,7 +97,7 @@ const LanguageDialog = ({ show, close }: { show: boolean; close: () => void }) =
     >
       <div className={styles.container}>
         <p className={styles.title}>{t('settings.general.select-language')}</p>
-        <div className={styles.dropdown}>
+        <div className={styles.dropdown} ref={dropdownRef}>
           <SelectItem
             locale={lng}
             className={styles.content}
@@ -62,7 +106,7 @@ const LanguageDialog = ({ show, close }: { show: boolean; close: () => void }) =
             sufIcon={<Arrow />}
           />
           {isDropdownOpen ? (
-            <div className={styles.selects}>
+            <div className={styles.selects} style={dropdownStyle}>
               {LOCALES.map(item => (
                 <SelectItem
                   locale={item}
