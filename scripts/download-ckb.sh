@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CKB_VERSION=$(cat .ckb-version)
 CKB_LIGHT_VERSION=$(cat .ckb-light-version)
