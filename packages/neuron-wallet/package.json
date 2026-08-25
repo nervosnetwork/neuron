@@ -89,11 +89,12 @@
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",
     "electron": "36.8.1",
-    "electron-builder": "24.13.3",
+    "electron-builder": "26.15.7",
     "electron-devtools-installer": "3.2.1",
     "jest-when": "3.6.0",
     "neuron-ui": "^0.204.1",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "yaml": "2.8.0"
   },
   "resolutions": {
     "@ckb-lumos/base": "0.23.0",

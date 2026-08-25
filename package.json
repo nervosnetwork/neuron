@@ -80,7 +80,8 @@
     "@ckb-lumos/common-scripts": "0.23.0",
     "@ckb-lumos/config-manager": "0.23.0",
     "@ckb-lumos/lumos": "0.23.0",
-    "@ckb-lumos/rpc": "0.23.0"
+    "@ckb-lumos/rpc": "0.23.0",
+    "@electron/rebuild": "3.7.2"
   },
   "volta": {
     "node": "20.10.0"

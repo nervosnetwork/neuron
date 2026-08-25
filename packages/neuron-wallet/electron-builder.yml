@@ -24,6 +24,9 @@ files:
 publish:
   - github
 
+toolsets:
+  appimage: "1.0.3"
+
 nsis:
   oneClick: false
   createDesktopShortcut: always
@@ -52,9 +55,10 @@ win:
     - target: nsis
       arch:
         - x64
-  sign: scripts/customSign.js
-  signingHashAlgorithms:
-    - sha256
+  signtoolOptions:
+    sign: scripts/customSign.js
+    signingHashAlgorithms:
+      - sha256
 
 mac:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
