@@ -1,3 +1,23 @@
+# 0.209.0 (2026-08-26)
+
+### CKB Node & Light Client
+
+- [CKB@v0.209.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.209.0) was released on Jul. 29th, 2026. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.5.4](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.5.4) was released on Jan. 2nd, 2026. This version of CKB Light Client is now bundled and preconfigured in Neuron.
+
+---
+
+## Improvements
+
+- #3498: Detect a missing Microsoft Visual C++ Redistributable and show Windows users how to install it. (@chenyukang)
+
+## Bug fixes
+
+- #3446: Correct CKB compatibility version checks for custom networks. (@walker27)
+- #3482: Build Linux AppImages with a static runtime so they no longer require host `libfuse2`. (@eval-exec)
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.204.1...v0.209.0
+
 # 0.204.1 (2026-04-10)
 
 ### CKB Node & Light Client
