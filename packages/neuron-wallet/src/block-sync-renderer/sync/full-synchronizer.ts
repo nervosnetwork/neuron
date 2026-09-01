@@ -30,12 +30,16 @@ export default class FullSynchronizer extends Synchronizer {
       await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
-        const indexerTipBlock = await this.indexer.tip()
-        await this.synchronize(indexerTipBlock)
+        try {
+          const indexerTipBlock = await this.indexer.tip()
+          await this.synchronize(indexerTipBlock)
+        } catch (error) {
+          logger.error(`Full synchronization iteration failed; retrying in 5 seconds: ${error.message}`)
+        }
         await CommonUtils.sleep(5000)
       }
     } catch (error) {
-      logger.error(`Error connecting to Indexer: ${error.message}`)
+      logger.error(`Failed to initialize full synchronization: ${error.message}`)
     }
   }
 
