@@ -338,10 +338,13 @@ describe('unit tests for IndexerConnector', () => {
             await connectIndexer(indexerConnector)
             await flushPromises()
           })
-          it('throws error', async () => {
+          it('logs the queue worker error', () => {
             expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
               'Connector: \tError in processing next block number queue: Error: exception'
             )
+          })
+          it('starts polling after the queue worker error', () => {
+            expect(stubbedTipFn).toHaveBeenCalledTimes(1)
           })
         })
       })
@@ -395,6 +398,46 @@ describe('unit tests for IndexerConnector', () => {
                 cacheTipNumber: parseInt(fakeBlock3.number),
                 indexerTipNumber: parseInt(fakeTip2.blockNumber),
               })
+            })
+          })
+        })
+      })
+      describe('when a polling iteration fails', () => {
+        const sqliteBusyError = new Error('SQLITE_BUSY: database is locked')
+        let tipObserver: any
+
+        beforeEach(async () => {
+          tipObserver = jest.fn()
+          indexerConnector.blockTipsSubject.subscribe(tip => {
+            tipObserver(tip)
+          })
+          stubbedTipFn.mockResolvedValue(fakeTip1)
+          stubbedUpsertTxHashesFn.mockRejectedValueOnce(sqliteBusyError).mockResolvedValue([])
+          stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
+          stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
+
+          await connectIndexer(indexerConnector)
+        })
+
+        it('logs the error without emitting a block tip', () => {
+          expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
+            'Full synchronization iteration failed; retrying in 5 seconds: SQLITE_BUSY: database is locked'
+          )
+          expect(tipObserver).toHaveBeenCalledTimes(0)
+        })
+
+        describe('after the polling interval', () => {
+          beforeEach(async () => {
+            jest.advanceTimersByTime(5000)
+            await flushPromises()
+          })
+
+          it('continues polling and emits the recovered block tip', () => {
+            expect(stubbedTipFn).toHaveBeenCalledTimes(2)
+            expect(tipObserver).toHaveBeenCalledTimes(1)
+            expect(tipObserver).toHaveBeenCalledWith({
+              cacheTipNumber: parseInt(fakeTip1.blockNumber),
+              indexerTipNumber: parseInt(fakeTip1.blockNumber),
             })
           })
         })
