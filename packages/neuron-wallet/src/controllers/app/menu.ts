@@ -32,7 +32,7 @@ enum ExternalURL {
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
   Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet',
-  MailUs = 'neuron@magickbase.com',
+  MailUs = 'neuron@ckba.build',
 }
 
 const separator: MenuItemConstructorOptions = {
