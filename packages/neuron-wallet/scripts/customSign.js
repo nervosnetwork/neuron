@@ -1,4 +1,4 @@
-const { execSync } = require('node:child_process')
+const { execFileSync } = require('node:child_process')
 const path = require('node:path')
 
 /**
@@ -8,7 +8,6 @@ const path = require('node:path')
  *   SSL_COM_USERNAME      - SSL.com account username
  *   SSL_COM_PASSWORD      - SSL.com account password
  *   SSL_COM_TOTP_SECRET   - eSigner TOTP secret (OAuth secret)
- *   SSL_COM_MODE          - "sandbox" or "product". Defaults to "product".
  *   SSL_COM_CREDENTIAL_ID - optional, only needed when the account has multiple certificates
  *   CODE_SIGN_TOOL_PATH   - directory where CodeSignTool is extracted, e.g. C:\\CodeSignTool
  *
@@ -18,14 +17,8 @@ const path = require('node:path')
  * build can never be silently left unsigned.
  */
 exports.default = async configuration => {
-  const {
-    SSL_COM_USERNAME,
-    SSL_COM_PASSWORD,
-    SSL_COM_TOTP_SECRET,
-    SSL_COM_CREDENTIAL_ID,
-    SSL_COM_MODE,
-    CODE_SIGN_TOOL_PATH,
-  } = process.env
+  const { SSL_COM_USERNAME, SSL_COM_PASSWORD, SSL_COM_TOTP_SECRET, SSL_COM_CREDENTIAL_ID, CODE_SIGN_TOOL_PATH } =
+    process.env
 
   if (!SSL_COM_USERNAME || !SSL_COM_PASSWORD || !SSL_COM_TOTP_SECRET) {
     console.info('Skip signing because SSL.com credentials are not configured')
@@ -37,27 +30,32 @@ exports.default = async configuration => {
   }
 
   const toolDir = CODE_SIGN_TOOL_PATH || 'C:\\CodeSignTool'
-  const toolCmd = path.join(toolDir, 'CodeSignTool.bat')
+  // Use the runtime bundled with the pinned CodeSignTool v1.3.2 archive.
+  const java = path.join(toolDir, 'jdk-11.0.2', 'bin', 'java.exe')
+  const jar = path.join(toolDir, 'jar', 'code_sign_tool-1.3.2.jar')
   const inputPath = path.resolve(String(configuration.path))
 
   const args = [
+    '-jar',
+    jar,
     'sign',
-    `-username="${SSL_COM_USERNAME}"`,
-    `-password="${SSL_COM_PASSWORD}"`,
-    `-totp_secret="${SSL_COM_TOTP_SECRET}"`,
-    `-input_file_path="${inputPath}"`,
+    `-username=${SSL_COM_USERNAME}`,
+    `-password=${SSL_COM_PASSWORD}`,
+    `-totp_secret=${SSL_COM_TOTP_SECRET}`,
+    `-input_file_path=${inputPath}`,
     '-override=true',
   ]
 
   if (SSL_COM_CREDENTIAL_ID) {
-    args.push(`-credential_id="${SSL_COM_CREDENTIAL_ID}"`)
+    args.push(`-credential_id=${SSL_COM_CREDENTIAL_ID}`)
   }
 
   console.info(`Signing ${inputPath} with SSL.com CodeSignTool`)
 
-  execSync(`"${toolCmd}" ${args.join(' ')}`, {
+  // Credentials must bypass cmd.exe expansion, including percent signs and quotes.
+  execFileSync(java, args, {
     cwd: toolDir,
     stdio: 'inherit',
-    env: { ...process.env, MODE: SSL_COM_MODE || 'product' },
+    shell: false,
   })
 }
