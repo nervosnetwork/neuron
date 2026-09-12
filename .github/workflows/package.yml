@@ -54,38 +54,25 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
-      - name: Setup Certificate
-        if: runner.os == 'Windows'
-        run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_BASE64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-        shell: bash
-
       - name: Set variables
         if: runner.os == 'Windows'
         run: |
-          echo "SM_KEYPAIR_NAME=${{ secrets.SM_KEYPAIR_ALIAS }}" >> "$GITHUB_ENV"
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
           echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
           echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
-          echo "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools" >> $GITHUB_PATH
         shell: bash
 
-      - name: Setting up the client tools
-        if: ${{ runner.os == 'Windows' && env.SM_API_KEY != '' }}
+      - name: Ensure Windows signing credentials are present
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          SSL_COM_USERNAME: ${{ secrets.SSL_COM_USERNAME }}
+          SSL_COM_PASSWORD: ${{ secrets.SSL_COM_PASSWORD }}
+          SSL_COM_TOTP_SECRET: ${{ secrets.SSL_COM_TOTP_SECRET }}
         run: |
-          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi
-          msiexec /i smtools-windows-x64.msi /quiet /qn
-          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
-        shell: cmd
-
-      - name: Certificates Sync
-        if: ${{ runner.os == 'Windows' && env.SM_API_KEY != '' }}
-        run: |
-          smctl windows certsync
-        shell: cmd
+          if [ -z "$SSL_COM_USERNAME" ] || [ -z "$SSL_COM_PASSWORD" ] || [ -z "$SSL_COM_TOTP_SECRET" ]; then
+            echo "::error::SSL.com signing credentials are missing. Refusing to publish an unsigned release build."
+            exit 1
+          fi
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
@@ -101,6 +88,54 @@ jobs:
           yarn
         env:
           CI: false
+
+      # IMPORTANT: every SSL.com related step must stay AFTER "Bootstrap".
+      # actions/setup-java rewrites JAVA_HOME and PATH, which breaks node-gyp's
+      # Visual Studio detection when native modules (node-hid, etc.) are compiled.
+      - name: Setup Java (required by CodeSignTool)
+        if: runner.os == 'Windows'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+
+      - name: Download and setup SSL.com CodeSignTool
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/SSLcom/CodeSignTool/releases/download/v1.3.2/CodeSignTool-v1.3.2-windows.zip" -OutFile CodeSignTool.zip
+          Expand-Archive -Path CodeSignTool.zip -DestinationPath C:\CodeSignTool-tmp -Force
+          $root = Get-ChildItem C:\CodeSignTool-tmp | Select-Object -First 1
+          if (Test-Path (Join-Path $root.FullName "CodeSignTool.bat")) {
+            Move-Item $root.FullName C:\CodeSignTool
+          } else {
+            Move-Item C:\CodeSignTool-tmp C:\CodeSignTool
+          }
+          if (-not (Test-Path "C:\CodeSignTool\CodeSignTool.bat")) {
+            Write-Host "::error::CodeSignTool.bat was not found after extraction."
+            exit 1
+          }
+
+      # SSL_COM_MODE follows SSL.com's own naming: "sandbox" or "product".
+      # Leave the secret unset (or set it to "product") for real releases.
+      - name: Configure CodeSignTool environment
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          SSL_COM_MODE: ${{ secrets.SSL_COM_MODE }}
+        run: |
+          $mode = $env:SSL_COM_MODE
+          if ([string]::IsNullOrEmpty($mode)) { $mode = "product" }
+          Write-Host "Using SSL.com mode: $mode"
+          $propFile = "C:\CodeSignTool\conf\code_sign_tool.properties"
+          $sandbox  = "C:\CodeSignTool\conf\code_sign_tool_demo.properties"
+          if ($mode -eq "sandbox") {
+            if (-not (Test-Path $sandbox)) {
+              Write-Host "::error::sandbox mode requested but code_sign_tool_demo.properties was not found."
+              exit 1
+            }
+            Copy-Item $sandbox $propFile -Force
+          }
 
         # Inject LOG_ENCRYPTION_PUBLIC_KEY to encrypt sensitive log
       - name: Inject environment variables
@@ -129,6 +164,37 @@ jobs:
           bash ./scripts/release.sh win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSL_COM_USERNAME: ${{ secrets.SSL_COM_USERNAME }}
+          SSL_COM_PASSWORD: ${{ secrets.SSL_COM_PASSWORD }}
+          SSL_COM_TOTP_SECRET: ${{ secrets.SSL_COM_TOTP_SECRET }}
+          SSL_COM_CREDENTIAL_ID: ${{ secrets.SSL_COM_CREDENTIAL_ID }}
+          SSL_COM_MODE: ${{ secrets.SSL_COM_MODE }}
+          CODE_SIGN_TOOL_PATH: C:\CodeSignTool
+
+      - name: Verify Windows signature
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $failed = $false
+          $files = Get-ChildItem release\*.exe
+          if ($files.Count -eq 0) {
+            Write-Host "::error::No .exe found in release directory."
+            exit 1
+          }
+          foreach ($file in $files) {
+            $sig = Get-AuthenticodeSignature $file.FullName
+            Write-Host "=== $($file.Name) ==="
+            $sig | Format-List Status, StatusMessage, SignerCertificate, TimeStamperCertificate
+            if ($sig.Status -ne 'Valid') {
+              Write-Host "::error::$($file.Name) signature is not valid: $($sig.StatusMessage)"
+              $failed = $true
+            }
+            if (-not $sig.TimeStamperCertificate) {
+              Write-Host "::error::$($file.Name) is not timestamped."
+              $failed = $true
+            }
+          }
+          if ($failed) { exit 1 }
 
       - name: Package for Linux
         if: runner.os == 'Linux'
