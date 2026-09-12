@@ -14,7 +14,7 @@ jobs:
     if: ${{ startsWith(github.ref_name, 'rc/') }}
     steps:
       - name: Create Branch
-        uses: peterjgrainger/action-create-branch@v3.0.0
+        uses: peterjgrainger/action-create-branch@v4.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -22,12 +22,12 @@ jobs:
           sha: '${{ github.sha }}'
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: 'chore-update-wallet-env/${{github.ref_name}}'
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
 
@@ -36,7 +36,7 @@ jobs:
           npm run update:wallet-env
 
       - name: Commit env file
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ github.ref_name }}
@@ -63,7 +63,7 @@ jobs:
             })
 
       - name: Create PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{github.ref}}
