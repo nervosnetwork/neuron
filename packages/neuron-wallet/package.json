@@ -70,7 +70,7 @@
     "subleveldown": "4.1.4",
     "tslib": "2.6.3",
     "typeorm": "0.3.17",
-    "uuid": "8.3.2"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@electron/notarize": "2.5.0",
