@@ -92,6 +92,10 @@ linux:
   extraFiles:
     - from: "bin/linux/ckb"
       to: "bin/ckb"
+      filter: "**/*"
+    - from: "bin/linux/ckb-arm64"
+      to: "bin/ckb-arm64"
+      filter: "**/*"
     - from: "bin/linux/ckb-light-client"
       to: "bin/ckb-light-client"
     - from: "light/ckb_light_testnet.toml"
@@ -99,4 +103,7 @@ linux:
     - from: "light/ckb_light_mainnet.toml"
       to: "light/ckb_light_mainnet.toml"
   target:
-    - AppImage
+    - target: AppImage
+      arch:
+        - x64
+        - arm64

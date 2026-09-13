@@ -48,7 +48,7 @@ function download_macos_light() {
 }
 
 function download_linux() {
-  # Linux
+  # Linux x86_64
   CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-unknown-linux-gnu-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/linux
 
@@ -59,8 +59,20 @@ function download_linux() {
   rm ${CKB_FILENAME}.tar.gz
 }
 
+function download_linux_aarch64() {
+  # Linux arm64
+  CKB_FILENAME="ckb_${CKB_VERSION}_aarch64-unknown-linux-gnu"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/linux
+
+  curl -O -L "${GITHUB_RELEASE_URL}/${CKB_VERSION}/${CKB_FILENAME}.tar.gz"
+  tar xvzf ${CKB_FILENAME}.tar.gz
+  cp ${CKB_FILENAME}/ckb ./ckb-arm64
+  rm -rf $CKB_FILENAME
+  rm ${CKB_FILENAME}.tar.gz
+}
+
 function download_linux_light() {
-  # macOS
+  # Linux light client (x86_64 only — no arm64 release yet)
   CKB_FILENAME="ckb-light-client_${CKB_LIGHT_VERSION}-x86_64-linux-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/linux
 
@@ -99,7 +111,8 @@ function download_windows_light() {
 
 case $1 in
   mac)    download_macos; download_macos_light;;
-  linux)  download_linux; download_linux_light;;
+  linux)  download_linux; download_linux_aarch64; download_linux_light;;
+  linux-arm64) download_linux_aarch64; download_linux_light;;
   win)    download_windows; download_windows_light;;
   *)
     if [[ "$OSTYPE" == "darwin"* ]]; then
