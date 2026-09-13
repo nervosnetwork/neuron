@@ -24,15 +24,16 @@
       "pause": "Pausar sincronización",
       "experimental-functions": "Experimental",
       "s-udt": "Cuentas de activos",
-      "update-neuron-with-ckb": "La versión del nodo de CKB no coincide con Neuron (v{{ version }}), lo que puede causar problemas de compatibilidad. Por favor actualice a la última versión de Neuron.",
+      "update-neuron-with-ckb": "La versión del nodo CKB no coincide con Neuron (v{{ version }}), lo que puede causar problemas de compatibilidad. Actualice Neuron a la última versión.",
       "learn-more": "Saber más",
-      "ckb-node-compatible": "El nodo CKB no es compatible con Neuron (v{{ version }}), por favor compruébelo antes de continuar. (<0>{{btnText}}</0>)",
-      "ckb-without-indexer": "Por favor agregue la opción '--indexer' para iniciar el nodo local"
+      "ckb-node-compatible": "El nodo CKB no es compatible con Neuron (v{{ version }}). Compruébelo antes de continuar. (<0>{{btnText}}</0>)",
+      "ckb-without-indexer": "Añada la opción '--indexer' para iniciar el nodo local"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Bloque sincronizado",
-        "looking-valid-target": "Buscando objetivo válido asumido",
+        "looking-valid-target": "Buscando un objetivo considerado válido",
+        "start-block-number": "Número de bloque inicial",
         "set-start-block-number": "Establecer el número de bloque inicial"
       },
       "migrating": "migrando...",
@@ -41,13 +42,13 @@
     },
     "import-hardware": {
       "title": {
-        "select-model": "Por favor conecte su dispositivo y seleccione el modelo",
+        "select-model": "Conecte el dispositivo y seleccione el modelo",
         "detect-device": "Detectando dispositivo",
-        "name-wallet": "Nombre de la billetera",
-        "choose-address": "Elige una dirección del dispositivo"
+        "name-wallet": "Asignar un nombre a la billetera",
+        "choose-address": "Seleccione una dirección del dispositivo"
       },
       "actions": {
-        "confirm": "Por favor confirme en su dispositivo...",
+        "confirm": "Confirme en el dispositivo...",
         "success": "¡Importación exitosa!",
         "next": "Siguiente",
         "cancel": "Cancelar",
@@ -58,20 +59,20 @@
       },
       "errors": {
         "multi-device": "Se han detectado varios dispositivos. Solo se puede conectar un dispositivo del mismo modelo.",
-        "device-not-found": "No se ha detectado ningún dispositivo. Por favor conecte su dispositivo.",
-        "ckb-app-not-found": "No se abre la aplicación CKB. Por favor abra la aplicación CKB en su dispositivo."
+        "device-not-found": "No se ha detectado ningún dispositivo. Conéctelo.",
+        "ckb-app-not-found": "La aplicación CKB no está abierta. Ábrala en el dispositivo."
       },
       "waiting": "Esperando a la aplicación CKB...",
       "abort": "Esperando a la aplicación CKB... Acción cancelada",
       "app-version": "Aplicación CKB v{{version}} en ejecución.",
       "firmware-version": "Firmware v{{version}} detectado.",
       "wallet-name": "Nombre de la billetera",
-      "select-model": "Selecciona Modelo",
+      "select-model": "Seleccionar modelo",
       "other-device": "Otro"
     },
     "hardware-sign": {
       "cancel": "Cancelar",
-      "title": "Firma a través de billetera de hardware",
+      "title": "Firmar con una billetera de hardware",
       "device": "Dispositivo:",
       "status": {
         "label": "Estado:",
@@ -88,7 +89,7 @@
       }
     },
     "hardware-verify-address": {
-      "title": "Verificar dirección a través de billetera de hardware",
+      "title": "Verificar la dirección con una billetera de hardware",
       "device": "Dispositivo:",
       "address": "Dirección:",
       "verified": "Verificado",
@@ -102,9 +103,9 @@
       "actions": {
         "close": "Cerrar",
         "reconnect": "Reconectar",
-        "copy-address": "Copiar Dirección",
-        "verify": "Verificar Dirección",
-        "finish": "Ok"
+        "copy-address": "Copiar dirección",
+        "verify": "Verificar dirección",
+        "finish": "OK"
       }
     },
     "offline-sign": {
@@ -116,99 +117,106 @@
         "partially-signed": "Parcialmente firmado",
         "signed": "Firmado"
       },
+      "import-signed-transaction": "Importar una transacción firmada",
+      "import-signed-transaction-detail": "Se ha importado una transacción firmada. Confírmela e inténtelo de nuevo.",
       "wallet": "Billetera:",
       "content": "Contenido:",
-      "export": "Exportar Tx",
+      "export": "Exportar transacción",
       "sign-and-export": "Firmar y exportar",
       "sign-and-broadcast": "Firmar y transmitir",
       "actions": {
         "broadcast": "Transmitir",
         "sign": "Firmar y exportar",
-        "cancel": "Cancelar"
-      }
+        "cancel": "Cancelar",
+        "view-in-explorer": "Ver en el explorador"
+      },
+      "broadcast-transaction": "Transmitir transacción",
+      "import-transaction-to-sign": "Importar una transacción para firmarla",
+      "import-unsigned-transaction-detail": "Se ha importado una transacción sin firmar. Confírmela e inténtelo de nuevo."
     },
     "overview": {
       "date": "Fecha",
       "type": "Tipo",
       "balance": "Saldo",
-      "recent-activities": "Actividades Recientes",
+      "recent-activities": "Actividad reciente",
       "no-recent-activities": "No hay actividades recientes",
       "activity": "Actividad",
-      "datetime": "Fecha y Hora",
+      "datetime": "Fecha y hora",
       "status": "Estado",
-      "asset": "Activos",
+      "asset": "Activo",
       "address": "Dirección",
       "sent": "Enviado",
       "sending": "Enviando",
       "received": "Recibido",
       "receiving": "Recibiendo",
       "more": "Más",
-      "copy-balance": "Copiar Saldo",
-      "create": "Crear cuenta de activo(s) {{name}}",
-      "destroy": "Destruir cuenta de activo(s) {{name}}",
+      "copy-balance": "Copiar saldo",
+      "create": "Crear cuenta de activos {{name}}",
+      "destroy": "Eliminar cuenta de activos {{name}}",
       "createSUDT": "Crear cuenta de activo <0></0>",
-      "destroySUDT": "Destruir cuenta de activo <0></0>",
-      "wallet-ready": "La billetera está lista, bienvenido",
+      "destroySUDT": "Eliminar cuenta de activos <0></0>",
+      "wallet-ready": "La billetera está lista. Le damos la bienvenida.",
       "send": "Enviar",
       "receive": "Recibir",
       "locked": "Cantidad bloqueada",
       "locked-balance": "Saldo bloqueado",
-      "first-sync-notice": "La sincronización inicial requiere al menos {{size}} GB de espacio en disco, <br />Además, el tamaño de los datos aumentará con el tiempo, se recomienda seleccionar un espacio en disco más grande para almacenar los datos.",
+      "first-sync-notice": "La sincronización inicial necesita al menos {{size}} GB de espacio en disco. <br />El volumen de datos aumentará con el tiempo; se recomienda disponer de más espacio para almacenarlos.",
       "start-sync": "Iniciar sincronización"
     },
     "wizard": {
-      "welcome-to-nervos-neuron": "Bienvenido a Neuron",
-      "create-or-import-your-first-wallet": "Crea o importa tu primera billetera",
-      "create-new-wallet": "Crear una Billetera",
-      "import-mnemonic": "Importar Semilla de Billetera",
+      "welcome-to-nervos-neuron": "Le damos la bienvenida a Neuron",
+      "create-or-import-your-first-wallet": "Crear o importar su primera billetera",
+      "create-new-wallet": "Crear una billetera",
+      "import-mnemonic": "Importar una frase de recuperación",
       "import-keystore": "Importar desde Keystore",
-      "import-wallet": "Importar una Billetera",
-      "import-hardware-wallet": "Importar una Billetera de Hardware",
-      "new-wallet": "Nueva Billetera",
-      "wallet-seed": "Semilla de Billetera",
+      "import-wallet": "Importar una billetera",
+      "import-hardware-wallet": "Importar una billetera de hardware",
+      "new-wallet": "Nueva billetera",
+      "wallet-seed": "Frase de recuperación",
       "keystore": "Keystore",
-      "hardware-wallet": "Billetera de Hardware",
+      "hardware-wallet": "Billetera de hardware",
       "next": "Siguiente",
       "back": "Regresar",
       "name": "Nombre",
-      "your-wallet-seed-is": "Se ha generado la nueva frase semilla de tu billetera",
-      "input-your-seed": "Por favor introduce la frase semilla de tu billetera",
+      "your-wallet-seed-is": "Se ha generado la nueva frase de recuperación de su billetera",
+      "input-your-seed": "Introduzca la frase de recuperación de su billetera",
       "password": "Contraseña",
-      "confirm-password": "Confirmar Contraseña",
-      "set-wallet-name-and-password": "Por favor, nombra tu billetera en este dispositivo y elige una contraseña fuerte para protegerla",
-      "set-wallet-name": "Establece un nombre para la billetera",
-      "set-a-strong-password-to-protect-your-wallet": "Por favor, establece una contraseña fuerte para proteger tu billetera",
+      "confirm-password": "Confirmar contraseña",
+      "set-wallet-name-and-password": "Asigne un nombre a la billetera en este dispositivo y elija una contraseña segura para protegerla",
+      "set-wallet-name": "Asignar un nombre a la billetera",
+      "set-a-strong-password-to-protect-your-wallet": "Establezca una contraseña segura para proteger su billetera",
       "wallet-suffix": "Billetera {{suffix}}",
       "handwritten-recommended": "Se recomienda transcripción a mano",
       "do-not-copy": "No copiar",
       "do-not-save-screenshots": "No guardar capturas de pantalla",
-      "replenish-your-seed": "Por favor, repón la semilla de tu billetera",
-      "new-name": "Usa un nombre no usado previamente para la nueva billetera",
+      "replenish-your-seed": "Complete la frase de recuperación de su billetera",
+      "new-name": "Use un nombre nuevo para la billetera",
       "complex-password": "La contraseña debe tener entre 8 y 50 caracteres y contener al menos tres categorías de caracteres entre las siguientes: letras en mayúscula, letras en minúscula, números y símbolos especiales.",
       "same-password": "La contraseña y la confirmación de contraseña deben coincidir",
-      "input-seed-verify": "Por favor, ingresa la semilla correcta de la billetera o haz clic en regresar para recrear la billetera",
-      "input-seed-first-empty-space": "Puede pegar toda la semilla del monedero en el primer espacio vacío",
-      "no-wallet": "¿No tienes una billetera?",
-      "create-wallet": "Crear Billetera",
-      "repeat-password": "Repetir Contraseña",
-      "finish-create": "Finalizar Creación",
-      "creating-wallet": "Se está preparando la billetera, por favor espera",
-      "add-one": "Añadir una más"
+      "input-seed-verify": "Introduzca la frase de recuperación correcta o vuelva atrás para recrear la billetera",
+      "input-seed-first-empty-space": "Puede pegar toda la frase de recuperación en el primer campo vacío",
+      "no-wallet": "¿No tiene una billetera?",
+      "create-wallet": "Crear billetera",
+      "repeat-password": "Repetir contraseña",
+      "finish-create": "Finalizar creación",
+      "creating-wallet": "Se está creando la billetera. Espere.",
+      "add-one": "Añadir otra billetera",
+      "detect-duplicate-wallets": "Detectar billeteras duplicadas"
     },
     "import-keystore": {
-      "title": "Importar Keystore",
-      "select-file": "Seleccionar Archivo",
+      "title": "Importar un archivo Keystore",
+      "select-file": "Seleccionar archivo",
       "import-failure": "Error de importación",
-      "import-failure-msg": "Neuron no soporta la importación del archivo keystore de ckb-cli debido a diferentes reglas de derivación del archivo keystore.",
+      "import-failure-msg": "Neuron no admite la importación del archivo Keystore de ckb-cli porque utiliza reglas de derivación diferentes.",
       "label": {
-        "path": "Archivo de Claves",
-        "name": "Nombre de la Billetera",
+        "path": "Archivo Keystore",
+        "name": "Nombre de la billetera",
         "password": "Contraseña"
       },
       "placeholder": {
-        "path": "Haz clic para seleccionar el archivo de claves",
+        "path": "Seleccionar el archivo Keystore",
         "name": "Nombre para la nueva billetera",
-        "password": "Contraseña para verificar el archivo de claves"
+        "password": "Contraseña para verificar el archivo Keystore"
       },
       "button": {
         "back": "Regresar",
@@ -220,35 +228,35 @@
     },
     "send": {
       "address": "Enviar a",
-      "input-address": "Por favor ingresa la dirección de destino",
+      "input-address": "Introduzca la dirección de destino",
       "amount": "Cantidad (CKB)",
-      "input-amount": "Por favor ingresa la cantidad",
+      "input-amount": "Introduzca la cantidad",
       "send": "Enviar",
-      "reset": "Reiniciar",
-      "confirm-password": "Confirmar Contraseña",
+      "reset": "Restablecer",
+      "confirm-password": "Confirmar contraseña",
       "to": "Para",
-      "add-receiving-address": "Añadir Dirección de Recepción",
-      "input-password-to-confirm": "Ingresa la contraseña para confirmar",
-      "scan-to-get-address": "Escanea el código QR para leer la dirección a la que deseas enviar",
-      "total-amount": "Cantidad Total (CKB)",
+      "add-receiving-address": "Añadir dirección de recepción",
+      "input-password-to-confirm": "Introduzca la contraseña para confirmar",
+      "scan-to-get-address": "Escanee el código QR para obtener la dirección de destino",
+      "total-amount": "Cantidad total (CKB)",
       "description": "Descripción",
-      "description-optional": "Por favor ingresa una descripción, opcional",
+      "description-optional": "Introduzca una descripción (opcional)",
       "balance": "Saldo",
-      "add-one": "Añadir uno más",
-      "remove-this": "Eliminar esta",
-      "fee": "Tarifa de Transacción (CKB)",
-      "advanced-fee-settings": "Configuración Avanzada de Tarifa",
-      "price": "Precio",
-      "pick-price": "Seleccionar Precio Rápido",
-      "custom-price": "Precio Personalizado",
+      "add-one": "Añadir otra",
+      "remove-this": "Eliminar",
+      "fee": "Comisión de transacción (CKB)",
+      "advanced-fee-settings": "Configuración avanzada de la comisión",
+      "price": "Tasa de comisión",
+      "pick-price": "Elegir tasa rápidamente",
+      "custom-price": "Tasa personalizada",
       "slow": "Lento",
       "standard": "Estándar",
       "fast": "Rápido",
       "total-cycles": "Ciclos RISC-V Totales",
-      "scan-screen-qr-code": "Escanea el código QR en la pantalla",
+      "scan-screen-qr-code": "Escanee el código QR de la pantalla",
       "set-locktime": "Fijar hora de bloqueo",
-      "remove-receiving-address": "Eliminar Dirección de Recepción",
-      "remove-receiving-address-msg": "¿Estás seguro de que quieres eliminar la dirección de recepción seleccionada?",
+      "remove-receiving-address": "Eliminar dirección de recepción",
+      "remove-receiving-address-msg": "¿Está seguro de que desea eliminar la dirección de recepción seleccionada?",
       "locktime-notice-content": "De acuerdo al número de bloque actual, puede haber algunas variaciones de tiempo en en el tiempo de bloqueo.",
       "release-on": "Liberar en",
       "locktime-warning": "Asegúrese de que la billetera del receptor pueda soportar el desbloqueo por vencimiento. (Nota: 1. Generalmente, las casas de cambio no admiten el desbloqueo por vencimiento {{extraNote}})",
@@ -261,13 +269,13 @@
     "receive": {
       "title": "Recibir",
       "address-book": "Libro de Direcciones",
-      "click-to-copy": "Haz clic para copiar la dirección",
-      "copy-address": "Copiar Dirección",
+      "click-to-copy": "Copiar la dirección",
+      "copy-address": "Copiar dirección",
       "address-not-found": "Dirección no encontrada",
-      "prompt": "Neuron elige una nueva dirección de recepción para una mejor privacidad. Por favor, ve al Libro de Direcciones si deseas utilizar una dirección de recepción utilizada anteriormente.",
-      "address-qrcode": "Código QR de la Dirección",
+      "prompt": "Para mejorar la privacidad, Neuron selecciona una nueva dirección de recepción. Si desea reutilizar una dirección anterior, búsquela en el libro de direcciones.",
+      "address-qrcode": "Código QR de la dirección",
       "address": "Dirección {{network}}",
-      "verify-address": "Verificar Dirección",
+      "verify-address": "Verificar dirección",
       "turn-into-full-version-format": "Convertir en formato de versión completa",
       "turn-into-deprecated-format": "Convertir en formato obsoleto",
       "save-qr-code": "Descargar",
@@ -279,21 +287,22 @@
       "failed": "Fallido",
       "confirming": "Confirmación"
     },
-    "confirmationsCount_one": "{{count}} Confirmación",
-    "confirmationsCount_other": "{{count}} Confirmaciones",
+    "confirmationsCount_one": "{{count}} confirmación",
+    "confirmationsCount_many": "{{count}} confirmaciones",
+    "confirmationsCount_other": "{{count}} confirmaciones",
     "history": {
       "title": "Historial",
-      "title-detail": "Detalle del Historial",
-      "meta": "Meta",
+      "title-detail": "Detalles del historial",
+      "meta": "Metadatos",
       "type": "Tipo",
       "date": "Fecha",
       "timestamp": "Hora",
       "amount": "Cantidad",
-      "transaction-hash": "Hash de Transacción",
+      "transaction-hash": "Hash de transacción",
       "send": "Enviar",
       "receive": "Recibir",
       "other": "Otro",
-      "more-actions": "Más Acciones",
+      "more-actions": "Más acciones",
       "detail": "Detalle",
       "explorer": "Explorador",
       "first": "Primero",
@@ -302,44 +311,44 @@
       "last": "Último",
       "description": "Descripción",
       "status": "Estado",
-      "blockNumber": "Número de Bloque",
-      "basic-information": "Información Básica",
+      "blockNumber": "Número de bloque",
+      "basic-information": "Información básica",
       "search": {
         "button": "Buscar",
         "placeholder": "Buscar hash de transacción, dirección o fecha (aaaa-mm-dd)"
       },
       "table": {
-        "name": "Nombre de la Billetera",
+        "name": "Nombre de la billetera",
         "type": "Tipo",
         "balance": "Saldo",
-        "asset": "activos",
+        "asset": "Activo",
         "timestamp": "Tiempo",
         "status": "Estado",
         "operation": "Operación"
       },
-      "export-history": "Exportar Historial de Transacciones",
+      "export-history": "Exportar historial de transacciones",
       "confirmationTimes": "Confirmaciones",
-      "confirming-with-count": "{{confirmations}} Confirmaciones",
-      "view-on-explorer": "Ver en el Explorador",
-      "no-txs": "No Historial de Transacciones",
+      "confirming-with-count": "{{confirmations}} confirmaciones",
+      "view-on-explorer": "Ver en el explorador",
+      "no-txs": "No hay transacciones en el historial",
       "view-in-explorer": "Ver en el explorador",
       "view-in-explorer-button-title": "Ver en el explorador",
       "view-detail": "Detalle",
-      "view-detail-button-title": "Ver Detalle",
-      "amend": "Enmendar",
+      "view-detail-button-title": "Ver detalles",
+      "amend": "Modificar",
       "opening": "Abriendo",
-      "copy-tx-hash": "Copiar Hash de Transacción",
-      "copy-balance": "Copiar Saldo",
-      "copy-address": "Copiar Dirección",
-      "create": "Crear Cuenta de Activos {{name}}",
-      "destroy": "Destruir Cuenta de Activos {{name}}",
-      "fee": "Tarifa de transacción"
+      "copy-tx-hash": "Copiar hash de transacción",
+      "copy-balance": "Copiar saldo",
+      "copy-address": "Copiar dirección",
+      "create": "Crear cuenta de activos {{name}}",
+      "destroy": "Eliminar cuenta de activos {{name}}",
+      "fee": "Comisión de transacción"
     },
     "transaction": {
       "window-title": "Transacción: {{hash}}",
       "date": "Fecha",
-      "transaction-hash": "Hash de Transacción",
-      "block-number": "Número de Bloque",
+      "transaction-hash": "Hash de transacción",
+      "block-number": "Número de bloque",
       "goBack": "Volver",
       "index": "Índice",
       "address": "Dirección",
@@ -347,12 +356,12 @@
       "amount": "Cantidad",
       "inputs": "Entradas",
       "outputs": "Salidas",
-      "cell-from-cellbase": "Desde cellbase",
-      "lock-script": "Script de Bloqueo",
-      "lock-script-title": "Información de Dirección",
+      "cell-from-cellbase": "Desde Cellbase",
+      "lock-script": "Script de bloqueo",
+      "lock-script-title": "Información de la dirección",
       "deprecated-address-format": "Dirección en formato obsoleto",
       "type": "Tipo",
-      "fee": "Tarifa de transacción",
+      "fee": "Comisión de transacción",
       "assets": "Activos",
       "balance": "Saldo",
       "status": "Estado",
@@ -361,7 +370,7 @@
       "cell-detail": "Detalles de la Cell"
     },
     "addresses": {
-      "title": "Libro de Direcciones",
+      "title": "Libro de direcciones",
       "addresses": "Direcciones",
       "type": "Tipo",
       "address": "Dirección",
@@ -371,21 +380,21 @@
       "transactions": "TXs",
       "receiving-address": "Recepción",
       "change-address": "Cambiar",
-      "copy-address": "Copiar Dirección",
-      "request-payment": "Solicitar Pago",
-      "view-on-explorer": "Ver en el Explorador",
+      "copy-address": "Copiar dirección",
+      "request-payment": "Solicitar pago",
+      "view-on-explorer": "Ver en el explorador",
       "default-description": "Ninguna",
       "all-address": "Todas",
       "view-private-key": "Ver clave privada",
       "private-key": "Clave privada",
-      "view-private-key-tip": "Si pierdes tu clave privada, tus activos desaparecerán. (Ver en un entorno seguro)"
+      "view-private-key-tip": "Si pierde la clave privada, perderá sus activos. Consúltela únicamente en un entorno seguro."
     },
     "settings": {
       "title": {
         "normal": "Ajustes",
         "mac": "Preferencias"
       },
-      "go-to-overview": "Ir a Resumen",
+      "go-to-overview": "Ir al resumen",
       "setting-tabs": {
         "general": "General",
         "wallets": "Billeteras",
@@ -397,7 +406,7 @@
         "hide": "Ocultar",
         "version": "Versión",
         "language": "Idioma",
-        "select-language": "Seleccionar Idioma",
+        "select-language": "Seleccionar idioma",
         "apply": "Aplicar",
         "keep-awake": "Mantener la pantalla encendida durante la sincronización",
         "lock-password": "Contraseña de bloqueo de pantalla",
@@ -412,36 +421,45 @@
           "different-password": "Las contraseñas ingresadas no coinciden",
           "set-password-success": "Contraseña establecida exitosamente",
           "change-password-success": "Contraseña modificada exitosamente",
-          "reset": "Reestablecer"
+          "reset": "Restablecer"
         }
       },
       "wallet-manager": {
         "edit-wallet": {
-          "wallet-name": "Nombre de la Billetera",
+          "wallet-name": "Nombre de la billetera",
           "password": "Contraseña",
-          "new-password": "Nueva Contraseña",
-          "confirm-password": "Confirmar Contraseña",
-          "edit-wallet": "Editar Billetera"
+          "new-password": "Nueva contraseña",
+          "confirm-password": "Confirmar contraseña",
+          "edit-wallet": "Editar billetera"
         },
         "edit-success": "Información de la billetera actualizada",
-        "delete-wallet-title": "Por Favor ingrese la {{name}} Contraseña",
+        "delete-wallet-title": "Introduzca la contraseña de {{name}}",
         "password": "Contraseña",
         "wallet-detail": {
           "balance": "Saldo"
+        },
+        "importing-existing": {
+          "title": "Importar una billetera existente",
+          "detail": "Esta billetera ya existe. Reemplace la billetera existente o cancele la importación.",
+          "replace": "Reemplazar"
+        },
+        "detected-duplicate": {
+          "title": "Billeteras duplicadas detectadas",
+          "detail": "Su cuenta contiene billeteras duplicadas. Seleccione las que quiera diferenciar para facilitar su gestión."
         }
       },
       "network": {
-        "online": "En Línea",
-        "offline": "Desconectado",
-        "add-network": "Agregar Red",
-        "remove-network": "Eliminar Red",
+        "online": "En línea",
+        "offline": "Sin conexión",
+        "add-network": "Añadir red",
+        "remove-network": "Eliminar red",
         "remove-network-msg": "¿Está seguro de que desea eliminar la red seleccionada?",
         "edit-network": {
-          "title": "Editar Red",
+          "title": "Editar red",
           "rpc-url": "URL RPC",
-          "name": "Nombre de la Red",
-          "input-rpc": "Por favor ingrese el rpc",
-          "input-network": "Por favor ingrese el nombre"
+          "name": "Nombre de la red",
+          "input-rpc": "Introduzca la URL RPC",
+          "input-network": "Introduzca el nombre de la red"
         },
         "edit-success": "Edición de la red exitosa",
         "mainnet": "Mainnet",
@@ -451,8 +469,8 @@
         "devnet": "Devnet",
         "switch-network-type": "Cambiar a {{type}}",
         "type": "Tipo",
-        "full-node": "Nodo Completo",
-        "light-client-node": "Nodo Cliente Ligero"
+        "full-node": "Nodo completo",
+        "light-client-node": "Cliente ligero"
       },
       "locale": {
         "en": "English",
@@ -466,37 +484,37 @@
         "es": "Español"
       },
       "data": {
-        "ckb-node-data": "Configuración de Datos del Nodo CKB",
+        "ckb-node-data": "Configuración y almacenamiento del nodo CKB",
         "set": "Establecer",
         "cache": "Caché",
         "clear-cache-description": "Borre la memoria caché si encuentra problemas de sincronización de datos o visualización de saldo. Neuron volverá a escanear los datos de los bloques.",
         "cache-cleared-on": "Caché actualizada en {{date}}",
         "refresh": "Actualizar",
-        "clearing-cache": "Borrando Caché, por favor espere un momento",
-        "clear-success": "Caché Eliminada",
-        "set-path": "Establecer Ruta",
-        "remove-ckb-data-tip": "Por favor mueva los Datos del Nodo CKB de 【{{prevPath}}】 a 【{{currentPath}}】 y luego haga clic en \"Se han movido los datos\" para comenzar desde el bloque previamente sincronizado; O haga clic en \"Sincronizar desde el principio\" para empezar a sincronizar de nuevo.",
-        "resync-ckb-node-describe": "Atención: Sincronizar desde cero no eliminará los datos del Nodo CKB descargados previamente",
+        "clearing-cache": "Borrando la caché. Espere un momento.",
+        "clear-success": "Caché borrada",
+        "set-path": "Establecer ruta",
+        "remove-ckb-data-tip": "Mueva los datos del nodo CKB de 【{{prevPath}}】 a 【{{currentPath}}】 y haga clic en \"Se han movido los datos\" para reanudar la sincronización desde el último bloque. También puede elegir \"Sincronizar desde cero\" para empezar de nuevo.",
+        "resync-ckb-node-describe": "Atención: la sincronización desde cero no eliminará los datos del nodo CKB ya descargados",
         "cancel": "Cancelar",
         "confirm-clear": "Confirmar",
         "move-data-finish": "Se han movido los datos",
         "re-sync": "Sincronizar desde cero",
-        "disabled-set-path": "Cuando el nodo CKB se inicia manualmente, la configuración de la ruta de configuración y el almacenamiento del nodo CKB no tienen efecto",
-        "ckb-node-storage": "Almacenamiento de Nodo CKB",
+        "disabled-set-path": "Cuando el nodo CKB se inicia manualmente, la configuración de la ruta de almacenamiento no se aplica",
+        "ckb-node-storage": "Almacenamiento del nodo CKB",
         "browse-local-files": "Explorar archivos locales",
         "modify-path": "Modificar ruta",
-        "modify-path-notice": "Por favor, asegúrese de que el espacio disponible en el disco sea mayor a {{needSize}} GB para almacenar los datos del Nodo CKB.",
-        "modify-path-content": "Puedes elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores para continuar la sincronización.",
+        "modify-path-notice": "Asegúrese de disponer de más de {{needSize}} GB para almacenar los datos del nodo CKB.",
+        "modify-path-content": "Puede elegir una nueva ruta para volver a sincronizar o migrar los datos anteriores y continuar la sincronización.",
         "retain-previous-data": "Conservar datos anteriores",
         "set-a-new-path": "Establecer una nueva ruta",
         "browse": "Explorar",
-        "migrate-previous-ckb-node-data": "Migrar datos anteriores del Nodo CKB",
+        "migrate-previous-ckb-node-data": "Migrar los datos anteriores del nodo CKB",
         "migrate-previous-ckb-node-data-notice": "Antes de hacer clic en el botón Confirmar, complete lo siguiente:",
         "migrate-confirm": "Confirmar ({{seconds}}s)",
-        "migrate-step-1": "Abrir la ruta de almacenamiento de los datos anteriores del Nodo CKB.",
+        "migrate-step-1": "Abrir la ruta de almacenamiento de los datos anteriores del nodo CKB.",
         "migrate-step-2": "Abrir la nueva ruta establecida.",
-        "migrate-step-3": "Copiar todos los archivos al nuevo camino.",
-        "click-here": "Haz clic aquí",
+        "migrate-step-3": "Copiar todos los archivos a la nueva ruta.",
+        "click-here": "Hacer clic aquí",
         "migrate-data-successful": "Migración de datos exitosa",
         "resync": "Reiniciar sincronización",
         "retry": "Reintentar",
@@ -506,8 +524,8 @@
     },
     "password-request": {
       "wallet-not-found": "No se encontró la billetera",
-      "verify-password": "Verificar Contraseña",
-      "password": "Ingresar Contraseña",
+      "verify-password": "Verificar contraseña",
+      "password": "Introducir contraseña",
       "placeholder": "Por favor ingrese la contraseña de la billetera",
       "send": {
         "title": "Enviar la transacción"
@@ -519,13 +537,13 @@
         "title": "Eliminar la billetera"
       },
       "backup": {
-        "title": "Respaldar la Billetera"
+        "title": "Respaldar la billetera"
       },
       "unlock": {
-        "title": "Por favor ingrese la contraseña de la billetera para reclamar el activo"
+        "title": "Introduzca la contraseña de la billetera para reclamar el activo"
       },
       "create-sudt-account": {
-        "title": "Crear Cuenta de Activos"
+        "title": "Crear cuenta de activos"
       },
       "send-sudt": {
         "title": "Enviar UDT"
@@ -546,7 +564,7 @@
         "title": "Enviar CKB"
       },
       "migrate-acp": {
-        "title": "Actualizar Cuentas de Activos"
+        "title": "Actualizar cuentas de activos"
       },
       "send-cheque": {
         "title": "Enviar Cheque"
@@ -558,10 +576,10 @@
         "title": "Reclamar Cheque"
       },
       "create-account-to-claim-cheque": {
-        "title": "Reclamar Cheque con Nueva Cuenta"
+        "title": "Reclamar Cheque con una cuenta nueva"
       },
       "destroy-asset-account": {
-        "title": "Destruir Cuenta de Activos"
+        "title": "Eliminar cuenta de activos"
       },
       "send-from-multisig": {
         "title": "Enviar CKB desde dirección multifirma"
@@ -569,7 +587,7 @@
       "send-from-multisig-need-one": {
         "title": "Enviar CKB desde dirección multifirma"
       },
-      "xpub-notice": "Para billetera de solo lectura, sólo es posible exportar transacciones"
+      "xpub-notice": "Una billetera de solo lectura solo permite exportar transacciones"
     },
     "qrcode": {
       "copy": "Copiar imagen",
@@ -587,8 +605,8 @@
         "on": "Encendido",
         "off": "Apagado"
       },
-      "copy-tx-hash": "Copiar Hash de Transacción",
-      "copy-address": "Copiar Dirección",
+      "copy-tx-hash": "Copiar hash de transacción",
+      "copy-address": "Copiar dirección",
       "select": "Seleccionar",
       "backup": "Respaldar",
       "edit": "Editar",
@@ -603,7 +621,7 @@
       "back": "Atrás",
       "switch-to-light": "Cambiar a modo claro",
       "switch-to-dark": "Cambiar a modo oscuro",
-      "ckb-node-data-path": "CKB Ruta de los datos del nodo"
+      "ckb-node-data-path": "Ruta de datos del nodo CKB"
     },
     "notification-panel": {
       "title": "Notificaciones"
@@ -616,21 +634,21 @@
     "messages": {
       "error": "Error",
       "unknown-error": "Error desconocido",
-      "update-wallet-successfully": "La billetera fue actualizada",
-      "delete-wallet-successfully": "La billetera fue eliminada",
-      "create-network-successfully": "La red fue creada",
-      "update-network-successfully": "La red fue actualizada",
-      "clear-cache-successfully": "El caché fue borrado",
-      "addr-copied": "La dirección ha sido copiada en el portapapeles",
-      "qrcode-copied": "El Código QR ha sido copiado en el portapapeles",
+      "update-wallet-successfully": "Se actualizó la billetera",
+      "delete-wallet-successfully": "Se eliminó la billetera",
+      "create-network-successfully": "Se creó la red",
+      "update-network-successfully": "Se actualizó la red",
+      "clear-cache-successfully": "Se borró la caché",
+      "addr-copied": "Dirección copiada al portapapeles",
+      "qrcode-copied": "Código QR copiado al portapapeles",
       "view-the-run-node-doc": "Ver la guía en el navegador",
       "remain-ckb-for-withdraw": "Es recomendable reservar algunos CKBytes para operaciones de retiro",
       "no-valid-addresses-found": "No se encontraron direcciones válidas",
-      "decimal-range": "El decimal debe ser un número entero de {{range}}(incluido)",
+      "decimal-range": "El número de decimales debe ser un entero incluido en {{range}}",
       "experimental-message-hardware": "Esta es una función experimental. Preste atención al riesgo y use con precaución.",
-      "experimental-message": "Esta es una función experimental, puede cambiar en cualquier momento. Por favor, use con precaución.",
-      "rebuild-sync": "Para una mejor experiencia de usuario, Neuron ha adoptado un nuevo almacenamiento, lo que requiere una migración de datos (estimado de 20 a 60 minutos).\nLo sentimos por la inconveniencia.",
-      "migrate-warning": "Advertencia: el proceso de migración puede fallar por razones desconocidas, lo que resulta en resincronización, ¡haga una copia de seguridad manualmente y comience la migración!",
+      "experimental-message": "Esta función es experimental y puede cambiar en cualquier momento. Úsela con precaución.",
+      "rebuild-sync": "Para mejorar la experiencia, Neuron usa un nuevo sistema de almacenamiento que requiere migrar los datos (entre 20 y 60 minutos).\nDisculpe las molestias.",
+      "migrate-warning": "Advertencia: la migración puede fallar por motivos desconocidos y obligar a sincronizar de nuevo. Haga una copia de seguridad manual antes de iniciarla.",
       "migrate-ckb-data": "Migrar",
       "migrate": "Migrar",
       "secp256k1/blake160-address-required": "Se requiere la dirección Secp256k1/Blake160",
@@ -646,7 +664,7 @@
         "amount": "Cantidad",
         "transaction": "Transacción",
         "default-address": "Dirección predeterminada",
-        "mnemonic": "Mnemónico",
+        "mnemonic": "Frase de recuperación",
         "keystore-path": "Archivo Keystore",
         "keystore-name": "Nombre de la billetera",
         "keystore-password": "Contraseña",
@@ -655,51 +673,51 @@
         "token-name": "Nombre del token",
         "token-id": "ID del token",
         "symbol": "Símbolo",
-        "decimal": "Decimal"
+        "decimal": "Decimales"
       },
       "codes": {
         "-3": "",
         "100": "La cantidad no es suficiente.",
-        "101": "La cantidad {{amount}} CKB es demasiado pequeña, por favor ingrese una cantidad no menor a {{required}} CKB.",
+        "101": "La cantidad de {{amount}} CKB es demasiado pequeña. Introduzca al menos {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) no es válido.",
         "103": "$t(messages.fields.keystore-password) es incorrecta",
-        "104": "No se pudo conectar al nodo, por favor reinicie Neuron.",
-        "105": "Necesitas más CKBytes para el cambio (más de 61 CKBytes).",
-        "106": "Necesitas más CKBytes para el cambio (más de 61 CKBytes), o desliza hasta el final para enviar todo tu saldo.",
-        "107": "La cantidad {{amount}} CKB es demasiado pequeña, la transferencia con tiempo de bloqueo requiere una cantidad no menor a 69 CKB.",
-        "108": "La dirección proporcionada no pertenece a la billetera actual. Por favor revise su billetera o espere hasta que se complete la sincronización.",
+        "104": "No se pudo conectar al nodo. Reinicie Neuron.",
+        "105": "La salida de cambio necesita más de 61 CKBytes.",
+        "106": "La salida de cambio necesita más de 61 CKBytes. También puede deslizar hasta el final para enviar todo el saldo.",
+        "107": "La cantidad de {{amount}} CKB es demasiado pequeña. Una transferencia con bloqueo temporal necesita al menos 69 CKB.",
+        "108": "La dirección indicada no pertenece a la billetera actual. Compruebe la billetera o espere a que termine la sincronización.",
         "109": "Saldo insuficiente.",
-        "110": "Saldo disponible insuficiente, por favor intente de nuevo cuando la última transacción haya sido confirmada.",
+        "110": "Saldo disponible insuficiente. Inténtelo de nuevo cuando se confirme la última transacción.",
         "111": "La billetera actual no está configurada.",
-        "112": "Billetera {{id}} no encontrada.",
-        "113": "El archivo de almacenamiento es inválido, por favor revise la integridad del archivo.",
-        "114": "El balance mínimo de transferencia es {{bytes}} CKBytes.",
-        "115": "Necesitas más CKBytes para el cambio (más de 61 CKBytes), o haz clic en el botón 'Máx' para enviar todo tu saldo.",
-        "201": "$t(messages.fields.{{fieldName}}) es requerido.",
+        "112": "No se encontró la billetera {{id}}.",
+        "113": "El archivo Keystore no es válido. Compruebe su integridad.",
+        "114": "La cantidad mínima de transferencia es de {{bytes}} CKBytes.",
+        "115": "La salida de cambio necesita más de 61 CKBytes. También puede seleccionar 'Máx' para enviar todo el saldo.",
+        "201": "Se requiere $t(messages.fields.{{fieldName}}).",
         "202": "$t(messages.fields.{{fieldName}}) ya está en uso.",
-        "203": "$t(messages.fields.{{fieldName}}) debería ser más corto o igual a {{length}}.",
-        "204": "$t(messages.fields.{{fieldName}}) es demasiado corto, debe ser más largo o igual a {{length}}.",
+        "203": "$t(messages.fields.{{fieldName}}) no debe superar los {{length}} caracteres.",
+        "204": "$t(messages.fields.{{fieldName}}) debe tener al menos {{length}} caracteres.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido.",
-        "206": "$t(messages.fields.{{fieldName}}) no es válido, introduzca $t(messages.fields.{{fieldName}}) con no más de {{length}} decimales.",
+        "206": "$t(messages.fields.{{fieldName}}) no es válido. Introduzca $t(messages.fields.{{fieldName}}) con un máximo de {{length}} decimales.",
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido, no puede ser negativo.",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} no es válido, debería comenzar con http(s)://",
         "209": "$t(messages.fields.{{fieldName}}) no debe tener espacios en blanco.",
-        "210": "\"{{value}}\" está reservado, por favor utilice otro.",
+        "210": "\"{{value}}\" está reservado. Utilice otro valor.",
         "211": "La cantidad no puede ser 0",
         "212": "$t(messages.fields.{{fieldName}}) es demasiado simple",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} no se puede eliminar.",
         "303": "$t(messages.fields.{{fieldName}}) no se encuentra.",
         "304": "La cámara no está disponible o está deshabilitada.",
         "305": "$t(messages.fields.address) no puede estar vacío.",
-        "306": "Por favor introduzca una dirección de red principal",
-        "307": "Por favor introduzca una dirección de testnet",
+        "306": "Introduzca una dirección Mainnet",
+        "307": "Introduzca una dirección Testnet",
         "308": "La cantidad no es suficiente",
         "309": "El destinatario debe actualizar la dirección de su cuenta para aceptar más transferencias.",
-        "310": "Por favor introduzca una dirección {{tagName}}",
-        "311": "Por favor introduzca una dirección",
+        "310": "Introduzca una dirección {{tagName}}",
+        "311": "Introduzca una dirección",
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
-        "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
-        "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
+        "403": "No se detectó ningún dispositivo. Conéctelo.",
+        "404": "Se detectaron varios dispositivos. Solo se puede conectar uno del mismo modelo.",
         "408": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
         "600": "Asegúrese de que la sincronización haya finalizado antes de realizar cualquier operación relacionada con transacciones."
       }
@@ -730,35 +748,35 @@
       "free": "Disponible",
       "locked": "Bloqueado",
       "deposit": "Depósito",
-      "deposit-rules": "Reglas de Depósito",
-      "copy-balance": "Copiar Saldo",
+      "deposit-rules": "Reglas de depósito",
+      "copy-balance": "Copiar saldo",
       "deposit-records": "Depósitos",
       "completed-records": "Completados",
-      "apc": "APC Actual",
-      "apc-tooltip": "Porcentaje de Compensación Anual Actual",
-      "fee": "Tarifa de Transacción: ",
+      "apc": "APC actual",
+      "apc-tooltip": "Porcentaje de compensación anual actual",
+      "fee": "Comisión de transacción: ",
       "deposit-to-nervos-dao": "Depositar en Nervos DAO",
       "withdraw-from-nervos-dao": "Retirar de Nervos DAO",
       "cancel": "Cancelar",
       "proceed": "Continuar",
       "compensation": "Compensación",
-      "notice-wait-time": "Aviso: Está a punto de iniciar un retiro, el cual tardará {{epochs}} epochs {{blocks}} bloques (aproximadamente {{days}} días) para completarse.",
+      "notice-wait-time": "Aviso: está iniciando un retiro. El retiro definitivo necesitará {{epochs}} epochs y {{blocks}} bloques (unos {{days}} días).",
       "deposit-dialog-title": "Depósito",
-      "deposit-terms": "Nervos DAO requiere 102 CKBytes para el almacenamiento de Cells de depósito, las cuales no reciben compensación. Por favor visite Nervos DAO RFC para obtener más información sobre Nervos DAO",
+      "deposit-terms": "Nervos DAO necesita 102 CKBytes para almacenar la Cell de depósito, que no genera compensación. <br />Consulte <0>Nervos DAO RFC</0> para obtener más información sobre Nervos DAO.",
       "minimal-fee-required": "La capacidad mínima de depósito es de {{minimal}} CKBytes",
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
-      "balance-not-reserved": "No reservar ningún CKBytes para futuras operaciones de DAO (no se recomienda)",
-      "estimated-rewards": "Recompensas estimadas de {{días}} días",
-      "estimated-apc": "Estimación APC",
-      "estimated-apc-tooltip": "Estimación de Compensación Anual",
-      "deposit-amount": "Cantidad a Depositar (CKB)",
-      "attention": "Atención: Una vez depositado en el DAO de Nervos, sus depósitos estarán bloqueados durante al menos 180 épocas (unos 30 días).",
-      "deposit-submitted": "Depósito presentado",
+      "balance-not-reserved": "No reservar CKBytes para futuras operaciones de DAO (no recomendado)",
+      "estimated-rewards": "Compensación estimada para {{days}} días",
+      "estimated-apc": "APC estimado",
+      "estimated-apc-tooltip": "Porcentaje de compensación anual estimado",
+      "deposit-amount": "Cantidad del depósito (CKB)",
+      "attention": "Atención: una vez depositados en Nervos DAO, sus fondos permanecerán bloqueados durante al menos 180 epochs (unos 30 días).",
+      "deposit-submitted": "Depósito enviado",
       "deposit-record": {
         "deposited-at": "Depositado",
         "completed-at": "Completado",
-        "deposit-pending": "Depósito Pendiente",
+        "deposit-pending": "Depósito pendiente",
         "withdraw-action-label": "Retirar",
         "unlock-action-label": "Desbloquear",
         "record": "Registro",
@@ -766,26 +784,26 @@
         "withdrawn": "Retirado",
         "unlocked": "Desbloqueado",
         "view-tx-detail": "Ver detalles de la transacción",
-        "locked-period": "Período de Bloqueo",
-        "compensated-period": "Período de Compensación",
+        "locked-period": "Período de bloqueo",
+        "compensated-period": "Período de compensación",
         "days-hours": "{{days}} días {{hours}} horas",
-        "no-deposit": "Sin Depósito",
-        "no-completed": "Sin Completar",
-        "insufficient-balance-to-unlock": "El saldo no es suficiente para que la comisión de transacción desbloquee el depósito",
-        "lock-warn": "Bloqueo al final del ciclo de compensación actual"
+        "no-deposit": "Sin depósitos",
+        "no-completed": "Ninguno completado",
+        "insufficient-balance-to-unlock": "El saldo no alcanza para pagar la comisión necesaria para desbloquear el depósito",
+        "lock-warn": "Bloqueado hasta el final del período de compensación actual"
       },
       "compensation-period": {
         "tooltip": {
-          "compensated-period": "Período de Compensación",
+          "compensated-period": "Período de compensación",
           "days-hours": "{{days}} días {{hours}} horas",
-          "immature-for-withdraw": "Se tarda al menos 16 horas (4epochs) para realizar la siguiente acción",
-          "normal": "La cantidad de compensación es baja, no se recomienda la acción de retiro",
-          "suggested": "Período de retiro sugerido para una compensación maximizada",
+          "immature-for-withdraw": "La siguiente acción estará disponible en unas 16 horas como mínimo (4 epochs)",
+          "normal": "La compensación es baja; no se recomienda retirar",
+          "suggested": "Período de retiro recomendado para maximizar la compensación",
           "ending": "Es posible que el retiro solicitado se posponga y se bloquee durante un ciclo adicional de 30 días",
           "withdrawn": "Retirado"
         },
         "stage-messages": {
-          "deposit-in-progress": "Depósito en curso...",
+          "deposit-in-progress": "Depósito en curso",
           "immature-for-withdraw": "No se puede retirar CKB durante las próximas {{ hours }} horas",
           "immature-for-unlock": "No se puede desbloquear CKB durante las próximas {{ hours }} horas",
           "next-compensation-cycle": "El siguiente ciclo de compensación comenzará en aproximadamente {{days}} días",
@@ -793,7 +811,7 @@
           "withdrawing": "Retirando...",
           "compensation-cycle-will-end": "El ciclo de compensación termina en aproximadamente {{days}} días",
           "compensation-cycle-will-end-hours": "El ciclo de compensación termina en aproximadamente {{hours}} horas",
-          "compensation-cycle-has-ended": "El ciclo ha terminado, CKB está listo para ser desbloqueado",
+          "compensation-cycle-has-ended": "El ciclo ha terminado; los CKB están listos para desbloquearse",
           "unlocking": "Desbloqueando...",
           "calculating-the-compensation-cycle": "Calculando el ciclo de compensación"
         }
@@ -812,15 +830,15 @@
       "index": "Índice",
       "address": "Dirección",
       "amount": "Cantidad",
-      "cell-from-cellbase": "Desde cellbase",
+      "cell-from-cellbase": "Desde Cellbase",
       "cancel": "Cancelar",
       "next": "Siguiente",
-      "export": "Exportar Tx"
+      "export": "Exportar transacción"
     },
     "deposit-rules": {
       "minimum-deposit": "Depósito mínimo",
       "single-compensation-cycle": "Ciclo de compensación único",
-      "single-compensation-cycle-description": "180 Época (unos 30 días)",
+      "single-compensation-cycle-description": "180 epochs (unos 30 días)",
       "withdraw": "Retirar",
       "withdraw-description": "En cualquier momento",
       "unlock": "Desbloquear",
@@ -837,106 +855,106 @@
       "update-available": "Actualizaciones disponibles actualmente.",
       "downloading-update": "Descargando actualización...",
       "update-not-available": "Actualmente no hay actualizaciones disponibles.",
-      "updates-found-do-you-want-to-update": "Hay una actualización ({{versión}}) disponible",
-      "install-update": "Actualización inmediata",
-      "updates-downloaded-about-to-quit-and-install": "Actualización descargada. Listo para instalar y reiniciar.",
+      "updates-found-do-you-want-to-update": "Hay una actualización disponible ({{version}})",
+      "install-update": "Actualizar ahora",
+      "updates-downloaded-about-to-quit-and-install": "La actualización se descargó y está lista para instalarse. Neuron se reiniciará.",
       "quit-and-install-restart": "Instalar y reiniciar",
-      "quit-and-install": "Inmediata Instalar"
+      "quit-and-install": "Instalar ahora"
     },
     "datetime": {
       "mon": {
-        "full": "Lunes",
-        "short": "Lun.",
+        "full": "lunes",
+        "short": "lun.",
         "tag": "L"
       },
       "tue": {
-        "full": "Martes",
-        "short": "Mar.",
+        "full": "martes",
+        "short": "mar.",
         "tag": "Ma"
       },
       "wed": {
-        "full": "Miércoles",
-        "short": "Mié.",
+        "full": "miércoles",
+        "short": "mié.",
         "tag": "X"
       },
       "thur": {
-        "full": "Jueves",
-        "short": "Jue.",
+        "full": "jueves",
+        "short": "jue.",
         "tag": "J"
       },
       "fri": {
-        "full": "Viernes",
-        "short": "Vie.",
+        "full": "viernes",
+        "short": "vie.",
         "tag": "V"
       },
       "sat": {
-        "full": "Sábado",
-        "short": "Sáb.",
+        "full": "sábado",
+        "short": "sáb.",
         "tag": "Sá"
       },
       "sun": {
-        "full": "Domingo",
-        "short": "Dom.",
+        "full": "domingo",
+        "short": "dom.",
         "tag": "D"
       },
       "jan": {
-        "full": "Enero",
-        "short": "Ene.",
+        "full": "enero",
+        "short": "ene.",
         "tag": "E"
       },
       "feb": {
-        "full": "Febrero",
-        "short": "Feb.",
+        "full": "febrero",
+        "short": "feb.",
         "tag": "F"
       },
       "mar": {
-        "full": "Marzo",
-        "short": "Mar.",
+        "full": "marzo",
+        "short": "mar.",
         "tag": "M"
       },
       "apr": {
-        "full": "Abril",
-        "short": "Abr.",
+        "full": "abril",
+        "short": "abr.",
         "tag": "A"
       },
       "may": {
-        "full": "Mayo",
-        "short": "May.",
+        "full": "mayo",
+        "short": "may.",
         "tag": "M"
       },
       "june": {
-        "full": "Junio",
-        "short": "Jun.",
+        "full": "junio",
+        "short": "jun.",
         "tag": "J"
       },
       "july": {
-        "full": "Julio",
-        "short": "Jul.",
+        "full": "julio",
+        "short": "jul.",
         "tag": "J"
       },
       "aug": {
-        "full": "Agosto",
-        "short": "Ago.",
+        "full": "agosto",
+        "short": "ago.",
         "tag": "Ago"
       },
       "sept": {
-        "full": "Septiembre",
-        "short": "Sept.",
+        "full": "septiembre",
+        "short": "sept.",
         "tag": "S"
       },
       "oct": {
-        "full": "Octubre",
-        "short": "Oct.",
+        "full": "octubre",
+        "short": "oct.",
         "tag": "O"
       },
       "nov": {
-        "full": "Noviembre",
-        "short": "Nov.",
+        "full": "noviembre",
+        "short": "nov.",
         "tag": "N"
       },
       "dec": {
-        "full": "Diciembre",
-        "short": "Dic.",
+        "full": "diciembre",
+        "short": "dic.",
         "tag": "D"
       },
       "timezone": "Zona horaria",
@@ -969,18 +987,18 @@
       "title": "Activos personalizados",
       "date": "Fecha",
       "assets": "Activos",
-      "type-script-tooltip": "Type Script",
+      "type-script-tooltip": "Script de tipo",
       "data-tooltip": "Datos",
       "user-defined-asset": "Activo no catalogado",
       "user-defined-asset-tooltip": "Este es un activo no catalogado. Neuron no puede procesarlo actualmente. Utilice un software de terceros para verificarlo.",
       "locked-asset": "Bloqueado",
-      "locked-asset-tooltip": "El parámetro de bloqueo es de {{epochs}} épocas, la fecha de lanzamiento estimada es {{year}}-{{month}}-{{day}} (según la altura del bloque en ejecución real, pueden haber algunas variaciones de tiempo en el tiempo de bloqueo).",
+      "locked-asset-tooltip": "El bloqueo dura {{epochs}} epochs. La fecha estimada de desbloqueo es {{year}}-{{month}}-{{day}} y puede variar según la altura real del bloque.",
       "withdraw-asset-tooltip": "Hora estimada de lanzamiento es {{year}}-{{month}}-{{day}} {{hour}}:{{minute}} (según la altura del bloque en ejecución real).",
       "user-defined-token-tooltip": "Migre el activo {{udtType}} a una cuenta de activos {{udtType}}",
       "claim-asset": "Reclamar",
       "withdraw-asset": "Retirar",
       "view-details": "Ver detalles",
-      "release-success": "El activo fue liberado, vea los detalles en Historial.",
+      "release-success": "El activo se liberó. Consulte los detalles en el historial.",
       "no-special-assets": "No hay activos personalizados",
       "experimental": "Experimental",
       "unknown-asset": "Activo desconocido",
@@ -998,12 +1016,12 @@
       "choose-title": "Modo de migración",
       "next": "Siguiente",
       "back": "Atrás",
-      "input-token": "Por favor ingrese el nombre del token",
-      "input-symbol": "Por favor ingrese el símbolo",
-      "input-decimal": "Por favor ingrese el decimal",
+      "input-token": "Introduzca el nombre del token",
+      "input-symbol": "Introduzca el símbolo",
+      "input-decimal": "Introduzca el número de decimales",
       "turn-into-new-account": {
         "title": "Conviértalo en una nueva cuenta de activo {{udtType}}",
-        "sub-title": "Convierta el activo {{udtType}} en una nueva cuenta {{udtType}}, ocupa al menos 142 CKbytes.",
+        "sub-title": "Convierta el activo {{udtType}} en una nueva cuenta {{udtType}}. Ocupa al menos 142 CKBytes.",
         "cancel": "Cancelar",
         "confirm": "Confirmar"
       },
@@ -1013,7 +1031,7 @@
       },
       "cancel": "Cancelar",
       "confirm": "Confirmar",
-      "balance": "Balance",
+      "balance": "Saldo",
       "amount": "Monto",
       "address": "Dirección"
     },
@@ -1031,7 +1049,7 @@
       },
       "create-dialog": {
         "create-asset-account": "Crear cuenta de activos",
-        "input-account-name": "Por favor ingrese el nombre de la cuenta",
+        "input-account-name": "Introduzca el nombre de la cuenta",
         "select-account-type": "Seleccione el tipo de cuenta",
         "account-name": "Nombre de la cuenta",
         "sudt-account": "Cuenta de activos sUDT",
@@ -1042,22 +1060,22 @@
         "token-id": "ID del token",
         "token-name": "Nombre del token",
         "symbol": "Símbolo",
-        "decimal": "Decimal",
+        "decimal": "Decimales",
         "confirm": "Confirmar",
         "cancel": "Cancelar",
         "next": "Siguiente",
         "back": "Atrás",
-        "occupy-142-ckb": "Ocupa al menos 142 CKbytes.",
-        "occupy-61-ckb": "Ocupa al menos 61 CKbytes.",
+        "occupy-142-ckb": "Ocupa al menos 142 CKBytes",
+        "occupy-61-ckb": "Ocupa al menos 61 CKBytes",
         "input": {
-          "account-name": "Por favor ingrese el nombre de la cuenta",
+          "account-name": "Introduzca el nombre de la cuenta",
           "token-id": "Ingrese el ID del token",
           "token-name": "Ingrese el nombre del token",
           "symbol": "Ingrese el símbolo",
-          "decimal": "Ingrese el decimal"
+          "decimal": "Introduzca el número de decimales"
         },
         "placeholder": {
-          "token-id": "El ID del token es el Args del {{udtType}} Type Script, que es el mismo que el hash de bloqueo del emisor del token."
+          "token-id": "El ID del token corresponde al argumento del script de tipo {{udtType}} y al hash de bloqueo del emisor."
         }
       },
       "send": {
@@ -1073,7 +1091,7 @@
         "submit": "Enviar",
         "click-to-edit": "Haga clic para editar",
         "cheque-address-hint": {
-          "label": "Bloquee temporalmente 162 CKBytes",
+          "label": "Bloquear temporalmente 162 CKBytes",
           "tooltip": "La capacidad de 162 CKBytes se bloqueará temporalmente para inicializar la transferencia del token, y se desbloqueará automáticamente una vez que el receptor reclame el token."
         },
         "destroy": "Destruir",
@@ -1100,30 +1118,30 @@
         "token-id": "ID del token",
         "token-name": "Nombre del token",
         "symbol": "Símbolo",
-        "decimal": "Decimal",
+        "decimal": "Decimales",
         "confirm": "Confirmar",
         "cancel": "Cancelar"
       },
       "recycle-dialog": {
-        "title": "Reciclar Celda UDT",
-        "notation": "Tenga en cuenta que reciclar las celdas destruirá el UDT y liberará el CKB bloqueado",
+        "title": "Reciclar la Cell UDT",
+        "notation": "El reciclaje de las Cells destruirá el UDT y liberará los CKB bloqueados",
         "destroy": "Destruir",
         "release": "Liberar",
-        "current-wallet": "Billetera Actual",
+        "current-wallet": "Billetera actual",
         "receive-address": "Dirección de Recepción",
         "receive-address-placeholder": "Por favor ingrese la dirección de recepción",
-        "submitted-tips": "La transacción de reciclaje de la celda UDT ha sido enviada",
-        "connect-wallet": "Conectar Billetera",
+        "submitted-tips": "Se ha enviado la transacción de reciclaje de la Cell UDT",
+        "connect-wallet": "Conectar billetera",
         "verifying": "Verificando",
-        "view-details": "Ver Detalles"
+        "view-details": "Ver detalles"
       }
     },
     "multisig-address": {
-      "window-title": "Direcciones de Multifirma",
-      "guide-tip": "Para los usuarios nuevos, pueden consultar la documentación para obtener <0>más información</0>.",
+      "window-title": "Direcciones multifirma",
+      "guide-tip": "Consulte la documentación sobre multifirma para obtener <0>más información</0>.",
       "learn-more": "más información",
       "search": {
-        "placeholder": "buscar por dirección de multifirma, alias"
+        "placeholder": "Buscar por dirección multifirma o alias"
       },
       "add": {
         "label": "Crear"
@@ -1140,7 +1158,7 @@
         "address": "Dirección del firmante",
         "alias": "Alias",
         "type": "Tipo",
-        "balance": "Balance",
+        "balance": "Saldo",
         "copy-address": "Copiar dirección",
         "action": "Acciones",
         "more": "Más",
@@ -1150,12 +1168,12 @@
           "send": "Enviar",
           "approve": "Aprobar",
           "delete": "Eliminar",
-          "daoDeposit": "Depositar en DAO",
-          "daoWithdraw": "Retirar de DAO",
+          "daoDeposit": "Depositar en Nervos DAO",
+          "daoWithdraw": "Retirar de Nervos DAO",
           "regenerate": "Regenerar"
         }
       },
-      "dao-ledger-notice": "Las billeteras Ledger actualmente no admiten transacciones DAO para direcciones multifirma. Por favor, use una dirección de firma única o espere futuras actualizaciones.",
+      "dao-ledger-notice": "Las billeteras Ledger todavía no admiten transacciones DAO con direcciones multifirma. Use una dirección de firma única o espere una futura actualización.",
       "dao-hardware-not-match": "La billetera de hardware conectada actualmente no coincide con la billetera actual.",
       "import-dialog": {
         "actions": {
@@ -1170,24 +1188,24 @@
       "send-ckb": {
         "title": "Enviar CKB desde una dirección multifirma",
         "detail": "Enviar desde la dirección multifirma {{m}}-de-{{n}}: <0></0>",
-        "balance": "Balance",
+        "balance": "Saldo",
         "address": "Dirección",
         "amount": "Monto",
         "send": "Enviar",
         "cancel": "Cancelar",
-        "export": "Exportar Tx"
+        "export": "Exportar transacción"
       },
       "nervos-dao": "Nervos DAO",
-      "multisig-script-update-notice": "Debido a la <0>actualización del script multisig</0>, recomendamos regenerar las direcciones multisig y transferir los activos desde la antigua para garantizar el funcionamiento adecuado.",
+      "multisig-script-update-notice": "Debido a la <0>actualización del script multifirma</0>, regenere las direcciones multifirma y transfiera los activos desde la anterior para garantizar su funcionamiento.",
       "regenerate-dialog": {
         "title": "Regenerar",
-        "detail": "Se generará una nueva dirección utilizando la configuración de tu dirección multisig anterior, actualizada al formato de script más reciente.",
-        "donnot-worry": "No te preocupes — la dirección antigua seguirá siendo accesible.",
+        "detail": "Se generará una nueva dirección con la configuración de la dirección multifirma anterior y el formato de script más reciente.",
+        "donnot-worry": "La dirección anterior seguirá estando disponible.",
         "donnot-remind-again": "No volver a recordar"
       },
       "multi-details": "Detalles de la dirección multifirma",
       "synchronization-abort": "Abortar sincronización",
-      "synchronization-abort-msg": "Salir de la ventana actual provocará que se aborte la sincronización de multisig, por favor confirme si desea salir.",
+      "synchronization-abort-msg": "Si cierra esta ventana, se cancelará la sincronización multifirma. Confirme que desea salir.",
       "create-dialog": {
         "title": "Crear dirección multifirma",
         "preview-title": "La dirección multifirma se ha generado",
@@ -1197,15 +1215,15 @@
         "copy-address": "Copiar dirección",
         "placeholder": "Ingrese {{type}} (1-255)",
         "m-n": {
-          "title": "Ingrese la configuración de dirección multifirma en el tipo de m-de-n donde se requiere cualquier m llaves privadas de un posible n para mover el activo",
-          "m-less-equal-n": "Para la dirección multifirma m-de-n, m no debe ser mayor que n",
-          "m-n-required": "Ingrese m/n",
+          "title": "Introduzca una configuración multifirma m de n, en la que se necesiten m claves privadas de un total de n para mover el activo.",
+          "m-less-equal-n": "En una dirección multifirma m de n, m no puede ser mayor que n",
+          "m-n-required": "Introduzca m/n",
           "m-n-between-0-256": "m/n debe estar entre 0 y 256"
         },
         "multi-address-info": {
-          "title": "Ingrese los firmantes para la dirección multifirma {{m}}-de-{{n}}",
-          "view-title": "La dirección multifirma {{m}}-de-{{n}}",
-          "ckb-address-placeholder": "Ingrese la dirección de ckb"
+          "title": "Introduzca los firmantes de la dirección multifirma {{m}} de {{n}}",
+          "view-title": "Dirección multifirma {{m}} de {{n}}",
+          "ckb-address-placeholder": "Introduzca la dirección CKB"
         },
         "multi-list": "Lista de firmantes",
         "actions": {
@@ -1219,17 +1237,17 @@
       },
       "approve-dialog": {
         "title": "Aprobar con dirección multifirma",
-        "detail": "Aprobar con la dirección multifirma {{m}}-de-{{n}} <0></0>",
+        "detail": "Aprobar con la dirección multifirma {{m}} de {{n}} <0></0>",
         "transaction": "Transacción",
         "cancel": "Cancelar",
         "signAndExport": "Firmar y exportar",
-        "export": "Exportar Tx",
-        "signAndBroadcast": "Firmar y enviar",
-        "broadcast": "Enviar",
+        "export": "Exportar transacción",
+        "signAndBroadcast": "Firmar y transmitir",
+        "broadcast": "Transmitir",
         "content": "Contenido:",
         "status": "Estado",
-        "signerApprove": "Falta la aprobación de {{m}} firmante(s), incluidos {{r}} de firmante(s) especificado(s)",
-        "noRSignerApprove": "Falta la aprobación de {{m}} firmante(s)",
+        "signerApprove": "Faltan {{m}} aprobaciones de firmantes, incluidas {{r}} de firmantes designados",
+        "noRSignerApprove": "Faltan {{m}} aprobaciones de firmantes",
         "signed": "Firmado",
         "view-concise-data": "Datos concisos",
         "view-raw-data": "Datos sin procesar"
@@ -1239,30 +1257,33 @@
       "placeholder": "Por favor seleccione..."
     },
     "price-switch": {
-      "price": "Precio",
-      "customPrice": "Precio personalizado",
-      "errorTip": "El precio no puede ser menor que {{minPrice}} shannons/KB, vuelva a ingresar",
-      "hintTip": "El precio sugerido es {{suggestFeeRate}} shannons/KB",
-      "priceColumn": "Precio {{priceValue}} shannons/KB | Tarifa {{feeValue}} CKB",
+      "price": "Tasa de comisión",
+      "customPrice": "Tasa de comisión personalizada",
+      "errorTip": "La tasa de comisión no puede ser inferior a {{minPrice}} Shannon/KB. Introduzca otro valor.",
+      "hintTip": "Tasa de comisión sugerida: {{suggestFeeRate}} Shannon/KB",
+      "priceColumn": "Tasa de comisión {{priceValue}} Shannon/KB | Comisión {{feeValue}} CKB",
       "fast": "Rápido",
       "standard": "Estándar",
       "slow": "Lento",
-      "countDownTip": "El precio se actualizará después de {{countDown}} segundos",
-      "switchToCustomPrice": "Cambio a precio personalizado",
-      "switchToPrice": "Cambio a precio"
+      "countDownTip": "La tasa de comisión se actualizará dentro de {{countDown}} segundos",
+      "switchToCustomPrice": "Usar una tasa de comisión personalizada",
+      "switchToPrice": "Usar la tasa de comisión propuesta"
     },
     "set-start-block-number": {
       "title": "Establecer bloque de inicio de sincronización",
-      "warn": "Para garantizar una sincronización precisa de datos, ingrese el número de bloque de la primera transacción de su billetera",
-      "input-place-holder": "Ingrese el número de bloque de sincronización inicial, por ejemplo: 10,100,101",
+      "warn": "Para garantizar una sincronización precisa, introduzca el número de bloque de la primera transacción de su billetera",
+      "tip": "En el modo de cliente ligero puede indicar el bloque en el que debe comenzar la sincronización para acelerarla.",
+      "input-place-holder": "Introduzca el número del bloque inicial, por ejemplo: 10, 100, 101",
       "locate-first-tx": "Ubicar la primera transacción",
-      "view-block": "Ver bloque"
+      "view-block": "Ver bloque",
+      "set-less-than-before": "El número de bloque indicado es inferior al anterior. La sincronización se reiniciará; continúe con precaución.",
+      "reset-to-header-tip-number": "No se puede indicar un número superior al bloque de cabecera más reciente. Se restablecerá a ese bloque."
     },
     "main": {
       "external-node-detected-dialog": {
         "title": "Nodo externo detectado",
-        "body-tips-without-network": "Has seleccionado el nodo interno pero has iniciado el nodo externo. Si deseas continuar usando un nodo externo, por favor añade una nueva red.",
-        "body-tips-with-network": "Actualmente has seleccionado un nodo interno pero has iniciado un nodo externo. Si necesitas continuar usando el nodo externo, por favor cambia a otra red externa o añade una nueva red.",
+        "body-tips-without-network": "Ha seleccionado el nodo interno, pero ha iniciado uno externo. Para seguir usando el nodo externo, añada una nueva red.",
+        "body-tips-with-network": "Ha seleccionado el nodo interno, pero ha iniciado uno externo. Para seguir usándolo, cambie a otra red externa o añada una nueva.",
         "add-network": "Agregar red",
         "ignore-external-node": "Ignorar nodo externo"
       },
@@ -1272,18 +1293,18 @@
         "migrate-data": "Migrar datos"
       },
       "import-exist-xpubkey-dialog": {
-        "replace-tip": "El monedero de observación ya ha sido importado antes, ¿desea reemplazarlo?",
-        "delete-tip": "Existe el mismo monedero original. Si desea continuar con la importación, por favor elimínelo."
+        "replace-tip": "Esta billetera de solo lectura ya se ha importado. ¿Desea reemplazarla?",
+        "delete-tip": "La billetera original ya existe. Elimínela para continuar con la importación."
       }
     },
     "cell-manage": {
-      "title": "Gestionar Cell",
-      "wallet-balance": "Balance de la billetera",
+      "title": "Gestión de Cells",
+      "wallet-balance": "Saldo de la billetera",
       "table": {
         "head": {
           "date": "Fecha",
           "type": "Tipo",
-          "balance": "Balance",
+          "balance": "Saldo",
           "status": "Estado",
           "description": "Descripción",
           "action": "Acción"
@@ -1294,7 +1315,7 @@
       },
       "cell-detail-dialog": {
         "title": "Detalles de la Cell",
-        "transaction-hash": "Hash de Transacción",
+        "transaction-hash": "Hash de transacción",
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
@@ -1307,30 +1328,30 @@
       },
       "locked-reason": {
         "multi-locktime": "La Cell tiene un bloqueo de tiempo y no se puede usar hasta {{time}}.",
-        "multi-locktime-reached": "El bloqueo de tiempo para esta Cell ha expirado y debe reclamarla en Activos personalizados antes de usarla.",
+        "multi-locktime-reached": "El bloqueo temporal de esta Cell ha vencido. Reclámela en activos personalizados antes de usarla.",
         "cheque-acp-multisig": "Esta es una Cell {{type}} y no admite desbloqueo.",
-        "NFT-SUDT-DAO": "Esta es un activo {{type}} y no admite desbloqueo.",
+        "NFT-SUDT-DAO": "Este activo {{type}} no admite el desbloqueo.",
         "Unknown": "Este es un activo no catalogado. Revise y confirme antes de continuar."
       },
       "cell-lock-dialog": {
         "title": "Bloquear Cell",
-        "capacity": "Bloquear selección de Cells de {{capacity}} CKB",
-        "locked-cell-can-not-use": "Advertencia, las Cells bloqueadas no se pueden utilizar."
+        "capacity": "Bloquear la Cell seleccionada de {{capacity}} CKB",
+        "locked-cell-can-not-use": "Advertencia: las Cells bloqueadas no se pueden utilizar"
       },
       "cell-unlock-dialog": {
         "title": "Desbloquear Cell",
-        "capacity": "Desbloquear Cell seleccionada {{capacity}} CKB"
+        "capacity": "Desbloquear la Cell seleccionada de {{capacity}} CKB"
       },
       "cell-consume-dialog": {
         "title": "Consumir Cell",
-        "warn-consume": "Al consumir la Cell, no se retendrá ningún dato y se utilizará todo el ckb, asegúrese de que no haya datos importantes que necesiten ser retenidos"
+        "warn-consume": "Al consumir la Cell se eliminarán todos sus datos y se utilizarán todos sus CKB. Asegúrese de que no contenga datos importantes."
       },
       "cell-consolidate-dialog": {
-        "title": "Consolidar",
-        "warn-consume": "Todas las celdas seleccionadas se consolidarán en una nueva celda, asegúrese de que las celdas seleccionadas no contienen datos importantes."
+        "title": "Consolidar Cells",
+        "warn-consume": "Todas las Cells seleccionadas se consolidarán en una nueva Cell. Asegúrese de que no contengan datos importantes."
       },
-      "enter-password": "Ingresar Contraseña",
-      "password-placeholder": "Ingrese la contraseña de la billetera",
+      "enter-password": "Introducir contraseña",
+      "password-placeholder": "Introduzca la contraseña de la billetera",
       "lock": "Bloquear",
       "unlock": "Desbloquear",
       "consume": "Consumir",
@@ -1340,22 +1361,22 @@
     },
     "send-tx-detail": {
       "page-title": "Detalles de la transacción",
-      "basic-info": "Información Básica",
-      "topology": "Diagrama de topología",
+      "basic-info": "Información básica",
+      "topology": "Topología",
       "tx-basic": {
-        "tx-hash": "Hash de Transacción",
-        "capacity": "Cantidad",
-        "tx-fee": "Tarifa de transacción",
-        "size": "tamaño",
-        "lock-time": "Período de Bloqueo"
+        "tx-hash": "Hash de transacción",
+        "capacity": "Capacidad",
+        "tx-fee": "Comisión de transacción",
+        "size": "Tamaño",
+        "lock-time": "Tiempo de bloqueo"
       }
     },
     "lock-window": {
       "neuron-is-locked": "La ventana de Neuron está bloqueada",
       "enter-lock-password": "Ingresar contraseña de bloqueo de pantalla",
-      "forget-password": "Olvidé mi contraseña?",
+      "forget-password": "¿Olvidó la contraseña?",
       "lock-password-error": "Contraseña de bloqueo de pantalla incorrecta",
-      "failed-times": "Fallo más de {{frequency}} veces, por favor inténtalo de nuevo después de {{time}}",
+      "failed-times": "Tras más de {{frequency}} intentos fallidos, vuelva a intentarlo después de {{time}}",
       "verify-wallet": "Verificar"
     }
   }

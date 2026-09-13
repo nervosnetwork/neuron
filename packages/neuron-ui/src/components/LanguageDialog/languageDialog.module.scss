@@ -30,13 +30,12 @@
     }
   }
 
+  // position, width and max-height are computed from the trigger to keep the dropdown inside the window
   .selects {
     position: fixed;
-    width: 648px;
-    max-height: calc(100vh - 400px);
+    box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-top: 8px;
     padding: 16px 0;
     z-index: 2;
     background: var(--secondary-background-color);
@@ -45,6 +44,10 @@
     @media (prefers-color-scheme: dark) {
       box-shadow: none;
       border: 1px solid var(--border-color);
+    }
+
+    .selectItem {
+      width: 100%;
     }
 
     .wrap {
