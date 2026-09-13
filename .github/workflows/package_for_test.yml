@@ -1,13 +1,24 @@
 name: Package Neuron for Test
 
-on: 
+# SECURITY NOTE: This workflow runs on issue_comment events, which execute in the
+# base repository context where secrets are available. We intentionally checkout
+# refs/pull/<number>/merge instead of the PR author's fork (head_owner/head_repo)
+# to avoid explicit untrusted-repository checkout. Do NOT revert to fork-based
+# checkout without a full security review.
+# See: https://securitylab.github.com/research/github-actions-preventing-pwn-requests
+on:
   issue_comment:
     types: [created]
   push:
 
 jobs:
   packaging:
-    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package') && contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)) || github.event_name == 'push' }}
+    # Only respond to an exact /package comment from an OWNER/COLLABORATOR on a
+    # pull request, or to trusted push events.
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.body == '/package' && contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)) || github.event_name == 'push' }}
+
+    # Require a maintainer to approve before PR code runs in this privileged context.
+    environment: ${{ github.event_name == 'issue_comment' && 'package-for-test' || '' }}
 
     strategy:
       matrix:
@@ -102,8 +113,10 @@ jobs:
         run: yarn global add lerna
 
       - name: Bootstrap
+        # Use --frozen-lockfile when triggered by a PR comment so that a malicious
+        # PR cannot silently introduce unaudited dependencies during packaging.
         run: |
-          yarn
+          yarn ${{ github.event_name == 'issue_comment' && '--frozen-lockfile' || '' }}
         env:
           CI: false
 
@@ -122,7 +135,8 @@ jobs:
           ./scripts/download-ckb.sh mac
           yarn package:test mac
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Do not expose GITHUB_TOKEN to PR code. Only pass it for trusted push events.
+          GITHUB_TOKEN: ${{ github.event_name == 'push' && secrets.GITHUB_TOKEN || '' }}
           SKIP_NOTARIZE: true
           USE_HARD_LINKS: false
 
@@ -134,7 +148,8 @@ jobs:
           bash ./scripts/copy-ui-files.sh
           bash ./scripts/package-for-test.sh win
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Do not expose GITHUB_TOKEN to PR code. Only pass it for trusted push events.
+          GITHUB_TOKEN: ${{ github.event_name == 'push' && secrets.GITHUB_TOKEN || '' }}
 
       - name: Package for Linux
         if: runner.os == 'Linux'
@@ -142,7 +157,8 @@ jobs:
           ./scripts/download-ckb.sh
           yarn package:test linux
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Do not expose GITHUB_TOKEN to PR code. Only pass it for trusted push events.
+          GITHUB_TOKEN: ${{ github.event_name == 'push' && secrets.GITHUB_TOKEN || '' }}
           USE_HARD_LINKS: false
 
       - name: Upload Neuron App Zip
