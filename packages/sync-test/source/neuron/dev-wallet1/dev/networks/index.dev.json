@@ -1,0 +1,53 @@
+{
+  "selected": "e8f41a40-37a8-468b-97c9-0b5e478d8f9a",
+  "networks": [
+    {
+      "id": "mainnet",
+      "name": "Internal Node",
+      "remote": "http://127.0.0.1:8114",
+      "genesisHash": "0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5",
+      "type": 0,
+      "chain": "ckb",
+      "readonly": true
+    },
+    {
+      "id": "light_client",
+      "name": "Light Client",
+      "remote": "http://127.0.0.1:9000",
+      "genesisHash": "0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5",
+      "type": 2,
+      "chain": "light_client_mainnet",
+      "readonly": true
+    },
+    {
+      "id": "light_client_testnet",
+      "name": "Light Client",
+      "remote": "http://127.0.0.1:9000",
+      "genesisHash": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+      "type": 2,
+      "chain": "light_client_testnet",
+      "readonly": true
+    },
+    {
+      "id": "e8f41a40-37a8-468b-97c9-0b5e478d8f9a",
+      "name": "dev",
+      "remote": "http://127.0.0.1:8114",
+      "type": 1,
+      "genesisHash": "0x9c96d0b369b5fd42d7e6b30d6dfdb46e32dac7293bf84de9d1e2d11ca7930717",
+      "chain": "ckb_dev",
+      "readonly": false
+    },
+    {
+      "id": "471a2055-fda3-4ef2-b84d-e3a54f2e67d9",
+      "name": "light-light",
+      "remote": "http://127.0.0.1:9000",
+      "type": 2,
+      "genesisHash": "0x",
+      "chain": "light_client_testnet",
+      "readonly": false
+    }
+  ],
+  "AddedLightNetwork": true,
+  "MigrateNetwork": true,
+  "AddInternalNetwork": true
+}

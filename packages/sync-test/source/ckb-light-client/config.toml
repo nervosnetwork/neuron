@@ -1,0 +1,47 @@
+# chain = "mainnet"
+# chain = "testnet"
+# chain = "your_path_to/dev.toml"
+chain = "../ckb/specs/dev.toml"
+
+[store]
+path = "data/store"
+
+[network]
+path = "data/network"
+
+listen_addresses = ["/ip4/0.0.0.0/tcp/8118"]
+### Specify the public and routable network addresses
+# public_addresses = []
+
+# Node connects to nodes listed here to discovery other peers when there's no local stored peers.
+# When chain.spec is changed, this usually should also be changed to the bootnodes in the new chain.
+bootnodes = ["/ip4/127.0.0.1/tcp/8115/p2p/QmShJCAx1RzpEDFwBuQ6noqViNgNuYrYv2KCRhxmNQCe5J"]
+
+### Whitelist-only mode
+# whitelist_only = false
+### Whitelist peers connecting from the given IP addresses
+# whitelist_peers = []
+
+### Enable `SO_REUSEPORT` feature to reuse port on Linux, not supported on other OS yet
+# reuse_port_on_linux = true
+
+max_peers = 125
+max_outbound_peers = 2
+# 2 minutes
+ping_interval_secs = 120
+# 20 minutes
+ping_timeout_secs = 1200
+connect_outbound_interval_secs = 15
+# If set to true, try to register upnp
+upnp = false
+# If set to true, network service will add discovered local address to peer store, it's helpful for private net development
+discovery_local_address = false
+# If set to true, random cleanup when there are too many inbound nodes
+# Ensure that itself can continue to serve as a bootnode node
+bootnode_mode = false
+
+[rpc]
+# Light client rpc is designed for self hosting, exposing to public network is not recommended and may cause security issues.
+# By default RPC only binds to localhost, thus it only allows accessing from the same machine.
+listen_address = "127.0.0.1:9000"
+
