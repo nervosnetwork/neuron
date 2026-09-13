@@ -1,3 +1,7 @@
+[default]
+# OAuth client IDs are opaque identifiers, not prose.
+extend-ignore-re = ["(?m)^CLIENT_ID=[A-Za-z0-9_-]+$"]
+
 [default.extend-words]
 thur = "thur"
 numer = "numer"
