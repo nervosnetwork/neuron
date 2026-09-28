@@ -25,7 +25,7 @@ const download = async (directory) => {
     .then((res) => res.json())
     .then((res) => res.map(({ name, url }) => ({ name, url })))
 
-  assetList.forEach(async ({ name, url }) => {
+  await Promise.all(assetList.map(async ({ name, url }) => {
     const path = `${directory}/${name}`
 
     await pipeline(
@@ -43,7 +43,7 @@ const download = async (directory) => {
 
       createWriteStream(path)
     )
-  })
+  }))
 }
 
 if (process.argv.length < 3) {
@@ -54,4 +54,7 @@ if (process.argv.length < 3) {
 
 const directory = process.argv[2]
 
-download(directory)
+download(directory).catch((error) => {
+  console.error(error)
+  process.exitCode = 1
+})
