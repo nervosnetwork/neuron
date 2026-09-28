@@ -32,17 +32,17 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout for push
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ github.event_name == 'push' }}
 
       - name: Checkout for PR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ github.event_name == 'issue_comment' }}
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: Ensure no more commits after the triggering comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: ${{ github.event_name == 'issue_comment' }}
         env:
           ISSUE_NUMBER: ${{github.event.issue.number}}
@@ -73,13 +73,13 @@ jobs:
             }
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: "yarn"
 
       - name: Restore
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -88,7 +88,7 @@ jobs:
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
@@ -108,7 +108,7 @@ jobs:
           CI: false
 
       - name: Write electron-build Test yml
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('node:fs')
@@ -147,42 +147,42 @@ jobs:
 
       - name: Upload Neuron App Zip
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Mac-x64
           path: release/Neuron-*-mac-x64.zip
 
       - name: Upload Neuron App Zip(arm64)
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Mac-arm64
           path: release/Neuron-*-mac-arm64.zip
 
       - name: Upload Neuron Dmg
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Dmg-x64
           path: release/Neuron-*-x64.dmg
 
       - name: Upload Neuron Dmg(arm64)
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Dmg-arm64
           path: release/Neuron-*-arm64.dmg
 
       - name: Upload Neuron Win
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Win
           path: release/Neuron-*-setup.exe
 
       - name: Upload Neuron Linux
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
@@ -197,14 +197,14 @@ jobs:
     steps:
       - name: Comment by push event
         if: ${{ github.event_name == 'push' }}
-        uses: peter-evans/commit-comment@v3
+        uses: peter-evans/commit-comment@v4
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
       - name: Comment by pull request comment event
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |
@@ -221,7 +221,7 @@ jobs:
     steps:
       - name: Comment by pull request comment event when package failed
         if: ${{ github.event_name == 'issue_comment' }}
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           comment-id: ${{ github.event.comment.id }}
           body: Packageing failed in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
